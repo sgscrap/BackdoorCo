@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Backdoor Admin Dashboard - Manage orders, products, and customers">
+    <title>Admin Dashboard - Backdoor</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <!-- ============================================
+       LOGIN SCREEN
+       ============================================ -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>BACKDOOR</h1>
+                <p>Admin Dashboard</p>
+            </div>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter admin password" required>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+                <p class="login-hint">Demo password: <code>admin123</code></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================
+       ADMIN DASHBOARD
+       ============================================ -->
+    <div class="admin-dashboard hidden" id="adminDashboard">
+
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg"
+                        style="display: inline-block; vertical-align: middle; margin-right: 8px; margin-bottom: 2px;">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M4 2C2.89543 2 2 2.89543 2 4V20C2 21.1046 2.89543 22 4 22H14C17.3137 22 20 19.3137 20 16C20 12.6863 17.3137 10 14 10V10C16.2091 10 18 8.20914 18 6C18 3.79086 16.2091 2 14 2H4ZM12 13C13.1046 13 14 13.8954 14 15C14 15.356 13.9066 15.6897 13.7441 15.9774L14.5 18H9.5L10.2559 15.9774C10.0934 15.6897 10 15.356 10 15C10 13.8954 10.8954 13 12 13Z" />
+                    </svg>
+                    Backdoor
+                </h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="switchTab('dashboard')">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" onclick="switchTab('orders')">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">Orders</span>
+                    <span class="nav-badge">10</span>
+                </a>
+                <a href="#" class="nav-item" data-section="products">
+                    <span class="nav-icon">👟</span>
+                    <span class="nav-text">Products</span>
+                </a>
+                <a href="#" class="nav-item" data-section="customers">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Customers</span>
+                </a>
+                <a href="#" class="nav-item" data-section="import">
+                    <span class="nav-icon">🛍️</span>
+                    <span class="nav-text">Import Products</span>
+                </a>
+                <a href="#" class="nav-item" data-section="analytics">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <span>🚪</span> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="admin-main">
+
+            <!-- Header -->
+            <header class="admin-header">
+                <h1 id="sectionTitle">Dashboard</h1>
+                <div class="header-actions">
+                    <button class="icon-btn" id="notificationsBtn">
+                        🔔
+                        <span class="notification-dot"></span>
+                    </button>
+                    <div class="admin-user">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section class="content-section active" id="dashboardSection">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <p class="stat-label">Total Revenue</p>
+                            <h3 class="stat-value" id="totalRevenue">$0</h3>
+                            <span class="stat-change positive">+12.5% from last month</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <p class="stat-label">Total Orders</p>
+                            <h3 class="stat-value" id="totalOrders">0</h3>
+                            <span class="stat-change positive">+8 today</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <p class="stat-label">Pending Orders</p>
+                            <h3 class="stat-value" id="pendingOrders">0</h3>
+                            <span class="stat-change">Requires attention</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <p class="stat-label">Total Customers</p>
+                            <h3 class="stat-value" id="totalCustomers">0</h3>
+                            <span class="stat-change positive">+15 this week</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Recent Orders</h3>
+                            <a href="#" class="view-all-link" data-section="orders">View All →</a>
+                        </div>
+                        <div class="recent-orders-list" id="recentOrdersList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Low Stock Alerts</h3>
+                            <a href="#" class="view-all-link" data-section="products">View All →</a>
+                        </div>
+                        <div class="low-stock-list" id="lowStockList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section class="content-section" id="ordersSection">
+                <div class="section-toolbar">
+                    <div class="toolbar-left">
+                        <input type="text" class="search-input" id="orderSearch" placeholder="Search orders...">
+                        <select class="filter-select" id="orderStatusFilter">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn-secondary" id="exportOrdersBtn">Export CSV</button>
+                        <button class="btn-primary" id="addOrderBtn">+ New Order</button>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <table class="data-table" id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Products</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section class="content-section" id="productsSection">
+                <div class="section-toolbar">
+                    <div class="toolbar-left">
+                        <input type="text" class="search-input" id="productSearch" placeholder="Search products...">
+                        <select class="filter-select" id="productCategoryFilter">
+                            <option value="all">All Categories</option>
+                            <option value="Sneakers">Sneakers</option>
+                            <option value="Apparel">Apparel</option>
+                        </select>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn-secondary" id="exportProductsBtn">Export CSV</button>
+                        <button class="btn-primary" id="addProductBtn">+ Add Product</button>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <table class="data-table" id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>SKU</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Customers Section -->
+            <section class="content-section" id="customersSection">
+                <div class="section-toolbar">
+                    <div class="toolbar-left">
+                        <input type="text" class="search-input" id="customerSearch" placeholder="Search customers...">
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn-secondary" id="exportCustomersBtn">Export CSV</button>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <table class="data-table" id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Total Orders</th>
+                                <th>Total Spent</th>
+                                <th>Last Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- Import Product Section -->
+            <div id="import" class="content-section">
+                <div class="import-container">
+                    <div class="import-header">
+                        <h2>Import from Kickwho</h2>
+                        <p>Paste a product URL to automatically fetch details</p>
+                    </div>
+
+                    <div class="import-form-card">
+                        <div class="form-group">
+                            <label>Product URL</label>
+                            <input type="text" id="productUrl" class="url-input" placeholder="https://kickwho.info/...">
+                        </div>
+                        <button class="btn-primary" id="fetchProductBtn">
+                            <span>🔍</span> Fetch Details
+                        </button>
+                    </div>
+
+                    <div id="importPreview" class="import-preview hidden">
+                        <h3>Product Preview</h3>
+                        <div class="preview-grid">
+                            <div class="preview-image-container">
+                                <img id="previewImage" src="" alt="Preview" class="preview-image">
+                            </div>
+                            <div class="preview-details">
+                                <div class="form-group">
+                                    <label>Product Name</label>
+                                    <input type="text" id="previewName">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Price ($)</label>
+                                        <input type="number" id="previewPrice">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Category</label>
+                                        <select id="previewCategory">
+                                            <option value="Sneakers">Sneakers</option>
+                                            <option value="Apparel">Apparel</option>
+                                            <option value="Accessories">Accessories</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>SKU</label>
+                                        <input type="text" id="previewSKU" class="preview-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Stock</label>
+                                        <input type="number" id="previewStock" class="preview-input" value="10">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    aria-label="Product category">
+                                    <option value="Sneakers">Sneakers</option>
+                                    <option value="Apparel">Apparel</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Colorway</label>
+                                    <input type="text" id="previewColorway" class="preview-input">
+                                </div>
+                                <div class="import-actions">
+                                    <button class="btn-secondary" id="cancelImportBtn">Cancel</button>
+                                    <button class="btn-primary" id="confirmImportBtn">
+                                        <span>✓</span> Add to Inventory
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="import-history">
+                        <h3>Recently Imported</h3>
+                        <div class="history-list" id="importHistory">
+                            <p class="empty-state">No products imported yet</p>
+                        </div>
+                    </div>
+                </div>
+                </section>
+
+                <!-- Analytics Section -->
+                <section class="content-section" id="analyticsSection">
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>Sales Overview</h3>
+                            <div class="chart-placeholder" id="salesChart">
+                                <p>📊 Sales chart will be displayed here</p>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <h3>Top Selling Products</h3>
+                            <div class="top-products-list" id="topProductsList">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <h3>Revenue by Category</h3>
+                            <div class="chart-placeholder" id="categoryChart">
+                                <p>📊 Category chart will be displayed here</p>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <h3>Performance Metrics</h3>
+                            <div class="metrics-list">
+                                <div class="metric-item">
+                                    <span class="metric-label">Average Order Value</span>
+                                    <span class="metric-value" id="avgOrderValue">$0</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Conversion Rate</span>
+                                    <span class="metric-value" id="conversionRate">0%</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Customer Lifetime Value</span>
+                                    <span class="metric-value" id="customerLTV">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+        </main>
+    </div>
+
+    <!-- ============================================
+       ORDER DETAIL MODAL
+       ============================================ -->
+    <div class="modal" id="orderModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content large">
+            <button class="modal-close" id="orderModalClose">×</button>
+            <div class="modal-header">
+                <h2 id="orderModalTitle">Order Details</h2>
+            </div>
+            <div class="modal-body" id="orderModalBody">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+       PRODUCT FORM MODAL
+       ============================================ -->
+    <div class="modal" id="productModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content large">
+            <button class="modal-close" id="productModalClose">×</button>
+            <div class="modal-header">
+                <h2 id="productModalTitle">Add Product</h2>
+            </div>
+            <div class="modal-body">
+                <form id="productForm" class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productName">Product Name *</label>
+                            <input type="text" id="productName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productSKU">SKU *</label>
+                            <input type="text" id="productSKU" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productBrand">Brand *</label>
+                            <select id="productBrand" required>
+                                <option value="">Select Brand</option>
+                                <option value="Nike">Nike</option>
+                                <option value="Jordan">Jordan</option>
+                                <option value="Adidas">Adidas</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="productCategory">Category *</label>
+                            <select id="productCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="Sneakers">Sneakers</option>
+                                <option value="Apparel">Apparel</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productPrice">Price ($) *</label>
+                            <input type="number" id="productPrice" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productStock">Stock Quantity *</label>
+                            <input type="number" id="productStock" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productColorway">Colorway</label>
+                        <input type="text" id="productColorway">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productDescription">Description</label>
+                        <textarea id="productDescription" rows="4"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productImage">Image Path</label>
+                        <input type="text" id="productImage" placeholder="products/product-name.jpg">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelProductBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="admin.js"></script>
+</body>
+
+</html>
