@@ -7,6 +7,20 @@
 // ============================================
 const products = [
     {
+        id: 16,
+        name: "Godkiller Virgil Abloh Archive™ x Air Jordan 1 High OG \"Alaska\" Retro",
+        brand: "Jordan",
+        price: 1647.20,
+        sku: "AA3834-100",
+        colorway: "White/White",
+        releaseDate: "3/3/18",
+        category: "Sneakers",
+        badge: "new",
+        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13", "M/US14"],
+        description: "The elusive Off-White x Air Jordan 1 'Alaska' (White) featuring deconstructed leather and Virgil Abloh's signature typography.",
+        image: "products/jordan-1-ow-alaska.jpg"
+    },
+    {
         id: 1,
         name: "Pharrell x VIRGINIA x Adistar Jellyfish 'Royal Blue'",
         brand: "Adidas",
@@ -215,20 +229,6 @@ const products = [
         sizes: ["Small", "Medium", "Large", "X-Large"],
         description: "Insulated down fill, metallic mica-green quilted shell, and minimal NOCTA branding.",
         image: "products/nocta-sunset-jacket.jpg"
-    },
-    {
-        id: 16,
-        name: "Godkiller Virgil Abloh Archive™ x Air Jordan 1 High OG \"Alaska\" Retro",
-        brand: "Jordan",
-        price: 1647.20,
-        sku: "AA3834-100",
-        colorway: "White/White",
-        releaseDate: "3/3/18",
-        category: "Sneakers",
-        badge: "new",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13", "M/US14"],
-        description: "The elusive Off-White x Air Jordan 1 'Alaska' (White) featuring deconstructed leather and Virgil Abloh's signature typography.",
-        image: "products/jordan-1-ow-alaska.jpg"
     }
 ];
 
