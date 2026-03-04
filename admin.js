@@ -24,6 +24,32 @@ let currentProduct = null;
 // Import products from main app
 const products = [
     {
+        id: 17,
+        name: "Godspeed Surf Day T-shirt",
+        brand: "Godspeed",
+        price: 45.00,
+        sku: "GS-SURF-001",
+        colorway: "White/Blue",
+        releaseDate: "4/15/26",
+        category: "Apparel",
+        stock: 50,
+        image: "products/godspeed-surf-day.png",
+        status: "active"
+    },
+    {
+        id: 16,
+        name: "Godkiller Virgil Abloh Archive™ x Air Jordan 1 High OG \"Alaska\" Retro",
+        brand: "Jordan",
+        price: 1647.20,
+        sku: "AA3834-100",
+        colorway: "White/White",
+        releaseDate: "3/3/18",
+        category: "Sneakers",
+        stock: 15,
+        image: "products/jordan-1-ow-alaska.jpg",
+        status: "active"
+    },
+    {
         id: 1,
         name: "Pharrell x VIRGINIA x Adistar Jellyfish 'Royal Blue'",
         brand: "Adidas",

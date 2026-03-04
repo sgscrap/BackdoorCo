@@ -7,6 +7,20 @@
 // ============================================
 const products = [
     {
+        id: 17,
+        name: "Godspeed Surf Day T-shirt",
+        brand: "Godspeed",
+        price: 45.00,
+        sku: "GS-SURF-001",
+        colorway: "White/Blue",
+        releaseDate: "4/15/26",
+        category: "Apparel",
+        badge: "new",
+        sizes: ["Small", "Medium", "Large", "X-Large"],
+        description: "Classic fit Godspeed Surf Day graphic t-shirt.",
+        image: "products/godspeed-surf-day.png"
+    },
+    {
         id: 16,
         name: "Godkiller Virgil Abloh Archive™ x Air Jordan 1 High OG \"Alaska\" Retro",
         brand: "Jordan",

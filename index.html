@@ -33,16 +33,16 @@
       </div>
 
       <div class="header-actions">
-        <a href="#" class="header-utility-link">News</a>
-        <a href="#" class="header-utility-link">About</a>
-        <a href="#" class="header-utility-link">Help</a>
-        <a href="#" class="header-utility-link">Sell</a>
+        <a href="javascript:alert('News section coming soon!');" class="header-utility-link">News</a>
+        <a href="javascript:alert('About section coming soon!');" class="header-utility-link">About</a>
+        <a href="javascript:alert('Help center coming soon!');" class="header-utility-link">Help</a>
+        <a href="javascript:alert('Seller application coming soon!');" class="header-utility-link">Sell</a>
         <button class="cart-btn" onclick="toggleCart()" aria-label="Toggle Shopping Cart">
           🛒
           <span class="cart-count">0</span>
         </button>
-        <button class="login-btn outline">Login</button>
-        <button class="login-btn solid">Sign Up</button>
+        <button class="login-btn outline" onclick="window.location.href='admin.html'">Login</button>
+        <button class="login-btn solid" onclick="alert('Sign up coming soon!')">Sign Up</button>
       </div>
     </div>
   </header>
@@ -52,15 +52,15 @@
        ============================================ -->
   <nav>
     <div class="nav-container">
-      <a href="#" class="nav-link">All</a>
-      <a href="#" class="nav-link">Brands</a>
-      <a href="#" class="nav-link">Trending</a>
-      <a href="#" class="nav-link deals-link">Deals</a>
-      <a href="#" class="nav-link">Men</a>
-      <a href="#" class="nav-link">Kids</a>
-      <a href="#" class="nav-link active">Sneakers</a>
-      <a href="#" class="nav-link">Apparel</a>
-      <a href="#" class="nav-link">Accessories</a>
+      <a href="javascript:void(0)" class="nav-link">All</a>
+      <a href="javascript:void(0)" class="nav-link">Brands</a>
+      <a href="javascript:void(0)" class="nav-link">Trending</a>
+      <a href="javascript:void(0)" class="nav-link deals-link">Deals</a>
+      <a href="javascript:void(0)" class="nav-link">Men</a>
+      <a href="javascript:void(0)" class="nav-link">Kids</a>
+      <a href="javascript:void(0)" class="nav-link active">Sneakers</a>
+      <a href="javascript:void(0)" class="nav-link">Apparel</a>
+      <a href="javascript:void(0)" class="nav-link">Accessories</a>
     </div>
   </nav>
 
@@ -163,7 +163,9 @@
         <span>Total</span>
         <span class="cart-total-price" id="cartTotal">$0.00</span>
       </div>
-      <button class="cart-checkout">Proceed to Checkout</button>
+      <button class="cart-checkout"
+        onclick="alert('Checkout integration is disabled in prototype mode. Please use Admin to test orders.')">Proceed
+        to Checkout</button>
     </div>
   </div>
 
@@ -177,7 +179,7 @@
           <h3>BACKDOOR</h3>
           <p>The premium marketplace for authentic sneakers and streetwear.</p>
           <div class="social-links">
-            <a href="#" class="social-link" aria-label="Instagram">
+            <a href="javascript:void(0)" class="social-link" aria-label="Instagram">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="none" stroke="#0a0a0a" stroke-width="2">
@@ -185,14 +187,14 @@
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="#0a0a0a" stroke-width="2"></line>
               </svg>
             </a>
-            <a href="#" class="social-link" aria-label="Twitter">
+            <a href="javascript:void(0)" class="social-link" aria-label="Twitter">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path
                   d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
                 </path>
               </svg>
             </a>
-            <a href="#" class="social-link" aria-label="Facebook">
+            <a href="javascript:void(0)" class="social-link" aria-label="Facebook">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
               </svg>
@@ -203,30 +205,32 @@
         <div class="footer-section">
           <h3>Shop</h3>
           <ul class="footer-links">
-            <li><a href="#" class="footer-link">New Releases</a></li>
-            <li><a href="#" class="footer-link">Best Sellers</a></li>
-            <li><a href="#" class="footer-link">Sale</a></li>
-            <li><a href="#" class="footer-link">All Sneakers</a></li>
+            <li><a href="javascript:void(0)" class="footer-link">New Releases</a></li>
+            <li><a href="javascript:void(0)" class="footer-link">Best Sellers</a></li>
+            <li><a href="javascript:void(0)" class="footer-link">Sale</a></li>
+            <li><a href="javascript:void(0)" class="footer-link">All Sneakers</a></li>
           </ul>
         </div>
 
         <div class="footer-section">
           <h3>Support</h3>
           <ul class="footer-links">
-            <li><a href="#" class="footer-link">Contact Us</a></li>
-            <li><a href="#" class="footer-link">Shipping Info</a></li>
-            <li><a href="#" class="footer-link">Returns</a></li>
-            <li><a href="#" class="footer-link">FAQ</a></li>
+            <li><a href="javascript:alert('Support contact coming soon!')" class="footer-link">Contact Us</a></li>
+            <li><a href="javascript:alert('Shipping information coming soon!')" class="footer-link">Shipping Info</a>
+            </li>
+            <li><a href="javascript:alert('Returns policy coming soon!')" class="footer-link">Returns</a></li>
+            <li><a href="javascript:alert('FAQ coming soon!')" class="footer-link">FAQ</a></li>
           </ul>
         </div>
 
         <div class="footer-section">
           <h3>Company</h3>
           <ul class="footer-links">
-            <li><a href="#" class="footer-link">About Us</a></li>
-            <li><a href="#" class="footer-link">Authenticity</a></li>
-            <li><a href="#" class="footer-link">Privacy Policy</a></li>
-            <li><a href="#" class="footer-link">Terms & Conditions</a></li>
+            <li><a href="javascript:void(0)" class="footer-link">About Us</a></li>
+            <li><a href="javascript:void(0)" class="footer-link">Authenticity</a></li>
+            <li><a href="javascript:alert('Privacy policy coming soon!')" class="footer-link">Privacy Policy</a></li>
+            <li><a href="javascript:alert('Terms & Conditions coming soon!')" class="footer-link">Terms & Conditions</a>
+            </li>
           </ul>
         </div>
       </div>
