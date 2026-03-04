@@ -329,7 +329,9 @@ let selectedFilters = {
     categories: [],
     sizes: [],
     maxPrice: 1000,
-    searchQuery: ''
+    searchQuery: '',
+    badge: null,
+    collection: null
 };
 
 // ============================================
@@ -484,6 +486,15 @@ function applyFilters() {
             return false;
         }
 
+        // Collection filter
+        if (selectedFilters.collection) {
+            const col = selectedFilters.collection;
+            if (col === 'Trending' && !(product.badge === 'bestseller' || product.badge === 'trending')) return false;
+            if (col === 'Deals' && product.price > 200) return false;
+            if (col === 'Kids' && !(product.name.toLowerCase().includes('kids') || product.name.toLowerCase().includes('gs'))) return false;
+            if (col === 'Men' && product.category !== 'Sneakers' && product.category !== 'Apparel') return false; // Default logic
+        }
+
         // Badge filter (New Releases / Trending)
         if (selectedFilters.badge && product.badge !== selectedFilters.badge) {
             return false;
@@ -567,23 +578,37 @@ function handleNavLink(e) {
             selectedFilters.categories = ['Sneakers'];
             // Sync chip
             document.querySelector('.brand-filter[data-brand="all"]')?.classList.remove('active');
-            document.querySelector('.category-filter[data-category="Sneakers"]')?.classList.add('active');
+            const sneakerChip = document.querySelector('.category-filter[data-category="Sneakers"]');
+            if (sneakerChip) {
+                document.querySelectorAll('.category-filter').forEach(c => c.classList.remove('active'));
+                sneakerChip.classList.add('active');
+            }
             break;
         case 'Apparel':
             selectedFilters.categories = ['Apparel'];
             // Sync chip
             document.querySelector('.brand-filter[data-brand="all"]')?.classList.remove('active');
-            document.querySelector('.category-filter[data-category="Apparel"]')?.classList.add('active');
-            break;
-        case 'New Releases':
-            selectedFilters.badge = 'new';
+            const apparelChip = document.querySelector('.category-filter[data-category="Apparel"]');
+            if (apparelChip) {
+                document.querySelectorAll('.category-filter').forEach(c => c.classList.remove('active'));
+                apparelChip.classList.add('active');
+            }
             break;
         case 'Trending':
-            selectedFilters.badge = 'bestseller';
+            selectedFilters.collection = 'Trending';
+            break;
+        case 'Deals':
+            selectedFilters.collection = 'Deals';
+            break;
+        case 'Men':
+            selectedFilters.collection = 'Men';
+            break;
+        case 'Kids':
+            selectedFilters.collection = 'Kids';
             break;
         case 'All':
         default:
-            // Reset is default
+            // Reset is default handled above by clearing selectedFilters
             break;
     }
 
@@ -686,7 +711,9 @@ function resetFilters() {
         categories: [],
         sizes: [],
         maxPrice: 1000,
-        searchQuery: ''
+        searchQuery: '',
+        badge: null,
+        collection: null
     };
 
     // Reset UI
@@ -921,7 +948,7 @@ document.addEventListener('click', (e) => {
 
 if (cartCheckoutBtn) {
     cartCheckoutBtn.onclick = () => {
-        showComingSoon("Checkout");
+        window.location.href = 'checkout.html';
     };
 }
 
