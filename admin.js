@@ -27,7 +27,7 @@ const products = [
         id: 17,
         name: "Godspeed Surf Day T-shirt",
         brand: "Godspeed",
-        price: 45.00,
+        price: 100.00,
         sku: "GS-SURF-001",
         colorway: "White/Blue",
         releaseDate: "4/15/26",

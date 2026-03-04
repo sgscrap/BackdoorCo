@@ -10,14 +10,14 @@ const products = [
         id: 17,
         name: "Godspeed Surf Day T-shirt",
         brand: "Godspeed",
-        price: 45.00,
+        price: 100.00,
         sku: "GS-SURF-001",
         colorway: "White/Blue",
         releaseDate: "4/15/26",
         category: "Apparel",
         badge: "new",
         sizes: ["Small", "Medium", "Large", "X-Large"],
-        description: "Classic fit Godspeed Surf Day graphic t-shirt.",
+        description: "Classic fit Godspeed Surf Day graphic t-shirt. Free shipping (1-2 weeks) or Express shipping (3-5 days, +$10).",
         image: "products/godspeed-surf-day.png"
     },
     {
