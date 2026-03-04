@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backdoor — Email Automation System</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="email.css" />
+</head>
+
+<body>
+
+    <!-- ══ NAVBAR ══ -->
+    <nav class="navbar">
+        <div class="nav-logo">BACK<span>DOOR</span></div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPage('flows',    this)">Flows</button>
+            <button class="nav-tab" onclick="showPage('builder',  this)">Builder</button>
+            <button class="nav-tab" onclick="showPage('analytics',this)">Analytics</button>
+            <button class="nav-tab" onclick="showPage('subs',     this)">Subscribers</button>
+            <button class="nav-tab" onclick="showPage('settings', this)">Settings</button>
+        </div>
+        <div class="nav-right">
+            <button onclick="openNewFlowModal()"
+                style="padding:9px 18px;background:var(--accent);border:none;border-radius:10px;color:#000;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s"
+                onmouseover="this.style.background='#a8d94a'" onmouseout="this.style.background='var(--accent)'">
+                <i class="fa-solid fa-plus"></i> New Flow
+            </button>
+        </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════
+     FLOWS PAGE
+══════════════════════════════════════ -->
+    <div class="page show" id="flowsPage">
+        <div class="page-inner">
+
+            <div class="page-header">
+                <div>
+                    <h1>EMAIL <span>AUTOMATION</span></h1>
+                    <p>Triggered by customer actions · Real-time analytics</p>
+                </div>
+                <div style="display:flex;gap:10px">
+                    <button onclick="sendBroadcast()"
+                        style="padding:10px 20px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text2);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s"
+                        onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+                        onmouseout="this.style.color='var(--text2)';this.style.borderColor='var(--border2)'">
+                        <i class="fa-solid fa-paper-plane"></i> Send Broadcast
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card" style="--c:var(--accent)">
+                    <div class="stat-label">Emails Sent</div>
+                    <div class="stat-value" id="statSent">12.4K</div>
+                    <div class="stat-sub">all time</div>
+                </div>
+                <div class="stat-card" style="--c:var(--blue)">
+                    <div class="stat-label">Open Rate</div>
+                    <div class="stat-value" style="color:var(--blue)" id="statOpen">38.2%</div>
+                    <div class="stat-sub">industry avg 21%</div>
+                </div>
+                <div class="stat-card" style="--c:var(--purple)">
+                    <div class="stat-label">Click Rate</div>
+                    <div class="stat-value" style="color:var(--purple)" id="statClick">4.8%</div>
+                    <div class="stat-sub">industry avg 2.6%</div>
+                </div>
+                <div class="stat-card" style="--c:var(--green)">
+                    <div class="stat-label">Revenue</div>
+                    <div class="stat-value" style="color:var(--green)" id="statRevenue">$8.2K</div>
+                    <div class="stat-sub">from emails</div>
+                </div>
+                <div class="stat-card" style="--c:var(--orange)">
+                    <div class="stat-label">Subscribers</div>
+                    <div class="stat-value" style="color:var(--orange)" id="statSubs">2,104</div>
+                    <div class="stat-sub">active list</div>
+                </div>
+                <div class="stat-card" style="--c:var(--red)">
+                    <div class="stat-label">Unsubscribes</div>
+                    <div class="stat-value" style="color:var(--red)" id="statUnsub">14</div>
+                    <div class="stat-sub">this month</div>
+                </div>
+            </div>
+
+            <!-- Flow Cards -->
+            <div class="flows-grid" id="flowsList"></div>
+
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+     BUILDER PAGE
+══════════════════════════════════════ -->
+    <div class="page" id="builderPage">
+        <div class="page-inner" style="padding-bottom:0">
+
+            <div class="page-header" style="margin-bottom:20px">
+                <div>
+                    <h1>EMAIL <span>BUILDER</span></h1>
+                    <p id="builderFlowName">Select a template to start editing</p>
+                </div>
+            </div>
+
+            <div class="builder-layout">
+
+                <!-- Left: Template List -->
+                <div class="builder-sidebar">
+                    <div class="builder-sidebar-header">
+                        <i class="fa-solid fa-layer-group"></i>
+                        TEMPLATES
+                    </div>
+                    <div class="template-list" id="templateList"></div>
+                </div>
+
+                <!-- Center: Preview -->
+                <div class="builder-canvas">
+                    <div class="canvas-toolbar">
+                        <button class="canvas-toolbar-btn" onclick="saveTemplate()">
+                            <i class="fa-solid fa-floppy-disk"></i> Save
+                        </button>
+                        <button class="canvas-toolbar-btn" onclick="sendTestEmail()">
+                            <i class="fa-solid fa-vial"></i> Send Test
+                        </button>
+                        <div class="device-toggle">
+                            <button class="device-btn active" id="desktopBtn" onclick="setDevice('desktop')">
+                                <i class="fa-solid fa-desktop"></i>
+                            </button>
+                            <button class="device-btn" id="mobileBtn" onclick="setDevice('mobile')">
+                                <i class="fa-solid fa-mobile-screen"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="email-preview-wrap">
+                        <div class="email-frame" id="emailFrame">
+                            <div id="emailPreviewContent"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Settings -->
+                <div class="builder-settings">
+                    <div class="settings-tabs">
+                        <button class="settings-tab active" id="stContent"
+                            onclick="switchSettingsTab('content',this)">Content</button>
+                        <button class="settings-tab" id="stTrigger"
+                            onclick="switchSettingsTab('trigger',this)">Trigger</button>
+                        <button class="settings-tab" id="stDesign"
+                            onclick="switchSettingsTab('design', this)">Design</button>
+                    </div>
+
+                    <div class="settings-content">
+
+                        <!-- CONTENT TAB -->
+                        <div id="tabContent">
+                            <div class="setting-group">
+                                <label class="setting-label">Subject Line</label>
+                                <input class="setting-input" type="text" id="emailSubject"
+                                    placeholder="Your order is confirmed! 🎉" oninput="updatePreview()" />
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">Preview Text</label>
+                                <input class="setting-input" type="text" id="emailPreviewText"
+                                    placeholder="Here's your order summary..." oninput="updatePreview()" />
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">Headline</label>
+                                <input class="setting-input" type="text" id="emailHeadline" oninput="updatePreview()" />
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">Body Text</label>
+                                <textarea class="setting-textarea" id="emailBody" oninput="updatePreview()"></textarea>
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">Button Text</label>
+                                <input class="setting-input" type="text" id="emailBtnText" oninput="updatePreview()" />
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">Button URL</label>
+                                <input class="setting-input" type="url" id="emailBtnUrl"
+                                    placeholder="https://backdoor.com/..." />
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">
+                                    <i class="fa-solid fa-code" style="color:var(--accent)"></i>
+                                    Dynamic Variables
+                                </label>
+                                <div class="var-chips">
+                                    <span class="var-chip" onclick="insertVar('{{first_name}}')">{{first_name}}</span>
+                                    <span class="var-chip" onclick="insertVar('{{order_id}}')">{{order_id}}</span>
+                                    <span class="var-chip" onclick="insertVar('{{order_total}}')">{{order_total}}</span>
+                                    <span class="var-chip"
+                                        onclick="insertVar('{{product_name}}')">{{product_name}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TRIGGER TAB -->
+                        <div id="tabTrigger" style="display:none">
+                            <div class="setting-group">
+                                <label class="setting-label">Trigger Event</label>
+                                <select class="setting-select" id="triggerEvent">
+                                    <option value="signup">User Signs Up</option>
+                                    <option value="order_placed">Order Placed</option>
+                                    <option value="order_shipped">Order Shipped</option>
+                                    <option value="abandoned_cart">Cart Abandoned</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">Send Delay</label>
+                                <div class="delay-row">
+                                    <input class="setting-input" type="number" id="delayVal" value="0" min="0"
+                                        style="flex:1" />
+                                    <select class="setting-select" id="delayUnit" style="flex:1">
+                                        <option>Minutes</option>
+                                        <option>Hours</option>
+                                        <option>Days</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DESIGN TAB -->
+                        <div id="tabDesign" style="display:none">
+                            <div class="setting-group">
+                                <label class="setting-label">Accent Color</label>
+                                <div class="color-row">
+                                    <div class="color-swatch selected" style="background:#c8f65d"
+                                        onclick="setColor('#c8f65d',this)"></div>
+                                    <div class="color-swatch" style="background:#4d9fff"
+                                        onclick="setColor('#4d9fff',this)"></div>
+                                    <div class="color-swatch" style="background:#ff4d4d"
+                                        onclick="setColor('#ff4d4d',this)"></div>
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <label class="setting-label">Show Product Grid</label>
+                                <select class="setting-select" id="showProducts" onchange="updatePreview()">
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Send Test -->
+                    <div class="send-section">
+                        <div class="send-input-row">
+                            <input class="send-input" type="email" id="testEmailAddr" placeholder="Send test to..." />
+                            <button class="send-btn" onclick="sendTestEmail()">
+                                Test
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+     ANALYTICS PAGE
+══════════════════════════════════════ -->
+    <div class="page" id="analyticsPage">
+        <div class="page-inner">
+
+            <div class="page-header">
+                <div>
+                    <h1>EMAIL <span>ANALYTICS</span></h1>
+                    <p>Track opens, clicks, and revenue per flow</p>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button onclick="setAnaFilter('7',this)" class="filter-btn active-filter">7 Days</button>
+                    <button onclick="setAnaFilter('30',this)" class="filter-btn">30 Days</button>
+                </div>
+            </div>
+
+            <div class="analytics-grid">
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-envelope-open"></i> DAILY OPENS</div>
+                    <div class="chart-bars" id="opensChart"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-arrow-pointer"></i> DAILY CLICKS</div>
+                    <div class="chart-bars" id="clicksChart"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-table"></i> FLOW PERFORMANCE</div>
+                <table class="perf-table">
+                    <thead>
+                        <tr>
+                            <th>Flow</th>
+                            <th>Sent</th>
+                            <th>Open Rate</th>
+                            <th>CTR</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody id="perfTableBody"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+     SUBSCRIBERS PAGE
+══════════════════════════════════════ -->
+    <div class="page" id="subsPage">
+        <div class="page-inner">
+
+            <div class="page-header">
+                <div>
+                    <h1>SUBSCRIBER <span>LIST</span></h1>
+                    <p>Manage your email list and segments</p>
+                </div>
+                <div style="display:flex;gap:10px">
+                    <button onclick="exportSubs()" class="send-btn">
+                        <i class="fa-solid fa-download"></i> Export List
+                    </button>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+                <button class="seg-btn active-seg" onclick="filterSubs('all',this)">All</button>
+                <button class="seg-btn" onclick="filterSubs('active',this)">Active</button>
+                <button class="seg-btn" onclick="filterSubs('vip',this)">VIP</button>
+                <input type="text" id="subSearch" placeholder="🔍 Search subscribers..." oninput="searchSubs()"
+                    style="margin-left:auto;padding:8px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;min-width:220px" />
+            </div>
+
+            <div class="subscribers-table-wrap">
+                <table class="sub-table">
+                    <thead>
+                        <tr>
+                            <th>Subscriber</th>
+                            <th>Joined</th>
+                            <th>Last Open</th>
+                            <th>Orders</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subTableBody"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+     SETTINGS PAGE
+══════════════════════════════════════ -->
+    <div class="page" id="settingsPage">
+        <div class="page-inner" style="max-width:800px">
+
+            <div class="page-header">
+                <div>
+                    <h1>EMAIL <span>SETTINGS</span></h1>
+                    <p>Configure sending domain and provider</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom:20px">
+                <div class="card-title"><i class="fa-solid fa-server"></i> EMAIL PROVIDER</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+                    <div class="provider-card selected-provider" onclick="selectProvider('resend',this)"
+                        style="padding:16px;border:2px solid var(--accent);border-radius:12px;cursor:pointer;background:rgba(200,246,93,0.04)">
+                        <div style="font-weight:700;margin-bottom:4px">Resend</div>
+                        <div style="font-size:12px;color:var(--text2)">Recommended</div>
+                    </div>
+                    <div class="provider-card" onclick="selectProvider('sendgrid',this)"
+                        style="padding:16px;border:1px solid var(--border);border-radius:12px;cursor:pointer">
+                        <div style="font-weight:700;margin-bottom:4px">SendGrid</div>
+                        <div style="font-size:12px;color:var(--text2)">Industry Standard</div>
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:14px">
+                    <div>
+                        <label class="setting-label">API KEY</label>
+                        <input type="password" class="setting-input" value="re_demo_key_123" placeholder="re_xxxx">
+                    </div>
+                    <div>
+                        <label class="setting-label">FROM EMAIL</label>
+                        <input type="email" class="setting-input" value="orders@backdoor.com">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-sliders"></i> GLOBAL TOGGLES</div>
+                <div
+                    style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg4);border-radius:10px;margin-bottom:10px">
+                    <div>
+                        <p style="font-size:14px;font-weight:600">Track Email Opens</p>
+                        <p style="font-size:12px;color:var(--text2)">Embed a pixel to track view rates</p>
+                    </div>
+                    <div class="toggle on"></div>
+                </div>
+                <div
+                    style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg4);border-radius:10px">
+                    <div>
+                        <p style="font-size:14px;font-weight:600">Auto-tag VIPs</p>
+                        <p style="font-size:12px;color:var(--text2)">Tag customers with > $1000 spend</p>
+                    </div>
+                    <div class="toggle on"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">NEW FLOW</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="email.js"></script>
+    <script src="analytics.js"></script>
+</body>
+
+</html>
