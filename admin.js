@@ -217,6 +217,19 @@ const products = [
         stock: 10,
         image: "products/nocta-sunset-jacket.jpg",
         status: "active"
+    },
+    {
+        id: 16,
+        name: "Godkiller Virgil Abloh Archive™ x Air Jordan 1 High OG \"Alaska\" Retro",
+        brand: "Jordan",
+        price: 1647.20,
+        sku: "AA3834-100",
+        colorway: "White/White",
+        releaseDate: "3/3/18",
+        category: "Sneakers",
+        stock: 15,
+        image: "products/jordan-1-ow-alaska.jpg",
+        status: "active"
     }
 ];
 

@@ -332,8 +332,8 @@ h6,
     height: var(--header-height);
     background: rgba(255, 255, 255, 0.8);
     /* Lighter, cleaner glass */
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     display: flex;
     align-items: center;
@@ -987,8 +987,8 @@ h6,
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     /* Darker overlay for pop */
-    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     animation: fadeIn 0.3s ease-out;
 }
 
@@ -1103,6 +1103,14 @@ h6,
         display: none;
     }
 
+    .sidebar-logo-icon {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 8px;
+        margin-bottom: 2px;
+    }
+
+
     .sidebar-header {
         justify-content: center;
     }
@@ -1110,6 +1118,11 @@ h6,
     .sidebar-header h2::before {
         display: none;
     }
+
+    .sidebar-logo-icon {
+        display: none;
+    }
+
 
     .nav-item {
         justify-content: center;
