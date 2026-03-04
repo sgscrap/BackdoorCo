@@ -25,9 +25,7 @@
             <button class="nav-tab" onclick="showPage('settings', this)">Settings</button>
         </div>
         <div class="nav-right">
-            <button onclick="openNewFlowModal()"
-                style="padding:9px 18px;background:var(--accent);border:none;border-radius:10px;color:#000;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s"
-                onmouseover="this.style.background='#a8d94a'" onmouseout="this.style.background='var(--accent)'">
+            <button onclick="openNewFlowModal()" class="btn-new-flow">
                 <i class="fa-solid fa-plus"></i> New Flow
             </button>
         </div>
@@ -44,11 +42,8 @@
                     <h1>EMAIL <span>AUTOMATION</span></h1>
                     <p>Triggered by customer actions · Real-time analytics</p>
                 </div>
-                <div style="display:flex;gap:10px">
-                    <button onclick="sendBroadcast()"
-                        style="padding:10px 20px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text2);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s"
-                        onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
-                        onmouseout="this.style.color='var(--text2)';this.style.borderColor='var(--border2)'">
+                <div class="flex-gap-10">
+                    <button onclick="sendBroadcast()" class="btn-broadcast">
                         <i class="fa-solid fa-paper-plane"></i> Send Broadcast
                     </button>
                 </div>
@@ -56,34 +51,34 @@
 
             <!-- Stats -->
             <div class="stats-grid">
-                <div class="stat-card" style="--c:var(--accent)">
+                <div class="stat-card stat-c-accent">
                     <div class="stat-label">Emails Sent</div>
                     <div class="stat-value" id="statSent">12.4K</div>
                     <div class="stat-sub">all time</div>
                 </div>
-                <div class="stat-card" style="--c:var(--blue)">
+                <div class="stat-card stat-c-blue">
                     <div class="stat-label">Open Rate</div>
-                    <div class="stat-value" style="color:var(--blue)" id="statOpen">38.2%</div>
+                    <div class="stat-value color-blue" id="statOpen">38.2%</div>
                     <div class="stat-sub">industry avg 21%</div>
                 </div>
-                <div class="stat-card" style="--c:var(--purple)">
+                <div class="stat-card stat-c-purple">
                     <div class="stat-label">Click Rate</div>
-                    <div class="stat-value" style="color:var(--purple)" id="statClick">4.8%</div>
+                    <div class="stat-value color-purple" id="statClick">4.8%</div>
                     <div class="stat-sub">industry avg 2.6%</div>
                 </div>
-                <div class="stat-card" style="--c:var(--green)">
+                <div class="stat-card stat-c-green">
                     <div class="stat-label">Revenue</div>
-                    <div class="stat-value" style="color:var(--green)" id="statRevenue">$8.2K</div>
+                    <div class="stat-value color-green" id="statRevenue">$8.2K</div>
                     <div class="stat-sub">from emails</div>
                 </div>
-                <div class="stat-card" style="--c:var(--orange)">
+                <div class="stat-card stat-c-orange">
                     <div class="stat-label">Subscribers</div>
-                    <div class="stat-value" style="color:var(--orange)" id="statSubs">2,104</div>
+                    <div class="stat-value color-orange" id="statSubs">2,104</div>
                     <div class="stat-sub">active list</div>
                 </div>
-                <div class="stat-card" style="--c:var(--red)">
+                <div class="stat-card stat-c-red">
                     <div class="stat-label">Unsubscribes</div>
-                    <div class="stat-value" style="color:var(--red)" id="statUnsub">14</div>
+                    <div class="stat-value color-red" id="statUnsub">14</div>
                     <div class="stat-sub">this month</div>
                 </div>
             </div>
@@ -98,9 +93,9 @@
      BUILDER PAGE
 ══════════════════════════════════════ -->
     <div class="page" id="builderPage">
-        <div class="page-inner" style="padding-bottom:0">
+        <div class="page-inner pb-0">
 
-            <div class="page-header" style="margin-bottom:20px">
+            <div class="page-header mb-20">
                 <div>
                     <h1>EMAIL <span>BUILDER</span></h1>
                     <p id="builderFlowName">Select a template to start editing</p>
@@ -128,10 +123,11 @@
                             <i class="fa-solid fa-vial"></i> Send Test
                         </button>
                         <div class="device-toggle">
-                            <button class="device-btn active" id="desktopBtn" onclick="setDevice('desktop')">
+                            <button class="device-btn active" id="desktopBtn" title="Desktop View"
+                                onclick="setDevice('desktop')">
                                 <i class="fa-solid fa-desktop"></i>
                             </button>
-                            <button class="device-btn" id="mobileBtn" onclick="setDevice('mobile')">
+                            <button class="device-btn" id="mobileBtn" title="Mobile View" onclick="setDevice('mobile')">
                                 <i class="fa-solid fa-mobile-screen"></i>
                             </button>
                         </div>
@@ -160,35 +156,38 @@
                         <!-- CONTENT TAB -->
                         <div id="tabContent">
                             <div class="setting-group">
-                                <label class="setting-label">Subject Line</label>
-                                <input class="setting-input" type="text" id="emailSubject"
+                                <label class="setting-label" for="emailSubject">Subject Line</label>
+                                <input class="setting-input" type="text" id="emailSubject" title="Subject Line"
                                     placeholder="Your order is confirmed! 🎉" oninput="updatePreview()" />
                             </div>
                             <div class="setting-group">
-                                <label class="setting-label">Preview Text</label>
-                                <input class="setting-input" type="text" id="emailPreviewText"
+                                <label class="setting-label" for="emailPreviewText">Preview Text</label>
+                                <input class="setting-input" type="text" id="emailPreviewText" title="Preview Text"
                                     placeholder="Here's your order summary..." oninput="updatePreview()" />
                             </div>
                             <div class="setting-group">
-                                <label class="setting-label">Headline</label>
-                                <input class="setting-input" type="text" id="emailHeadline" oninput="updatePreview()" />
+                                <label class="setting-label" for="emailHeadline">Headline</label>
+                                <input class="setting-input" type="text" id="emailHeadline" title="Headline"
+                                    placeholder="Headline text" oninput="updatePreview()" />
                             </div>
                             <div class="setting-group">
-                                <label class="setting-label">Body Text</label>
-                                <textarea class="setting-textarea" id="emailBody" oninput="updatePreview()"></textarea>
+                                <label class="setting-label" for="emailBody">Body Text</label>
+                                <textarea class="setting-textarea" id="emailBody" title="Body Text"
+                                    placeholder="Email body content" oninput="updatePreview()"></textarea>
                             </div>
                             <div class="setting-group">
-                                <label class="setting-label">Button Text</label>
-                                <input class="setting-input" type="text" id="emailBtnText" oninput="updatePreview()" />
+                                <label class="setting-label" for="emailBtnText">Button Text</label>
+                                <input class="setting-input" type="text" id="emailBtnText" title="Button Text"
+                                    placeholder="Button text" oninput="updatePreview()" />
                             </div>
                             <div class="setting-group">
-                                <label class="setting-label">Button URL</label>
-                                <input class="setting-input" type="url" id="emailBtnUrl"
+                                <label class="setting-label" for="emailBtnUrl">Button URL</label>
+                                <input class="setting-input" type="url" id="emailBtnUrl" title="Button URL"
                                     placeholder="https://backdoor.com/..." />
                             </div>
                             <div class="setting-group">
                                 <label class="setting-label">
-                                    <i class="fa-solid fa-code" style="color:var(--accent)"></i>
+                                    <i class="fa-solid fa-code color-accent"></i>
                                     Dynamic Variables
                                 </label>
                                 <div class="var-chips">
@@ -202,10 +201,10 @@
                         </div>
 
                         <!-- TRIGGER TAB -->
-                        <div id="tabTrigger" style="display:none">
+                        <div id="tabTrigger" class="hide">
                             <div class="setting-group">
-                                <label class="setting-label">Trigger Event</label>
-                                <select class="setting-select" id="triggerEvent">
+                                <label class="setting-label" for="triggerEvent">Trigger Event</label>
+                                <select class="setting-select" id="triggerEvent" title="Trigger Event">
                                     <option value="signup">User Signs Up</option>
                                     <option value="order_placed">Order Placed</option>
                                     <option value="order_shipped">Order Shipped</option>
@@ -213,11 +212,11 @@
                                 </select>
                             </div>
                             <div class="setting-group">
-                                <label class="setting-label">Send Delay</label>
+                                <label class="setting-label" for="delayVal">Send Delay</label>
                                 <div class="delay-row">
-                                    <input class="setting-input" type="number" id="delayVal" value="0" min="0"
-                                        style="flex:1" />
-                                    <select class="setting-select" id="delayUnit" style="flex:1">
+                                    <input class="setting-input flex-1" type="number" id="delayVal"
+                                        title="Send Delay Value" value="0" min="0" />
+                                    <select class="setting-select flex-1" id="delayUnit" title="Send Delay Unit">
                                         <option>Minutes</option>
                                         <option>Hours</option>
                                         <option>Days</option>
@@ -227,21 +226,20 @@
                         </div>
 
                         <!-- DESIGN TAB -->
-                        <div id="tabDesign" style="display:none">
+                        <div id="tabDesign" class="hide">
                             <div class="setting-group">
                                 <label class="setting-label">Accent Color</label>
                                 <div class="color-row">
-                                    <div class="color-swatch selected" style="background:#c8f65d"
-                                        onclick="setColor('#c8f65d',this)"></div>
-                                    <div class="color-swatch" style="background:#4d9fff"
-                                        onclick="setColor('#4d9fff',this)"></div>
-                                    <div class="color-swatch" style="background:#ff4d4d"
-                                        onclick="setColor('#ff4d4d',this)"></div>
+                                    <div class="color-swatch selected bg-c8f65d" onclick="setColor('#c8f65d',this)">
+                                    </div>
+                                    <div class="color-swatch bg-4d9fff" onclick="setColor('#4d9fff',this)"></div>
+                                    <div class="color-swatch bg-ff4d4d" onclick="setColor('#ff4d4d',this)"></div>
                                 </div>
                             </div>
                             <div class="setting-group">
-                                <label class="setting-label">Show Product Grid</label>
-                                <select class="setting-select" id="showProducts" onchange="updatePreview()">
+                                <label class="setting-label" for="showProducts">Show Product Grid</label>
+                                <select class="setting-select" id="showProducts" title="Show Product Grid"
+                                    onchange="updatePreview()">
                                     <option value="yes">Yes</option>
                                     <option value="no">No</option>
                                 </select>
@@ -276,7 +274,7 @@
                     <h1>EMAIL <span>ANALYTICS</span></h1>
                     <p>Track opens, clicks, and revenue per flow</p>
                 </div>
-                <div style="display:flex;gap:8px">
+                <div class="flex-gap-8">
                     <button onclick="setAnaFilter('7',this)" class="filter-btn active-filter">7 Days</button>
                     <button onclick="setAnaFilter('30',this)" class="filter-btn">30 Days</button>
                 </div>
@@ -323,19 +321,19 @@
                     <h1>SUBSCRIBER <span>LIST</span></h1>
                     <p>Manage your email list and segments</p>
                 </div>
-                <div style="display:flex;gap:10px">
+                <div class="flex-gap-10">
                     <button onclick="exportSubs()" class="send-btn">
                         <i class="fa-solid fa-download"></i> Export List
                     </button>
                 </div>
             </div>
 
-            <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+            <div class="sub-filter-row">
                 <button class="seg-btn active-seg" onclick="filterSubs('all',this)">All</button>
                 <button class="seg-btn" onclick="filterSubs('active',this)">Active</button>
                 <button class="seg-btn" onclick="filterSubs('vip',this)">VIP</button>
-                <input type="text" id="subSearch" placeholder="🔍 Search subscribers..." oninput="searchSubs()"
-                    style="margin-left:auto;padding:8px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;min-width:220px" />
+                <input type="text" id="subSearch" class="sub-search-input" title="Search subscribers"
+                    placeholder="🔍 Search subscribers..." oninput="searchSubs()" />
             </div>
 
             <div class="subscribers-table-wrap">
@@ -360,7 +358,7 @@
      SETTINGS PAGE
 ══════════════════════════════════════ -->
     <div class="page" id="settingsPage">
-        <div class="page-inner" style="max-width:800px">
+        <div class="page-inner max-w-800">
 
             <div class="page-header">
                 <div>
@@ -369,47 +367,45 @@
                 </div>
             </div>
 
-            <div class="card" style="margin-bottom:20px">
+            <div class="card mb-20">
                 <div class="card-title"><i class="fa-solid fa-server"></i> EMAIL PROVIDER</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-                    <div class="provider-card selected-provider" onclick="selectProvider('resend',this)"
-                        style="padding:16px;border:2px solid var(--accent);border-radius:12px;cursor:pointer;background:rgba(200,246,93,0.04)">
-                        <div style="font-weight:700;margin-bottom:4px">Resend</div>
-                        <div style="font-size:12px;color:var(--text2)">Recommended</div>
+                <div class="provider-grid">
+                    <div class="provider-card selected-provider" onclick="selectProvider('resend',this)">
+                        <div class="provider-title">Resend</div>
+                        <div class="provider-sub">Recommended</div>
                     </div>
-                    <div class="provider-card" onclick="selectProvider('sendgrid',this)"
-                        style="padding:16px;border:1px solid var(--border);border-radius:12px;cursor:pointer">
-                        <div style="font-weight:700;margin-bottom:4px">SendGrid</div>
-                        <div style="font-size:12px;color:var(--text2)">Industry Standard</div>
+                    <div class="provider-card" onclick="selectProvider('sendgrid',this)">
+                        <div class="provider-title">SendGrid</div>
+                        <div class="provider-sub">Industry Standard</div>
                     </div>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:14px">
+                <div class="flex-column-gap-14">
                     <div>
-                        <label class="setting-label">API KEY</label>
-                        <input type="password" class="setting-input" value="re_demo_key_123" placeholder="re_xxxx">
+                        <label class="setting-label" for="apiKey">API KEY</label>
+                        <input type="password" id="apiKey" title="API Key" class="setting-input" value="re_demo_key_123"
+                            placeholder="re_xxxx">
                     </div>
                     <div>
-                        <label class="setting-label">FROM EMAIL</label>
-                        <input type="email" class="setting-input" value="orders@backdoor.com">
+                        <label class="setting-label" for="fromEmail">FROM EMAIL</label>
+                        <input type="email" id="fromEmail" title="From Email" class="setting-input"
+                            value="orders@backdoor.com" placeholder="orders@backdoor.com">
                     </div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-sliders"></i> GLOBAL TOGGLES</div>
-                <div
-                    style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg4);border-radius:10px;margin-bottom:10px">
+                <div class="global-toggle-row mb-10">
                     <div>
-                        <p style="font-size:14px;font-weight:600">Track Email Opens</p>
-                        <p style="font-size:12px;color:var(--text2)">Embed a pixel to track view rates</p>
+                        <p class="toggle-title">Track Email Opens</p>
+                        <p class="toggle-sub">Embed a pixel to track view rates</p>
                     </div>
                     <div class="toggle on"></div>
                 </div>
-                <div
-                    style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg4);border-radius:10px">
+                <div class="global-toggle-row">
                     <div>
-                        <p style="font-size:14px;font-weight:600">Auto-tag VIPs</p>
-                        <p style="font-size:12px;color:var(--text2)">Tag customers with > $1000 spend</p>
+                        <p class="toggle-title">Auto-tag VIPs</p>
+                        <p class="toggle-sub">Tag customers with > $1000 spend</p>
                     </div>
                     <div class="toggle on"></div>
                 </div>

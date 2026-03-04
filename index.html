@@ -2,129 +2,357 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
-    content="Backdoor - Premium sneaker resale marketplace. Buy and sell authentic sneakers from Nike, Jordan, Adidas and more.">
-  <title>Backdoor - Premium Sneaker Marketplace</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    content="Backdoor — Premium authenticated sneakers at the best resell prices. Every pair verified." />
+  <title>Backdoor — Authenticated Sneakers</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@700;800;900&display=swap"
-    rel="stylesheet">
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css?v=1.1">
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="store.css" />
 </head>
 
 <body>
 
-  <!-- ============================================
-       HEADER
-       ============================================ -->
-  <header>
-    <div class="header-container">
-      <a href="#" class="logo">Backdoor</a>
+  <!-- ══ ANNOUNCEMENT BAR ══ -->
+  <div class="announce-bar" id="announceBar">
+    <span>🔥 New Jordan 4 Military Blue just dropped</span>
+    <span class="sep">|</span>
+    <span>🚚 Free shipping on orders over $150</span>
+    <span class="sep">|</span>
+    <span>✅ All shoes 100% authenticated</span>
+    <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
 
-      <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search for brand, color, etc.">
-      </div>
-
-      <div class="header-actions">
-        <a href="tracking.html" class="header-utility-link">Track Order</a>
-        <a href="javascript:void(0)" class="header-utility-link coming-soon" data-feature="News">News</a>
-        <a href="javascript:void(0)" class="header-utility-link coming-soon" data-feature="About">About</a>
-        <a href="javascript:void(0)" class="header-utility-link coming-soon" data-feature="Help Center">Help</a>
-        <a href="javascript:void(0)" class="header-utility-link coming-soon" data-feature="Seller Application">Sell</a>
-        <button class="cart-btn" onclick="toggleCart()" aria-label="Toggle Shopping Cart">
-          🛒
-          <span class="cart-count">0</span>
-        </button>
-        <button class="login-btn outline" onclick="window.location.href='accounts.html'">Login</button>
-        <button class="login-btn solid" onclick="window.location.href='accounts.html#register'">Sign Up</button>
-      </div>
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar announce-offset" id="navbar">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-mark">B</div>
+      BACK<span>DOOR</span>
+    </a>
+    <div class="nav-center">
+      <a class="nav-link active" href="#shopSection">Shop</a>
+      <a class="nav-link" href="#brandsSection">Brands</a>
+      <a class="nav-link" href="#dropSection">New Drops</a>
+      <a class="nav-link" href="tracking.html">Track Order</a>
+      <a class="nav-link" href="accounts.html">Account</a>
     </div>
-  </header>
-
-  <!-- ============================================
-       NAVIGATION
-       ============================================ -->
-  <nav>
-    <div class="nav-container">
-      <a href="javascript:void(0)" class="nav-link">All</a>
-      <a href="javascript:void(0)" class="nav-link">Brands</a>
-      <a href="javascript:void(0)" class="nav-link">Trending</a>
-      <a href="javascript:void(0)" class="nav-link deals-link">Deals</a>
-      <a href="javascript:void(0)" class="nav-link">Men</a>
-      <a href="javascript:void(0)" class="nav-link">Kids</a>
-      <a href="javascript:void(0)" class="nav-link active">Sneakers</a>
-      <a href="javascript:void(0)" class="nav-link">Apparel</a>
-      <a href="javascript:void(0)" class="nav-link">Accessories</a>
+    <div class="nav-right">
+      <div class="nav-search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" class="nav-search" placeholder="Search brand, name..."
+          title="Search products" />
+      </div>
+      <button class="nav-icon-btn" title="Wishlist" onclick="showToast('Sign in to view wishlist','info')">
+        <i class="fa-regular fa-heart"></i>
+      </button>
+      <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
+        <i class="fa-solid fa-bag-shopping"></i> Cart
+        <span class="cart-pill" id="cartCount">0</span>
+      </button>
+      <button class="btn-signup-nav" onclick="window.location.href='accounts.html'">Sign In</button>
     </div>
   </nav>
 
-  <!-- ============================================
-       MAIN CONTENT
-       ============================================ -->
-  <main class="container">
-    <!-- Hero Banner -->
-    <div class="hero-banner">
-      <div class="hero-content">
-        <span class="hero-badge">Just Added</span>
-        <h1 class="hero-title">Archive Collection:<br>Virgil Abloh Archive™ x Air Jordan 1 High OG "Alaska" Retro</h1>
-        <p class="hero-subtitle">The elusive Air Jordan 1 High OG Retro. Deconstructed luxury meets ultimate streetwear
-          pedigree.</p>
-        <button class="hero-btn" onclick="openProductModal(products.find(p => p.id === 16))">Shop Now</button>
+  <!-- ══ HERO ══ -->
+  <section class="hero announce-offset-section">
+    <div class="hero-grid"></div>
+    <div class="hero-glow-1"></div>
+    <div class="hero-glow-2"></div>
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-eyebrow">
+          <div class="live-dot"></div> New drops every week
+        </div>
+        <h1 class="hero-title">
+          <span class="line1">STEP INTO</span>
+          <span class="line2">THE BACK</span>
+          <span class="line3">DOOR.</span>
+        </h1>
+        <p class="hero-sub">
+          Premium authenticated sneakers at the <strong>best resell prices</strong>.
+          Every pair verified. Every drop delivered fast. <strong>No fakes. No games.</strong>
+        </p>
+        <div class="hero-btns">
+          <button class="btn-hero-primary" onclick="scrollToShop()">
+            <i class="fa-solid fa-shoe-prints"></i> SHOP ALL
+          </button>
+          <button class="btn-hero-secondary" onclick="window.location.href='tracking.html'">
+            <i class="fa-solid fa-truck"></i> Track Order
+          </button>
+        </div>
+        <div class="hero-trust">
+          <div class="trust-item"><i class="fa-solid fa-shield-halved"></i> 100% Authenticated</div>
+          <div class="trust-item"><i class="fa-solid fa-truck"></i> Fast Shipping</div>
+          <div class="trust-item"><i class="fa-solid fa-rotate-left"></i> Easy Returns</div>
+          <div class="trust-item"><i class="fa-solid fa-lock"></i> Secure Checkout</div>
+        </div>
       </div>
-      <div class="hero-image-container">
-        <img src="products/jordan-1-ow-alaska.jpg" alt="Off-White Alaska" class="hero-image">
+      <div class="hero-right">
+        <div class="hero-stat-bubble b1">
+          <div class="bubble-icon bubble-icon-accent"><i class="fa-solid fa-fire"></i></div>
+          <div class="bubble-text">
+            <p>12 sold today</p><span>Jordan 1 Chicago</span>
+          </div>
+        </div>
+        <div class="hero-shoe-card" onclick="openProductModal(16)">
+          <div class="shoe-card-badge"><i class="fa-solid fa-fire"></i> EXCLUSIVE DROP</div>
+          <img src="products/jordan-1-ow-alaska.png" alt="Off-White x Air Jordan 1 Alaska" class="hero-shoe-img-real" />
+          <div class="shoe-card-info">
+            <h2>OFF-WHITE X AJ1 "ALASKA"</h2>
+            <p>Jordan · White/White · Deadstock</p>
+            <div class="shoe-card-bottom">
+              <div>
+                <div class="shoe-card-price">$1,647</div>
+                <div class="shoe-card-retail">Retail $190</div>
+              </div>
+              <button class="shoe-card-btn" onclick="event.stopPropagation(); openProductModal(16)">View Drop</button>
+            </div>
+          </div>
+        </div>
+        <div class="hero-stat-bubble b2">
+          <div class="bubble-icon bubble-icon-green"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="bubble-text">
+            <p>Verified Authentic</p><span>All pairs checked</span>
+          </div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-      <span class="filter-label">Filter:</span>
-      <button class="filter-chip brand-filter" data-brand="all">All</button>
-      <button class="filter-chip brand-filter" data-brand="Nike">Nike</button>
-      <button class="filter-chip brand-filter" data-brand="Jordan">Jordan</button>
-      <button class="filter-chip brand-filter" data-brand="Adidas">Adidas</button>
-      <button class="filter-chip category-filter" data-category="Sneakers">Sneakers</button>
-      <button class="filter-chip category-filter" data-category="Apparel">Apparel</button>
-
-      <select class="sort-select" id="sortSelect" aria-label="Sort products">
-        <option value="featured">Sort: Featured</option>
-        <option value="price-low">Price: Low to High</option>
-        <option value="price-high">Price: High to Low</option>
-        <option value="newest">Newest</option>
-      </select>
+  <!-- ══ TICKER ══ -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span class="ticker-item"><span class="ticker-dot"></span> Jordan 1 OW Alaska</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> Kobe 6 Reverse Grinch</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> Jordan 4 Black Cat</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> CPFM x AF1 Moss</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> Travis Scott x Fragment</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> NOCTA Sunset Jacket</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> Jordan 3 For The Love</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> Jordan 1 OW Alaska</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> Kobe 6 Reverse Grinch</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> Jordan 4 Black Cat</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> CPFM x AF1 Moss</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> Travis Scott x Fragment</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> NOCTA Sunset Jacket</span>
+      <span class="ticker-item"><span class="ticker-dot"></span> Jordan 3 For The Love</span>
     </div>
+  </div>
 
-    <!-- Products Grid -->
+  <!-- ══ PRODUCTS ══ -->
+  <div class="section" id="shopSection">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">TRENDING <span>NOW</span></h2>
+        <p class="section-sub">Most popular picks this week</p>
+      </div>
+      <div class="filter-sort-row">
+        <select class="sort-select-new" id="sortSelect" aria-label="Sort products" title="Sort products">
+          <option value="featured">Sort: Featured</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="newest">Newest</option>
+        </select>
+      </div>
+    </div>
+    <div class="brand-filters">
+      <button class="brand-chip active brand-filter" data-brand="all">All</button>
+      <button class="brand-chip brand-filter" data-brand="Jordan">Jordan</button>
+      <button class="brand-chip brand-filter" data-brand="Nike">Nike</button>
+      <button class="brand-chip brand-filter" data-brand="Adidas">Adidas</button>
+      <button class="brand-chip category-filter" data-category="Sneakers">Sneakers</button>
+      <button class="brand-chip category-filter" data-category="Apparel">Apparel</button>
+    </div>
     <div class="products-grid" id="productGrid">
-      <!-- Products will be dynamically inserted here by JavaScript -->
+      <!-- Products rendered by app.js -->
     </div>
-  </main>
+  </div>
 
-  <!-- ============================================
-       PRODUCT MODAL
-       ============================================ -->
+  <!-- ══ STATS ══ -->
+  <div class="stats-section">
+    <div class="stats-inner">
+      <div class="stat-block">
+        <div class="stat-num">24K+</div>
+        <div class="stat-name">Pairs Sold</div>
+        <div class="stat-detail">and counting</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">100%</div>
+        <div class="stat-name">Authenticated</div>
+        <div class="stat-detail">every single pair</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">2-4</div>
+        <div class="stat-name">Day Shipping</div>
+        <div class="stat-detail">continental US</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">4.9★</div>
+        <div class="stat-name">Customer Rating</div>
+        <div class="stat-detail">across 1,200+ reviews</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BRANDS ══ -->
+  <div class="section" id="brandsSection">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">SHOP BY <span>BRAND</span></h2>
+        <p class="section-sub">Browse our curated collections</p>
+      </div>
+    </div>
+    <div class="brands-grid">
+      <div class="brand-card" onclick="filterByBrandClick('Jordan')">
+        <img src="products/jordan-4-black-cat.jpg" alt="Jordan" class="brand-card-img" />
+        <div class="brand-name">Jordan</div>
+        <div class="brand-count">8 items</div>
+      </div>
+      <div class="brand-card" onclick="filterByBrandClick('Nike')">
+        <img src="products/kobe-6-reverse-grinch.jpg" alt="Nike" class="brand-card-img" />
+        <div class="brand-name">Nike</div>
+        <div class="brand-count">5 items</div>
+      </div>
+      <div class="brand-card" onclick="filterByBrandClick('Adidas')">
+        <img src="products/pharrell-jellyfish-blue.jpg" alt="Adidas" class="brand-card-img" />
+        <div class="brand-name">Adidas</div>
+        <div class="brand-count">2 items</div>
+      </div>
+      <div class="brand-card" onclick="filterByBrandClick('Godspeed')">
+        <img src="products/godspeed-surf-day.png" alt="Godspeed" class="brand-card-img" />
+        <div class="brand-name">Godspeed</div>
+        <div class="brand-count">1 item</div>
+      </div>
+      <div class="brand-card" onclick="filterByBrandClick('Nike')">
+        <img src="products/nocta-sunset-jacket.jpg" alt="NOCTA" class="brand-card-img" />
+        <div class="brand-name">NOCTA</div>
+        <div class="brand-count">1 item</div>
+      </div>
+      <div class="brand-card" onclick="filterByBrandClick('Jordan')">
+        <img src="products/jordan-1-fragment-travis.jpg" alt="Travis Scott" class="brand-card-img" />
+        <div class="brand-name">Travis Scott</div>
+        <div class="brand-count">1 item</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FEATURED DROP ══ -->
+  <div class="section" id="dropSection">
+    <div class="featured-drop" onclick="openProductModal(5)">
+      <div class="drop-left">
+        <div class="drop-eyebrow"><i class="fa-solid fa-fire"></i> EXCLUSIVE DROP</div>
+        <h2 class="drop-title">FRAGMENT X TRAVIS SCOTT<br>JORDAN 1 <span>LOW</span></h2>
+        <p class="drop-desc">The most sought-after collaboration. Reverse mocha colorway with premium sail leather,
+          military blue accents, and Travis's signature reverse Swoosh.</p>
+        <div class="countdown" id="countdown">
+          <div class="count-block">
+            <div class="count-num" id="cDays">02</div>
+            <div class="count-label">Days</div>
+          </div>
+          <div class="count-block">
+            <div class="count-num" id="cHrs">14</div>
+            <div class="count-label">Hours</div>
+          </div>
+          <div class="count-block">
+            <div class="count-num" id="cMin">37</div>
+            <div class="count-label">Mins</div>
+          </div>
+          <div class="count-block">
+            <div class="count-num" id="cSec">52</div>
+            <div class="count-label">Secs</div>
+          </div>
+        </div>
+        <button class="btn-hero-primary" onclick="event.stopPropagation(); openProductModal(5)">
+          <i class="fa-solid fa-eye"></i> VIEW DROP
+        </button>
+      </div>
+      <div class="drop-right">
+        <img src="products/jordan-1-fragment-travis.jpg" alt="Fragment x Travis Scott Jordan 1"
+          class="drop-right-img" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NEWSLETTER ══ -->
+  <div class="newsletter-section">
+    <div class="newsletter-inner">
+      <h2>JOIN THE <span>BACKDOOR</span></h2>
+      <p>Get early access to exclusive drops, restocks, and member-only deals. No spam, just heat.</p>
+      <form class="newsletter-form" onsubmit="event.preventDefault(); showToast('You\'re on the list!','info')">
+        <input class="newsletter-input" type="email" title="Email address" placeholder="your@email.com" required />
+        <button class="newsletter-btn" type="submit">SUBSCRIBE</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="footer-logo">BACK<span>DOOR</span></span>
+          <p>The premium marketplace for authenticated sneakers. Every pair verified. Every drop delivered fast.</p>
+          <div class="social-links">
+            <a class="social-btn" href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a class="social-btn" href="#" title="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+            <a class="social-btn" href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            <a class="social-btn" href="#" title="Discord"><i class="fa-brands fa-discord"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>SHOP</h4>
+          <a href="#shopSection">All Products</a>
+          <a href="#brandsSection">Brands</a>
+          <a href="#dropSection">New Drops</a>
+          <a href="checkout.html">Checkout</a>
+        </div>
+        <div class="footer-col">
+          <h4>HELP</h4>
+          <a href="tracking.html">Track Order</a>
+          <a href="accounts.html">My Account</a>
+          <a href="#">Shipping Info</a>
+          <a href="#">Returns</a>
+          <a href="#">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h4>ADMIN</h4>
+          <a href="admin.html">Dashboard</a>
+          <a href="email.html">Email System</a>
+          <a href="pricing.html">Pricing Engine</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 <span>Backdoor</span>. All rights reserved. Authentic sneakers guaranteed.</p>
+        <div class="payment-logos">
+          <i class="fa-brands fa-cc-visa"></i>
+          <i class="fa-brands fa-cc-mastercard"></i>
+          <i class="fa-brands fa-cc-amex"></i>
+          <i class="fa-brands fa-cc-apple-pay"></i>
+          <i class="fa-brands fa-google-pay"></i>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══ PRODUCT MODAL (from old layout) ══ -->
   <div class="modal" id="productModal">
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="modal-content">
       <button class="modal-close" id="modalClose" aria-label="Close Modal">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+        <i class="fa-solid fa-xmark"></i>
       </button>
-
       <div class="modal-body">
         <div class="modal-badge-container">
           <span id="modalBadge" class="modal-badge"></span>
         </div>
-        <img src="" alt="Product Image" class="modal-image" id="modalImage">
+        <img src="" alt="Product Image" class="modal-image" id="modalImage" />
         <div class="modal-details">
           <div class="modal-category">Sneakers</div>
           <h2 class="modal-name" id="modalTitle"></h2>
@@ -132,47 +360,32 @@
           <div class="modal-colorway" id="modalColorway"></div>
           <div class="modal-price" id="modalPrice"></div>
           <div class="modal-lowest-ask">Lowest Ask</div>
-
           <div class="modal-info-grid">
             <div class="info-item">
               <span class="info-label">Release Date</span>
               <span id="modalReleaseDate" class="info-value"></span>
             </div>
           </div>
-
           <p id="modalDescription" class="modal-description"></p>
-
           <div class="size-selector">
             <h3>Select Size</h3>
-            <div class="size-options" id="modalSizeOptions">
-              <!-- Sizes will be injected here -->
-            </div>
+            <div class="size-options" id="modalSizeOptions"></div>
           </div>
-
           <button class="add-to-cart-btn modal-add-to-cart" id="modalAddToCart">Add to Cart</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ============================================
-       SHOPPING CART SIDEBAR
-       ============================================ -->
+  <!-- ══ CART SIDEBAR (from old layout) ══ -->
   <div class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Shopping Cart</h3>
       <button class="cart-close" id="cartClose" aria-label="Close Cart Sidebar">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+        <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
-
-    <div class="cart-items" id="cartItems">
-      <!-- Cart items will be dynamically inserted here -->
-    </div>
-
+    <div class="cart-items" id="cartItems"></div>
     <div class="cart-footer">
       <div class="cart-total">
         <span>Total</span>
@@ -183,9 +396,7 @@
     </div>
   </div>
 
-  <!-- ============================================
-       COMING SOON MODAL
-       ============================================ -->
+  <!-- ══ COMING SOON MODAL ══ -->
   <div class="modal" id="comingSoonModal">
     <div class="modal-overlay" id="comingSoonOverlay"></div>
     <div class="modal-content small center">
@@ -199,88 +410,59 @@
     </div>
   </div>
 
-  <!-- ============================================
-       FOOTER
-       ============================================ -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h3>BACKDOOR</h3>
-          <p>The premium marketplace for authentic sneakers and streetwear.</p>
-          <div class="social-links">
-            <a href="javascript:void(0)" class="social-link" aria-label="Instagram">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="none" stroke="#0a0a0a" stroke-width="2">
-                </path>
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="#0a0a0a" stroke-width="2"></line>
-              </svg>
-            </a>
-            <a href="javascript:void(0)" class="social-link" aria-label="Twitter">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path
-                  d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
-                </path>
-              </svg>
-            </a>
-            <a href="javascript:void(0)" class="social-link" aria-label="Facebook">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-              </svg>
-            </a>
-          </div>
-        </div>
-
-        <div class="footer-section">
-          <h3>Shop</h3>
-          <ul class="footer-links">
-            <li><a href="javascript:void(0)" class="footer-link">New Releases</a></li>
-            <li><a href="javascript:void(0)" class="footer-link">Best Sellers</a></li>
-            <li><a href="javascript:void(0)" class="footer-link">Sale</a></li>
-            <li><a href="javascript:void(0)" class="footer-link">All Sneakers</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-section">
-          <h3>Support</h3>
-          <ul class="footer-links">
-            <li><a href="tracking.html" class="footer-link">Track Your Order</a></li>
-            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="Support contact">Contact
-                Us</a></li>
-            <li><a href="javascript:void(0)" class="footer-link coming-soon"
-                data-feature="Shipping information">Shipping Info</a>
-            </li>
-            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="Returns policy">Returns</a>
-            </li>
-            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="FAQ">FAQ</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-section">
-          <h3>Company</h3>
-          <ul class="footer-links">
-            <li><a href="javascript:void(0)" class="footer-link">About Us</a></li>
-            <li><a href="javascript:void(0)" class="footer-link">Authenticity</a></li>
-            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="Privacy policy">Privacy
-                Policy</a></li>
-            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="Terms & Conditions">Terms &
-                Conditions</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>&copy; 2025 Backdoor. All rights reserved. Authentic sneakers guaranteed.</p>
-      </div>
-    </div>
-  </footer>
+  <!-- ══ TOAST ══ -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <!-- JavaScript -->
   <script src="app.js" defer></script>
-  <!-- Backdoor Analytics Tracker -->
   <script src="analytics.js" defer></script>
+  <script>
+    // Announcement bar
+    function closeAnnounce() {
+      document.getElementById('announceBar').style.display = 'none';
+      document.getElementById('navbar').classList.remove('announce-offset');
+      document.querySelector('.hero').classList.remove('announce-offset-section');
+    }
+    // Scroll to shop
+    function scrollToShop() {
+      document.getElementById('shopSection').scrollIntoView({ behavior: 'smooth' });
+    }
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 80);
+    });
+    // Toast system
+    function showToast(msg, type) {
+      type = type || 'info';
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = 'toast ' + type;
+      const icon = type === 'error' ? 'circle-exclamation' : type === 'warn' ? 'triangle-exclamation' : 'circle-info';
+      t.innerHTML = '<i class="fa-solid fa-' + icon + '"></i> ' + msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+    // Brand card click filter
+    function filterByBrandClick(brand) {
+      scrollToShop();
+      // Find and click the matching brand chip
+      document.querySelectorAll('.brand-filter').forEach(chip => {
+        const b = chip.dataset.brand;
+        if (b === brand) { chip.click(); }
+      });
+    }
+    // Countdown timer
+    (function initCountdown() {
+      const target = Date.now() + 2 * 86400000 + 14 * 3600000 + 37 * 60000;
+      setInterval(() => {
+        const diff = Math.max(0, target - Date.now());
+        document.getElementById('cDays').textContent = String(Math.floor(diff / 86400000)).padStart(2, '0');
+        document.getElementById('cHrs').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+        document.getElementById('cMin').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+        document.getElementById('cSec').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+      }, 1000);
+    })();
+  </script>
 </body>
 
 </html>
