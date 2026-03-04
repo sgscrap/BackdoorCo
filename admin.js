@@ -46,7 +46,7 @@ const products = [
         releaseDate: "3/3/18",
         category: "Sneakers",
         stock: 15,
-        image: "products/jordan-1-ow-alaska.jpg",
+        image: "products/jordan-1-ow-alaska.png",
         status: "active"
     },
     {

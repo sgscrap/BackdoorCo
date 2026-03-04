@@ -32,7 +32,7 @@ const products = [
         badge: "new",
         sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13", "M/US14"],
         description: "The elusive Off-White x Air Jordan 1 'Alaska' (White) featuring deconstructed leather and Virgil Abloh's signature typography.",
-        image: "products/jordan-1-ow-alaska.jpg"
+        image: "products/jordan-1-ow-alaska.png"
     },
     {
         id: 1,
