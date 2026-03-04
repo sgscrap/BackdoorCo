@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backdoor — Smart Pricing Engine</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="pricing.css" />
+</head>
+
+<body>
+
+    <!-- ── HEADER ── -->
+    <div class="page-header">
+        <div>
+            <h1>SMART <span>PRICING</span> ENGINE</h1>
+            <p>Real-time market data · AI-powered recommendations · Auto-pricing rules</p>
+        </div>
+        <div class="header-actions">
+            <div class="live-badge">
+                <div class="live-dot"></div>
+                MARKET LIVE
+            </div>
+            <button class="auto-price-btn" onclick="runAutoPrice()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Price All
+            </button>
+            <a href="admin.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Admin</a>
+        </div>
+    </div>
+
+    <!-- ── TOP STATS ── -->
+    <div class="top-stats">
+        <div class="stat-card stat-card--accent">
+            <div class="stat-label">Avg Your Price</div>
+            <div class="stat-value" id="statAvgYours">$—</div>
+            <div class="stat-sub">across all products</div>
+        </div>
+        <div class="stat-card stat-card--blue">
+            <div class="stat-label">Avg Market Price</div>
+            <div class="stat-value" id="statAvgMarket">$—</div>
+            <div class="stat-sub">GOAT + StockX avg</div>
+        </div>
+        <div class="stat-card stat-card--green">
+            <div class="stat-label">Underpriced</div>
+            <div class="stat-value green" id="statUnder">—</div>
+            <div class="stat-sub">room to increase</div>
+        </div>
+        <div class="stat-card stat-card--red">
+            <div class="stat-label">Overpriced</div>
+            <div class="stat-value red" id="statOver">—</div>
+            <div class="stat-sub">should lower price</div>
+        </div>
+        <div class="stat-card stat-card--accent">
+            <div class="stat-label">Est. Revenue Gain</div>
+            <div class="stat-value accent" id="statGain">$—</div>
+            <div class="stat-sub">if optimized now</div>
+        </div>
+    </div>
+
+    <!-- ── SEARCH + MAIN AREA ── -->
+    <div class="two-col">
+
+        <!-- LEFT: Product Search + Table -->
+        <div>
+            <div class="card mb-20">
+                <div class="card-title">
+                    <i class="fa-solid fa-magnifying-glass-dollar"></i>
+                    MARKET PRICE LOOKUP
+                </div>
+
+                <div class="search-bar">
+                    <input class="search-input" id="searchInput" type="text"
+                        placeholder="Search by name or SKU — e.g. 'Jordan 1 Chicago' or '555088-101'"
+                        onkeydown="if(event.key==='Enter') fetchMarketData()" />
+                    <button class="search-btn" id="searchBtn" onclick="fetchMarketData()">
+                        <i class="fa-solid fa-chart-line"></i> Get Prices
+                    </button>
+                </div>
+
+                <!-- Quick searches -->
+                <div class="quick-search-row">
+                    <span class="quick-label">Quick:</span>
+                    <button onclick="quickSearch('Jordan 1 Retro High OG Chicago')" class="tag tag-clickable">Jordan 1
+                        Chicago</button>
+                    <button onclick="quickSearch('Yeezy 350 V2 Zebra')" class="tag tag-clickable">Yeezy 350
+                        Zebra</button>
+                    <button onclick="quickSearch('Nike Dunk Low Panda')" class="tag tag-clickable">Dunk Low
+                        Panda</button>
+                    <button onclick="quickSearch('Travis Scott Nike Dunk Low')" class="tag tag-clickable">Travis Scott
+                        Dunk</button>
+                    <button onclick="quickSearch('New Balance 550 White Green')" class="tag tag-clickable">NB
+                        550</button>
+                </div>
+
+                <!-- Result area -->
+                <div id="resultArea">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-magnifying-glass-dollar empty-icon"></i>
+                        Search a shoe to see real-time market comparison
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Comparison Table -->
+            <div class="card hidden" id="comparisonCard">
+                <div class="card-title">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    SIZE-BY-SIZE COMPARISON
+                </div>
+                <div class="table-scroll">
+                    <table class="price-table" id="priceTable">
+                        <thead>
+                            <tr>
+                                <th>Size</th>
+                                <th>Your Price</th>
+                                <th>GOAT</th>
+                                <th>StockX</th>
+                                <th>Avg Market</th>
+                                <th>Position</th>
+                                <th>Suggested</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priceTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Price History -->
+            <div class="card hidden mt-20" id="historyCard">
+                <div class="card-title">
+                    <i class="fa-solid fa-chart-area"></i>
+                    PRICE HISTORY — <span id="historyTitle" class="accent"></span>
+                </div>
+                <div class="history-chart" id="historyChart"></div>
+            </div>
+
+            <!-- Auto Rules -->
+            <div class="card mt-20">
+                <div class="card-title">
+                    <i class="fa-solid fa-robot"></i>
+                    AUTO-PRICING RULES
+                </div>
+                <table class="rules-table">
+                    <thead>
+                        <tr>
+                            <th>Rule</th>
+                            <th>Condition</th>
+                            <th>Action</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rulesTable"></tbody>
+                </table>
+                <button onclick="addRule()" class="add-rule-btn">
+                    <i class="fa-solid fa-plus"></i> Add Rule
+                </button>
+            </div>
+        </div>
+
+        <!-- RIGHT: Recommendation Panel -->
+        <div>
+            <!-- Market Position Gauge -->
+            <div class="card mb-20 text-center">
+                <div class="card-title center">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    MARKET POSITION
+                </div>
+                <div class="gauge-wrap">
+                    <div class="gauge-arc">
+                        <div class="gauge-bg"></div>
+                        <div class="gauge-center"></div>
+                        <div class="gauge-needle" id="gaugeNeedle"></div>
+                    </div>
+                    <div class="gauge-label" id="gaugeLabel">—</div>
+                    <div class="gauge-sub" id="gaugeSub">Search a product to analyze</div>
+                </div>
+                <div class="market-bar-wrap">
+                    <div class="market-bar-track">
+                        <div class="market-bar-needle" id="marketNeedle" data-label="—"></div>
+                    </div>
+                    <div class="market-bar-labels">
+                        <span>🟢 Best Deal</span><span>Fair</span><span>🔴 Overpriced</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Recommendation -->
+            <div class="card mb-20" id="recCard">
+                <div class="card-title">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    AI RECOMMENDATION
+                </div>
+                <div id="recContent">
+                    <div class="empty-state small">
+                        <i class="fa-solid fa-wand-magic-sparkles empty-icon small"></i>
+                        Search a product to get AI pricing recommendation
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing Strategy -->
+            <div class="card mb-20">
+                <div class="card-title">
+                    <i class="fa-solid fa-chess"></i>
+                    PRICING STRATEGY
+                </div>
+                <div class="strategy-grid">
+                    <button class="strategy-btn active" onclick="setStrategy('competitive', this)">
+                        <span class="s-title">⚡ Competitive</span>
+                        <span class="s-desc">5% below market avg. Sell faster.</span>
+                    </button>
+                    <button class="strategy-btn" onclick="setStrategy('premium', this)">
+                        <span class="s-title">💎 Premium</span>
+                        <span class="s-desc">10% above market. Max profit.</span>
+                    </button>
+                    <button class="strategy-btn" onclick="setStrategy('match', this)">
+                        <span class="s-title">🎯 Match Market</span>
+                        <span class="s-desc">Match lowest ask exactly.</span>
+                    </button>
+                    <button class="strategy-btn" onclick="setStrategy('aggressive', this)">
+                        <span class="s-title">🔥 Aggressive</span>
+                        <span class="s-desc">15% below market. Move units.</span>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Minimum Profit Margin</label>
+                    <div class="slider-wrap">
+                        <input type="range" min="5" max="50" value="20" id="marginSlider" title="Minimum Profit Margin"
+                            oninput="updateMargin(this.value)" />
+                        <div class="slider-labels">
+                            <span>5%</span>
+                            <span id="marginVal" class="accent bold">20%</span>
+                            <span>50%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Price Floor ($)</label>
+                        <input class="form-input" type="number" id="priceFloor" placeholder="150" value="150" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Price Ceiling ($)</label>
+                        <input class="form-input" type="number" id="priceCeiling" placeholder="2000" value="2000" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fa-solid fa-bell"></i>
+                    PRICE ALERTS
+                </div>
+                <div id="alertsList">
+                    <div class="alert alert-accent">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>Search a product to see pricing alerts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── BULK PRICING TABLE ── -->
+    <div class="card">
+        <div class="card-title">
+            <i class="fa-solid fa-table"></i>
+            ALL PRODUCTS — BULK PRICING
+        </div>
+        <div class="table-scroll">
+            <table class="price-table" id="bulkTable">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Your Price</th>
+                        <th>Market Avg</th>
+                        <th>Difference</th>
+                        <th>Status</th>
+                        <th>Suggested</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="bulkTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="pricing.js"></script>
+    <!-- Backdoor Analytics Tracker -->
+    <script src="analytics.js"></script>
+</body>
+
+</html>

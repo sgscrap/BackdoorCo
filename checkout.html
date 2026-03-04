@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backdoor — Checkout</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="checkout.css" />
+</head>
+
+<body>
+
+    <!-- ══ NAVBAR ══ -->
+    <nav class="navbar">
+        <div class="nav-logo" onclick="showPage('store')">BACK<span>DOOR</span></div>
+        <div class="free-ship-bar" id="navShipBar">
+            <div class="free-ship-text" id="navShipText">Add <span id="navShipAmt">$150</span> more for FREE shipping 🚚
+            </div>
+            <div class="free-ship-track">
+                <div class="free-ship-fill" id="navShipFill"></div>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button class="cart-btn" onclick="openCart()"><i class="fa-solid fa-bag-shopping"></i> Cart <span
+                    class="cart-count" id="cartCount">0</span></button>
+        </div>
+    </nav>
+
+    <!-- ══ STORE PAGE ══ -->
+    <div class="store-page" id="storePage">
+        <div class="store-header">FRESH <span>DROPS</span></div>
+        <div class="products-grid" id="productsGrid"></div>
+    </div>
+
+    <!-- ══ CHECKOUT PAGE ══ -->
+    <div class="checkout-page" id="checkoutPage">
+        <div class="checkout-inner">
+            <div>
+                <!-- Steps -->
+                <div class="checkout-steps">
+                    <div class="c-step">
+                        <div class="c-step-num active" id="step1">1</div>
+                        <div class="c-step-label active" id="step1l">Contact</div>
+                    </div>
+                    <div class="c-step-line"></div>
+                    <div class="c-step">
+                        <div class="c-step-num" id="step2">2</div>
+                        <div class="c-step-label" id="step2l">Shipping</div>
+                    </div>
+                    <div class="c-step-line"></div>
+                    <div class="c-step">
+                        <div class="c-step-num" id="step3">3</div>
+                        <div class="c-step-label" id="step3l">Payment</div>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="checkout-section" id="sectionContact">
+                    <div class="checkout-section-title"><i class="fa-solid fa-user"></i> CONTACT INFORMATION</div>
+                    <div class="form-row-2">
+                        <div class="form-group"><label class="form-label">First Name *</label><input class="form-input"
+                                type="text" id="firstName" placeholder="Marcus" /></div>
+                        <div class="form-group"><label class="form-label">Last Name *</label><input class="form-input"
+                                type="text" id="lastName" placeholder="Johnson" /></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Email *</label><input class="form-input"
+                            type="email" id="email" placeholder="marcus@email.com" /></div>
+                    <div class="form-group"><label class="form-label">Phone</label><input class="form-input" type="tel"
+                            id="phone" placeholder="+1 (555) 000-0000" /></div>
+                </div>
+
+                <!-- Address -->
+                <div class="checkout-section" id="sectionAddress">
+                    <div class="checkout-section-title"><i class="fa-solid fa-location-dot"></i> SHIPPING ADDRESS</div>
+                    <div class="form-group"><label class="form-label">Address *</label><input class="form-input"
+                            type="text" id="address1" placeholder="123 Main Street" /></div>
+                    <div class="form-group"><label class="form-label">Apt / Suite</label><input class="form-input"
+                            type="text" id="address2" placeholder="Apt 4B (optional)" /></div>
+                    <div class="form-row-3">
+                        <div class="form-group"><label class="form-label">City *</label><input class="form-input"
+                                type="text" id="city" placeholder="New York" /></div>
+                        <div class="form-group"><label class="form-label">State *</label>
+                            <select class="form-select" id="state" title="State">
+                                <option value="">State</option>
+                                <option>AL</option>
+                                <option>AK</option>
+                                <option>AZ</option>
+                                <option>AR</option>
+                                <option>CA</option>
+                                <option>CO</option>
+                                <option>CT</option>
+                                <option>DE</option>
+                                <option>FL</option>
+                                <option>GA</option>
+                                <option>HI</option>
+                                <option>ID</option>
+                                <option>IL</option>
+                                <option>IN</option>
+                                <option>IA</option>
+                                <option>KS</option>
+                                <option>KY</option>
+                                <option>LA</option>
+                                <option>ME</option>
+                                <option>MD</option>
+                                <option>MA</option>
+                                <option>MI</option>
+                                <option>MN</option>
+                                <option>MS</option>
+                                <option>MO</option>
+                                <option>MT</option>
+                                <option>NE</option>
+                                <option>NV</option>
+                                <option>NH</option>
+                                <option>NJ</option>
+                                <option>NM</option>
+                                <option selected>NY</option>
+                                <option>NC</option>
+                                <option>ND</option>
+                                <option>OH</option>
+                                <option>OK</option>
+                                <option>OR</option>
+                                <option>PA</option>
+                                <option>RI</option>
+                                <option>SC</option>
+                                <option>SD</option>
+                                <option>TN</option>
+                                <option>TX</option>
+                                <option>UT</option>
+                                <option>VT</option>
+                                <option>VA</option>
+                                <option>WA</option>
+                                <option>WV</option>
+                                <option>WI</option>
+                                <option>WY</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">ZIP *</label><input class="form-input"
+                                type="text" id="zip" placeholder="10001" /></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Country</label>
+                        <select class="form-select" id="country" title="Country">
+                            <option>United States</option>
+                            <option>Canada</option>
+                            <option>United Kingdom</option>
+                            <option>Australia</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Shipping -->
+                <div class="checkout-section" id="sectionShipping">
+                    <div class="checkout-section-title"><i class="fa-solid fa-truck"></i> SHIPPING METHOD</div>
+                    <div class="shipping-options" id="shippingOptions"></div>
+                </div>
+
+                <!-- Payment -->
+                <div class="checkout-section" id="sectionPayment">
+                    <div class="checkout-section-title"><i class="fa-solid fa-credit-card"></i> PAYMENT</div>
+                    <div class="payment-tabs">
+                        <button class="pay-tab active" id="payCard" onclick="setPayMethod('card', this)"><i
+                                class="fa-regular fa-credit-card"></i> Card</button>
+                        <button class="pay-tab" id="payApple" onclick="setPayMethod('apple', this)"><i
+                                class="fa-brands fa-apple"></i> Apple Pay</button>
+                        <button class="pay-tab" id="payGoogle" onclick="setPayMethod('google', this)"><i
+                                class="fa-brands fa-google-pay pay-icon-lg"></i> Google Pay</button>
+                        <button class="pay-tab" id="payPaypal" onclick="setPayMethod('paypal', this)"><i
+                                class="fa-brands fa-paypal pay-icon-blue"></i> PayPal</button>
+                    </div>
+                    <div id="cardPayment">
+                        <div class="form-group"><label class="form-label">Card Number</label>
+                            <div class="stripe-element-wrap"><input class="form-input form-input--naked" type="text"
+                                    id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19"
+                                    oninput="formatCard(this)" /></div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group"><label class="form-label">Expiry Date</label>
+                                <div class="stripe-element-wrap"><input class="form-input form-input--naked" type="text"
+                                        id="cardExp" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)" />
+                                </div>
+                            </div>
+                            <div class="form-group"><label class="form-label">CVC</label>
+                                <div class="stripe-element-wrap"><input class="form-input form-input--naked" type="text"
+                                        id="cardCvc" placeholder="123" maxlength="4" /></div>
+                            </div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Name on Card</label><input class="form-input"
+                                type="text" id="cardName" placeholder="MARCUS JOHNSON" /></div>
+                        <label class="save-card-label"><input type="checkbox" id="saveCard" class="accent-checkbox" />
+                            Save card for future purchases</label>
+                    </div>
+                    <div id="applePayment" class="alt-pay-placeholder hidden"><i
+                            class="fa-brands fa-apple alt-pay-icon"></i>
+                        <p class="alt-pay-text">Apple Pay will be triggered at order confirmation</p>
+                    </div>
+                    <div id="googlePayment" class="alt-pay-placeholder hidden"><i
+                            class="fa-brands fa-google-pay alt-pay-icon"></i>
+                        <p class="alt-pay-text">Google Pay will be triggered at order confirmation</p>
+                    </div>
+                    <div id="paypalPayment" class="alt-pay-placeholder hidden"><i
+                            class="fa-brands fa-paypal alt-pay-icon pay-icon-blue"></i>
+                        <p class="alt-pay-text">You'll be redirected to PayPal to complete payment</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div>
+                <div class="order-summary">
+                    <div class="summary-title">ORDER SUMMARY</div>
+                    <div class="summary-items" id="summaryItems"></div>
+                    <div class="promo-row mb-16"><input class="promo-input" type="text" id="checkoutPromo"
+                            placeholder="Promo code" /><button class="promo-btn" onclick="applyPromo()">Apply</button>
+                    </div>
+                    <div class="summary-line"><span>Subtotal</span><span id="summarySubtotal">$0.00</span></div>
+                    <div class="summary-line hidden" id="discountLine"><span
+                            class="summary-discount">Discount</span><span class="summary-discount"
+                            id="discountAmt">-$0.00</span></div>
+                    <div class="summary-line"><span>Shipping</span><span id="summaryShipping">—</span></div>
+                    <div class="summary-line"><span>Tax (8%)</span><span id="summaryTax">$0.00</span></div>
+                    <div class="summary-line total"><span>Total</span><strong id="summaryTotal">$0.00</strong></div>
+                    <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrder()"><i
+                            class="fa-solid fa-lock"></i> PLACE ORDER</button>
+                    <div class="security-row"><i class="fa-solid fa-shield-halved"></i> 256-bit SSL encrypted · 100%
+                        secure</div>
+                    <div class="payment-logos"><i class="fa-brands fa-cc-visa"></i><i
+                            class="fa-brands fa-cc-mastercard"></i><i class="fa-brands fa-cc-amex"></i><i
+                            class="fa-brands fa-cc-paypal"></i><i class="fa-brands fa-apple-pay"></i><i
+                            class="fa-brands fa-google-pay"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ SUCCESS PAGE ══ -->
+    <div class="success-page" id="successPage">
+        <div class="success-inner">
+            <div class="success-icon">✅</div>
+            <h1>ORDER <span>CONFIRMED!</span></h1>
+            <p id="successMsg">Your order has been placed successfully.<br />A confirmation email has been sent to
+                <strong id="successEmail"></strong></p>
+            <div class="order-summary-box">
+                <h3>ORDER DETAILS</h3>
+                <div class="order-detail-row"><span>Order Number</span><strong id="successOrderNum">#BD-0000</strong>
+                </div>
+                <div class="order-detail-row"><span>Date</span><strong id="successDate"></strong></div>
+                <div class="order-detail-row"><span>Payment</span><strong id="successPayment">Visa •••• 4242</strong>
+                </div>
+                <div class="order-detail-row"><span>Total</span><strong id="successTotal" class="accent"></strong></div>
+                <div class="order-detail-row"><span>Est. Delivery</span><strong id="successDelivery"
+                        class="accent"></strong></div>
+            </div>
+            <div class="tracking-timeline">
+                <div class="tracking-step">
+                    <div class="t-dot done"><i class="fa-solid fa-check t-icon"></i></div><span
+                        class="t-label">Order<br />Placed</span>
+                </div>
+                <div class="tracking-step">
+                    <div class="t-dot active"><i class="fa-solid fa-box t-icon"></i></div><span
+                        class="t-label">Processing</span>
+                </div>
+                <div class="tracking-step">
+                    <div class="t-dot"><i class="fa-solid fa-truck t-icon"></i></div><span
+                        class="t-label">Shipped</span>
+                </div>
+                <div class="tracking-step">
+                    <div class="t-dot"><i class="fa-solid fa-house t-icon"></i></div><span
+                        class="t-label">Delivered</span>
+                </div>
+            </div>
+            <div class="success-btns">
+                <button class="btn-primary" onclick="showPage('store')">Continue Shopping</button>
+                <button class="btn-secondary" onclick="showToast('Order tracking coming in next build!', 'info')">Track
+                    Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ CART DRAWER ══ -->
+    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <div class="cart-header-left">
+                <h2>YOUR CART</h2><span id="cartHeaderCount">0 items</span>
+            </div>
+            <button class="cart-close" onclick="closeCart()" title="Close cart"><i
+                    class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-ship-bar">
+            <div class="cart-ship-text" id="drawerShipText">Add <strong id="drawerShipAmt">$150</strong> more for FREE
+                shipping 🚚</div>
+            <div class="free-ship-track">
+                <div class="free-ship-fill" id="drawerShipFill"></div>
+            </div>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer" id="cartFooter">
+            <div class="promo-row"><input class="promo-input" type="text" id="promoCode"
+                    placeholder="Promo code" /><button class="promo-btn" onclick="applyPromo()">Apply</button></div>
+            <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
+            <div class="cart-savings hidden" id="cartSavings"></div>
+            <button class="checkout-btn" onclick="goToCheckout()"><i class="fa-solid fa-lock"></i> CHECKOUT</button>
+            <div class="cart-trust"><span><i class="fa-solid fa-shield-halved"></i> Secure</span><span><i
+                        class="fa-solid fa-rotate-left"></i> Easy Returns</span><span><i class="fa-solid fa-truck"></i>
+                    Fast Ship</span></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="checkout.js"></script>
+    <script src="analytics.js"></script>
+</body>
+
+</html>

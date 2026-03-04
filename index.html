@@ -41,8 +41,8 @@
           🛒
           <span class="cart-count">0</span>
         </button>
-        <button class="login-btn outline" onclick="window.location.href='admin.html'">Login</button>
-        <button class="login-btn solid" onclick="alert('Sign up coming soon!')">Sign Up</button>
+        <button class="login-btn outline" onclick="window.location.href='accounts.html'">Login</button>
+        <button class="login-btn solid" onclick="window.location.href='accounts.html#register'">Sign Up</button>
       </div>
     </div>
   </header>
@@ -72,7 +72,7 @@
     <div class="hero-banner">
       <div class="hero-content">
         <span class="hero-badge">Just Added</span>
-        <h1 class="hero-title">Archive Collection:<br>Off-White™ "Alaska"</h1>
+        <h1 class="hero-title">Archive Collection:<br>Virgil Abloh Archive™ x Air Jordan 1 High OG "Alaska" Retro</h1>
         <p class="hero-subtitle">The elusive Air Jordan 1 High OG Retro. Deconstructed luxury meets ultimate streetwear
           pedigree.</p>
         <button class="hero-btn" onclick="openProductModal(products.find(p => p.id === 16))">Shop Now</button>
@@ -120,16 +120,30 @@
       </button>
 
       <div class="modal-body">
-        <img src="" alt="Product Image" class="modal-image">
+        <div class="modal-badge-container">
+          <span id="modalBadge" class="modal-badge"></span>
+        </div>
+        <img src="" alt="Product Image" class="modal-image" id="modalImage">
         <div class="modal-details">
           <div class="modal-category">Sneakers</div>
-          <h2 class="modal-name"></h2>
-          <div class="modal-price"></div>
+          <h2 class="modal-name" id="modalTitle"></h2>
+          <div class="modal-sku" id="modalSku"></div>
+          <div class="modal-colorway" id="modalColorway"></div>
+          <div class="modal-price" id="modalPrice"></div>
           <div class="modal-lowest-ask">Lowest Ask</div>
+
+          <div class="modal-info-grid">
+            <div class="info-item">
+              <span class="info-label">Release Date</span>
+              <span id="modalReleaseDate" class="info-value"></span>
+            </div>
+          </div>
+
+          <p id="modalDescription" class="modal-description"></p>
 
           <div class="size-selector">
             <h3>Select Size</h3>
-            <div class="size-options">
+            <div class="size-options" id="modalSizeOptions">
               <!-- Sizes will be injected here -->
             </div>
           </div>
@@ -163,9 +177,24 @@
         <span>Total</span>
         <span class="cart-total-price" id="cartTotal">$0.00</span>
       </div>
-      <button class="cart-checkout"
-        onclick="alert('Checkout integration is disabled in prototype mode. Please use Admin to test orders.')">Proceed
-        to Checkout</button>
+      <button class="cart-checkout" id="cartCheckoutBtn" onclick="window.location.href='checkout.html'">Proceed to
+        Checkout</button>
+    </div>
+  </div>
+
+  <!-- ============================================
+       COMING SOON MODAL
+       ============================================ -->
+  <div class="modal" id="comingSoonModal">
+    <div class="modal-overlay" id="comingSoonOverlay"></div>
+    <div class="modal-content small center">
+      <button class="modal-close" id="comingSoonClose">×</button>
+      <div class="coming-soon-body">
+        <div class="coming-soon-icon">✨</div>
+        <h2 id="comingSoonTitle">Coming Soon</h2>
+        <p id="comingSoonMessage">This feature is currently being refined for our archive collection. Stay tuned!</p>
+        <button class="add-to-cart-btn" id="comingSoonAck">Got it</button>
+      </div>
     </div>
   </div>
 
@@ -215,11 +244,14 @@
         <div class="footer-section">
           <h3>Support</h3>
           <ul class="footer-links">
-            <li><a href="javascript:alert('Support contact coming soon!')" class="footer-link">Contact Us</a></li>
-            <li><a href="javascript:alert('Shipping information coming soon!')" class="footer-link">Shipping Info</a>
+            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="Support contact">Contact
+                Us</a></li>
+            <li><a href="javascript:void(0)" class="footer-link coming-soon"
+                data-feature="Shipping information">Shipping Info</a>
             </li>
-            <li><a href="javascript:alert('Returns policy coming soon!')" class="footer-link">Returns</a></li>
-            <li><a href="javascript:alert('FAQ coming soon!')" class="footer-link">FAQ</a></li>
+            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="Returns policy">Returns</a>
+            </li>
+            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="FAQ">FAQ</a></li>
           </ul>
         </div>
 
@@ -228,8 +260,10 @@
           <ul class="footer-links">
             <li><a href="javascript:void(0)" class="footer-link">About Us</a></li>
             <li><a href="javascript:void(0)" class="footer-link">Authenticity</a></li>
-            <li><a href="javascript:alert('Privacy policy coming soon!')" class="footer-link">Privacy Policy</a></li>
-            <li><a href="javascript:alert('Terms & Conditions coming soon!')" class="footer-link">Terms & Conditions</a>
+            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="Privacy policy">Privacy
+                Policy</a></li>
+            <li><a href="javascript:void(0)" class="footer-link coming-soon" data-feature="Terms & Conditions">Terms &
+                Conditions</a>
             </li>
           </ul>
         </div>
@@ -243,6 +277,8 @@
 
   <!-- JavaScript -->
   <script src="app.js" defer></script>
+  <!-- Backdoor Analytics Tracker -->
+  <script src="analytics.js" defer></script>
 </body>
 
 </html>

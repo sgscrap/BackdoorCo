@@ -16,13 +16,18 @@ const products = [
         releaseDate: "4/15/26",
         category: "Apparel",
         badge: "new",
-        sizes: ["Small", "Medium", "Large", "X-Large"],
+        sizes: [
+            { size: "Small", stock: 10, price: 100.00 },
+            { size: "Medium", stock: 15, price: 100.00 },
+            { size: "Large", stock: 8, price: 100.00 },
+            { size: "X-Large", stock: 12, price: 100.00 }
+        ],
         description: "Classic fit Godspeed Surf Day graphic t-shirt. Free shipping (1-2 weeks) or Express shipping (3-5 days, +$10).",
         image: "products/godspeed-surf-day.png"
     },
     {
         id: 16,
-        name: "Godkiller Virgil Abloh Archive™ x Air Jordan 1 High OG \"Alaska\" Retro",
+        name: "Virgil Abloh Archive™ x Air Jordan 1 High OG \"Alaska\" Retro",
         brand: "Jordan",
         price: 1647.20,
         sku: "AA3834-100",
@@ -30,7 +35,18 @@ const products = [
         releaseDate: "3/3/18",
         category: "Sneakers",
         badge: "new",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13", "M/US14"],
+        sizes: [
+            { size: "M/US7", stock: 2, price: 1647.20 },
+            { size: "M/US7.5", stock: 1, price: 1647.20 },
+            { size: "M/US8", stock: 0, price: 1647.20 },
+            { size: "M/US8.5", stock: 3, price: 1647.20 },
+            { size: "M/US9", stock: 5, price: 1647.20 },
+            { size: "M/US9.5", stock: 2, price: 1647.20 },
+            { size: "M/US10", stock: 0, price: 1647.20 },
+            { size: "M/US11", stock: 4, price: 1647.20 },
+            { size: "M/US12", stock: 2, price: 1647.20 },
+            { size: "M/US13", stock: 1, price: 1647.20 }
+        ],
         description: "The elusive Off-White x Air Jordan 1 'Alaska' (White) featuring deconstructed leather and Virgil Abloh's signature typography.",
         image: "products/jordan-1-ow-alaska.png"
     },
@@ -44,7 +60,12 @@ const products = [
         releaseDate: "10/25/25",
         category: "Sneakers",
         badge: "new",
-        sizes: ["Y/US4", "Y/US4.5", "Y/US5", "Y/US5.5", "Y/US6", "Y/US6.5", "M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9"],
+        sizes: [
+            { size: "M/US7", stock: 5, price: 249.00 },
+            { size: "M/US8", stock: 8, price: 249.00 },
+            { size: "M/US9", stock: 3, price: 249.00 },
+            { size: "M/US10", stock: 0, price: 249.00 }
+        ],
         description: "The Pharrell x VIRGINIA x Adistar Jellyfish features a unique design with royal blue accents and innovative materials.",
         image: "products/pharrell-jellyfish-blue.jpg"
     },
@@ -58,7 +79,11 @@ const products = [
         releaseDate: "10/11/25",
         category: "Sneakers",
         badge: "new",
-        sizes: ["Y/US4", "Y/US4.5", "Y/US5", "Y/US5.5", "Y/US6", "Y/US6.5", "M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9"],
+        sizes: [
+            { size: "M/US7", stock: 4, price: 249.00 },
+            { size: "M/US8", stock: 6, price: 249.00 },
+            { size: "M/US9", stock: 2, price: 249.00 }
+        ],
         description: "A sleek colorway of the Pharrell collaboration featuring solid grey and black tones.",
         image: "products/pharrell-jellyfish-grey.jpg"
     },
@@ -72,7 +97,12 @@ const products = [
         releaseDate: "11/12/25",
         category: "Sneakers",
         badge: "new",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13"],
+        sizes: [
+            { size: "M/US7", stock: 3, price: 249.00 },
+            { size: "M/US8", stock: 5, price: 249.00 },
+            { size: "M/US9", stock: 4, price: 249.00 },
+            { size: "M/US10", stock: 2, price: 249.00 }
+        ],
         description: "Features a white Cushlon midsole with large Zoom Air forefoot unit and micromesh upper with scaly-textured 'islands'.",
         image: "products/kobe-6-caitlin-clark.jpg"
     },
@@ -86,7 +116,11 @@ const products = [
         releaseDate: "5/1/24",
         category: "Sneakers",
         badge: "new",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13"],
+        sizes: [
+            { size: "M/US8", stock: 2, price: 299.00 },
+            { size: "M/US9", stock: 4, price: 299.00 },
+            { size: "M/US10", stock: 1, price: 299.00 }
+        ],
         description: "Tumbled leather upper with prominent logos inspired by the Air More Uptempo; 'Air' and 'Sunshine' wordmarks.",
         image: "products/af1-cpfm-moss.jpg"
     },
@@ -100,7 +134,11 @@ const products = [
         releaseDate: "7/29/21",
         category: "Sneakers",
         badge: "bestseller",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13"],
+        sizes: [
+            { size: "M/US7", stock: 1, price: 899.00 },
+            { size: "M/US8", stock: 2, price: 899.00 },
+            { size: "M/US9", stock: 1, price: 899.00 }
+        ],
         description: "White leather base, black forefoot overlay, and Travis's signature reverse Swoosh in royal blue.",
         image: "products/jordan-1-fragment-travis.jpg"
     },
@@ -114,7 +152,10 @@ const products = [
         releaseDate: "1/10/26",
         category: "Sneakers",
         badge: "new",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13"],
+        sizes: [
+            { size: "M/US9", stock: 3, price: 499.00 },
+            { size: "M/US10", stock: 2, price: 499.00 }
+        ],
         description: "Exclusive House of Hoops collaboration featuring premium materials and unique colorway.",
         image: "products/jordan-10-hoh.jpg"
     },
@@ -128,7 +169,10 @@ const products = [
         releaseDate: "1/10/26",
         category: "Sneakers",
         badge: "new",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13"],
+        sizes: [
+            { size: "M/US7", stock: 5, price: 260.00 },
+            { size: "M/US8", stock: 4, price: 260.00 }
+        ],
         description: "Grey layered nubuck upper with white contrast stitching and silver reflective tongue.",
         image: "products/jordan-5-wolf-grey.jpg"
     },
@@ -142,7 +186,10 @@ const products = [
         releaseDate: "11/19/25",
         category: "Sneakers",
         badge: "new",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13"],
+        sizes: [
+            { size: "M/US9", stock: 6, price: 260.00 },
+            { size: "M/US10", stock: 4, price: 260.00 }
+        ],
         description: "Classic Jordan 10 silhouette in the iconic Shadow colorway with premium materials.",
         image: "products/jordan-10-shadow.jpg"
     },
@@ -156,7 +203,10 @@ const products = [
         releaseDate: "12/3/25",
         category: "Sneakers",
         badge: "new",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13"],
+        sizes: [
+            { size: "M/US8", stock: 3, price: 250.00 },
+            { size: "M/US9", stock: 5, price: 250.00 }
+        ],
         description: "PSG collaboration featuring team colors and premium construction.",
         image: "products/jordan-5-psg.jpg"
     },
@@ -170,7 +220,11 @@ const products = [
         releaseDate: "12/15/24",
         category: "Sneakers",
         badge: "new",
-        sizes: ["M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US12.5", "M/US13", "M/US14", "M/US15"],
+        sizes: [
+            { size: "M/US9", stock: 4, price: 250.00 },
+            { size: "M/US10", stock: 3, price: 250.00 },
+            { size: "M/US11", stock: 2, price: 250.00 }
+        ],
         description: "Jalen Brunson PE featuring Statue of Liberty inspired colorway with turquoise and copper accents.",
         image: "products/kobe-6-brunson.jpg"
     },
@@ -184,7 +238,11 @@ const products = [
         releaseDate: "11/28/25",
         category: "Sneakers",
         badge: "bestseller",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13", "M/US14"],
+        sizes: [
+            { size: "M/US8", stock: 2, price: 250.00 },
+            { size: "M/US9", stock: 5, price: 250.00 },
+            { size: "M/US10", stock: 0, price: 250.00 }
+        ],
         description: "The iconic all-black Jordan 4 returns with premium nubuck construction.",
         image: "products/jordan-4-black-cat.jpg"
     },
@@ -198,7 +256,11 @@ const products = [
         releaseDate: "12/15/23",
         category: "Sneakers",
         badge: "sale",
-        sizes: ["M/US8", "M/US8.5", "M/US14"],
+        sizes: [
+            { size: "M/US8", stock: 1, price: 260.00 },
+            { size: "M/US8.5", stock: 0, price: 260.00 },
+            { size: "M/US14", stock: 2, price: 260.00 }
+        ],
         description: "Limited edition Reverse Grinch colorway with bright crimson and electric green.",
         image: "products/kobe-6-reverse-grinch.jpg"
     },
@@ -212,7 +274,10 @@ const products = [
         releaseDate: "4/15/25",
         category: "Sneakers",
         badge: "bestseller",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13", "M/US14"],
+        sizes: [
+            { size: "M/US9", stock: 4, price: 190.00 },
+            { size: "M/US10", stock: 3, price: 190.00 }
+        ],
         description: "Special edition Jordan 3 celebrating the love of the game with unique colorway.",
         image: "products/jordan-3-for-the-love.jpg"
     },
@@ -226,7 +291,10 @@ const products = [
         releaseDate: "2/15/25",
         category: "Sneakers",
         badge: "bestseller",
-        sizes: ["M/US7", "M/US7.5", "M/US8", "M/US8.5", "M/US9", "M/US9.5", "M/US10", "M/US10.5", "M/US11", "M/US11.5", "M/US12", "M/US13"],
+        sizes: [
+            { size: "M/US9", stock: 5, price: 275.00 },
+            { size: "M/US10", stock: 2, price: 275.00 }
+        ],
         description: "Matte black nubuck upper with University Blue vents; inspired by MJ's love of luxury sports cars.",
         image: "products/jordan-14-black-blue.jpg"
     },
@@ -240,7 +308,12 @@ const products = [
         releaseDate: "11/1/24",
         category: "Apparel",
         badge: "new",
-        sizes: ["Small", "Medium", "Large", "X-Large"],
+        sizes: [
+            { size: "Small", stock: 4, price: 420.00 },
+            { size: "Medium", stock: 6, price: 420.00 },
+            { size: "Large", stock: 3, price: 420.00 },
+            { size: "X-Large", stock: 2, price: 420.00 }
+        ],
         description: "Insulated down fill, metallic mica-green quilted shell, and minimal NOCTA branding.",
         image: "products/nocta-sunset-jacket.jpg"
     }
@@ -250,7 +323,7 @@ const products = [
 // STATE MANAGEMENT
 // ============================================
 let filteredProducts = [...products];
-let cart = [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let selectedFilters = {
     brands: [],
     categories: [],
@@ -284,7 +357,7 @@ const modalColorway = document.getElementById('modalColorway');
 const modalPrice = document.getElementById('modalPrice');
 const modalDescription = document.getElementById('modalDescription');
 const modalReleaseDate = document.getElementById('modalReleaseDate');
-const modalSizeSelect = document.getElementById('modalSizeSelect');
+const modalSizeOptions = document.getElementById('modalSizeOptions');
 const modalAddToCart = document.getElementById('modalAddToCart');
 const modalBadge = document.getElementById('modalBadge');
 
@@ -669,8 +742,16 @@ function openProductModal(productId) {
     }
 
     // Populate sizes
-    modalSizeSelect.innerHTML = '<option value="">Choose a size</option>' +
-        product.sizes.map(size => `<option value="${size}">${size}</option>`).join('');
+    modalSizeOptions.innerHTML = product.sizes.map(s => {
+        const isSoldOut = s.stock === 0;
+        return `
+            <div class="size-option ${isSoldOut ? 'sold-out' : ''}" 
+                 data-size="${s.size}" 
+                 onclick="${isSoldOut ? '' : 'selectModalSize(this)'}">
+                ${s.size}${isSoldOut ? ' - Sold Out' : ''}
+            </div>
+        `;
+    }).join('');
 
     // Store product ID on modal
     productModal.dataset.productId = productId;
@@ -685,9 +766,19 @@ function closeModal() {
     document.body.style.overflow = '';
 }
 
+let selectedModalSizeValue = null;
+
+function selectModalSize(element) {
+    // Remove selected class from all options
+    document.querySelectorAll('.modal .size-option').forEach(opt => opt.classList.remove('selected'));
+    // Add selected class to clicked option
+    element.classList.add('selected');
+    selectedModalSizeValue = element.dataset.size;
+}
+
 function addToCartFromModal() {
     const productId = parseInt(productModal.dataset.productId);
-    const selectedSize = modalSizeSelect.value;
+    const selectedSize = selectedModalSizeValue;
 
     if (!selectedSize) {
         alert('Please select a size');
@@ -697,22 +788,28 @@ function addToCartFromModal() {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
-    // Check if item already in cart
-    const existingItem = cart.find(item => item.id === productId && item.size === selectedSize);
+    // Advanced cart logic: prevent duplicates of same product + size
+    const existingIndex = cart.findIndex(item => item.id === productId && item.size === selectedSize);
 
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({
-            id: productId,
-            name: product.name,
-            price: product.price,
-            size: selectedSize,
-            image: product.image,
-            quantity: 1
-        });
+    if (existingIndex !== -1) {
+        alert('This size is already in your cart');
+        return;
     }
 
+    // Get specific price for this size
+    const sizeData = product.sizes.find(s => s.size === selectedSize);
+    const price = sizeData ? sizeData.price : product.price;
+
+    cart.push({
+        id: productId,
+        name: product.name,
+        price: price,
+        size: selectedSize,
+        image: product.image,
+        quantity: 1
+    });
+
+    saveCart();
     updateCartUI();
     closeModal();
 
@@ -720,12 +817,15 @@ function addToCartFromModal() {
     cartSidebar.classList.add('active');
     setTimeout(() => {
         if (cartSidebar.classList.contains('active')) {
-            // Auto-close after 3 seconds if user doesn't interact
             setTimeout(() => {
                 cartSidebar.classList.remove('active');
             }, 3000);
         }
     }, 100);
+}
+
+function saveCart() {
+    localStorage.setItem('cart', JSON.stringify(cart));
 }
 
 // ============================================
@@ -736,6 +836,9 @@ function toggleCart() {
 }
 
 function updateCartUI() {
+    // Safety guard for non-marketplace pages
+    if (!cartCount || !cartItems || !cartTotal) return;
+
     // Update cart count
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     cartCount.textContent = totalItems;
@@ -754,7 +857,7 @@ function updateCartUI() {
       <div class="cart-item-info">
         <div class="cart-item-name">${item.name}</div>
         <div class="cart-item-size">Size: ${item.size}</div>
-        <div class="cart-item-price">$${item.price.toFixed(2)} x ${item.quantity}</div>
+        <div class="cart-item-price">$${item.price.toFixed(2)}</div>
       </div>
       <button class="cart-item-remove" onclick="removeFromCart(${index})">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -766,16 +869,65 @@ function updateCartUI() {
   `).join('');
 
     // Update total
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const total = cart.reduce((sum, item) => sum + item.price, 0);
     cartTotal.textContent = `$${total.toFixed(2)}`;
 }
 
 function removeFromCart(index) {
     cart.splice(index, 1);
+    saveCart();
     updateCartUI();
 }
 
 
+// ============================================
+// COMING SOON MODAL LOGIC
+// ============================================
+const comingSoonModal = document.getElementById('comingSoonModal');
+const comingSoonTitle = document.getElementById('comingSoonTitle');
+const comingSoonMessage = document.getElementById('comingSoonMessage');
+const comingSoonClose = document.getElementById('comingSoonClose');
+const comingSoonOverlay = document.getElementById('comingSoonOverlay');
+const comingSoonAck = document.getElementById('comingSoonAck');
+const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
+
+function showComingSoon(featureName = "") {
+    if (featureName) {
+        comingSoonTitle.textContent = `${featureName} Coming Soon`;
+        comingSoonMessage.textContent = `The ${featureName.toLowerCase()} feature is currently being refined for our archive collection. stay tuned!`;
+    } else {
+        comingSoonTitle.textContent = "Coming Soon";
+        comingSoonMessage.textContent = "This feature is currently being refined for our archive collection. Stay tuned!";
+    }
+    comingSoonModal.classList.add('active');
+}
+
+function closeComingSoon() {
+    comingSoonModal.classList.remove('active');
+}
+
+if (comingSoonClose) comingSoonClose.onclick = closeComingSoon;
+if (comingSoonOverlay) comingSoonOverlay.onclick = closeComingSoon;
+if (comingSoonAck) comingSoonAck.onclick = closeComingSoon;
+
+// Global listener for all elements with .coming-soon
+document.addEventListener('click', (e) => {
+    const target = e.target.closest('.coming-soon');
+    if (target) {
+        const feature = target.dataset.feature || "";
+        showComingSoon(feature);
+    }
+});
+
+if (cartCheckoutBtn) {
+    cartCheckoutBtn.onclick = () => {
+        showComingSoon("Checkout");
+    };
+}
+
 // Make functions globally available
 window.openProductModal = openProductModal;
+window.showComingSoon = showComingSoon;
+window.closeComingSoon = closeComingSoon;
 window.removeFromCart = removeFromCart;
+window.selectModalSize = selectModalSize;

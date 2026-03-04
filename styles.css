@@ -1133,3 +1133,56 @@ html {
   background: var(--primary-green);
   color: white;
 }
+
+/* Coming Soon Modal Styles */
+.modal-content.small {
+  max-width: 400px;
+}
+
+.modal-content.center {
+  text-align: center;
+}
+
+.coming-soon-body {
+  padding: 40px 20px;
+}
+
+.coming-soon-icon {
+  font-size: 48px;
+  margin-bottom: 24px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+#comingSoonTitle {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, #666 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#comingSoonMessage {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.modal-content.small .add-to-cart-btn {
+  padding: 16px;
+  font-size: 15px;
+}
