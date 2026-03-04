@@ -416,7 +416,7 @@ nav {
   position: relative;
   width: 100%;
   padding-top: 85%;
-  background: var(--bg-white);
+  background: #F4F5F5;
   border-radius: var(--radius-lg);
   overflow: hidden;
   margin-bottom: 12px;
@@ -431,6 +431,7 @@ nav {
   height: auto;
   max-height: 85%;
   object-fit: contain;
+  mix-blend-mode: darken;
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
