@@ -374,8 +374,8 @@ function renderProducts() {
       <div class="product-info" onclick="openProductModal(${product.id})">
         <div class="product-name">${product.name}</div>
         <div class="product-category">${product.category}</div>
-        <div class="product-price">$${product.price.toFixed(0)}</div>
         <div class="product-lowest-ask">Lowest Ask</div>
+        <div class="product-price">$${product.price.toFixed(0)}</div>
       </div>
       <button class="quick-view-btn" onclick="openProductModal(${product.id})">View</button>
     </div>
