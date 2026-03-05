@@ -372,6 +372,7 @@ const productModal = document.getElementById('productModal');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalClose = document.getElementById('modalClose');
 const modalImage = document.getElementById('modalImage');
+const modalCategory = document.getElementById('modalCategory');
 const modalTitle = document.getElementById('modalTitle');
 const modalSku = document.getElementById('modalSku');
 const modalColorway = document.getElementById('modalColorway');
@@ -771,6 +772,7 @@ function openProductModal(productId) {
     modalImage.onerror = () => {
         modalImage.src = `https://via.placeholder.com/600x600/1a1a1a/8B5CF6?text=${encodeURIComponent(product.name)}`;
     };
+    if (modalCategory) modalCategory.textContent = product.category.toUpperCase();
     modalTitle.textContent = product.name;
     modalSku.textContent = `SKU: ${product.sku}`;
     modalColorway.textContent = product.colorway;
