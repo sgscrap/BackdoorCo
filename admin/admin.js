@@ -1,9 +1,10 @@
-// ============================================
-// BACKDOOR ADMIN DASHBOARD - FIREBASE ENGINE
-// ============================================
-
-// Initialize Firebase (using config from firebase-config.js)
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase (using config defined in index.html)
+console.log('Backdoor Admin Engine: Initializing Firebase...', typeof firebaseConfig !== 'undefined' ? 'Config Found' : 'Config MISSING');
+if (typeof firebaseConfig !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+} else {
+    console.error('CRITICAL: firebaseConfig is not defined. Login will fail.');
+}
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -44,6 +45,7 @@ const pageData = {
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded. Initializing Dashboard...');
     initFirebaseListeners();
     initImporter();
     setupEventListeners();
@@ -87,26 +89,33 @@ function checkAuth() {
 
 function setupEventListeners() {
     // Login
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button');
-        const email = document.getElementById('adminEmail').value;
-        const pass = document.getElementById('adminPassword').value;
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const email = document.getElementById('adminEmail').value;
+            const pass = document.getElementById('adminPassword').value;
 
-        btn.disabled = true;
-        btn.textContent = 'Verifying...';
+            btn.disabled = true;
+            btn.textContent = 'Verifying...';
 
-        try {
-            await auth.signInWithEmailAndPassword(email, pass);
-            showToast('Welcome back, Admin');
-        } catch (err) {
-            console.error(err);
-            showToast('Login Failed: ' + err.message, 'error');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Unlock Dashboard';
-        }
-    });
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                showToast('Welcome back, Admin');
+            } catch (err) {
+                console.error('Login Error:', err);
+                let message = err.message;
+                if (err.code === 'auth/unauthorized-domain') {
+                    message = 'UNAUTHORIZED DOMAIN: Please add backdoordmv.netlify.app to authorized domains in Firebase Console > Authentication > Settings.';
+                }
+                showToast('Login Failed: ' + message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Unlock Dashboard';
+            }
+        });
+    }
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -667,9 +676,7 @@ function setImporterStep(step) {
 }
 
 // Hook into the main init
-document.addEventListener('DOMContentLoaded', () => {
-    initImporter();
-});
+// initImporter() is already called in the top-level DOMContentLoaded
 
 
 // Data is now handled via initFirebaseListeners
