@@ -163,12 +163,18 @@
       </div>
     </div>
     <div class="brand-filters">
-      <button class="brand-chip active brand-filter" data-brand="all">All</button>
-      <button class="brand-chip brand-filter" data-brand="Jordan">Jordan</button>
-      <button class="brand-chip brand-filter" data-brand="Nike">Nike</button>
-      <button class="brand-chip brand-filter" data-brand="Adidas">Adidas</button>
-      <button class="brand-chip category-filter" data-category="Sneakers">Sneakers</button>
-      <button class="brand-chip category-filter" data-category="Apparel">Apparel</button>
+      <button class="brand-chip active brand-filter" data-brand="all">All <span class="filter-count"
+          data-count="all"></span></button>
+      <button class="brand-chip brand-filter" data-brand="Jordan">Jordan <span class="filter-count"
+          data-count="Jordan"></span></button>
+      <button class="brand-chip brand-filter" data-brand="Nike">Nike <span class="filter-count"
+          data-count="Nike"></span></button>
+      <button class="brand-chip brand-filter" data-brand="Adidas">Adidas <span class="filter-count"
+          data-count="Adidas"></span></button>
+      <button class="brand-chip category-filter" data-category="Sneakers">Sneakers <span class="filter-count"
+          data-count="Sneakers"></span></button>
+      <button class="brand-chip category-filter" data-category="Apparel">Apparel <span class="filter-count"
+          data-count="Apparel"></span></button>
     </div>
     <div class="products-grid" id="productGrid">
       <!-- Products rendered by app.js -->
@@ -414,7 +420,22 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- JavaScript -->
-  <script src="app.js" defer></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+      authDomain: "coalition-aec44.firebaseapp.com",
+      projectId: "coalition-aec44",
+      storageBucket: "coalition-aec44.firebasestorage.app",
+      messagingSenderId: "312196142925",
+      appId: "1:312196142925:web:ba090f602c8b5a31b20904",
+      measurementId: "G-SPJ2FDLSKZ"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+  <script src="app.js?v=2.0" defer></script>
   <script src="analytics.js" defer></script>
   <script>
     // Announcement bar

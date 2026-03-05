@@ -5,358 +5,57 @@
 // ============================================
 // PRODUCT DATA
 // ============================================
-const products = [
-    {
-        id: 19,
-        name: "Acne Studios 1996 Rhinestone Logo T-Shirt - Black",
-        brand: "Acne Studios",
-        price: 350.00,
-        sku: "FN-UX-TSHI000231",
-        colorway: "Black",
-        releaseDate: "2/1/24",
-        category: "Apparel",
-        badge: "hot",
-        sizes: [
-            { size: "Small", stock: 10, price: 350.00 },
-            { size: "Medium", stock: 15, price: 350.00 },
-            { size: "Large", stock: 8, price: 350.00 },
-            { size: "X-Large", stock: 12, price: 350.00 }
-        ],
-        description: "Long-sleeve crewneck T-shirt featuring a metallic foiled 'Acne Studios 1996' print across the chest with rhinestone details. Crafted from lightweight cotton-hemp jersey with an irregular surface for a vintage-inspired feel. Cut to a relaxed unisex fit and hip length. Shell: 85% Cotton, 15% True hemp.",
-        image: "products/acne-1996-rhinestone-1.png",
-        images: ["products/acne-1996-rhinestone-1.png", "products/acne-1996-rhinestone-2.png"]
-    },
-    {
-        id: 18,
-        name: "Acne Studios 1996 Logo T-Shirt - Relaxed Fit Deep Blue",
-        brand: "Acne Studios",
-        price: 250.00,
-        sku: "FN-UX-TSHI000013",
-        colorway: "Deep Blue",
-        releaseDate: "1/1/24",
-        category: "Apparel",
-        badge: "hot",
-        sizes: [
-            { size: "Small", stock: 10, price: 250.00 },
-            { size: "Medium", stock: 15, price: 250.00 },
-            { size: "Large", stock: 8, price: 250.00 },
-            { size: "X-Large", stock: 12, price: 250.00 }
-        ],
-        description: "Short-sleeve crewneck T-shirt is crafted from organic cotton jersey with an irregular surface and sprayed for a vintage-inspired look. Detailed with an Acne Studios 1996 stamp logo and finished with distressed neckline, cuffs, and hem. Cut to a relaxed unisex fit and hip length.",
-        image: "products/acne-1996-logo-tshirt.png"
-    },
-    {
-        id: 17,
-        name: "Godspeed Surf Day T-shirt",
-        brand: "Godspeed",
-        price: 100.00,
-        sku: "GS-SURF-001",
-        colorway: "White/Blue",
-        releaseDate: "4/15/26",
-        category: "Apparel",
-        badge: "new",
-        sizes: [
-            { size: "Small", stock: 10, price: 100.00 },
-            { size: "Medium", stock: 15, price: 100.00 },
-            { size: "Large", stock: 8, price: 100.00 },
-            { size: "X-Large", stock: 12, price: 100.00 }
-        ],
-        description: "Classic fit Godspeed Surf Day graphic t-shirt. Free shipping (1-2 weeks) or Express shipping (3-5 days, +$10).",
-        image: "products/godspeed-surf-day.png"
-    },
-    {
-        id: 16,
-        name: "Virgil Abloh Archive™ x Air Jordan 1 High OG \"Alaska\" Retro",
-        brand: "Jordan",
-        price: 1647.20,
-        sku: "AA3834-100",
-        colorway: "White/White",
-        releaseDate: "3/3/18",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 2, price: 1647.20 },
-            { size: "M/US7.5", stock: 1, price: 1647.20 },
-            { size: "M/US8", stock: 0, price: 1647.20 },
-            { size: "M/US8.5", stock: 3, price: 1647.20 },
-            { size: "M/US9", stock: 5, price: 1647.20 },
-            { size: "M/US9.5", stock: 2, price: 1647.20 },
-            { size: "M/US10", stock: 0, price: 1647.20 },
-            { size: "M/US11", stock: 4, price: 1647.20 },
-            { size: "M/US12", stock: 2, price: 1647.20 },
-            { size: "M/US13", stock: 1, price: 1647.20 }
-        ],
-        description: "The elusive Off-White x Air Jordan 1 'Alaska' (White) featuring deconstructed leather and Virgil Abloh's signature typography.",
-        image: "products/jordan-1-ow-alaska.png"
-    },
-    {
-        id: 1,
-        name: "Pharrell x VIRGINIA x Adistar Jellyfish 'Royal Blue'",
-        brand: "Adidas",
-        price: 249.00,
-        sku: "JP9263",
-        colorway: "Royal Blue/Core Black/Focus Olive",
-        releaseDate: "10/25/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 5, price: 249.00 },
-            { size: "M/US8", stock: 8, price: 249.00 },
-            { size: "M/US9", stock: 3, price: 249.00 },
-            { size: "M/US10", stock: 0, price: 249.00 }
-        ],
-        description: "The Pharrell x VIRGINIA x Adistar Jellyfish features a unique design with royal blue accents and innovative materials.",
-        image: "products/pharrell-jellyfish-blue.jpg"
-    },
-    {
-        id: 2,
-        name: "Pharrell x VIRGINIA x Adistar Jellyfish 'Solid Grey Black'",
-        brand: "Adidas",
-        price: 249.00,
-        sku: "JP9265",
-        colorway: "Mgh Solid Grey/Core Black/Clear Onix",
-        releaseDate: "10/11/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 4, price: 249.00 },
-            { size: "M/US8", stock: 6, price: 249.00 },
-            { size: "M/US9", stock: 2, price: 249.00 }
-        ],
-        description: "A sleek colorway of the Pharrell collaboration featuring solid grey and black tones.",
-        image: "products/pharrell-jellyfish-grey.jpg"
-    },
-    {
-        id: 3,
-        name: "Caitlin Clark x Zoom Kobe 6 Protro 'Light Armory Blue'",
-        brand: "Nike",
-        price: 249.00,
-        sku: "IO3672 400",
-        colorway: "Light Armory Blue/White/Baltic Blue",
-        releaseDate: "11/12/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 3, price: 249.00 },
-            { size: "M/US8", stock: 5, price: 249.00 },
-            { size: "M/US9", stock: 4, price: 249.00 },
-            { size: "M/US10", stock: 2, price: 249.00 }
-        ],
-        description: "Features a white Cushlon midsole with large Zoom Air forefoot unit and micromesh upper with scaly-textured 'islands'.",
-        image: "products/kobe-6-caitlin-clark.jpg"
-    },
-    {
-        id: 4,
-        name: "Cactus Plant Flea Market x Air Force 1 Low Premium 'Moss'",
-        brand: "Nike",
-        price: 299.00,
-        sku: "FQ7069 300",
-        colorway: "Moss/Moss",
-        releaseDate: "5/1/24",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US8", stock: 2, price: 299.00 },
-            { size: "M/US9", stock: 4, price: 299.00 },
-            { size: "M/US10", stock: 1, price: 299.00 }
-        ],
-        description: "Tumbled leather upper with prominent logos inspired by the Air More Uptempo; 'Air' and 'Sunshine' wordmarks.",
-        image: "products/af1-cpfm-moss.jpg"
-    },
-    {
-        id: 5,
-        name: "Fragment Design x Travis Scott x Jordan 1 Low OG SP 'Sail Military Blue'",
-        brand: "Jordan",
-        price: 899.00,
-        sku: "DM7866 140",
-        colorway: "Sail/Black/Muslin/Military Blue",
-        releaseDate: "7/29/21",
-        category: "Sneakers",
-        badge: "bestseller",
-        sizes: [
-            { size: "M/US7", stock: 1, price: 899.00 },
-            { size: "M/US8", stock: 2, price: 899.00 },
-            { size: "M/US9", stock: 1, price: 899.00 }
-        ],
-        description: "White leather base, black forefoot overlay, and Travis's signature reverse Swoosh in royal blue.",
-        image: "products/jordan-1-fragment-travis.jpg"
-    },
-    {
-        id: 6,
-        name: "Steve Wiebe x Jordan 10 Retro 'HOH'",
-        brand: "Jordan",
-        price: 499.00,
-        sku: "DD0587 002",
-        colorway: "Light Graphite/White/Wolf Grey",
-        releaseDate: "1/10/26",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US9", stock: 3, price: 499.00 },
-            { size: "M/US10", stock: 2, price: 499.00 }
-        ],
-        description: "Exclusive House of Hoops collaboration featuring premium materials and unique colorway.",
-        image: "products/jordan-10-hoh.jpg"
-    },
-    {
-        id: 7,
-        name: "Jordan 5 Retro 'Wolf Grey' 2026 GS",
-        brand: "Jordan",
-        price: 260.00,
-        sku: "DD0587 002",
-        colorway: "Light Graphite/White/Wolf Grey",
-        releaseDate: "1/10/26",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 5, price: 260.00 },
-            { size: "M/US8", stock: 4, price: 260.00 }
-        ],
-        description: "Grey layered nubuck upper with white contrast stitching and silver reflective tongue.",
-        image: "products/jordan-5-wolf-grey.jpg"
-    },
-    {
-        id: 8,
-        name: "Jordan 10 Retro 'Shadow' 2025",
-        brand: "Jordan",
-        price: 260.00,
-        sku: "HJ6779 001",
-        colorway: "Charred Grey/True Red/Black",
-        releaseDate: "11/19/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US9", stock: 6, price: 260.00 },
-            { size: "M/US10", stock: 4, price: 260.00 }
-        ],
-        description: "Classic Jordan 10 silhouette in the iconic Shadow colorway with premium materials.",
-        image: "products/jordan-10-shadow.jpg"
-    },
-    {
-        id: 9,
-        name: "Paris Saint-Germain x Jordan 5 Retro 'Off Noir'",
-        brand: "Jordan",
-        price: 250.00,
-        sku: "HQ3004 001",
-        colorway: "Off Noir/Particle Rose/Anthracite/Pearl Pink/Sail",
-        releaseDate: "12/3/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US8", stock: 3, price: 250.00 },
-            { size: "M/US9", stock: 5, price: 250.00 }
-        ],
-        description: "PSG collaboration featuring team colors and premium construction.",
-        image: "products/jordan-5-psg.jpg"
-    },
-    {
-        id: 10,
-        name: "Jalen Brunson x Zoom Kobe 6 Protro 'Statue of Liberty'",
-        brand: "Nike",
-        price: 250.00,
-        sku: "IQ5774 300",
-        colorway: "Hyper Turquoise/Metallic Copper",
-        releaseDate: "12/15/24",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US9", stock: 4, price: 250.00 },
-            { size: "M/US10", stock: 3, price: 250.00 },
-            { size: "M/US11", stock: 2, price: 250.00 }
-        ],
-        description: "Jalen Brunson PE featuring Statue of Liberty inspired colorway with turquoise and copper accents.",
-        image: "products/kobe-6-brunson.jpg"
-    },
-    {
-        id: 11,
-        name: "Jordan 4 Retro 'Black Cat' 2025",
-        brand: "Jordan",
-        price: 250.00,
-        sku: "FV5029 010",
-        colorway: "Black/Black/Light Graphite",
-        releaseDate: "11/28/25",
-        category: "Sneakers",
-        badge: "bestseller",
-        sizes: [
-            { size: "M/US8", stock: 2, price: 250.00 },
-            { size: "M/US9", stock: 5, price: 250.00 },
-            { size: "M/US10", stock: 0, price: 250.00 }
-        ],
-        description: "The iconic all-black Jordan 4 returns with premium nubuck construction.",
-        image: "products/jordan-4-black-cat.jpg"
-    },
-    {
-        id: 12,
-        name: "Zoom Kobe 6 Protro 'Reverse Grinch'",
-        brand: "Nike",
-        price: 260.00,
-        sku: "FV4921 600",
-        colorway: "Bright Crimson/Black/Electric Green",
-        releaseDate: "12/15/23",
-        category: "Sneakers",
-        badge: "sale",
-        sizes: [
-            { size: "M/US8", stock: 1, price: 260.00 },
-            { size: "M/US8.5", stock: 0, price: 260.00 },
-            { size: "M/US14", stock: 2, price: 260.00 }
-        ],
-        description: "Limited edition Reverse Grinch colorway with bright crimson and electric green.",
-        image: "products/kobe-6-reverse-grinch.jpg"
-    },
-    {
-        id: 13,
-        name: "Air Jordan 3 Retro OG SP 'For The Love'",
-        brand: "Jordan",
-        price: 190.00,
-        sku: "HV8571 100",
-        colorway: "White/Diffused Blue/Anthracite/Muslin",
-        releaseDate: "4/15/25",
-        category: "Sneakers",
-        badge: "bestseller",
-        sizes: [
-            { size: "M/US9", stock: 4, price: 190.00 },
-            { size: "M/US10", stock: 3, price: 190.00 }
-        ],
-        description: "Special edition Jordan 3 celebrating the love of the game with unique colorway.",
-        image: "products/jordan-3-for-the-love.jpg"
-    },
-    {
-        id: 14,
-        name: "Jordan 14 'Black University Blue'",
-        brand: "Jordan",
-        price: 275.00,
-        sku: "DH4121 041",
-        colorway: "Black/University Blue",
-        releaseDate: "2/15/25",
-        category: "Sneakers",
-        badge: "bestseller",
-        sizes: [
-            { size: "M/US9", stock: 5, price: 275.00 },
-            { size: "M/US10", stock: 2, price: 275.00 }
-        ],
-        description: "Matte black nubuck upper with University Blue vents; inspired by MJ's love of luxury sports cars.",
-        image: "products/jordan-14-black-blue.jpg"
-    },
-    {
-        id: 15,
-        name: "Nike x NOCTA 'Sunset' Puffer Jacket – Mica Green / Cyber",
-        brand: "Nike",
-        price: 420.00,
-        sku: "FN8196-330",
-        colorway: "Mica Green/Cyber",
-        releaseDate: "11/1/24",
-        category: "Apparel",
-        badge: "new",
-        sizes: [
-            { size: "Small", stock: 4, price: 420.00 },
-            { size: "Medium", stock: 6, price: 420.00 },
-            { size: "Large", stock: 3, price: 420.00 },
-            { size: "X-Large", stock: 2, price: 420.00 }
-        ],
-        description: "Insulated down fill, metallic mica-green quilted shell, and minimal NOCTA branding.",
-        image: "products/nocta-sunset-jacket.jpg"
-    }
-];
+const db = firebase.firestore();
+let products = [];
+let firebaseLoaded = false;
+
+// ============================================
+// FIREBASE DATA SYNC
+// ============================================
+function initFirebaseSync() {
+    console.log('Syncing Shop with Firebase...');
+    db.collection('products').where('status', '==', 'active').onSnapshot(snapshot => {
+        products = snapshot.docs.map(doc => {
+            const data = doc.data();
+
+            // Format sizes nicely because it could be string or array
+            let parsedSizes = [];
+            if (Array.isArray(data.sizes)) {
+                parsedSizes = data.sizes;
+            } else if (typeof data.sizes === 'string') {
+                parsedSizes = data.sizes.split(',').map(s => {
+                    return { size: s.trim(), stock: data.stock || 10, price: parseFloat(data.price) || 0 };
+                });
+            }
+
+            return {
+                id: doc.id,
+                name: data.name,
+                brand: data.brand || (data.category === 'Sneakers' ? '' : data.category),
+                price: parseFloat(data.price) || 0,
+                sku: data.sku || '',
+                colorway: data.colorway || '',
+                releaseDate: data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '',
+                category: data.category || 'Uncategorized',
+                badge: data.featured ? 'trending' : (data.badge || null),
+                sizes: parsedSizes,
+                description: data.description || '',
+                image: data.image || '',
+                images: data.images || [data.image]
+            };
+        });
+
+        firebaseLoaded = true;
+        console.log('Sync Complete: ' + products.length + ' products loaded.');
+
+        // Re-run original setup logic now that we have data
+        filteredProducts = [...products];
+        applyFilters();
+    }, err => {
+        console.error('Firebase Sync Error:', err);
+        showToast('Error loading products. Please refresh.', 'error');
+    });
+}
 
 // ============================================
 // STATE MANAGEMENT
@@ -415,6 +114,7 @@ const cartTotal = document.getElementById('cartTotal');
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+    initFirebaseSync();
     renderProducts();
     setupEventListeners();
     updateCartUI();
@@ -566,6 +266,25 @@ function applyFilters() {
     });
 
     renderProducts();
+    updateFilterCounts();
+}
+
+function updateFilterCounts() {
+    const counts = {
+        all: products.length,
+        Jordan: products.filter(p => (p.brand || '').toLowerCase() === 'jordan').length,
+        Nike: products.filter(p => (p.brand || '').toLowerCase() === 'nike').length,
+        Adidas: products.filter(p => (p.brand || '').toLowerCase() === 'adidas').length,
+        Sneakers: products.filter(p => (p.category || '').toLowerCase() === 'sneakers').length,
+        Apparel: products.filter(p => (p.category || '').toLowerCase() === 'apparel').length
+    };
+
+    document.querySelectorAll('.filter-count').forEach(span => {
+        const type = span.dataset.count;
+        if (counts[type] !== undefined) {
+            span.textContent = `(${counts[type]})`;
+        }
+    });
 }
 
 function handleSearch(e) {
