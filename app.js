@@ -547,8 +547,8 @@ function openProductModal(productId) {
         `;
     }).join('');
 
-    // Store product ID on modal
-    productModal.dataset.productId = productId;
+    // Store the canonical Firestore product ID on modal (ensure it's the ID, not SKU)
+    productModal.dataset.productId = product.id;
 
     // Show modal
     productModal.classList.add('active');

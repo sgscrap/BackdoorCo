@@ -464,15 +464,7 @@
       c.appendChild(t);
       setTimeout(() => t.remove(), 3500);
     }
-    // Brand card click filter
-    function filterByBrandClick(brand) {
-      scrollToShop();
-      // Find and click the matching brand chip
-      document.querySelectorAll('.brand-filter').forEach(chip => {
-        const b = chip.dataset.brand;
-        if (b === brand) { chip.click(); }
-      });
-    }
+
     // Countdown timer
     (function initCountdown() {
       const target = Date.now() + 2 * 86400000 + 14 * 3600000 + 37 * 60000;
