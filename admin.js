@@ -90,8 +90,8 @@ function setupEventListeners() {
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = e.target.querySelector('button');
+        const email = document.getElementById('adminEmail').value;
         const pass = document.getElementById('adminPassword').value;
-        const email = 'sgmpl99@gmail.com'; // Default admin email from prev sessions
 
         btn.disabled = true;
         btn.textContent = 'Verifying...';
@@ -101,7 +101,7 @@ function setupEventListeners() {
             showToast('Welcome back, Admin');
         } catch (err) {
             console.error(err);
-            showToast('Invalid Password or Access Denied', 'error');
+            showToast('Login Failed: ' + err.message, 'error');
         } finally {
             btn.disabled = false;
             btn.textContent = 'Unlock Dashboard';

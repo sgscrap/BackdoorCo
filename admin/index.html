@@ -2,116 +2,636 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backdoor Admin — Login</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backdoor — Admin</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="admin.css">
 </head>
 
-<body class="login-body">
+<body>
 
-    <div class="login-wrap">
-        <div class="login-card">
-
-            <!-- Logo -->
-            <div class="login-logo">
-                <span class="logo-text">BACKDOOR</span>
-                <span class="logo-sub">Admin Panel</span>
+    <!-- ══ LOGIN SCREEN ══ -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>BACK<span>DOOR</span></h1>
+                <p>Enter your credentials to access the vault.</p>
             </div>
-
-            <!-- Error Message -->
-            <div class="login-error" id="loginError">
-                Invalid email or password.
-            </div>
-
-            <!-- Form -->
             <form class="login-form" id="loginForm">
                 <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="loginEmail" placeholder="admin@backdoor.com" required>
+                    <label for="adminEmail">Email Address</label>
+                    <input type="email" id="adminEmail" placeholder="admin@backdoordmv.com" required>
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
-                    <div class="password-wrap">
-                        <input type="password" id="loginPassword" placeholder="••••••••" required>
-                        <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password visibility">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M1 12s4-8 11-8 11 8
-                                         11 8-4 8-11 8-11-8-11-8z" />
-                                <circle cx="12" cy="12" r="3" />
-                            </svg>
-                        </button>
-                    </div>
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="login-btn" id="loginBtn">
-                    <span>Sign In</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                </button>
+                <button type="submit" class="login-btn">Unlock Dashboard</button>
             </form>
-
         </div>
     </div>
 
-    <script type="module">
-        import { auth } from './firebase-config.js';
-        import { signInWithEmailAndPassword } from
-            'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+    <!-- ══ ADMIN DASHBOARD ══ -->
+    <div class="admin-dashboard hidden" id="adminDashboard">
 
-        // Redirect if already logged in
-        auth.onAuthStateChanged(user => {
-            if (user) window.location.href = 'dashboard.html';
-        });
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-mark">B</div>
+                <div class="logo-text">BACK<span>DOOR</span></div>
+            </div>
 
-        const form = document.getElementById('loginForm');
-        const error = document.getElementById('loginError');
-        const btn = document.getElementById('loginBtn');
-        const togglePw = document.getElementById('togglePw');
-        const pwInput = document.getElementById('loginPassword');
+            <div class="admin-badge">
+                <div class="admin-avatar">A</div>
+                <div class="admin-info">
+                    <p>Admin</p>
+                    <span>● Super Admin</span>
+                </div>
+            </div>
 
-        // Toggle password visibility
-        togglePw.addEventListener('click', () => {
-            pwInput.type =
-                pwInput.type === 'password' ? 'text' : 'password';
-        });
+            <div class="nav-label">Main</div>
 
-        // Login
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            btn.innerHTML = '<span>Signing in...</span>';
-            btn.disabled = true;
-            error.style.display = 'none';
+            <a class="nav-item active" data-page="dashboard" onclick="switchTab('dashboard', this)">
+                <i class="nav-icon fa-solid fa-chart-pie"></i>
+                Dashboard
+            </a>
 
-            const email = document.getElementById('loginEmail').value;
-            const password = pwInput.value;
+            <a class="nav-item" data-page="orders" onclick="switchTab('orders', this)">
+                <i class="nav-icon fa-solid fa-box"></i>
+                Orders
+                <span class="nav-badge" id="orderBadge">0</span>
+            </a>
 
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = 'dashboard.html';
-            } catch (err) {
-                console.error('Firebase Auth Error:', err.code, err.message);
-                error.textContent = err.code === 'auth/invalid-credential'
-                    ? 'Invalid email or password.'
-                    : err.code === 'auth/user-not-found'
-                        ? 'No account found with this email.'
-                        : err.code === 'auth/wrong-password'
-                            ? 'Incorrect password.'
-                            : err.code === 'auth/too-many-requests'
-                                ? 'Too many attempts. Try again later.'
-                                : `Error: ${err.code || err.message}`;
-                error.style.display = 'block';
-                btn.innerHTML = `<span>Sign In</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor"
-                         stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>`;
-                btn.disabled = false;
-            }
-        });
+            <a class="nav-item" data-page="products" onclick="switchTab('products', this)">
+                <i class="nav-icon fa-solid fa-shoe-prints"></i>
+                Products
+                <span class="nav-badge green" id="productBadge">0</span>
+            </a>
+
+            <a class="nav-item" data-page="customers" onclick="switchTab('customers', this)">
+                <i class="nav-icon fa-solid fa-users"></i>
+                Customers
+            </a>
+
+            <div class="nav-label">Tools</div>
+
+            <a class="nav-item" data-page="import" onclick="switchTab('import', this)">
+                <i class="nav-icon fa-solid fa-cloud-arrow-up"></i>
+                Import Products
+            </a>
+
+            <a class="nav-item" href="pricing.html">
+                <i class="nav-icon fa-solid fa-tags"></i>
+                Smart Pricing
+            </a>
+
+            <a class="nav-item" data-page="analytics" onclick="switchTab('analytics', this)">
+                <i class="nav-icon fa-solid fa-chart-line"></i>
+                Analytics
+            </a>
+
+            <a class="nav-item" href="email.html">
+                <i class="nav-icon fa-solid fa-envelope-circle-check"></i>
+                Email Automation
+            </a>
+
+            <a class="nav-item" data-page="settings" onclick="switchTab('settings', this)">
+                <i class="nav-icon fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <div class="sidebar-bottom">
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1 id="sectionTitle">DASHBOARD</h1>
+                    <p id="sectionSubtitle">Welcome back — here's what's happening today.</p>
+                </div>
+                <div class="topbar-right">
+                    <div class="live-indicator">
+                        <div class="live-dot"></div>
+                        LIVE
+                    </div>
+                    <button class="topbar-btn" onclick="toggleNotifPanel()" title="Notifications">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="notif-dot"></span>
+                    </button>
+                    <button class="topbar-btn" onclick="showToast('Search coming soon', 'info')" title="Search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    <button class="add-product-btn" id="addProductBtnTop">
+                        <i class="fa-solid fa-plus"></i>
+                        Add Product
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="content">
+
+                <!-- DASHBOARD SECTION -->
+                <section class="content-section active" id="dashboardSection">
+                    <div class="stats-grid">
+                        <div class="stat-card stat-card--revenue" onclick="switchTab('analytics')">
+                            <div class="stat-card-top">
+                                <span class="stat-label">Total Revenue</span>
+                                <div class="stat-icon-wrap icon-wrap-revenue">
+                                    <i class="fa-solid fa-dollar-sign icon-revenue"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="revenueVal">$0</div>
+                            <div class="stat-footer">
+                                <div class="stat-change up"><i class="fa-solid fa-arrow-up fs-9"></i>
+                                    12.5%</div>
+                                <span class="stat-period">vs last month</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card stat-card--orders" onclick="switchTab('orders')">
+                            <div class="stat-card-top">
+                                <span class="stat-label">Total Orders</span>
+                                <div class="stat-icon-wrap icon-wrap-orders">
+                                    <i class="fa-solid fa-box icon-orders"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="ordersVal">0</div>
+                            <div class="stat-footer">
+                                <div class="stat-change up"><i class="fa-solid fa-arrow-up fs-9"></i> 8
+                                </div>
+                                <span class="stat-period">today</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card stat-card--pending" onclick="switchTab('orders')">
+                            <div class="stat-card-top">
+                                <span class="stat-label">Pending Orders</span>
+                                <div class="stat-icon-wrap icon-wrap-pending">
+                                    <i class="fa-solid fa-clock icon-pending"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="pendingVal">0</div>
+                            <div class="stat-footer">
+                                <div class="stat-change down"><i class="fa-solid fa-triangle-exclamation fs-9"></i>
+                                    Alert</div>
+                                <span class="stat-period">requires attention</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card stat-card--customers" onclick="switchTab('customers')">
+                            <div class="stat-card-top">
+                                <span class="stat-label">Total Customers</span>
+                                <div class="stat-icon-wrap icon-wrap-customers">
+                                    <i class="fa-solid fa-users icon-customers"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="customersVal">0</div>
+                            <div class="stat-footer">
+                                <div class="stat-change up"><i class="fa-solid fa-arrow-up fs-9"></i>
+                                    15</div>
+                                <span class="stat-period">this week</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="middle-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">REVENUE OVERVIEW</span>
+                                <button class="card-action" onclick="switchTab('analytics')">View Full Report →</button>
+                            </div>
+                            <div class="chart-bars" id="chartBars"></div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">QUICK ACTIONS</span>
+                            </div>
+                            <div class="quick-actions">
+                                <button class="quick-action-btn" id="quickAddProduct">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Add Product
+                                </button>
+                                <button class="quick-action-btn" onclick="switchTab('orders')">
+                                    <i class="fa-solid fa-box-open"></i>
+                                    View Orders
+                                </button>
+                                <button class="quick-action-btn" onclick="switchTab('import')">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    Import SKU
+                                </button>
+                                <button class="quick-action-btn" onclick="switchTab('analytics')">
+                                    <i class="fa-solid fa-chart-line"></i>
+                                    Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bottom-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">RECENT ORDERS</span>
+                                <button class="card-action" onclick="switchTab('orders')">See All →</button>
+                            </div>
+                            <div class="data-table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order</th>
+                                            <th>Customer</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentOrdersList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">INVENTORY SPOTLIGHT</span>
+                                <button class="card-action" onclick="switchTab('products')">Manage →</button>
+                            </div>
+                            <div id="lowStockList"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ORDERS SECTION -->
+                <section class="content-section" id="ordersSection">
+                    <div class="card">
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Products</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PRODUCTS SECTION -->
+                <section class="content-section" id="productsSection">
+                    <div class="card">
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>SKU</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CUSTOMERS SECTION -->
+                <section class="content-section" id="customersSection">
+                    <div class="card">
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Total Orders</th>
+                                        <th>Total Spent</th>
+                                        <th>Last Order</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- IMPORT SECTION -->
+                <section class="content-section" id="importSection">
+                    <div class="steps steps-container">
+                        <div class="step">
+                            <div class="step-num active" id="step1num">1</div>
+                            <div class="step-info">
+                                <p class="active" id="step1label">Add Images</p>
+                                <span>Paste Imgur URLs</span>
+                            </div>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step">
+                            <div class="step-num" id="step2num">2</div>
+                            <div class="step-info">
+                                <p id="step2label">Product Details</p>
+                                <span>Name, price, sizes</span>
+                            </div>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step">
+                            <div class="step-num" id="step3num">3</div>
+                            <div class="step-info">
+                                <p id="step3label">Publish</p>
+                                <span>Save to store</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="import-layout">
+                        <!-- LEFT PANEL -->
+                        <div class="import-main-col">
+                            <div class="card mb-20">
+                                <div class="card-title">
+                                    <i class="fa-brands fa-square-reddit icon-imgur"></i>
+                                    IMGUR IMAGE IMPORTER
+                                </div>
+
+                                <div class="imgur-info">
+                                    <h4>📌 ACCEPTED IMGUR FORMATS</h4>
+                                    <div class="imgur-format-row">
+                                        <span>https://imgur.com/abc1234</span>
+                                        <i class="fa-solid fa-arrow-right imgur-arrow"></i>
+                                        <span class="format-result">✓ Album/page</span>
+                                    </div>
+                                    <div class="imgur-tip">
+                                        💡 Non-direct links are auto-converted to direct image format
+                                    </div>
+                                </div>
+
+                                <div class="tab-row">
+                                    <button class="tab-btn active" id="tabIndividual"
+                                        onclick="handleImporterTabSwitch('individual')">
+                                        <i class="fa-solid fa-list"></i> Individual
+                                    </button>
+                                    <button class="tab-btn" id="tabBulk" onclick="handleImporterTabSwitch('bulk')">
+                                        <i class="fa-solid fa-paste"></i> Bulk Paste
+                                    </button>
+                                </div>
+
+                                <div id="individualTabImporter">
+                                    <div class="url-input-list" id="urlInputList">
+                                        <!-- rows injected -->
+                                    </div>
+                                    <div class="add-url-row">
+                                        <button class="btn-secondary" id="addUrlBtn" onclick="addImporterUrlRow()">
+                                            <i class="fa-solid fa-plus"></i> Add URL
+                                        </button>
+                                        <button class="btn-secondary btn-danger" onclick="clearImporterUrls()">
+                                            <i class="fa-solid fa-trash"></i> Clear
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="bulkTabImporter" class="hidden">
+                                    <textarea class="paste-area-advanced" id="bulkPasteArea"
+                                        placeholder="Paste up to 12 Imgur links (one per line)..."
+                                        oninput="processBulkImporterPaste()"></textarea>
+                                    <div class="bulk-confirm-row">
+                                        <button class="btn-primary" onclick="confirmBulkImporterPaste()">Confirm Bulk
+                                            URLs</button>
+                                    </div>
+                                </div>
+
+                                <button class="btn-primary w-100 btn-load-preview" id="loadPreviewBtn"
+                                    onclick="loadImporterPreviews()">
+                                    <i class="fa-solid fa-eye"></i> LOAD PREVIEWS
+                                </button>
+
+                                <div class="import-progress-advanced" id="importProgress">
+                                    <div class="progress-label">
+                                        <span id="progressLabel">Initializing...</span>
+                                        <span id="progressPct">0%</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div id="progressFill" class="progress-fill">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card hidden" id="previewCard">
+                                <div class="preview-header">
+                                    <div class="card-title mb-0">
+                                        <i class="fa-solid fa-images"></i> PREVIEW <span id="previewCounter"
+                                            class="preview-count-label"></span>
+                                    </div>
+                                    <button class="btn-secondary btn-sm"
+                                        onclick="resetImporterPreviews()">Reset</button>
+                                </div>
+                                <div class="preview-grid-advanced" id="previewGrid"></div>
+                                <button class="btn-primary w-100 mt-15" onclick="confirmImporterImages()">
+                                    <i class="fa-solid fa-check"></i> USE THESE IMAGES
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT PANEL (Details) -->
+                        <div class="import-side-col">
+                            <div class="card" id="importerFormCard">
+                                <div class="card-title"><i class="fa-solid fa-shoe-prints"></i> DETAILS</div>
+                                <div class="form-group">
+                                    <label>Product Name *</label>
+                                    <input type="text" id="impName" class="form-input"
+                                        placeholder="e.g. Air Jordan 1 Retro">
+                                </div>
+                                <div class="form-group">
+                                    <label>Brand *</label>
+                                    <select id="impBrand" class="form-select" aria-label="Brand" title="Select Brand">
+                                        <option value="Jordan">Jordan</option>
+                                        <option value="Nike">Nike</option>
+                                        <option value="Adidas">Adidas</option>
+                                        <option value="Yeezy">Yeezy</option>
+                                        <option value="New Balance">New Balance</option>
+                                        <option value="Asics">Asics</option>
+                                    </select>
+                                </div>
+                                <div class="form-row form-row-2col">
+                                    <div class="form-group">
+                                        <label>SKU</label>
+                                        <input type="text" id="impSku" class="form-input" placeholder="AA3834-100">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Retail ($)</label>
+                                        <input type="number" id="impRetail" class="form-input" placeholder="190">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Resell Price ($) *</label>
+                                    <input type="number" id="impResell" class="form-input" placeholder="350">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label-upper">Available
+                                        Sizes</label>
+                                    <div class="size-chips" id="impSizeChips"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea id="impDesc" class="form-textarea"
+                                        placeholder="Features, history, condition..."></textarea>
+                                </div>
+                                <button class="btn-primary w-100 btn-load-preview" id="publishImporterBtn"
+                                    onclick="publishImporterProduct()">
+                                    <i class="fa-solid fa-rocket"></i> PUBLISH TO STORE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ANALYTICS SECTION -->
+                <section class="content-section" id="analyticsSection">
+                    <div class="card">
+                        <p class="text-muted text-center p-40">Advanced Analytics
+                            coming soon...</p>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ NOTIFICATION PANEL ══ -->
+    <div class="notif-panel" id="notifPanel">
+        <h3>NOTIFICATIONS</h3>
+        <div id="notifList">
+            <div class="notif-item">
+                <div class="notif-icon icon-wrap-revenue">
+                    <i class="fa-solid fa-box icon-revenue"></i>
+                </div>
+                <div class="notif-text">
+                    <p>New order <strong>#BD-1042</strong> placed — Jordan 1 Retro High</p>
+                    <span>2 minutes ago</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ PRODUCT MODAL ══ -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="productModalTitle">ADD PRODUCT</h2>
+                <button class="modal-close" id="productModalClose" aria-label="Close Product Modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="productForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <input type="text" id="productName" placeholder="Product Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productSKU">SKU</label>
+                        <input type="text" id="productSKU" placeholder="SKU-123" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productBrand">Brand</label>
+                        <select id="productBrand" required aria-label="Select Brand">
+                            <option value="Nike">Nike</option>
+                            <option value="Jordan">Jordan</option>
+                            <option value="Adidas">Adidas</option>
+                            <option value="New Balance">New Balance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productCategory">Category</label>
+                        <select id="productCategory" required aria-label="Select Category">
+                            <option value="Sneakers">Sneakers</option>
+                            <option value="Apparel">Apparel</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Base Price ($)</label>
+                    <input type="number" id="productPrice" placeholder="0.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Size Inventory (Stock & Price per size)</label>
+                    <div id="sizeInventoryGrid" class="size-inventory-grid"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" rows="3" placeholder="Product details..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="productImage">Product Image (Upload)</label>
+                    <input type="file" id="productImage" accept="image/*" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelProductBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══ ORDER DETAIL MODAL ══ -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">ORDER DETAILS</h2>
+                <button class="modal-close" id="orderModalClose" aria-label="Close Order Details Modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="orderModalBody"></div>
+        </div>
+    </div>
+
+    <!-- ══ TOAST CONTAINER ══ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+            authDomain: "coalition-aec44.firebaseapp.com",
+            projectId: "coalition-aec44",
+            storageBucket: "coalition-aec44.firebasestorage.app",
+            messagingSenderId: "312196142925",
+            appId: "1:312196142925:web:ba090f602c8b5a31b20904",
+            measurementId: "G-SPJ2FDLSKZ"
+        };
     </script>
+
+    <script src="admin.js"></script>
+    <!-- Backdoor Analytics Tracker -->
+    <script src="analytics.js"></script>
 </body>
 
 </html>

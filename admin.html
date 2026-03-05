@@ -23,11 +23,14 @@
             </div>
             <form class="login-form" id="loginForm">
                 <div class="form-group">
+                    <label for="adminEmail">Email Address</label>
+                    <input type="email" id="adminEmail" placeholder="admin@backdoordmv.com" required>
+                </div>
+                <div class="form-group">
                     <label for="adminPassword">Password</label>
                     <input type="password" id="adminPassword" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="login-btn">Unlock Dashboard</button>
-                <p class="login-hint">Demo password: <code>admin123</code></p>
             </form>
         </div>
     </div>
@@ -614,7 +617,17 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="admin/firebase-config.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+            authDomain: "coalition-aec44.firebaseapp.com",
+            projectId: "coalition-aec44",
+            storageBucket: "coalition-aec44.firebasestorage.app",
+            messagingSenderId: "312196142925",
+            appId: "1:312196142925:web:ba090f602c8b5a31b20904",
+            measurementId: "G-SPJ2FDLSKZ"
+        };
+    </script>
 
     <script src="admin.js"></script>
     <!-- Backdoor Analytics Tracker -->
