@@ -4,6 +4,5 @@ node_modules/
 dist/
 build/
 .vscode/
-
-# Local Netlify folder
 .netlify
+admin/firebase-config.js
