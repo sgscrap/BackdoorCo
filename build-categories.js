@@ -29,8 +29,8 @@ categories.forEach(cat => {
     newHtml = newHtml.replace(linkRegex, `<a class="nav-link active" href="${cat.file}">${cat.name}</a>`);
 
     // 4. Inject initialFilter logic before shop-all.js loads
-    const scriptInjection = `<script>window.initialFilter = '${cat.name}';</script>\n    <script src="shop-all.js">`;
-    newHtml = newHtml.replace('<script src="shop-all.js">', scriptInjection);
+    const scriptInjection = `<script>window.initialFilter = '${cat.name}';</script>\n    <script type="module" src="shop-all.js?v=1.1">`;
+    newHtml = newHtml.replace('<script type="module" src="shop-all.js?v=1.1">', scriptInjection);
 
     // Write file
     fs.writeFileSync(path.join(__dirname, cat.file), newHtml);
