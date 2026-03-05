@@ -13,7 +13,7 @@ const puppeteer = require('puppeteer');
         const page = await browser.newPage();
 
         // Go to shop all page via local server
-        await page.goto('http://localhost:3000/shop-all.html', {
+        await page.goto('http://localhost:3000/apparel.html', {
             waitUntil: 'networkidle2'
         });
 

@@ -11,9 +11,9 @@ import {
 
 // ================================
 // STATE
-// ================================
+// ================================// Global variables
 let allProducts = [];
-let currentFilter = 'all';
+let currentFilter = window.initialFilter || 'all'; // Default to injected category, or 'all'
 let currentSort = 'price-high';
 let searchTerm = '';
 
@@ -504,6 +504,18 @@ document.querySelectorAll('.accordion-header').forEach(header => {
 // INIT
 // ================================
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.initialFilter) {
+        document.querySelectorAll('.shop-filter-tab').forEach(t => t.classList.remove('active'));
+        const activeTab = document.querySelector(`[data-filter="${window.initialFilter}"]`);
+        if (activeTab) {
+            // Expand the accordion containing this tab if it isn't the first one
+            const accordion = activeTab.closest('.sidebar-accordion');
+            if (accordion && !accordion.classList.contains('open')) {
+                accordion.classList.add('open');
+            }
+            activeTab.classList.add('active');
+        }
+    }
     readUrlParams();
     updateCartDisplay();
     loadAllProducts();
