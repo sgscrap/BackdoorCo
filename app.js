@@ -7,6 +7,26 @@
 // ============================================
 const products = [
     {
+        id: 19,
+        name: "Acne Studios 1996 Rhinestone Logo T-Shirt - Black",
+        brand: "Acne Studios",
+        price: 350.00,
+        sku: "FN-UX-TSHI000231",
+        colorway: "Black",
+        releaseDate: "2/1/24",
+        category: "Apparel",
+        badge: "hot",
+        sizes: [
+            { size: "Small", stock: 10, price: 350.00 },
+            { size: "Medium", stock: 15, price: 350.00 },
+            { size: "Large", stock: 8, price: 350.00 },
+            { size: "X-Large", stock: 12, price: 350.00 }
+        ],
+        description: "Long-sleeve crewneck T-shirt featuring a metallic foiled 'Acne Studios 1996' print across the chest with rhinestone details. Crafted from lightweight cotton-hemp jersey with an irregular surface for a vintage-inspired feel. Cut to a relaxed unisex fit and hip length. Shell: 85% Cotton, 15% True hemp.",
+        image: "products/acne-1996-rhinestone-1.png",
+        images: ["products/acne-1996-rhinestone-1.png", "products/acne-1996-rhinestone-2.png"]
+    },
+    {
         id: 18,
         name: "Acne Studios 1996 Logo T-Shirt - Relaxed Fit Deep Blue",
         brand: "Acne Studios",

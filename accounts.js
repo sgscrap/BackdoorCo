@@ -9,6 +9,7 @@ let wishlist = [];
 
 /* ── PRODUCT DATA ── */
 const PRODUCTS = [
+    { id: 10, name: 'Acne Studios 1996 Rhinestone T-Shirt', brand: 'Acne Studios', price: 350, emoji: '👕', sku: 'FN-UX-TSHI000231' },
     { id: 9, name: 'Acne Studios 1996 Logo T-Shirt', brand: 'Acne Studios', price: 250, emoji: '👕', sku: 'FN-UX-TSHI000013' },
     { id: 1, name: 'Air Jordan 1 Retro High OG "Chicago"', brand: 'Jordan', price: 760, emoji: '👟', sku: '555088-101' },
     { id: 2, name: 'Adidas Yeezy 350 V2 "Zebra"', brand: 'Adidas', price: 320, emoji: '🦓', sku: 'CP9654' },

@@ -5,6 +5,14 @@
 /* ── PRODUCT DATA ── */
 const PRODUCTS = [
     {
+        id: 6, emoji: '👕',
+        brand: 'Acne Studios', name: '1996 Rhinestone T-Shirt',
+        price: 350, retail: 350, badge: 'hot',
+        sizes: [
+            { s: 'Small', stock: 10 }, { s: 'Medium', stock: 15 }, { s: 'Large', stock: 8 }, { s: 'X-Large', stock: 12 }
+        ]
+    },
+    {
         id: 5, emoji: '👕',
         brand: 'Acne Studios', name: '1996 Logo T-Shirt',
         price: 250, retail: 250, badge: 'hot',
