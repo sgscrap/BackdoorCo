@@ -108,7 +108,7 @@
                         </div>
                         <div class="form-group">
                             <label>Currency</label>
-                            <select id="storeCurrency">
+                            <select id="storeCurrency" aria-label="Store currency">
                                 <option value="USD" selected>USD ($)</option>
                                 <option value="EUR">EUR (€)</option>
                                 <option value="GBP">GBP (£)</option>
@@ -128,40 +128,40 @@
                             <div class="setting-name">Maintenance Mode</div>
                             <div class="setting-desc">Take the storefront offline for maintenance.</div>
                         </div>
-                        <label class="toggle"><input type="checkbox" id="maintenanceMode"><span
-                                class="toggle-slider"></span></label>
+                        <label class="toggle"><input type="checkbox" id="maintenanceMode"
+                                aria-label="Maintenance Mode"><span class="toggle-slider"></span></label>
                     </div>
                     <div class="setting-row">
                         <div class="setting-info">
                             <div class="setting-name">Allow Guest Checkout</div>
                             <div class="setting-desc">Users can checkout without creating an account.</div>
                         </div>
-                        <label class="toggle"><input type="checkbox" id="guestCheckout" checked><span
-                                class="toggle-slider"></span></label>
+                        <label class="toggle"><input type="checkbox" id="guestCheckout" checked
+                                aria-label="Allow Guest Checkout"><span class="toggle-slider"></span></label>
                     </div>
                     <div class="setting-row">
                         <div class="setting-info">
                             <div class="setting-name">Show Stock Levels</div>
                             <div class="setting-desc">Display remaining stock on product pages.</div>
                         </div>
-                        <label class="toggle"><input type="checkbox" id="showStock" checked><span
-                                class="toggle-slider"></span></label>
+                        <label class="toggle"><input type="checkbox" id="showStock" checked
+                                aria-label="Show Stock Levels"><span class="toggle-slider"></span></label>
                     </div>
                     <div class="setting-row">
                         <div class="setting-info">
                             <div class="setting-name">Email Order Confirmations</div>
                             <div class="setting-desc">Send confirmation emails when orders are placed.</div>
                         </div>
-                        <label class="toggle"><input type="checkbox" id="emailConfirm" checked><span
-                                class="toggle-slider"></span></label>
+                        <label class="toggle"><input type="checkbox" id="emailConfirm" checked
+                                aria-label="Email Order Confirmations"><span class="toggle-slider"></span></label>
                     </div>
                     <div class="setting-row">
                         <div class="setting-info">
                             <div class="setting-name">Enable Product Reviews</div>
                             <div class="setting-desc">Allow customers to leave reviews on products.</div>
                         </div>
-                        <label class="toggle"><input type="checkbox" id="enableReviews"><span
-                                class="toggle-slider"></span></label>
+                        <label class="toggle"><input type="checkbox" id="enableReviews"
+                                aria-label="Enable Product Reviews"><span class="toggle-slider"></span></label>
                     </div>
                 </div>
             </div>
@@ -176,14 +176,16 @@
                             <label>Flat Rate Shipping</label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">$</span>
-                                <input type="number" id="shippingRate" value="0" min="0" step="0.01">
+                                <input type="number" id="shippingRate" value="0" min="0" step="0.01"
+                                    aria-label="Flat rate shipping cost">
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Free Shipping Threshold</label>
                             <div class="input-prefix-wrap">
                                 <span class="input-prefix">$</span>
-                                <input type="number" id="freeShipping" value="150" min="0" step="1">
+                                <input type="number" id="freeShipping" value="150" min="0" step="1"
+                                    aria-label="Free shipping threshold">
                             </div>
                         </div>
                     </div>
@@ -192,8 +194,8 @@
                             <div class="setting-name">International Shipping</div>
                             <div class="setting-desc">Accept orders from outside the US.</div>
                         </div>
-                        <label class="toggle"><input type="checkbox" id="intlShipping"><span
-                                class="toggle-slider"></span></label>
+                        <label class="toggle"><input type="checkbox" id="intlShipping"
+                                aria-label="International Shipping"><span class="toggle-slider"></span></label>
                     </div>
                 </div>
             </div>

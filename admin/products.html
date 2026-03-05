@@ -105,7 +105,7 @@
                     <span class="live-dot"></span>
                     <span>LIVE</span>
                 </div>
-                <button class="icon-btn" id="searchToggle">
+                <button class="icon-btn" id="searchToggle" aria-label="Toggle search bar">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -140,7 +140,7 @@
                 <button class="filter-tab" data-filter="inactive">Inactive</button>
             </div>
             <div class="filter-right">
-                <select id="sortSelect" class="sort-select">
+                <select id="sortSelect" class="sort-select" aria-label="Sort products">
                     <option value="name">Sort: Name</option>
                     <option value="price">Sort: Price</option>
                     <option value="stock">Sort: Stock</option>
@@ -184,7 +184,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 id="modalTitle">Add Product</h3>
-                <button class="modal-close" id="closeModal">
+                <button class="modal-close" id="closeModal" aria-label="Close modal">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18" />
                         <line x1="6" y1="6" x2="18" y2="18" />
@@ -240,7 +240,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Category *</label>
-                        <select id="productCategory" required>
+                        <select id="productCategory" required aria-label="Product category">
                             <option value="" disabled selected>Select category</option>
                             <option value="Sneakers">Sneakers</option>
                             <option value="Apparel">Apparel</option>
@@ -249,7 +249,7 @@
                     </div>
                     <div class="form-group">
                         <label>Status</label>
-                        <select id="productStatus">
+                        <select id="productStatus" aria-label="Product status">
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
@@ -291,7 +291,7 @@
         <div class="modal modal-sm">
             <div class="modal-header">
                 <h3>Delete Product</h3>
-                <button class="modal-close" id="closeDeleteModal">
+                <button class="modal-close" id="closeDeleteModal" aria-label="Close delete modal">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18" />
                         <line x1="6" y1="6" x2="18" y2="18" />
