@@ -7,6 +7,25 @@
 // ============================================
 const products = [
     {
+        id: 18,
+        name: "Acne Studios 1996 Logo T-Shirt - Relaxed Fit Deep Blue",
+        brand: "Acne Studios",
+        price: 250.00,
+        sku: "FN-UX-TSHI000013",
+        colorway: "Deep Blue",
+        releaseDate: "1/1/24",
+        category: "Apparel",
+        badge: "hot",
+        sizes: [
+            { size: "Small", stock: 10, price: 250.00 },
+            { size: "Medium", stock: 15, price: 250.00 },
+            { size: "Large", stock: 8, price: 250.00 },
+            { size: "X-Large", stock: 12, price: 250.00 }
+        ],
+        description: "Short-sleeve crewneck T-shirt is crafted from organic cotton jersey with an irregular surface and sprayed for a vintage-inspired look. Detailed with an Acne Studios 1996 stamp logo and finished with distressed neckline, cuffs, and hem. Cut to a relaxed unisex fit and hip length.",
+        image: "products/acne-1996-logo-tshirt.png"
+    },
+    {
         id: 17,
         name: "Godspeed Surf Day T-shirt",
         brand: "Godspeed",

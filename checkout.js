@@ -5,6 +5,14 @@
 /* ── PRODUCT DATA ── */
 const PRODUCTS = [
     {
+        id: 5, emoji: '👕',
+        brand: 'Acne Studios', name: '1996 Logo T-Shirt',
+        price: 250, retail: 250, badge: 'hot',
+        sizes: [
+            { s: 'Small', stock: 10 }, { s: 'Medium', stock: 15 }, { s: 'Large', stock: 8 }, { s: 'X-Large', stock: 12 }
+        ]
+    },
+    {
         id: 1, emoji: '👟',
         brand: 'Jordan', name: 'Air Jordan 1 Retro High OG "Chicago"',
         price: 750, retail: 170, badge: 'hot',
