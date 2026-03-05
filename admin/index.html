@@ -91,6 +91,16 @@
                 await signInWithEmailAndPassword(auth, email, password);
                 window.location.href = 'dashboard.html';
             } catch (err) {
+                console.error('Firebase Auth Error:', err.code, err.message);
+                error.textContent = err.code === 'auth/invalid-credential'
+                    ? 'Invalid email or password.'
+                    : err.code === 'auth/user-not-found'
+                        ? 'No account found with this email.'
+                        : err.code === 'auth/wrong-password'
+                            ? 'Incorrect password.'
+                            : err.code === 'auth/too-many-requests'
+                                ? 'Too many attempts. Try again later.'
+                                : `Error: ${err.code || err.message}`;
                 error.style.display = 'block';
                 btn.innerHTML = `<span>Sign In</span>
                     <svg width="16" height="16" viewBox="0 0 24 24"
