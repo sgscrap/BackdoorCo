@@ -1,12 +1,14 @@
 // ============================================
-// BACKDOOR ADMIN DASHBOARD - PREMIUM ENGINE
+// BACKDOOR ADMIN DASHBOARD - FIREBASE ENGINE
 // ============================================
 
-const ADMIN_PASSWORD = 'admin123';
+// Initialize Firebase (using config from firebase-config.js)
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
 const STORAGE_KEYS = {
-    AUTH: 'backdoor_admin_auth',
-    ORDERS: 'backdoor_orders',
-    CUSTOMERS: 'backdoor_customers'
+    AUTH: 'backdoor_admin_auth'
 };
 
 // ============================================
@@ -14,377 +16,7 @@ const STORAGE_KEYS = {
 // ============================================
 let orders = [];
 let customers = [];
-let products = [
-    {
-        id: 19,
-        name: "Acne Studios 1996 Rhinestone Logo T-Shirt - Black",
-        brand: "Acne Studios",
-        price: 350.00,
-        sku: "FN-UX-TSHI000231",
-        colorway: "Black",
-        releaseDate: "2/1/24",
-        category: "Apparel",
-        badge: "hot",
-        sizes: [
-            { size: "Small", stock: 10, price: 350.00 },
-            { size: "Medium", stock: 15, price: 350.00 },
-            { size: "Large", stock: 8, price: 350.00 },
-            { size: "X-Large", stock: 12, price: 350.00 }
-        ],
-        description: "Long-sleeve crewneck T-shirt featuring a metallic foiled 'Acne Studios 1996' print across the chest with rhinestone details. Crafted from lightweight cotton-hemp jersey with an irregular surface for a vintage-inspired feel. Cut to a relaxed unisex fit and hip length. Shell: 85% Cotton, 15% True hemp.",
-        image: "products/acne-1996-rhinestone-1.png",
-        images: ["products/acne-1996-rhinestone-1.png", "products/acne-1996-rhinestone-2.png"],
-        status: "active"
-    },
-    {
-        id: 18,
-        name: "Acne Studios 1996 Logo T-Shirt - Relaxed Fit Deep Blue",
-        brand: "Acne Studios",
-        price: 250.00,
-        sku: "FN-UX-TSHI000013",
-        colorway: "Deep Blue",
-        releaseDate: "1/1/24",
-        category: "Apparel",
-        badge: "hot",
-        sizes: [
-            { size: "Small", stock: 10, price: 250.00 },
-            { size: "Medium", stock: 15, price: 250.00 },
-            { size: "Large", stock: 8, price: 250.00 },
-            { size: "X-Large", stock: 12, price: 250.00 }
-        ],
-        description: "Short-sleeve crewneck T-shirt is crafted from organic cotton jersey with an irregular surface and sprayed for a vintage-inspired look. Detailed with an Acne Studios 1996 stamp logo and finished with distressed neckline, cuffs, and hem. Cut to a relaxed unisex fit and hip length.",
-        image: "products/acne-1996-logo-tshirt.png",
-        status: "active"
-    },
-    {
-        id: 17,
-        name: "Godspeed Surf Day T-shirt",
-        brand: "Godspeed",
-        price: 100.00,
-        sku: "GS-SURF-001",
-        colorway: "White/Blue",
-        releaseDate: "4/15/26",
-        category: "Apparel",
-        badge: "new",
-        sizes: [
-            { size: "Small", stock: 10, price: 100.00 },
-            { size: "Medium", stock: 15, price: 100.00 },
-            { size: "Large", stock: 8, price: 100.00 },
-            { size: "X-Large", stock: 12, price: 100.00 }
-        ],
-        description: "Classic fit Godspeed Surf Day graphic t-shirt. Free shipping (1-2 weeks) or Express shipping (3-5 days, +$10).",
-        image: "products/godspeed-surf-day.png",
-        status: "active"
-    },
-    {
-        id: 16,
-        name: "Virgil Abloh Archive™ x Air Jordan 1 High OG \"Alaska\" Retro",
-        brand: "Jordan",
-        price: 1647.20,
-        sku: "AA3834-100",
-        colorway: "White/White",
-        releaseDate: "3/3/18",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 2, price: 1647.20 },
-            { size: "M/US7.5", stock: 1, price: 1647.20 },
-            { size: "M/US8", stock: 0, price: 1647.20 },
-            { size: "M/US8.5", stock: 3, price: 1647.20 },
-            { size: "M/US9", stock: 5, price: 1647.20 },
-            { size: "M/US9.5", stock: 2, price: 1647.20 },
-            { size: "M/US10", stock: 0, price: 1647.20 },
-            { size: "M/US11", stock: 4, price: 1647.20 },
-            { size: "M/US12", stock: 2, price: 1647.20 },
-            { size: "M/US13", stock: 1, price: 1647.20 }
-        ],
-        description: "The elusive Off-White x Air Jordan 1 'Alaska' (White) featuring deconstructed leather and Virgil Abloh's signature typography.",
-        image: "products/jordan-1-ow-alaska.png",
-        status: "active"
-    },
-    {
-        id: 1,
-        name: "Pharrell x VIRGINIA x Adistar Jellyfish 'Royal Blue'",
-        brand: "Adidas",
-        price: 249.00,
-        sku: "JP9263",
-        colorway: "Royal Blue/Core Black/Focus Olive",
-        releaseDate: "10/25/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 5, price: 249.00 },
-            { size: "M/US8", stock: 8, price: 249.00 },
-            { size: "M/US9", stock: 3, price: 249.00 },
-            { size: "M/US10", stock: 0, price: 249.00 }
-        ],
-        description: "The Pharrell x VIRGINIA x Adistar Jellyfish features a unique design with royal blue accents and innovative materials.",
-        image: "products/pharrell-jellyfish-blue.jpg",
-        status: "active"
-    },
-    {
-        id: 2,
-        name: "Pharrell x VIRGINIA x Adistar Jellyfish 'Solid Grey Black'",
-        brand: "Adidas",
-        price: 249.00,
-        sku: "JP9265",
-        colorway: "Mgh Solid Grey/Core Black/Clear Onix",
-        releaseDate: "10/11/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 4, price: 249.00 },
-            { size: "M/US8", stock: 6, price: 249.00 },
-            { size: "M/US9", stock: 2, price: 249.00 }
-        ],
-        description: "A sleek colorway of the Pharrell collaboration featuring solid grey and black tones.",
-        image: "products/pharrell-jellyfish-grey.jpg",
-        status: "active"
-    },
-    {
-        id: 3,
-        name: "Caitlin Clark x Zoom Kobe 6 Protro 'Light Armory Blue'",
-        brand: "Nike",
-        price: 249.00,
-        sku: "IO3672 400",
-        colorway: "Light Armory Blue/White/Baltic Blue",
-        releaseDate: "11/12/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 3, price: 249.00 },
-            { size: "M/US8", stock: 5, price: 249.00 },
-            { size: "M/US9", stock: 4, price: 249.00 },
-            { size: "M/US10", stock: 2, price: 249.00 }
-        ],
-        description: "Features a white Cushlon midsole with large Zoom Air forefoot unit and micromesh upper with scaly-textured 'islands'.",
-        image: "products/kobe-6-caitlin-clark.jpg",
-        status: "active"
-    },
-    {
-        id: 4,
-        name: "Cactus Plant Flea Market x Air Force 1 Low Premium 'Moss'",
-        brand: "Nike",
-        price: 299.00,
-        sku: "FQ7069 300",
-        colorway: "Moss/Moss",
-        releaseDate: "5/1/24",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US8", stock: 2, price: 299.00 },
-            { size: "M/US9", stock: 4, price: 299.00 },
-            { size: "M/US10", stock: 1, price: 299.00 }
-        ],
-        description: "Tumbled leather upper with prominent logos inspired by the Air More Uptempo; 'Air' and 'Sunshine' wordmarks.",
-        image: "products/af1-cpfm-moss.jpg",
-        status: "active"
-    },
-    {
-        id: 5,
-        name: "Fragment Design x Travis Scott x Jordan 1 Low OG SP 'Sail Military Blue'",
-        brand: "Jordan",
-        price: 899.00,
-        sku: "DM7866 140",
-        colorway: "Sail/Black/Muslin/Military Blue",
-        releaseDate: "7/29/21",
-        category: "Sneakers",
-        badge: "bestseller",
-        sizes: [
-            { size: "M/US7", stock: 1, price: 899.00 },
-            { size: "M/US8", stock: 2, price: 899.00 },
-            { size: "M/US9", stock: 1, price: 899.00 }
-        ],
-        description: "White leather base, black forefoot overlay, and Travis's signature reverse Swoosh in royal blue.",
-        image: "products/jordan-1-fragment-travis.jpg",
-        status: "active"
-    },
-    {
-        id: 6,
-        name: "Steve Wiebe x Jordan 10 Retro 'HOH'",
-        brand: "Jordan",
-        price: 499.00,
-        sku: "DD0587 002",
-        colorway: "Light Graphite/White/Wolf Grey",
-        releaseDate: "1/10/26",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US9", stock: 3, price: 499.00 },
-            { size: "M/US10", stock: 2, price: 499.00 }
-        ],
-        description: "Exclusive House of Hoops collaboration featuring premium materials and unique colorway.",
-        image: "products/jordan-10-hoh.jpg",
-        status: "active"
-    },
-    {
-        id: 7,
-        name: "Jordan 5 Retro 'Wolf Grey' 2026 GS",
-        brand: "Jordan",
-        price: 260.00,
-        sku: "DD0587 002",
-        colorway: "Light Graphite/White/Wolf Grey",
-        releaseDate: "1/10/26",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US7", stock: 5, price: 260.00 },
-            { size: "M/US8", stock: 4, price: 260.00 }
-        ],
-        description: "Grey layered nubuck upper with white contrast stitching and silver reflective tongue.",
-        image: "products/jordan-5-wolf-grey.jpg",
-        status: "active"
-    },
-    {
-        id: 8,
-        name: "Jordan 10 Retro 'Shadow' 2025",
-        brand: "Jordan",
-        price: 260.00,
-        sku: "HJ6779 001",
-        colorway: "Charred Grey/True Red/Black",
-        releaseDate: "11/19/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US9", stock: 6, price: 260.00 },
-            { size: "M/US10", stock: 4, price: 260.00 }
-        ],
-        description: "Classic Jordan 10 silhouette in the iconic Shadow colorway with premium materials.",
-        image: "products/jordan-10-shadow.jpg",
-        status: "active"
-    },
-    {
-        id: 9,
-        name: "Paris Saint-Germain x Jordan 5 Retro 'Off Noir'",
-        brand: "Jordan",
-        price: 250.00,
-        sku: "HQ3004 001",
-        colorway: "Off Noir/Particle Rose/Anthracite/Pearl Pink/Sail",
-        releaseDate: "12/3/25",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US8", stock: 3, price: 250.00 },
-            { size: "M/US9", stock: 5, price: 250.00 }
-        ],
-        description: "PSG collaboration featuring team colors and premium construction.",
-        image: "products/jordan-5-psg.jpg",
-        status: "active"
-    },
-    {
-        id: 10,
-        name: "Jalen Brunson x Zoom Kobe 6 Protro 'Statue of Liberty'",
-        brand: "Nike",
-        price: 250.00,
-        sku: "IQ5774 300",
-        colorway: "Hyper Turquoise/Metallic Copper",
-        releaseDate: "12/15/24",
-        category: "Sneakers",
-        badge: "new",
-        sizes: [
-            { size: "M/US9", stock: 4, price: 250.00 },
-            { size: "M/US10", stock: 3, price: 250.00 },
-            { size: "M/US11", stock: 2, price: 250.00 }
-        ],
-        description: "Jalen Brunson PE featuring Statue of Liberty inspired colorway with turquoise and copper accents.",
-        image: "products/kobe-6-brunson.jpg",
-        status: "active"
-    },
-    {
-        id: 11,
-        name: "Jordan 4 Retro 'Black Cat' 2025",
-        brand: "Jordan",
-        price: 250.00,
-        sku: "FV5029 010",
-        colorway: "Black/Black/Light Graphite",
-        releaseDate: "11/28/25",
-        category: "Sneakers",
-        badge: "bestseller",
-        sizes: [
-            { size: "M/US8", stock: 2, price: 250.00 },
-            { size: "M/US9", stock: 5, price: 250.00 },
-            { size: "M/US10", stock: 0, price: 250.00 }
-        ],
-        description: "The iconic all-black Jordan 4 returns with premium nubuck construction.",
-        image: "products/jordan-4-black-cat.jpg",
-        status: "active"
-    },
-    {
-        id: 12,
-        name: "Zoom Kobe 6 Protro 'Reverse Grinch'",
-        brand: "Nike",
-        price: 260.00,
-        sku: "FV4921 600",
-        colorway: "Bright Crimson/Black/Electric Green",
-        releaseDate: "12/15/23",
-        category: "Sneakers",
-        badge: "sale",
-        sizes: [
-            { size: "M/US8", stock: 1, price: 260.00 },
-            { size: "M/US8.5", stock: 0, price: 260.00 },
-            { size: "M/US14", stock: 2, price: 260.00 }
-        ],
-        description: "Limited edition Reverse Grinch colorway with bright crimson and electric green.",
-        image: "products/kobe-6-reverse-grinch.jpg",
-        status: "active"
-    },
-    {
-        id: 13,
-        name: "Air Jordan 3 Retro OG SP 'For The Love'",
-        brand: "Jordan",
-        price: 190.00,
-        sku: "HV8571 100",
-        colorway: "White/Diffused Blue/Anthracite/Muslin",
-        releaseDate: "4/15/25",
-        category: "Sneakers",
-        badge: "bestseller",
-        sizes: [
-            { size: "M/US9", stock: 4, price: 190.00 },
-            { size: "M/US10", stock: 3, price: 190.00 }
-        ],
-        description: "Special edition Jordan 3 celebrating the love of the game with unique colorway.",
-        image: "products/jordan-3-for-the-love.jpg",
-        status: "active"
-    },
-    {
-        id: 14,
-        name: "Jordan 14 'Black University Blue'",
-        brand: "Jordan",
-        price: 275.00,
-        sku: "DH4121 041",
-        colorway: "Black/University Blue",
-        releaseDate: "2/15/25",
-        category: "Sneakers",
-        badge: "bestseller",
-        sizes: [
-            { size: "M/US9", stock: 5, price: 275.00 },
-            { size: "M/US10", stock: 2, price: 275.00 }
-        ],
-        description: "Matte black nubuck upper with University Blue vents; inspired by MJ's love of luxury sports cars.",
-        image: "products/jordan-14-black-blue.jpg",
-        status: "active"
-    },
-    {
-        id: 15,
-        name: "Nike x NOCTA 'Sunset' Puffer Jacket – Mica Green / Cyber",
-        brand: "Nike",
-        price: 420.00,
-        sku: "FN8196-330",
-        colorway: "Mica Green/Cyber",
-        releaseDate: "11/1/24",
-        category: "Apparel",
-        badge: "new",
-        sizes: [
-            { size: "Small", stock: 4, price: 420.00 },
-            { size: "Medium", stock: 6, price: 420.00 },
-            { size: "Large", stock: 3, price: 420.00 },
-            { size: "X-Large", stock: 2, price: 420.00 }
-        ],
-        description: "Insulated down fill, metallic mica-green quilted shell, and minimal NOCTA branding.",
-        image: "products/nocta-sunset-jacket.jpg",
-        status: "active"
-    }
-];
+let products = [];
 
 let currentProduct = null;
 
@@ -412,42 +44,74 @@ const pageData = {
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    loadData();
-    checkAuth();
+    initFirebaseListeners();
+    initImporter();
     setupEventListeners();
-    renderDashboard();
 });
 
+function initFirebaseListeners() {
+    // Products Listener
+    db.collection('products').onSnapshot(snap => {
+        products = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderProducts();
+        renderDashboard();
+    });
+
+    // Orders Listener
+    db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snap => {
+        orders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderOrders();
+        renderDashboard();
+    });
+
+    // Customers Listener
+    db.collection('customers').onSnapshot(snap => {
+        customers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderCustomers();
+        renderDashboard();
+    });
+}
+
 function checkAuth() {
-    const isAuth = sessionStorage.getItem(STORAGE_KEYS.AUTH) === 'true';
-    if (isAuth) {
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('adminDashboard').classList.remove('hidden');
-    } else {
-        document.getElementById('loginScreen').classList.remove('hidden');
-        document.getElementById('adminDashboard').classList.add('hidden');
-    }
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            renderDashboard();
+        } else {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+        }
+    });
 }
 
 function setupEventListeners() {
     // Login
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
-            sessionStorage.setItem(STORAGE_KEYS.AUTH, 'true');
-            checkAuth();
-            renderDashboard();
+        const btn = e.target.querySelector('button');
+        const pass = document.getElementById('adminPassword').value;
+        const email = 'sgmpl99@gmail.com'; // Default admin email from prev sessions
+
+        btn.disabled = true;
+        btn.textContent = 'Verifying...';
+
+        try {
+            await auth.signInWithEmailAndPassword(email, pass);
             showToast('Welcome back, Admin');
-        } else {
-            showToast('Invalid Password', 'error');
+        } catch (err) {
+            console.error(err);
+            showToast('Invalid Password or Access Denied', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Unlock Dashboard';
         }
     });
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
         if (confirm('Logout?')) {
-            sessionStorage.removeItem(STORAGE_KEYS.AUTH);
-            checkAuth();
+            auth.signOut();
         }
     });
 
@@ -461,10 +125,8 @@ function setupEventListeners() {
     document.getElementById('quickAddProduct').addEventListener('click', () => openProductModal());
     document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
 
-    // Import
-    document.getElementById('fetchProductBtn').addEventListener('click', handleFetchProduct);
-    document.getElementById('cancelImportBtn').addEventListener('click', () => document.getElementById('importPreview').classList.add('hidden'));
-    document.getElementById('confirmImportBtn').addEventListener('click', handleConfirmImport);
+    // Initial auth check
+    checkAuth();
 }
 
 // ============================================
@@ -620,12 +282,12 @@ function renderSizeGrid(existingSizes = []) {
     }).join('');
 }
 
-function handleProductSubmit(e) {
+async function handleProductSubmit(e) {
     e.preventDefault();
 
     const btn = e.target.querySelector('button[type="submit"]');
     const originalText = btn.textContent;
-    btn.textContent = 'Uploading & Pushing to Git...';
+    btn.textContent = 'Saving & Syncing...';
     btn.disabled = true;
 
     const sizeEntries = [];
@@ -636,46 +298,54 @@ function handleProductSubmit(e) {
         sizeEntries.push({ size, stock, price });
     });
 
-    const formData = new FormData();
-    formData.append('id', currentProduct ? currentProduct.id : Date.now());
-    formData.append('name', document.getElementById('productName').value);
-    formData.append('brand', document.getElementById('productBrand').value);
-    formData.append('sku', document.getElementById('productSKU').value);
-    formData.append('category', document.getElementById('productCategory').value);
-    formData.append('price', document.getElementById('productPrice').value);
-    formData.append('description', document.getElementById('productDescription').value);
-    formData.append('sizes', JSON.stringify(sizeEntries));
+    const productId = currentProduct ? currentProduct.id : Date.now().toString();
+    const productData = {
+        name: document.getElementById('productName').value,
+        brand: document.getElementById('productBrand').value,
+        sku: document.getElementById('productSKU').value,
+        category: document.getElementById('productCategory').value,
+        price: parseFloat(document.getElementById('productPrice').value),
+        description: document.getElementById('productDescription').value,
+        sizes: sizeEntries,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
 
-    const fileInput = document.getElementById('productImage');
-    if (fileInput.files.length > 0) {
-        formData.append('imageFile', fileInput.files[0]);
-    }
+    try {
+        // 1. Sync to Firestore
+        await db.collection('products').doc(productId).set(productData, { merge: true });
 
-    fetch('http://localhost:5001/api/products', {
-        method: 'POST',
-        body: formData
-    })
-        .then(r => r.json())
-        .then(data => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-
-            if (data.success) {
-                showToast('✓ Product pushed to git successfully!', 'success');
-                // Hard refresh page to see new static js
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            } else {
-                showToast('Error saving product: ' + data.error, 'error');
-            }
-        })
-        .catch(err => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-            console.error(err);
-            showToast('Failed to reach local server on port 5001.', 'error');
+        // 2. Also call local API if available (for Git push functionality)
+        const formData = new FormData();
+        formData.append('id', productId);
+        Object.keys(productData).forEach(key => {
+            if (key === 'sizes') formData.append(key, JSON.stringify(productData[key]));
+            else formData.append(key, productData[key]);
         });
+
+        const fileInput = document.getElementById('productImage');
+        if (fileInput.files.length > 0) {
+            formData.append('imageFile', fileInput.files[0]);
+        }
+
+        const apiRes = await fetch('http://localhost:5001/api/products', {
+            method: 'POST',
+            body: formData
+        });
+        const apiData = await apiRes.json();
+
+        if (apiData.success) {
+            showToast('✓ Product saved and pushed to Git!', 'success');
+        } else {
+            showToast('Firestore synced, but Git push failed.', 'warning');
+        }
+        closeModal();
+    } catch (err) {
+        console.error(err);
+        showToast('Error syncing product: ' + err.message, 'error');
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
 }
 
 function closeModal() {
@@ -944,7 +614,7 @@ function toggleImporterSize(s, el) {
     }
 }
 
-function publishImporterProduct() {
+async function publishImporterProduct() {
     const name = document.getElementById('impName').value;
     const resell = parseFloat(document.getElementById('impResell').value);
 
@@ -952,8 +622,8 @@ function publishImporterProduct() {
         return showToast('Please complete all required fields', 'error');
     }
 
+    const productId = Date.now().toString();
     const p = {
-        id: Date.now(),
         name,
         brand: document.getElementById('impBrand').value,
         sku: document.getElementById('impSku').value,
@@ -963,22 +633,25 @@ function publishImporterProduct() {
         sizes: importerSelectedSizes.map(sz => ({ size: sz, stock: 10, price: resell })),
         category: 'Sneakers',
         description: document.getElementById('impDesc').value,
-        status: 'active'
+        status: 'active',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    products.unshift(p);
-    showToast(`Published: ${name}`);
-    setImporterStep(3);
+    try {
+        await db.collection('products').doc(productId).set(p);
+        showToast(`Published to Cloud: ${name}`);
+        setImporterStep(3);
 
-    // Clear Form
-    document.getElementById('impName').value = '';
-    document.getElementById('impResell').value = '';
-    importerSelectedSizes = [];
-    buildImporterSizeChips();
-    clearImporterUrls();
-
-    renderDashboard();
-    renderProducts();
+        // Clear Form
+        document.getElementById('impName').value = '';
+        document.getElementById('impResell').value = '';
+        importerSelectedSizes = [];
+        buildImporterSizeChips();
+        clearImporterUrls();
+    } catch (err) {
+        console.error(err);
+        showToast('Failed to publish to Cloud', 'error');
+    }
 }
 
 function setImporterStep(step) {
@@ -999,37 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// ============================================
-// HELPERS
-// ============================================
-function loadData() {
-    const savedOrders = localStorage.getItem(STORAGE_KEYS.ORDERS);
-    if (savedOrders) orders = JSON.parse(savedOrders);
-    else orders = generateSampleOrders();
-
-    const savedCust = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
-    if (savedCust) customers = JSON.parse(savedCust);
-    else customers = [
-        { name: 'Marcus J.', email: 'marcus@gmail.com', totalOrders: 5, totalSpent: 1200, lastOrder: new Date().toISOString() },
-        { name: 'Sarah K.', email: 'sarah@yahoo.com', totalOrders: 2, totalSpent: 450, lastOrder: new Date().toISOString() }
-    ];
-}
-
-function generateSampleOrders() {
-    const o = [
-        {
-            id: '#BD-1042',
-            customer: { name: 'Marcus J.', email: 'marcus@gmail.com' },
-            items: [{ name: 'Jordan 1 High', size: 'US 10', quantity: 1, price: 380 }],
-            total: 380,
-            status: 'pending',
-            createdAt: new Date().toISOString(),
-            shippingAddress: { street: '123 Sneaker St', city: 'Portland', state: 'OR' }
-        }
-    ];
-    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(o));
-    return o;
-}
+// Data is now handled via initFirebaseListeners
 
 function showToast(msg, type = 'success') {
     const container = document.getElementById('toastContainer');
