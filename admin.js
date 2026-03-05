@@ -623,39 +623,59 @@ function renderSizeGrid(existingSizes = []) {
 function handleProductSubmit(e) {
     e.preventDefault();
 
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.textContent;
+    btn.textContent = 'Uploading & Pushing to Git...';
+    btn.disabled = true;
+
     const sizeEntries = [];
     document.querySelectorAll('.size-item').forEach(item => {
         const size = item.querySelector('span').textContent;
         const stock = parseInt(item.querySelector('.size-stock').value) || 0;
-        const price = parseFloat(item.querySelector('.size-price').value) || parseFloat(document.getElementById('productPrice').value);
+        const price = parseFloat(item.querySelector('.size-price').value) || parseFloat(document.getElementById('productPrice').value) || 0;
         sizeEntries.push({ size, stock, price });
     });
 
-    const productData = {
-        id: currentProduct ? currentProduct.id : Date.now(),
-        name: document.getElementById('productName').value,
-        brand: document.getElementById('productBrand').value,
-        sku: document.getElementById('productSKU').value,
-        category: document.getElementById('productCategory').value,
-        price: parseFloat(document.getElementById('productPrice').value),
-        description: document.getElementById('productDescription').value,
-        image: document.getElementById('productImage').value,
-        sizes: sizeEntries,
-        status: 'active'
-    };
+    const formData = new FormData();
+    formData.append('id', currentProduct ? currentProduct.id : Date.now());
+    formData.append('name', document.getElementById('productName').value);
+    formData.append('brand', document.getElementById('productBrand').value);
+    formData.append('sku', document.getElementById('productSKU').value);
+    formData.append('category', document.getElementById('productCategory').value);
+    formData.append('price', document.getElementById('productPrice').value);
+    formData.append('description', document.getElementById('productDescription').value);
+    formData.append('sizes', JSON.stringify(sizeEntries));
 
-    if (currentProduct) {
-        const idx = products.findIndex(p => p.id === currentProduct.id);
-        products[idx] = productData;
-        showToast('Product updated successfully');
-    } else {
-        products.push(productData);
-        showToast('New product added to vault');
+    const fileInput = document.getElementById('productImage');
+    if (fileInput.files.length > 0) {
+        formData.append('imageFile', fileInput.files[0]);
     }
 
-    closeModal();
-    renderProducts();
-    renderDashboard();
+    fetch('http://localhost:5001/api/products', {
+        method: 'POST',
+        body: formData
+    })
+        .then(r => r.json())
+        .then(data => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+
+            if (data.success) {
+                showToast('✓ Product pushed to git successfully!', 'success');
+                // Hard refresh page to see new static js
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showToast('Error saving product: ' + data.error, 'error');
+            }
+        })
+        .catch(err => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+            console.error(err);
+            showToast('Failed to reach local server on port 5001.', 'error');
+        });
 }
 
 function closeModal() {
