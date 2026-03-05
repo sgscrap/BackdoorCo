@@ -197,16 +197,16 @@ function renderProducts() {
     productGrid.innerHTML = filteredProducts.map(product => `
     <div class="product-card" data-product-id="${product.id}">
       <div class="card-heart-icon">♡</div>
-      <div class="product-image-container" onclick="openProductModal(${product.id})">
+      <div class="product-image-container" onclick="openProductModal('${product.id}')">
         <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/400x400/f8f8f8/666?text=${encodeURIComponent(product.brand)}'" loading="lazy">
       </div>
-      <div class="product-info" onclick="openProductModal(${product.id})">
+      <div class="product-info" onclick="openProductModal('${product.id}')">
         <div class="product-name">${product.name}</div>
         <div class="product-category">${product.category}</div>
         <div class="product-lowest-ask">Lowest Ask</div>
         <div class="product-price">$${product.price.toFixed(0)}</div>
       </div>
-      <button class="quick-view-btn" onclick="openProductModal(${product.id})">View</button>
+      <button class="quick-view-btn" onclick="openProductModal('${product.id}')">View</button>
     </div>
   `).join('');
 }
@@ -248,7 +248,10 @@ function applyFilters() {
         // Size filter
         if (selectedFilters.sizes.length > 0) {
             const hasSize = selectedFilters.sizes.some(size =>
-                product.sizes.some(productSize => productSize.includes(size))
+                product.sizes.some(productSize => {
+                    const s = typeof productSize === 'object' ? productSize.size : productSize;
+                    return s === size;
+                })
             );
             if (!hasSize) return false;
         }
@@ -502,8 +505,12 @@ function resetFilters() {
 // MODAL
 // ============================================
 function openProductModal(productId) {
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
+    // Find by ID or SKU
+    const product = products.find(p => p.id === productId || p.sku === productId);
+    if (!product) {
+        console.warn('Product not found:', productId);
+        return;
+    }
 
     // Populate modal
     modalImage.src = product.image;
@@ -564,7 +571,7 @@ function selectModalSize(element) {
 }
 
 function addToCartFromModal() {
-    const productId = parseInt(productModal.dataset.productId);
+    const productId = productModal.dataset.productId;
     const selectedSize = selectedModalSizeValue;
 
     if (!selectedSize) {
@@ -572,8 +579,11 @@ function addToCartFromModal() {
         return;
     }
 
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
+    const product = products.find(p => p.id === productId || p.sku === productId);
+    if (!product) {
+        console.warn('Product not found for cart:', productId);
+        return;
+    }
 
     // Advanced cart logic: prevent duplicates of same product + size
     const existingIndex = cart.findIndex(item => item.id === productId && item.size === selectedSize);
@@ -712,7 +722,25 @@ if (cartCheckoutBtn) {
     };
 }
 
+function filterByBrandClick(brandName) {
+    console.log('Filtering by brand:', brandName);
+    selectedFilters.brands = [brandName];
+    // Sync UI chips
+    document.querySelectorAll('.brand-filter').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.brand === brandName);
+    });
+    // Remove "All" active state if needed
+    if (brandName !== 'all') {
+        document.querySelector('.brand-filter[data-brand="all"]')?.classList.remove('active');
+    }
+    applyFilters();
+    // Scroll to shop
+    const shop = document.getElementById('shopSection');
+    if (shop) shop.scrollIntoView({ behavior: 'smooth' });
+}
+
 // Make functions globally available
+window.filterByBrandClick = filterByBrandClick;
 window.openProductModal = openProductModal;
 window.showComingSoon = showComingSoon;
 window.closeComingSoon = closeComingSoon;
