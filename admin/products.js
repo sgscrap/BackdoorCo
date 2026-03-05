@@ -1,4 +1,4 @@
-import { db, auth, storage } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import {
   collection,
   addDoc,
@@ -14,12 +14,7 @@ import {
   onAuthStateChanged,
   signOut,
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
-import { uploadImage } from "./image-upload.js";
+import { cloudifyUpload as uploadImage } from "./cloudify.js";
 
 // ================================
 // AUTH GUARD

@@ -1,6 +1,7 @@
 // 🔐 BACKDOOR ADMIN - FIREBASE CONFIGURATION
-// This file is now EXCLUDED from Git to prevent security alerts.
-// Ensure this file exists on your local machine and your hosting provider.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
@@ -11,3 +12,11 @@ const firebaseConfig = {
     appId: "1:312196142925:web:ba090f602c8b5a31b20904",
     measurementId: "G-SPJ2FDLSKZ"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+export const auth = getAuth(app);
+
+// For legacy compatibility if any script still expects a global firebaseConfig
+window.firebaseConfig = firebaseConfig;
