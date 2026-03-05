@@ -71,6 +71,10 @@ body {
     pointer-events: none;
 }
 
+.hidden {
+    display: none !important;
+}
+
 .login-container {
     background: var(--bg-card);
     padding: 48px;
