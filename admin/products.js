@@ -1,42 +1,54 @@
-import { db, auth, storage } from './firebase-config.js';
+import { db, auth, storage } from "./firebase-config.js";
 import {
-    collection, addDoc, updateDoc, deleteDoc,
-    doc, onSnapshot, query, orderBy, getDoc
-} from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-import { onAuthStateChanged, signOut } from
-    'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-import { ref, uploadBytes, getDownloadURL } from
-    'https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js';
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  getDoc,
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import {
+  onAuthStateChanged,
+  signOut,
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
+import { uploadImage } from "./image-upload.js";
 
 // ================================
 // AUTH GUARD
 // ================================
-onAuthStateChanged(auth, user => {
-    if (!user) {
-        window.location.href = 'index.html';
-        return;
-    }
-    document.getElementById('userName').textContent =
-        user.email.split('@')[0];
-    document.getElementById('userAvatar').textContent =
-        user.email[0].toUpperCase();
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+  document.getElementById("userName").textContent = user.email.split("@")[0];
+  document.getElementById("userAvatar").textContent =
+    user.email[0].toUpperCase();
 
-    initProducts();
+  initProducts();
 });
 
 // Logout
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    signOut(auth).then(() => {
-        window.location.href = 'index.html';
-    });
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  signOut(auth).then(() => {
+    window.location.href = "index.html";
+  });
 });
 
 // ================================
 // STATE
 // ================================
 let allProducts = [];
-let currentFilter = 'all';
-let currentSort = 'name';
+let currentFilter = "all";
+let currentSort = "name";
 let editingId = null;
 let deleteId = null;
 
@@ -44,72 +56,71 @@ let deleteId = null;
 // REALTIME PRODUCTS LISTENER
 // ================================
 function initProducts() {
-    const q = query(
-        collection(db, 'products'),
-        orderBy('createdAt', 'desc')
-    );
+  const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
 
-    onSnapshot(q, (snapshot) => {
-        allProducts = [];
-        snapshot.forEach(doc => {
-            allProducts.push({ id: doc.id, ...doc.data() });
-        });
-
-        document.getElementById('productsBadge').textContent =
-            allProducts.length;
-
-        renderProducts();
+  onSnapshot(q, (snapshot) => {
+    allProducts = [];
+    snapshot.forEach((doc) => {
+      allProducts.push({ id: doc.id, ...doc.data() });
     });
+
+    document.getElementById("productsBadge").textContent = allProducts.length;
+
+    renderProducts();
+  });
 }
 
 // ================================
 // RENDER PRODUCTS TABLE
 // ================================
 function renderProducts() {
-    let filtered = [...allProducts];
+  let filtered = [...allProducts];
 
-    if (currentFilter === 'active') {
-        filtered = filtered.filter(p => p.status === 'active');
-    } else if (currentFilter === 'inactive') {
-        filtered = filtered.filter(p => p.status === 'inactive');
-    } else if (currentFilter !== 'all') {
-        filtered = filtered.filter(p => p.category === currentFilter);
-    }
+  if (currentFilter === "active") {
+    filtered = filtered.filter((p) => p.status === "active");
+  } else if (currentFilter === "inactive") {
+    filtered = filtered.filter((p) => p.status === "inactive");
+  } else if (currentFilter !== "all") {
+    filtered = filtered.filter((p) => p.category === currentFilter);
+  }
 
-    const searchVal = document.getElementById('searchInput')
-        ?.value.toLowerCase() || '';
-    if (searchVal) {
-        filtered = filtered.filter(p =>
-            p.name.toLowerCase().includes(searchVal) ||
-            p.sku.toLowerCase().includes(searchVal)
-        );
-    }
+  const searchVal =
+    document.getElementById("searchInput")?.value.toLowerCase() || "";
+  if (searchVal) {
+    filtered = filtered.filter(
+      (p) =>
+        p.name.toLowerCase().includes(searchVal) ||
+        p.sku.toLowerCase().includes(searchVal),
+    );
+  }
 
-    filtered.sort((a, b) => {
-        if (currentSort === 'price') return a.price - b.price;
-        if (currentSort === 'stock') return b.stock - a.stock;
-        if (currentSort === 'newest') return 0;
-        return a.name.localeCompare(b.name);
-    });
+  filtered.sort((a, b) => {
+    if (currentSort === "price") return a.price - b.price;
+    if (currentSort === "stock") return b.stock - a.stock;
+    if (currentSort === "newest") return 0;
+    return a.name.localeCompare(b.name);
+  });
 
-    const tbody = document.getElementById('productsBody');
-    const emptyState = document.getElementById('emptyState');
+  const tbody = document.getElementById("productsBody");
+  const emptyState = document.getElementById("emptyState");
 
-    if (filtered.length === 0) {
-        tbody.innerHTML = '';
-        emptyState.style.display = 'flex';
-        return;
-    }
+  if (filtered.length === 0) {
+    tbody.innerHTML = "";
+    emptyState.style.display = "flex";
+    return;
+  }
 
-    emptyState.style.display = 'none';
+  emptyState.style.display = "none";
 
-    tbody.innerHTML = filtered.map(product => `
+  tbody.innerHTML = filtered
+    .map(
+      (product) => `
         <tr data-id="${product.id}">
             <td>
                 <div class="product-img-cell">
                     ${product.image
-            ? `<img src="${product.image}" alt="${product.name}" class="product-thumb">`
-            : `<div class="product-thumb" style="display:flex;align-items:center;justify-content:center">
+          ? `<img src="${product.image}" alt="${product.name}" class="product-thumb">`
+          : `<div class="product-thumb" style="display:flex;align-items:center;justify-content:center">
                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
                                    <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -122,21 +133,21 @@ function renderProducts() {
             <td>
                 <div class="product-name-cell">
                     <span class="product-name">${product.name}</span>
-                    ${product.colorway ? `<span class="product-sku">${product.colorway}</span>` : ''}
+                    ${product.colorway ? `<span class="product-sku">${product.colorway}</span>` : ""}
                 </div>
             </td>
             <td><span class="product-sku">${product.sku}</span></td>
             <td><strong>$${parseFloat(product.price).toFixed(2)}</strong></td>
             <td>
-                <span style="color:${product.stock < 5 ? 'var(--red)' : 'var(--text-primary)'}">
+                <span style="color:${product.stock < 5 ? "var(--red)" : "var(--text-primary)"}">
                     ${product.stock} units
                 </span>
             </td>
-            <td><span class="pill ${product.category === 'Sneakers' ? 'new' : 'hot'}">${product.category}</span></td>
+            <td><span class="pill ${product.category === "Sneakers" ? "new" : "hot"}">${product.category}</span></td>
             <td>
                 <button class="pill ${product.status}" style="cursor:pointer;border:none"
                     onclick="toggleStatus('${product.id}', '${product.status}')">
-                    ${product.status === 'active' ? 'ACTIVE' : 'INACTIVE'}
+                    ${product.status === "active" ? "ACTIVE" : "INACTIVE"}
                 </button>
             </td>
             <td>
@@ -156,250 +167,371 @@ function renderProducts() {
                 </div>
             </td>
         </tr>
-    `).join('');
+    `,
+    )
+    .join("");
 }
 
 // ================================
 // TOGGLE STATUS
 // ================================
 window.toggleStatus = async (id, currentStatus) => {
-    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-    try {
-        await updateDoc(doc(db, 'products', id), { status: newStatus });
-        showToast(`Product set to ${newStatus}`);
-    } catch (err) {
-        showToast('Error updating status', true);
-    }
+  const newStatus = currentStatus === "active" ? "inactive" : "active";
+  try {
+    await updateDoc(doc(db, "products", id), { status: newStatus });
+    showToast(`Product set to ${newStatus}`);
+  } catch (err) {
+    showToast("Error updating status", true);
+  }
 };
 
 // ================================
 // EDIT PRODUCT
 // ================================
 window.editProduct = async (id) => {
-    editingId = id;
-    const docRef = doc(db, 'products', id);
-    const docSnap = await getDoc(docRef);
+  editingId = id;
+  const docRef = doc(db, "products", id);
+  const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-        const p = docSnap.data();
-        document.getElementById('modalTitle').textContent = 'Edit Product';
-        document.getElementById('productId').value = id;
-        document.getElementById('productName').value = p.name || '';
-        document.getElementById('productSku').value = p.sku || '';
-        document.getElementById('productPrice').value = p.price || '';
-        document.getElementById('productStock').value = p.stock || '';
-        document.getElementById('productCategory').value = p.category || '';
-        document.getElementById('productStatus').value = p.status || 'active';
-        document.getElementById('productDesc').value = p.desc || '';
-        document.getElementById('productSizes').value = p.sizes || '';
-        document.getElementById('productColor').value = p.colorway || '';
-        document.getElementById('imageUrl').value = p.image || '';
+  if (docSnap.exists()) {
+    const p = docSnap.data();
+    document.getElementById("modalTitle").textContent = "Edit Product";
+    document.getElementById("productId").value = id;
+    document.getElementById("productName").value = p.name || "";
+    document.getElementById("productSku").value = p.sku || "";
+    document.getElementById("productPrice").value = p.price || "";
+    document.getElementById("productStock").value = p.stock || "";
+    document.getElementById("productCategory").value = p.category || "";
+    document.getElementById("productStatus").value = p.status || "active";
+    document.getElementById("productDesc").value = p.desc || "";
+    document.getElementById("productSizes").value = p.sizes || "";
+    document.getElementById("productColor").value = p.colorway || "";
+    document.getElementById("productBrand").value = p.brand || "";
+    document.getElementById("productFeatured").checked = !!p.featured;
+    document.getElementById("imageUrl").value = p.image || "";
 
-        if (p.image) {
-            document.getElementById('imagePreview').innerHTML =
-                `<img src="${p.image}" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
-        }
-
-        openModal();
+    if (p.image) {
+      document.getElementById("imagePreview").innerHTML =
+        `<img src="${p.image}" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
     }
+
+    openModal();
+  }
 };
 
 // ================================
 // DELETE PRODUCT
 // ================================
 window.deleteProduct = (id, name) => {
-    deleteId = id;
-    document.getElementById('deleteProductName').textContent = name;
-    document.getElementById('deleteModal').classList.add('open');
+  deleteId = id;
+  document.getElementById("deleteProductName").textContent = name;
+  document.getElementById("deleteModal").classList.add("open");
 };
 
-document.getElementById('confirmDelete').addEventListener('click', async () => {
-    if (!deleteId) return;
-    try {
-        await deleteDoc(doc(db, 'products', deleteId));
-        showToast('Product deleted');
-        closeDeleteModal();
-    } catch (err) {
-        showToast('Error deleting product', true);
-    }
+document.getElementById("confirmDelete").addEventListener("click", async () => {
+  if (!deleteId) return;
+  try {
+    await deleteDoc(doc(db, "products", deleteId));
+    showToast("Product deleted");
+    closeDeleteModal();
+  } catch (err) {
+    showToast("Error deleting product", true);
+  }
 });
 
 // ================================
 // SAVE PRODUCT
 // ================================
-document.getElementById('productForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+document.getElementById("productForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const btn = document.getElementById('saveProduct');
-    btn.innerHTML = '<span>Saving...</span>';
-    btn.disabled = true;
+  const btn = document.getElementById("saveProduct");
+  const progressBar = document.getElementById("uploadProgress");
 
-    let imageUrl = document.getElementById('imageUrl').value;
-    const imageFile = document.getElementById('imageInput').files[0];
+  btn.innerHTML = "<span>Saving...</span>";
+  btn.disabled = true;
 
-    if (imageFile) {
-        try {
-            const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
-            await uploadBytes(storageRef, imageFile);
-            imageUrl = await getDownloadURL(storageRef);
-        } catch (err) {
-            console.error('Image upload failed:', err);
-        }
-    }
+  let imageUrl = document.getElementById("imageUrl").value;
+  const imageFile = document.getElementById("imageInput").files[0];
 
-    const productData = {
-        name: document.getElementById('productName').value,
-        sku: document.getElementById('productSku').value,
-        price: parseFloat(document.getElementById('productPrice').value),
-        stock: parseInt(document.getElementById('productStock').value),
-        category: document.getElementById('productCategory').value,
-        status: document.getElementById('productStatus').value,
-        desc: document.getElementById('productDesc').value,
-        sizes: document.getElementById('productSizes').value,
-        colorway: document.getElementById('productColor').value,
-        image: imageUrl,
-        updatedAt: new Date()
-    };
-
+  // Upload image if file selected
+  if (imageFile) {
     try {
-        if (editingId) {
-            await updateDoc(doc(db, 'products', editingId), productData);
-            showToast('Product updated successfully!');
-        } else {
-            productData.createdAt = new Date();
-            await addDoc(collection(db, 'products'), productData);
-            showToast('Product added successfully!');
-        }
-        closeModal();
-    } catch (err) {
-        showToast('Error saving product', true);
-        console.error(err);
-    }
+      // Show progress
+      if (progressBar) {
+        progressBar.style.display = "block";
+        progressBar.innerHTML = `
+                    <div class="progress-inner">
+                        <div class="progress-bar-fill 
+                                     uploading">
+                        </div>
+                        <span>Uploading image...</span>
+                    </div>`;
+      }
 
-    btn.innerHTML = `<span>Save Product</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      imageUrl = await uploadImage(imageFile);
+
+      // Success state
+      if (progressBar) {
+        progressBar.innerHTML = `
+                    <div class="progress-inner success">
+                        <span>✓ Image uploaded</span>
+                    </div>`;
+      }
+    } catch (err) {
+      if (progressBar) {
+        progressBar.innerHTML = `
+                    <div class="progress-inner error">
+                        <span>
+                            ✗ Upload failed — 
+                            using URL instead
+                        </span>
+                    </div>`;
+      }
+      console.error("Upload error:", err);
+    }
+  }
+
+  const productData = {
+    name: document.getElementById("productName").value || "",
+    sku: document.getElementById("productSku").value || "",
+    price: parseFloat(document.getElementById("productPrice").value) || 0,
+    stock: parseInt(document.getElementById("productStock").value) || 0,
+    category:
+      document.getElementById("productCategory").value || "Uncategorized",
+    status: document.getElementById("productStatus").value || "active",
+    desc: document.getElementById("productDesc").value || "",
+    sizes: document.getElementById("productSizes").value || "",
+    colorway: document.getElementById("productColor").value || "",
+    brand: document.getElementById("productBrand").value || "",
+    featured: document.getElementById("productFeatured").checked,
+    image: imageUrl || "",
+    updatedAt: new Date(),
+  };
+
+  try {
+    if (editingId) {
+      await updateDoc(doc(db, "products", editingId), productData);
+      showToast("Product updated successfully!");
+    } else {
+      productData.createdAt = new Date();
+      await addDoc(collection(db, "products"), productData);
+      showToast("Product added successfully!");
+    }
+    closeModal();
+  } catch (err) {
+    showToast("Error saving product", true);
+    console.error(err);
+  }
+
+  btn.innerHTML = `
+        <span>Save Product</span>
+        <svg width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>`;
-    btn.disabled = false;
+  btn.disabled = false;
+
+  // Hide progress after delay
+  setTimeout(() => {
+    if (progressBar) progressBar.style.display = "none";
+  }, 3000);
 });
 
 // ================================
 // FILTER TABS
 // ================================
-document.querySelectorAll('.filter-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentFilter = tab.dataset.filter;
-        renderProducts();
-    });
+document.querySelectorAll(".filter-tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document
+      .querySelectorAll(".filter-tab")
+      .forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+    currentFilter = tab.dataset.filter;
+    renderProducts();
+  });
 });
 
 // ================================
 // SORT
 // ================================
-document.getElementById('sortSelect').addEventListener('change', (e) => {
-    currentSort = e.target.value;
-    renderProducts();
+document.getElementById("sortSelect").addEventListener("change", (e) => {
+  currentSort = e.target.value;
+  renderProducts();
 });
 
 // ================================
 // SEARCH
 // ================================
-document.getElementById('searchToggle').addEventListener('click', () => {
-    const bar = document.getElementById('searchBar');
-    bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
-    if (bar.style.display === 'flex') {
-        document.getElementById('searchInput').focus();
-    }
+document.getElementById("searchToggle").addEventListener("click", () => {
+  const bar = document.getElementById("searchBar");
+  bar.style.display = bar.style.display === "none" ? "flex" : "none";
+  if (bar.style.display === "flex") {
+    document.getElementById("searchInput").focus();
+  }
 });
 
-document.getElementById('searchInput')?.addEventListener('input', renderProducts);
+document
+  .getElementById("searchInput")
+  ?.addEventListener("input", renderProducts);
 
 // ================================
-// IMAGE UPLOAD PREVIEW
+// IMAGE UPLOAD UI - TABS & PREVIEW
 // ================================
-document.getElementById('imageUploadArea').addEventListener('click', () => {
-    document.getElementById('imageInput').click();
+document.querySelectorAll(".img-tab").forEach((tab) => {
+  tab.addEventListener("click", (e) => {
+    // Toggle tabs
+    document
+      .querySelectorAll(".img-tab")
+      .forEach((t) => t.classList.remove("active"));
+    e.target.classList.add("active");
+
+    // Toggle content
+    document
+      .querySelectorAll(".img-tab-content")
+      .forEach((c) => c.classList.remove("active"));
+    const targetId = e.target.dataset.tab === "upload" ? "uploadTab" : "urlTab";
+    document.getElementById(targetId).classList.add("active");
+  });
 });
 
-document.getElementById('imageInput').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            document.getElementById('imagePreview').innerHTML =
-                `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
-        };
-        reader.readAsDataURL(file);
-    }
+const dropZone = document.getElementById("imageDropZone");
+const fileInput = document.getElementById("imageInput");
+const imgPreview = document.getElementById("imagePreview");
+
+dropZone.addEventListener("click", () => fileInput.click());
+
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("dragover");
 });
 
-document.getElementById('imageUrl').addEventListener('input', (e) => {
-    if (e.target.value) {
-        document.getElementById('imagePreview').innerHTML =
-            `<img src="${e.target.value}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" onerror="this.style.display='none'">`;
-    }
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  if (e.dataTransfer.files.length) {
+    fileInput.files = e.dataTransfer.files;
+    updateImagePreview(fileInput.files[0]);
+  }
+});
+
+fileInput.addEventListener("change", (e) => {
+  if (e.target.files.length) {
+    updateImagePreview(e.target.files[0]);
+  }
+});
+
+function updateImagePreview(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imgPreview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+    imgPreview.style.padding = "0";
+  };
+  reader.readAsDataURL(file);
+}
+
+// URL Preview
+const urlInput = document.getElementById("imageUrl");
+const urlWrap = document.getElementById("urlPreviewWrap");
+const urlImg = document.getElementById("urlPreviewImg");
+
+urlInput.addEventListener("input", (e) => {
+  const val = e.target.value;
+  if (val) {
+    urlImg.src = val;
+    urlWrap.style.display = "block";
+  } else {
+    urlWrap.style.display = "none";
+    urlImg.src = "";
+  }
+});
+
+document.getElementById("clearUrl").addEventListener("click", () => {
+  urlInput.value = "";
+  urlWrap.style.display = "none";
+  urlImg.src = "";
 });
 
 // ================================
 // MODAL HELPERS
 // ================================
 function openModal() {
-    document.getElementById('productModal').classList.add('open');
-    document.body.style.overflow = 'hidden';
+  document.getElementById("productModal").classList.add("open");
+  document.body.style.overflow = "hidden";
 }
 
 function closeModal() {
-    document.getElementById('productModal').classList.remove('open');
-    document.body.style.overflow = '';
-    document.getElementById('productForm').reset();
-    document.getElementById('imagePreview').innerHTML = `
+  document.getElementById("productModal").classList.remove("open");
+  document.body.style.overflow = "";
+  document.getElementById("productForm").reset();
+  document.getElementById("imagePreview").innerHTML = `
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
             <circle cx="8.5" cy="8.5" r="1.5"/>
             <polyline points="21 15 16 10 5 21"/>
         </svg>
-        <span>Click to upload image</span>`;
-    editingId = null;
+        <span class="drop-text">Drop image here or click to upload</span>
+        <span class="drop-subtext">PNG, JPG up to 10MB</span>`;
+  document.getElementById("imagePreview").style.padding = "32px";
+
+  document.getElementById("urlPreviewWrap").style.display = "none";
+  document.getElementById("urlPreviewImg").src = "";
+
+  document
+    .querySelectorAll(".img-tab")
+    .forEach((t) => t.classList.remove("active"));
+  document
+    .querySelectorAll(".img-tab-content")
+    .forEach((c) => c.classList.remove("active"));
+  document.querySelector('[data-tab="upload"]').classList.add("active");
+  document.getElementById("uploadTab").classList.add("active");
+  editingId = null;
 }
 
 function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.remove('open');
-    deleteId = null;
+  document.getElementById("deleteModal").classList.remove("open");
+  deleteId = null;
 }
 
-document.getElementById('addProductBtn').addEventListener('click', () => {
-    editingId = null;
-    document.getElementById('modalTitle').textContent = 'Add Product';
-    document.getElementById('productForm').reset();
-    openModal();
+document.getElementById("addProductBtn").addEventListener("click", () => {
+  editingId = null;
+  document.getElementById("modalTitle").textContent = "Add Product";
+  document.getElementById("productForm").reset();
+  openModal();
 });
 
-document.getElementById('emptyAddBtn')?.addEventListener('click', () => {
-    editingId = null;
-    openModal();
+document.getElementById("emptyAddBtn")?.addEventListener("click", () => {
+  editingId = null;
+  openModal();
 });
 
-document.getElementById('closeModal').addEventListener('click', closeModal);
-document.getElementById('cancelModal').addEventListener('click', closeModal);
-document.getElementById('closeDeleteModal').addEventListener('click', closeDeleteModal);
-document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
+document.getElementById("closeModal").addEventListener("click", closeModal);
+document.getElementById("cancelModal").addEventListener("click", closeModal);
+document
+  .getElementById("closeDeleteModal")
+  .addEventListener("click", closeDeleteModal);
+document
+  .getElementById("cancelDelete")
+  .addEventListener("click", closeDeleteModal);
 
-document.getElementById('productModal').addEventListener('click', (e) => {
-    if (e.target.id === 'productModal') closeModal();
+document.getElementById("productModal").addEventListener("click", (e) => {
+  if (e.target.id === "productModal") closeModal();
 });
-document.getElementById('deleteModal').addEventListener('click', (e) => {
-    if (e.target.id === 'deleteModal') closeDeleteModal();
+document.getElementById("deleteModal").addEventListener("click", (e) => {
+  if (e.target.id === "deleteModal") closeDeleteModal();
 });
 
 // ================================
 // TOAST
 // ================================
 function showToast(msg, isError = false) {
-    const toast = document.getElementById('toast');
-    const toastMsg = document.getElementById('toastMsg');
-    toastMsg.textContent = msg;
-    toast.className = isError ? 'toast error show' : 'toast show';
-    setTimeout(() => toast.classList.remove('show'), 3000);
+  const toast = document.getElementById("toast");
+  const toastMsg = document.getElementById("toastMsg");
+  toastMsg.textContent = msg;
+  toast.className = isError ? "toast error show" : "toast show";
+  setTimeout(() => toast.classList.remove("show"), 3000);
 }
