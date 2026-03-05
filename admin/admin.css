@@ -1955,6 +1955,14 @@ body {
   display: none !important;
 }
 
+.hidden {
+  display: none !important;
+}
+
+.form-row--spaced {
+  margin-top: 15px;
+}
+
 .m-b-20 {
   margin-bottom: 20px;
 }

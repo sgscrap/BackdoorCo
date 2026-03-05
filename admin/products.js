@@ -259,14 +259,12 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
     try {
       // Show progress
       if (progressBar) {
-        progressBar.style.display = "block";
+        progressBar.classList.remove("hidden");
         progressBar.innerHTML = `
-                    <div class="progress-inner">
-                        <div class="progress-bar-fill 
-                                     uploading">
-                        </div>
-                        <span>Uploading image...</span>
-                    </div>`;
+          <div class="progress-inner">
+            <div class="progress-bar-fill uploading"></div>
+            <span>Uploading image...</span>
+          </div>`;
       }
 
       imageUrl = await uploadImage(imageFile);
@@ -334,7 +332,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
 
   // Hide progress after delay
   setTimeout(() => {
-    if (progressBar) progressBar.style.display = "none";
+    if (progressBar) progressBar.classList.add("hidden");
   }, 3000);
 });
 
@@ -435,10 +433,10 @@ function initImageUI() {
       const url = e.target.value.trim();
       if (url) {
         urlPreviewImg.src = url;
-        urlPreviewImg.onload = () => { urlPreview.style.display = "block"; };
-        urlPreviewImg.onerror = () => { urlPreview.style.display = "none"; };
+        urlPreviewImg.onload = () => { urlPreview.classList.remove("hidden"); };
+        urlPreviewImg.onerror = () => { urlPreview.classList.add("hidden"); };
       } else {
-        urlPreview.style.display = "none";
+        urlPreview.classList.add("hidden");
       }
     }, 500);
   });
@@ -446,7 +444,7 @@ function initImageUI() {
   // Clear URL
   clearUrl?.addEventListener("click", () => {
     urlInput.value = "";
-    urlPreview.style.display = "none";
+    urlPreview.classList.add("hidden");
     urlPreviewImg.src = "";
   });
 }
