@@ -89,7 +89,7 @@
         <div class="admin-topbar">
             <div class="topbar-left">
                 <h1 class="page-title">DASHBOARD</h1>
-                <p class="page-subtitle">Overview of your store performance.</p>
+                <p class="page-subtitle">Welcome back — here's what's happening today.</p>
             </div>
             <div class="topbar-right">
                 <div class="live-indicator"><span class="live-dot"></span><span>LIVE</span></div>
@@ -159,6 +159,62 @@
                 <div class="card-body" id="activityList">
                     <div class="page-loading">
                         <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Spotlight + Quick Actions -->
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">INVENTORY SPOTLIGHT</span>
+                    <a href="products.html" class="add-btn btn-sm">Manage &rarr;</a>
+                </div>
+                <div class="card-body" id="inventorySpotlight">
+                    <div class="page-loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><span class="card-title">QUICK ACTIONS</span></div>
+                <div class="card-body">
+                    <div class="quick-actions-grid">
+                        <a href="products.html" class="quick-action-btn">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            <span>Add Product</span>
+                        </a>
+                        <a href="orders.html" class="quick-action-btn">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                <line x1="3" y1="6" x2="21" y2="6" />
+                            </svg>
+                            <span>View Orders</span>
+                        </a>
+                        <a href="products.html" class="quick-action-btn">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            <span>Import SKU</span>
+                        </a>
+                        <a href="analytics.html" class="quick-action-btn">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <line x1="18" y1="20" x2="18" y2="10" />
+                                <line x1="12" y1="20" x2="12" y2="4" />
+                                <line x1="6" y1="20" x2="6" y2="14" />
+                            </svg>
+                            <span>Analytics</span>
+                        </a>
                     </div>
                 </div>
             </div>

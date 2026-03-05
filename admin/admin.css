@@ -2189,12 +2189,12 @@ body {
     background 0.2s ease;
 }
 
-.toggle-switch input:checked + .toggle-slider {
+.toggle-switch input:checked+.toggle-slider {
   background: rgba(163, 230, 53, 0.2);
   border-color: rgba(163, 230, 53, 0.4);
 }
 
-.toggle-switch input:checked + .toggle-slider::after {
+.toggle-switch input:checked+.toggle-slider::after {
   transform: translateX(18px);
   background: var(--green);
 }
@@ -2202,4 +2202,108 @@ body {
 .toggle-label {
   font-size: 0.78rem;
   color: var(--text-muted);
+}
+
+/* ================================
+   DASHBOARD — INVENTORY SPOTLIGHT
+================================ */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spotlight-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.spotlight-item:last-child {
+  border-bottom: none;
+}
+
+.spotlight-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+}
+
+.spotlight-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.spotlight-name {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spotlight-sku {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.spotlight-stock {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.spotlight-stock.low {
+  color: var(--red);
+}
+
+/* ================================
+   DASHBOARD — QUICK ACTIONS
+================================ */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  letter-spacing: 0.03em;
+}
+
+.quick-action-btn:hover {
+  background: rgba(163, 230, 53, 0.06);
+  border-color: rgba(163, 230, 53, 0.25);
+  color: var(--green);
 }

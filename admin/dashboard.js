@@ -1,5 +1,5 @@
 import { db, auth } from './firebase-config.js';
-import { collection, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { collection, onSnapshot, query, orderBy, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 onAuthStateChanged(auth, user => {
@@ -14,37 +14,94 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 });
 
 function initDashboard() {
-    // Products listener
-    onSnapshot(query(collection(db, 'products'), orderBy('createdAt', 'desc')), snap => {
+    // ── PRODUCTS ── no orderBy so no index needed
+    onSnapshot(collection(db, 'products'), snap => {
+        const count = snap.size;
+        document.getElementById('productsVal').textContent = count;
+        document.getElementById('productsBadge').textContent = count;
+
+        // Inventory spotlight: top 3 low-stock items
         const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        document.getElementById('productsVal').textContent = products.length;
-        document.getElementById('productsBadge').textContent = products.length;
+        renderInventorySpotlight(products);
     });
 
-    // Orders listener
-    onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), snap => {
-        const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // ── ORDERS ──
+    onSnapshot(collection(db, 'orders'), snap => {
+        const orders = snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => {
+                const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+                const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+                return tb - ta;
+            });
+
         document.getElementById('ordersVal').textContent = orders.length;
-        document.getElementById('ordersBadge').textContent = orders.filter(o => o.status === 'pending').length;
+
+        const pending = orders.filter(o => o.status === 'pending').length;
+        document.getElementById('ordersBadge').textContent = pending || '';
 
         const revenue = orders.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0);
-        document.getElementById('revenueVal').textContent = '$' + revenue.toFixed(2);
+        document.getElementById('revenueVal').textContent = '$' + revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         renderRecentOrders(orders.slice(0, 5));
         renderActivity(orders.slice(0, 6));
         renderChart(orders);
     });
 
-    // Customers listener
-    onSnapshot(query(collection(db, 'customers'), orderBy('createdAt', 'desc')), snap => {
+    // ── CUSTOMERS ──
+    onSnapshot(collection(db, 'customers'), snap => {
         document.getElementById('customersVal').textContent = snap.size;
     });
 }
 
+// ============================================
+// INVENTORY SPOTLIGHT
+// ============================================
+function renderInventorySpotlight(products) {
+    const el = document.getElementById('inventorySpotlight');
+    if (!el) return;
+
+    // Sort by stock ascending — lowest first
+    const sorted = [...products].sort((a, b) => (a.stock || 0) - (b.stock || 0)).slice(0, 4);
+
+    if (sorted.length === 0) {
+        el.innerHTML = '<p style="color:var(--text-muted);padding:12px 0;font-size:0.82rem;">No products yet.</p>';
+        return;
+    }
+
+    el.innerHTML = sorted.map(p => {
+        const stock = p.stock || 0;
+        const isLow = stock < 5;
+        return `
+            <div class="spotlight-item">
+                <div class="spotlight-img">
+                    ${p.image
+                ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`
+                : `<div style="width:100%;height:100%;background:rgba(255,255,255,0.04);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                           </div>`
+            }
+                </div>
+                <div class="spotlight-info">
+                    <span class="spotlight-name">${p.name}</span>
+                    <span class="spotlight-sku">${p.sku || ''}</span>
+                </div>
+                <span class="spotlight-stock ${isLow ? 'low' : ''}">${stock} left</span>
+            </div>`;
+    }).join('');
+}
+
+// ============================================
+// RECENT ORDERS
+// ============================================
 function renderRecentOrders(orders) {
     const tbody = document.getElementById('recentOrdersBody');
     if (orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted)">No orders yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state-row">No orders yet.</td></tr>';
         return;
     }
     tbody.innerHTML = orders.map(o => `
@@ -58,6 +115,9 @@ function renderRecentOrders(orders) {
     `).join('');
 }
 
+// ============================================
+// ACTIVITY FEED
+// ============================================
 function renderActivity(orders) {
     const list = document.getElementById('activityList');
     if (orders.length === 0) {
@@ -76,6 +136,11 @@ function renderActivity(orders) {
     `).join('');
 }
 
+// ============================================
+// REVENUE CHART
+// ============================================
+let chartInstance = null;
+
 function renderChart(orders) {
     const ctx = document.getElementById('revenueChart');
     if (!ctx) return;
@@ -84,13 +149,15 @@ function renderChart(orders) {
     const monthlyRev = new Array(12).fill(0);
 
     orders.forEach(o => {
-        const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
-        if (d && d.getMonth) {
+        const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt || 0);
+        if (d && !isNaN(d)) {
             monthlyRev[d.getMonth()] += parseFloat(o.total) || 0;
         }
     });
 
-    new Chart(ctx, {
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: months,
@@ -118,6 +185,9 @@ function renderChart(orders) {
     });
 }
 
+// ============================================
+// UTILS
+// ============================================
 function formatDate(ts) {
     if (!ts) return '—';
     const d = ts.toDate ? ts.toDate() : new Date(ts);

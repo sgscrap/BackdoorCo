@@ -376,85 +376,94 @@ document
   ?.addEventListener("input", renderProducts);
 
 // ================================
-// IMAGE UPLOAD UI - TABS & PREVIEW
+// IMAGE UI INIT
 // ================================
-document.querySelectorAll(".img-tab").forEach((tab) => {
-  tab.addEventListener("click", (e) => {
-    // Toggle tabs
-    document
-      .querySelectorAll(".img-tab")
-      .forEach((t) => t.classList.remove("active"));
-    e.target.classList.add("active");
+function initImageUI() {
+  const dropZone = document.getElementById("imageDropZone");
+  const fileInput = document.getElementById("imageInput");
+  const urlInput = document.getElementById("imageUrl");
+  const urlPreview = document.getElementById("urlPreviewWrap");
+  const urlPreviewImg = document.getElementById("urlPreviewImg");
+  const clearUrl = document.getElementById("clearUrl");
 
-    // Toggle content
-    document
-      .querySelectorAll(".img-tab-content")
-      .forEach((c) => c.classList.remove("active"));
-    const targetId = e.target.dataset.tab === "upload" ? "uploadTab" : "urlTab";
-    document.getElementById(targetId).classList.add("active");
+  // Tab switcher
+  document.querySelectorAll(".img-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".img-tab").forEach((t) => t.classList.remove("active"));
+      document.querySelectorAll(".img-tab-content").forEach((c) => c.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById(`${tab.dataset.tab}Tab`).classList.add("active");
+    });
   });
-});
 
-const dropZone = document.getElementById("imageDropZone");
-const fileInput = document.getElementById("imageInput");
-const imgPreview = document.getElementById("imagePreview");
+  // Click to open file picker
+  dropZone?.addEventListener("click", () => fileInput.click());
 
-dropZone.addEventListener("click", () => fileInput.click());
+  // Drag and drop
+  dropZone?.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+  });
 
-dropZone.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  dropZone.classList.add("dragover");
-});
+  dropZone?.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragover");
+  });
 
-dropZone.addEventListener("dragleave", () => {
-  dropZone.classList.remove("dragover");
-});
+  dropZone?.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      handleFilePreview(file);
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      fileInput.files = dt.files;
+    }
+  });
 
-dropZone.addEventListener("drop", (e) => {
-  e.preventDefault();
-  dropZone.classList.remove("dragover");
-  if (e.dataTransfer.files.length) {
-    fileInput.files = e.dataTransfer.files;
-    updateImagePreview(fileInput.files[0]);
-  }
-});
+  // File input change
+  fileInput?.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) handleFilePreview(file);
+  });
 
-fileInput.addEventListener("change", (e) => {
-  if (e.target.files.length) {
-    updateImagePreview(e.target.files[0]);
-  }
-});
+  // URL input preview (debounced)
+  let urlDebounce;
+  urlInput?.addEventListener("input", (e) => {
+    clearTimeout(urlDebounce);
+    urlDebounce = setTimeout(() => {
+      const url = e.target.value.trim();
+      if (url) {
+        urlPreviewImg.src = url;
+        urlPreviewImg.onload = () => { urlPreview.style.display = "block"; };
+        urlPreviewImg.onerror = () => { urlPreview.style.display = "none"; };
+      } else {
+        urlPreview.style.display = "none";
+      }
+    }, 500);
+  });
 
-function updateImagePreview(file) {
+  // Clear URL
+  clearUrl?.addEventListener("click", () => {
+    urlInput.value = "";
+    urlPreview.style.display = "none";
+    urlPreviewImg.src = "";
+  });
+}
+
+// File preview helper
+function handleFilePreview(file) {
   const reader = new FileReader();
-  reader.onload = (e) => {
-    imgPreview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
-    imgPreview.style.padding = "0";
+  reader.onload = (ev) => {
+    const preview = document.getElementById("imagePreview");
+    preview.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:200px;object-fit:cover;" alt="Preview">`;
+    preview.style.padding = "0";
   };
   reader.readAsDataURL(file);
 }
 
-// URL Preview
-const urlInput = document.getElementById("imageUrl");
-const urlWrap = document.getElementById("urlPreviewWrap");
-const urlImg = document.getElementById("urlPreviewImg");
-
-urlInput.addEventListener("input", (e) => {
-  const val = e.target.value;
-  if (val) {
-    urlImg.src = val;
-    urlWrap.style.display = "block";
-  } else {
-    urlWrap.style.display = "none";
-    urlImg.src = "";
-  }
-});
-
-document.getElementById("clearUrl").addEventListener("click", () => {
-  urlInput.value = "";
-  urlWrap.style.display = "none";
-  urlImg.src = "";
-});
+// Init on load
+initImageUI();
 
 // ================================
 // MODAL HELPERS
