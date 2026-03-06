@@ -716,6 +716,7 @@
     align-items: center;
     padding: 24px 0;
     cursor: pointer;
+    -webkit-user-select: none;
     user-select: none;
 }
 

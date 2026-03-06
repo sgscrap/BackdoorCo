@@ -196,7 +196,7 @@ function renderProducts() {
         grid.innerHTML = filtered.map((p, i) => `
             <div class="shop-card"
                  data-id="${p.id}"
-                 style="animation-delay:${i * 0.04}s"
+                 style="animation-delay:${Math.min(i * 0.04, 0.3)}s"
                  onclick="handleProductClick('${p.id}')">
 
                 <div class="shop-card-img">
