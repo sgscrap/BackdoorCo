@@ -217,13 +217,81 @@
     <button class="back-top-btn" id="backTopBtn" title="Back to Top">
         <i class="fa-solid fa-arrow-up"></i>
     </button>
-
     <!-- ══ TOAST ══ -->
     <div class="shop-toast" id="shopToast">✓ Added to cart!</div>
 
-    <!-- ══ GLOBAL COMPONENTS (Included by app.js) ══ -->
-    <div id="modalOverlay" class="modal-overlay"></div>
-    <!-- Note: Modal markup is dynamically handled by app.js or from external templates if needed -->
+    <!-- ══ PRODUCT MODAL (from old layout) ══ -->
+    <div class="modal" id="productModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose" aria-label="Close Modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-body">
+                <div class="modal-badge-container">
+                    <span id="modalBadge" class="modal-badge"></span>
+                </div>
+                <img src="" alt="Product Image" class="modal-image" id="modalImage" />
+                <div class="modal-details">
+                    <div class="modal-category" id="modalCategory">Sneakers</div>
+                    <h2 class="modal-name" id="modalTitle"></h2>
+                    <div class="modal-sku" id="modalSku"></div>
+                    <div class="modal-colorway" id="modalColorway"></div>
+                    <div class="modal-price" id="modalPrice"></div>
+                    <div class="modal-lowest-ask">Lowest Ask</div>
+                    <div class="modal-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Release Date</span>
+                            <span id="modalReleaseDate" class="info-value"></span>
+                        </div>
+                    </div>
+                    <p id="modalDescription" class="modal-description"></p>
+                    <div class="size-selector">
+                        <h3>Select Size</h3>
+                        <div class="size-options" id="modalSizeOptions"></div>
+                    </div>
+                    <button class="add-to-cart-btn modal-add-to-cart" id="modalAddToCart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ CART SIDEBAR (from old layout) ══ -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="cart-close" id="cartClose" aria-label="Close Cart Sidebar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span class="cart-total-price" id="cartTotal">$0.00</span>
+            </div>
+            <button class="cart-checkout" id="cartCheckoutBtn" onclick="window.location.href='checkout.html'">Proceed to
+                Checkout</button>
+        </div>
+    </div>
+
+    <!-- ══ COMING SOON MODAL ══ -->
+    <div class="modal" id="comingSoonModal">
+        <div class="modal-overlay" id="comingSoonOverlay"></div>
+        <div class="modal-content small center">
+            <button class="modal-close" id="comingSoonClose">×</button>
+            <div class="coming-soon-body">
+                <div class="coming-soon-icon">✨</div>
+                <h2 id="comingSoonTitle">Coming Soon</h2>
+                <p id="comingSoonMessage">This feature is currently being refined for our archive collection. Stay
+                    tuned!</p>
+                <button class="add-to-cart-btn" id="comingSoonAck">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ TOAST CONTENT CONTAINER ══ -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <!-- Scripts -->
     <!-- app.js is for global logic like cart/nav -->
