@@ -128,7 +128,10 @@ function renderProducts() {
     let filtered = [...allProducts];
 
     // Apply category/brand filter
-    if (currentFilter !== 'all') {
+    if (currentFilter === 'Men') {
+        // Temporarily treat 'Men' as the default for all current shoes and apparel
+        filtered = filtered.filter(p => p.category !== 'Women' && p.category !== 'Kids');
+    } else if (currentFilter !== 'all') {
         filtered = filtered.filter(p =>
             p.brand === currentFilter ||
             p.category === currentFilter
