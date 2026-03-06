@@ -131,6 +131,9 @@ function renderProducts() {
     if (currentFilter === 'Men') {
         // Temporarily treat 'Men' as the default for all current shoes and apparel
         filtered = filtered.filter(p => p.category !== 'Women' && p.category !== 'Kids');
+    } else if (currentFilter === 'Shoes') {
+        // 'Shoes' category should include both strict 'Shoes' and legacy 'Sneakers'
+        filtered = filtered.filter(p => p.category === 'Shoes' || p.category === 'Sneakers');
     } else if (currentFilter !== 'all') {
         filtered = filtered.filter(p =>
             p.brand === currentFilter ||
