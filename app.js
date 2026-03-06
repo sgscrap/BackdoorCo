@@ -200,10 +200,8 @@ function initGlobalListeners() {
 // ============================================
 // PRODUCT MODAL
 // ============================================
-export async function openProductModal(id) {
-    const product = products.find(p => p.id === id);
+window.showProductModal = function (product) {
     if (!product) return;
-
     const modal = document.getElementById('productModal');
     if (!modal) return;
 
@@ -241,7 +239,13 @@ export async function openProductModal(id) {
     modal.classList.add('active');
     if (modalOverlay) modalOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
+}; // End of showProductModal
+
+export async function openProductModal(id) {
+    const product = products.find(p => p.id === id);
+    if (product) window.showProductModal(product);
 }
+window.openProductModal = openProductModal;
 
 function closeProductModal() {
     const modal = document.getElementById('productModal');

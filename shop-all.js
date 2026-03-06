@@ -317,10 +317,12 @@ function updateSubtitle() {
 // PRODUCT CLICK
 // ================================
 window.handleProductClick = (id) => {
-    // Try to open modal if app.js has it
-    if (typeof openProductModal === 'function') {
-        openProductModal(id);
+    const product = allProducts.find(p => p.id === id);
+    // Try to open globally accessible modal function in app.js
+    if (product && typeof window.showProductModal === 'function') {
+        window.showProductModal(product);
     } else {
+        // Fallback
         window.location.href = `product.html?id=${id}`;
     }
 };
