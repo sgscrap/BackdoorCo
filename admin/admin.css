@@ -79,6 +79,12 @@ body {
   display: none !important;
 }
 
+.admin-dashboard {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
 .login-container {
   background: var(--bg-card);
   padding: 48px;
