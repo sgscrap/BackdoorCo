@@ -1529,3 +1529,89 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ── WIZARD NAV BUTTONS ── */
+.wizard-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    gap: 12px;
+}
+
+.wizard-continue-btn {
+    margin-left: auto;
+    padding: 14px 32px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.3px;
+}
+
+.wizard-continue-btn:hover {
+    background: #a8d94a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(200, 246, 93, 0.25);
+}
+
+.wizard-continue-btn:active {
+    transform: translateY(0);
+}
+
+.wizard-back-btn {
+    padding: 12px 22px;
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    color: var(--text2);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wizard-back-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ── FREE BADGE (shipping option) ── */
+.free-badge {
+    background: var(--accent);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+/* ── SHIPPING RADIO CHECKED STATE ── */
+.shipping-option .shipping-radio.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.shipping-option .shipping-radio.checked::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #000;
+    display: block;
+    margin: auto;
+    margin-top: 4px;
+}

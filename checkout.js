@@ -1,216 +1,75 @@
 /* ══════════════════════════════════════════
-   BACKDOOR — CHECKOUT JS
+   BACKDOOR — CHECKOUT JS (UPGRADED v2)
+   - Reads cart from localStorage (backdoor-cart)
+   - Step-gated 3-step wizard (Contact → Shipping → Payment)
+   - Saves orders to Firebase Firestore
+   - Clears localStorage cart on success
 ══════════════════════════════════════════ */
 
-/* ── PRODUCT DATA ── */
-const PRODUCTS = [
-    {
-        id: 6, emoji: '👕',
-        brand: 'Acne Studios', name: '1996 Rhinestone T-Shirt',
-        price: 350, retail: 350, badge: 'hot',
-        sizes: [
-            { s: 'Small', stock: 10 }, { s: 'Medium', stock: 15 }, { s: 'Large', stock: 8 }, { s: 'X-Large', stock: 12 }
-        ]
-    },
-    {
-        id: 5, emoji: '👕',
-        brand: 'Acne Studios', name: '1996 Logo T-Shirt',
-        price: 250, retail: 250, badge: 'hot',
-        sizes: [
-            { s: 'Small', stock: 10 }, { s: 'Medium', stock: 15 }, { s: 'Large', stock: 8 }, { s: 'X-Large', stock: 12 }
-        ]
-    },
-    {
-        id: 1, emoji: '👟',
-        brand: 'Jordan', name: 'Air Jordan 1 Retro High OG "Chicago"',
-        price: 750, retail: 170, badge: 'hot',
-        sizes: [
-            { s: '8', stock: 2 }, { s: '8.5', stock: 1 }, { s: '9', stock: 3 },
-            { s: '9.5', stock: 0 }, { s: '10', stock: 2 }, { s: '10.5', stock: 1 },
-            { s: '11', stock: 0 }
-        ]
-    },
-    {
-        id: 2, emoji: '🦓',
-        brand: 'Adidas', name: 'Yeezy Boost 350 V2 "Zebra"',
-        price: 320, retail: 220, badge: 'new',
-        sizes: [
-            { s: '7', stock: 1 }, { s: '8', stock: 2 }, { s: '9', stock: 1 },
-            { s: '10', stock: 3 }, { s: '11', stock: 0 }, { s: '12', stock: 2 }
-        ]
-    },
-    {
-        id: 3, emoji: '🐼',
-        brand: 'Nike', name: 'Nike Dunk Low Retro "Panda"',
-        price: 165, retail: 110, badge: 'low',
-        sizes: [
-            { s: '7', stock: 1 }, { s: '8', stock: 0 }, { s: '9', stock: 2 },
-            { s: '10', stock: 1 }, { s: '11', stock: 3 }, { s: '12', stock: 1 }
-        ]
-    },
-    {
-        id: 4, emoji: '🤠',
-        brand: 'Nike × Travis Scott', name: 'Travis Scott Dunk Low "Jackboys"',
-        price: 1350, retail: 150, badge: 'hot',
-        sizes: [
-            { s: '8', stock: 1 }, { s: '9', stock: 1 }, { s: '10', stock: 2 },
-            { s: '11', stock: 0 }, { s: '12', stock: 1 }
-        ]
-    },
-];
+/* ── FIREBASE ── */
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+    authDomain: "coalition-aec44.firebaseapp.com",
+    projectId: "coalition-aec44",
+    storageBucket: "coalition-aec44.firebasestorage.app",
+    messagingSenderId: "312196142925",
+    appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 
 /* ── PROMO CODES ── */
 const PROMO_CODES = {
     'BACKDOOR10': { type: 'percent', value: 10, label: '10% off' },
-    'WELCOME15': { type: 'percent', value: 15, label: '15% off' },
-    'FLAT20': { type: 'flat', value: 20, label: '$20 off' },
-    'FREESHIP': { type: 'freeship', value: 0, label: 'Free Shipping' },
+    'WELCOME15':  { type: 'percent', value: 15, label: '15% off' },
+    'FLAT20':     { type: 'flat',    value: 20, label: '$20 off' },
+    'FREESHIP':   { type: 'freeship',value: 0,  label: 'Free Shipping' },
 };
 
 /* ── SHIPPING OPTIONS ── */
 const SHIPPING_OPTIONS = [
-    { id: 'standard', name: 'Standard Shipping', time: '5–7 business days', price: 9.99 },
-    { id: 'express', name: 'Express Shipping', time: '2–3 business days', price: 19.99 },
-    { id: 'overnight', name: 'Overnight Shipping', time: 'Next business day', price: 34.99 },
+    { id: 'standard',  name: 'Standard Shipping', time: '5–7 business days',  price: 9.99  },
+    { id: 'express',   name: 'Express Shipping',   time: '2–3 business days',  price: 19.99 },
+    { id: 'overnight', name: 'Overnight Shipping', time: 'Next business day',  price: 34.99 },
 ];
 
 const FREE_SHIP_THRESHOLD = 150;
 
 /* ── STATE ── */
-let cart = [];
+let cart          = [];
+let currentStep   = 1;       // 1 = Contact/Address, 2 = Shipping, 3 = Payment
 let selectedShipping = 'standard';
-let appliedPromo = null;
-let selectedSizes = {};
+let appliedPromo  = null;
 
 /* ══════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════ */
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+const delay = ms => new Promise(r => setTimeout(r, ms));
 
 function showToast(msg, type = 'success') {
     const c = document.getElementById('toastContainer');
+    if (!c) return;
     const t = document.createElement('div');
     t.className = `toast ${type}`;
-    const icon = type === 'error' ? 'fa-circle-xmark' : type === 'info' ? 'fa-circle-info' : 'fa-circle-check';
+    const icon = type === 'error' ? 'fa-circle-xmark' : type === 'info' ? 'fa-circle-info' : type === 'warn' ? 'fa-triangle-exclamation' : 'fa-circle-check';
     t.innerHTML = `<i class="fa-solid ${icon}"></i> ${msg}`;
     c.appendChild(t);
     setTimeout(() => {
         t.style.opacity = '0';
         t.style.transform = 'translateX(110%)';
         setTimeout(() => t.remove(), 300);
-    }, 3000);
+    }, 3200);
 }
 
-function formatCurrency(n) {
-    return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
-/* ══════════════════════════════════════════
-   PRODUCT GRID
-══════════════════════════════════════════ */
-function renderProducts() {
-    const grid = document.getElementById('productsGrid');
-    grid.innerHTML = PRODUCTS.map(p => {
-        const badgeLabel = p.badge === 'hot' ? '🔥 HOT' : p.badge === 'new' ? '✨ NEW' : '⚡ LOW STOCK';
-        const badgeClass = `badge-${p.badge}`;
-
-        return `
-      <div class="product-card">
-        <div class="product-img">
-          ${p.emoji}
-          <span class="product-badge ${badgeClass}">${badgeLabel}</span>
-        </div>
-        <div class="product-info">
-          <div class="product-brand">${p.brand}</div>
-          <div class="product-name">${p.name}</div>
-          <div class="product-price-row">
-            <div class="product-price">${formatCurrency(p.price)}</div>
-            <div class="product-retail">Retail: $${p.retail}</div>
-          </div>
-          <div class="size-row" id="sizes-${p.id}">
-            ${p.sizes.map(sz =>
-            `<div class="size-chip ${sz.stock === 0 ? 'sold-out' : ''} ${selectedSizes[p.id] === sz.s ? 'selected' : ''}"
-                   onclick="${sz.stock > 0 ? `selectSize(${p.id}, '${sz.s}')` : ''}">${sz.s}</div>`
-        ).join('')}
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(${p.id})">
-            <i class="fa-solid fa-bag-shopping"></i>
-            ADD TO CART
-          </button>
-        </div>
-      </div>
-    `;
-    }).join('');
-}
-
-function selectSize(productId, size) {
-    selectedSizes[productId] = size;
-    renderProducts();
-}
-
-/* ══════════════════════════════════════════
-   CART MANAGEMENT
-══════════════════════════════════════════ */
-function addToCart(productId) {
-    const product = PRODUCTS.find(p => p.id === productId);
-    if (!product) return;
-
-    const size = selectedSizes[productId];
-    if (!size) {
-        showToast('Please select a size first', 'warn');
-        return;
-    }
-
-    // Check if already in cart with same size
-    const existing = cart.find(c => c.productId === productId && c.size === size);
-    if (existing) {
-        const sizeData = product.sizes.find(s => s.s === size);
-        if (existing.qty >= (sizeData?.stock || 1)) {
-            showToast('Max stock reached for this size', 'error');
-            return;
-        }
-        existing.qty++;
-    } else {
-        cart.push({ productId, size, qty: 1 });
-    }
-
-    updateCartUI();
-    openCart();
-    showToast(`${product.name} added to cart! 🛒`);
-}
-
-function removeFromCart(index) {
-    cart.splice(index, 1);
-    updateCartUI();
-    showToast('Item removed', 'info');
-}
-
-function updateQty(index, delta) {
-    const item = cart[index];
-    if (!item) return;
-
-    const product = PRODUCTS.find(p => p.id === item.productId);
-    const sizeData = product?.sizes.find(s => s.s === item.size);
-    const maxStock = sizeData?.stock || 1;
-
-    item.qty += delta;
-    if (item.qty <= 0) {
-        removeFromCart(index);
-        return;
-    }
-    if (item.qty > maxStock) {
-        item.qty = maxStock;
-        showToast('Max stock reached', 'warn');
-    }
-
-    updateCartUI();
+function fmt(n) {
+    return '$' + Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 function getCartSubtotal() {
-    return cart.reduce((sum, item) => {
-        const product = PRODUCTS.find(p => p.id === item.productId);
-        return sum + (product ? product.price * item.qty : 0);
-    }, 0);
+    return cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.qty), 0);
 }
 
 function getCartItemCount() {
@@ -220,7 +79,7 @@ function getCartItemCount() {
 function getDiscountAmount(subtotal) {
     if (!appliedPromo) return 0;
     if (appliedPromo.type === 'percent') return subtotal * (appliedPromo.value / 100);
-    if (appliedPromo.type === 'flat') return Math.min(appliedPromo.value, subtotal);
+    if (appliedPromo.type === 'flat')    return Math.min(appliedPromo.value, subtotal);
     return 0;
 }
 
@@ -231,148 +90,292 @@ function getShippingCost() {
 }
 
 /* ══════════════════════════════════════════
-   CART UI
+   CART — LOAD FROM LOCALSTORAGE
 ══════════════════════════════════════════ */
-function updateCartUI() {
+function loadCart() {
+    try {
+        cart = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+    } catch (e) {
+        cart = [];
+    }
+
     const count = getCartItemCount();
-    const subtotal = getCartSubtotal();
-    const discount = getDiscountAmount(subtotal);
+    const countEl = document.getElementById('cartCount');
+    if (countEl) countEl.textContent = count;
 
-    // Nav count
-    document.getElementById('cartCount').textContent = count;
+    updateFreeShippingBar(getCartSubtotal());
+    updateCheckoutSummary();
 
-    // Cart header
-    document.getElementById('cartHeaderCount').textContent = `${count} item${count !== 1 ? 's' : ''}`;
-
-    // Drawer items
-    const itemsContainer = document.getElementById('cartItems');
     if (cart.length === 0) {
-        itemsContainer.innerHTML = `
-      <div class="cart-empty">
-        <i class="fa-solid fa-bag-shopping"></i>
-        <h3>YOUR CART IS EMPTY</h3>
-        <p>Add some heat to your collection!</p>
-      </div>
-    `;
-        document.getElementById('cartFooter').style.display = 'none';
+        // Redirect to store if cart is empty
+        const grid = document.getElementById('cartItems');
+        if (grid) {
+            grid.innerHTML = `
+              <div class="cart-empty">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <h3>YOUR CART IS EMPTY</h3>
+                <p>Add some heat to your collection!</p>
+              </div>`;
+        }
+        const footer = document.getElementById('cartFooter');
+        if (footer) footer.style.display = 'none';
     } else {
-        document.getElementById('cartFooter').style.display = 'block';
-        itemsContainer.innerHTML = cart.map((item, i) => {
-            const p = PRODUCTS.find(pr => pr.id === item.productId);
-            if (!p) return '';
-            return `
-        <div class="cart-item">
-          <div class="cart-item-img">${p.emoji}</div>
-          <div class="cart-item-info">
-            <div class="cart-item-name">${p.name}</div>
-            <div class="cart-item-meta">
-              <span>Size ${item.size}</span>
-              <span>${p.brand}</span>
-            </div>
-            <div class="cart-item-bottom">
-              <div class="qty-control">
-                <button class="qty-btn" onclick="updateQty(${i}, -1)" title="Decrease quantity">−</button>
-                <div class="qty-val">${item.qty}</div>
-                <button class="qty-btn" onclick="updateQty(${i}, 1)" title="Increase quantity">+</button>
-              </div>
-              <div class="cart-item-price">${formatCurrency(p.price * item.qty)}</div>
-            </div>
-            <button class="cart-item-remove" onclick="removeFromCart(${i})" title="Remove item">
-              <i class="fa-solid fa-trash-can"></i> Remove
-            </button>
-          </div>
-        </div>
-      `;
-        }).join('');
+        renderCartDrawer();
     }
+}
 
-    // Subtotal
-    document.getElementById('cartSubtotal').textContent = formatCurrency(subtotal);
-
-    // Savings
-    const savingsEl = document.getElementById('cartSavings');
-    if (discount > 0) {
-        savingsEl.textContent = `You're saving ${formatCurrency(discount)}!`;
-        savingsEl.classList.remove('hidden');
-    } else {
-        savingsEl.classList.add('hidden');
-    }
-
-    // Free shipping bar
-    updateFreeShippingBar(subtotal);
-
-    // Update checkout summary too
+function saveCart() {
+    localStorage.setItem('backdoor-cart', JSON.stringify(cart));
+    updateFreeShippingBar(getCartSubtotal());
     updateCheckoutSummary();
 }
 
-function updateFreeShippingBar(subtotal) {
-    const remaining = Math.max(0, FREE_SHIP_THRESHOLD - subtotal);
-    const pct = Math.min(100, (subtotal / FREE_SHIP_THRESHOLD) * 100);
-
-    // Nav bar
-    const navShipAmt = document.getElementById('navShipAmt');
-    const navShipText = document.getElementById('navShipText');
-    const navShipFill = document.getElementById('navShipFill');
-    if (remaining > 0) {
-        navShipAmt.textContent = formatCurrency(remaining);
-        navShipText.innerHTML = `Add <span>${formatCurrency(remaining)}</span> more for FREE shipping 🚚`;
-    } else {
-        navShipText.innerHTML = `🎉 You qualify for <span>FREE</span> shipping!`;
-    }
-    navShipFill.style.width = pct + '%';
-
-    // Drawer bar
-    const drawerShipAmt = document.getElementById('drawerShipAmt');
-    const drawerShipText = document.getElementById('drawerShipText');
-    const drawerShipFill = document.getElementById('drawerShipFill');
-    if (remaining > 0) {
-        drawerShipAmt.textContent = formatCurrency(remaining);
-        drawerShipText.innerHTML = `Add <strong>${formatCurrency(remaining)}</strong> more for FREE shipping 🚚`;
-    } else {
-        drawerShipText.innerHTML = `🎉 You qualify for <strong>FREE</strong> shipping!`;
-    }
-    drawerShipFill.style.width = pct + '%';
+function clearCart() {
+    cart = [];
+    localStorage.removeItem('backdoor-cart');
+    const countEl = document.getElementById('cartCount');
+    if (countEl) countEl.textContent = '0';
 }
 
 /* ══════════════════════════════════════════
    CART DRAWER
 ══════════════════════════════════════════ */
+function renderCartDrawer() {
+    const itemsContainer = document.getElementById('cartItems');
+    const footer = document.getElementById('cartFooter');
+    const headerCount = document.getElementById('cartHeaderCount');
+
+    const count = getCartItemCount();
+    if (headerCount) headerCount.textContent = `${count} item${count !== 1 ? 's' : ''}`;
+
+    if (cart.length === 0) {
+        if (itemsContainer) itemsContainer.innerHTML = `
+          <div class="cart-empty">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <h3>YOUR CART IS EMPTY</h3>
+            <p>Add some heat to your collection!</p>
+          </div>`;
+        if (footer) footer.style.display = 'none';
+        return;
+    }
+
+    if (footer) footer.style.display = 'block';
+    if (!itemsContainer) return;
+
+    itemsContainer.innerHTML = cart.map((item, i) => `
+      <div class="cart-item">
+        <div class="cart-item-img">
+          ${item.image ? `<img src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none;font-size:2rem">👟</span>` : '<span style="font-size:2rem">👟</span>'}
+        </div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-meta">
+            <span>Size ${item.size}</span>
+            <span>${item.brand || ''}</span>
+          </div>
+          <div class="cart-item-bottom">
+            <div class="qty-control">
+              <button class="qty-btn" onclick="updateQty(${i}, -1)" title="Decrease">−</button>
+              <div class="qty-val">${item.qty}</div>
+              <button class="qty-btn" onclick="updateQty(${i}, 1)" title="Increase">+</button>
+            </div>
+            <div class="cart-item-price">${fmt(item.price * item.qty)}</div>
+          </div>
+          <button class="cart-item-remove" onclick="removeFromCart(${i})" title="Remove">
+            <i class="fa-solid fa-trash-can"></i> Remove
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    const subtotalEl = document.getElementById('cartSubtotal');
+    if (subtotalEl) subtotalEl.textContent = fmt(getCartSubtotal());
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    saveCart();
+    renderCartDrawer();
+    showToast('Item removed', 'info');
+}
+
+function updateQty(index, delta) {
+    const item = cart[index];
+    if (!item) return;
+    item.qty = Math.max(1, item.qty + delta);
+    saveCart();
+    renderCartDrawer();
+}
+
 function openCart() {
-    document.getElementById('cartOverlay').classList.add('open');
-    document.getElementById('cartDrawer').classList.add('open');
+    document.getElementById('cartOverlay')?.classList.add('open');
+    document.getElementById('cartDrawer')?.classList.add('open');
     document.body.style.overflow = 'hidden';
 }
 
 function closeCart() {
-    document.getElementById('cartOverlay').classList.remove('open');
-    document.getElementById('cartDrawer').classList.remove('open');
+    document.getElementById('cartOverlay')?.classList.remove('open');
+    document.getElementById('cartDrawer')?.classList.remove('open');
     document.body.style.overflow = '';
 }
 
 /* ══════════════════════════════════════════
-   PAGES
+   FREE SHIPPING BAR
 ══════════════════════════════════════════ */
-function showPage(page) {
-    document.getElementById('storePage').style.display = page === 'store' ? 'block' : 'none';
-    document.getElementById('checkoutPage').classList.toggle('show', page === 'checkout');
-    document.getElementById('successPage').classList.toggle('show', page === 'success');
+function updateFreeShippingBar(subtotal) {
+    const remaining = Math.max(0, FREE_SHIP_THRESHOLD - subtotal);
+    const pct = Math.min(100, (subtotal / FREE_SHIP_THRESHOLD) * 100);
+    const msg = remaining > 0
+        ? `Add <span>${fmt(remaining)}</span> more for FREE shipping 🚚`
+        : `🎉 You qualify for <span>FREE</span> shipping!`;
 
-    if (page === 'store') {
-        renderProducts();
-    }
-
-    window.scrollTo(0, 0);
+    ['navShipText', 'drawerShipText'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = msg;
+    });
+    ['navShipFill', 'drawerShipFill'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.width = pct + '%';
+    });
 }
 
-function goToCheckout() {
-    if (cart.length === 0) {
-        showToast('Your cart is empty!', 'error');
-        return;
+/* ══════════════════════════════════════════
+   STEP WIZARD
+══════════════════════════════════════════ */
+function setStep(step) {
+    currentStep = step;
+
+    // Update step indicators
+    for (let i = 1; i <= 3; i++) {
+        const num = document.getElementById('step' + i);
+        const lbl = document.getElementById('step' + i + 'l');
+        if (!num) continue;
+        num.className = 'c-step-num';
+        lbl.className = 'c-step-label';
+        if (i < step) {
+            num.classList.add('done');
+            num.innerHTML = '<i class="fa-solid fa-check" style="font-size:12px"></i>';
+            lbl.classList.add('active');
+        } else if (i === step) {
+            num.classList.add('active');
+            lbl.classList.add('active');
+        }
     }
-    closeCart();
-    showPage('checkout');
-    renderShippingOptions();
-    updateCheckoutSummary();
+
+    // Show/hide sections
+    const sectionMap = {
+        1: ['sectionContact', 'sectionAddress'],
+        2: ['sectionShipping'],
+        3: ['sectionPayment'],
+    };
+
+    ['sectionContact', 'sectionAddress', 'sectionShipping', 'sectionPayment'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    (sectionMap[step] || []).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'block';
+    });
+
+    // Show/hide nav buttons
+    const continueBtn = document.getElementById('continueBtn');
+    const backBtn     = document.getElementById('backBtn');
+    const placeBtn    = document.getElementById('placeOrderBtn');
+
+    if (continueBtn) continueBtn.style.display = step < 3 ? 'block' : 'none';
+    if (backBtn)     backBtn.style.display     = step > 1 ? 'inline-flex' : 'none';
+    if (placeBtn)    placeBtn.style.display    = step === 3 ? 'flex' : 'none';
+
+    // Render shipping options on step 2
+    if (step === 2) renderShippingOptions();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep1() {
+    const required = [
+        { id: 'firstName', label: 'First Name' },
+        { id: 'lastName',  label: 'Last Name'  },
+        { id: 'email',     label: 'Email'       },
+        { id: 'address1',  label: 'Address'     },
+        { id: 'city',      label: 'City'        },
+        { id: 'zip',       label: 'ZIP Code'    },
+    ];
+
+    let ok = true;
+    required.forEach(f => {
+        const el = document.getElementById(f.id);
+        if (!el) return;
+        const val = el.value.trim();
+        if (!val) {
+            el.classList.add('error');
+            if (ok) { showToast(`Please enter your ${f.label}`, 'error'); el.focus(); }
+            ok = false;
+        } else {
+            el.classList.remove('error');
+        }
+    });
+
+    // Email format check
+    if (ok) {
+        const email = document.getElementById('email');
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+            email.classList.add('error');
+            showToast('Please enter a valid email address', 'error');
+            email.focus();
+            return false;
+        }
+    }
+
+    const state = document.getElementById('state');
+    if (ok && state && !state.value) {
+        showToast('Please select a state', 'error');
+        return false;
+    }
+
+    return ok;
+}
+
+function validateStep2() {
+    if (!selectedShipping) {
+        showToast('Please select a shipping method', 'error');
+        return false;
+    }
+    return true;
+}
+
+function validateStep3() {
+    const cardPayment = document.getElementById('cardPayment');
+    if (!cardPayment || cardPayment.classList.contains('hidden')) return true;
+
+    const cardNum = document.getElementById('cardNum')?.value.replace(/\s/g, '') || '';
+    const cardExp = document.getElementById('cardExp')?.value || '';
+    const cardCvc = document.getElementById('cardCvc')?.value || '';
+    const cardName = document.getElementById('cardName')?.value.trim() || '';
+
+    if (cardNum.length < 13) { showToast('Please enter a valid card number', 'error'); return false; }
+    if (cardExp.length < 7)  { showToast('Please enter your expiry date (MM / YY)', 'error'); return false; }
+    if (cardCvc.length < 3)  { showToast('Please enter your CVC', 'error'); return false; }
+    if (!cardName)           { showToast('Please enter the name on your card', 'error'); return false; }
+
+    // Expiry not in past
+    const [mm, yy] = cardExp.split(' / ');
+    const expDate = new Date(2000 + parseInt(yy), parseInt(mm) - 1, 1);
+    if (expDate < new Date()) { showToast('Your card appears to be expired', 'error'); return false; }
+
+    return true;
+}
+
+function continueStep() {
+    if (currentStep === 1 && !validateStep1()) return;
+    if (currentStep === 2 && !validateStep2()) return;
+    setStep(currentStep + 1);
+}
+
+function prevStep() {
+    if (currentStep > 1) setStep(currentStep - 1);
 }
 
 /* ══════════════════════════════════════════
@@ -380,23 +383,23 @@ function goToCheckout() {
 ══════════════════════════════════════════ */
 function renderShippingOptions() {
     const container = document.getElementById('shippingOptions');
+    if (!container) return;
     const subtotal = getCartSubtotal();
 
     container.innerHTML = SHIPPING_OPTIONS.map(opt => {
         const isFree = subtotal >= FREE_SHIP_THRESHOLD && opt.id === 'standard';
-        const priceLabel = isFree ? 'FREE' : formatCurrency(opt.price);
+        const priceLabel = isFree ? '<span class="free-badge">FREE</span>' : fmt(opt.price);
         const isSelected = selectedShipping === opt.id;
 
         return `
       <div class="shipping-option ${isSelected ? 'selected' : ''}" onclick="selectShipping('${opt.id}')">
-        <div class="shipping-radio"></div>
+        <div class="shipping-radio${isSelected ? ' checked' : ''}"></div>
         <div class="shipping-info">
           <div class="shipping-name">${opt.name}</div>
           <div class="shipping-time">${opt.time}</div>
         </div>
         <div class="shipping-price">${priceLabel}</div>
-      </div>
-    `;
+      </div>`;
     }).join('');
 }
 
@@ -407,51 +410,49 @@ function selectShipping(id) {
 }
 
 /* ══════════════════════════════════════════
-   CHECKOUT SUMMARY
+   ORDER SUMMARY
 ══════════════════════════════════════════ */
 function updateCheckoutSummary() {
     const summaryItems = document.getElementById('summaryItems');
     if (!summaryItems) return;
 
-    // Summary items
-    summaryItems.innerHTML = cart.map(item => {
-        const p = PRODUCTS.find(pr => pr.id === item.productId);
-        if (!p) return '';
-        return `
+    summaryItems.innerHTML = cart.map(item => `
       <div class="summary-item">
         <div class="summary-img">
-          ${p.emoji}
+          ${item.image
+            ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:6px" onerror="this.parentElement.innerHTML='<span style=font-size:1.8rem>👟</span>'">`
+            : '<span style="font-size:1.8rem">👟</span>'}
           ${item.qty > 1 ? `<span class="summary-qty-badge">${item.qty}</span>` : ''}
         </div>
         <div class="summary-item-info">
-          <div class="summary-item-name">${p.name}</div>
-          <div class="summary-item-meta">Size ${item.size} · ${p.brand}</div>
+          <div class="summary-item-name">${item.name}</div>
+          <div class="summary-item-meta">Size ${item.size} · ${item.brand || 'Backdoor'}</div>
         </div>
-        <div class="summary-item-price">${formatCurrency(p.price * item.qty)}</div>
+        <div class="summary-item-price">${fmt(parseFloat(item.price) * item.qty)}</div>
       </div>
-    `;
-    }).join('');
+    `).join('');
 
-    // Totals
-    const subtotal = getCartSubtotal();
-    const discount = getDiscountAmount(subtotal);
-    const shipping = getShippingCost();
-    const taxable = subtotal - discount;
-    const tax = taxable * 0.08;
-    const total = taxable + shipping + tax;
+    const subtotal  = getCartSubtotal();
+    const discount  = getDiscountAmount(subtotal);
+    const shipping  = getShippingCost();
+    const taxable   = subtotal - discount;
+    const tax       = taxable * 0.08;
+    const total     = taxable + shipping + tax;
 
-    document.getElementById('summarySubtotal').textContent = formatCurrency(subtotal);
-    document.getElementById('summaryShipping').textContent = shipping === 0 ? 'FREE' : formatCurrency(shipping);
-    document.getElementById('summaryTax').textContent = formatCurrency(tax);
-    document.getElementById('summaryTotal').textContent = formatCurrency(total);
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('summarySubtotal', fmt(subtotal));
+    set('summaryShipping', shipping === 0 ? 'FREE' : fmt(shipping));
+    set('summaryTax',      fmt(tax));
+    set('summaryTotal',    fmt(total));
 
-    // Discount line
     const discountLine = document.getElementById('discountLine');
-    if (discount > 0) {
-        discountLine.classList.remove('hidden');
-        document.getElementById('discountAmt').textContent = '-' + formatCurrency(discount);
-    } else {
-        discountLine.classList.add('hidden');
+    if (discountLine) {
+        if (discount > 0) {
+            discountLine.classList.remove('hidden');
+            set('discountAmt', '-' + fmt(discount));
+        } else {
+            discountLine.classList.add('hidden');
+        }
     }
 }
 
@@ -459,213 +460,217 @@ function updateCheckoutSummary() {
    PROMO CODES
 ══════════════════════════════════════════ */
 function applyPromo() {
-    // Try both promo inputs (cart drawer and checkout)
-    const cartPromoInput = document.getElementById('promoCode');
-    const checkoutPromoInput = document.getElementById('checkoutPromo');
-    const code = (cartPromoInput?.value || checkoutPromoInput?.value || '').trim().toUpperCase();
+    const cartInput     = document.getElementById('promoCode');
+    const checkoutInput = document.getElementById('checkoutPromo');
+    const code = (cartInput?.value || checkoutInput?.value || '').trim().toUpperCase();
 
-    if (!code) {
-        showToast('Enter a promo code', 'warn');
-        return;
-    }
+    if (!code) { showToast('Enter a promo code', 'warn'); return; }
 
     const promo = PROMO_CODES[code];
-    if (!promo) {
-        showToast('Invalid promo code', 'error');
-        return;
-    }
+    if (!promo) { showToast('Invalid promo code', 'error'); return; }
 
     appliedPromo = promo;
     showToast(`Promo applied: ${promo.label}! 🎉`);
-    updateCartUI();
+    updateCheckoutSummary();
 
-    // Clear inputs
-    if (cartPromoInput) cartPromoInput.value = '';
-    if (checkoutPromoInput) checkoutPromoInput.value = '';
+    if (cartInput)     cartInput.value = '';
+    if (checkoutInput) checkoutInput.value = '';
 }
 
 /* ══════════════════════════════════════════
-   PAYMENT METHODS
+   PAYMENT METHOD TABS
 ══════════════════════════════════════════ */
 function setPayMethod(method, btn) {
     document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
 
-    document.getElementById('cardPayment').classList.toggle('hidden', method !== 'card');
-    document.getElementById('applePayment').classList.toggle('hidden', method !== 'apple');
-    document.getElementById('googlePayment').classList.toggle('hidden', method !== 'google');
-    document.getElementById('paypalPayment').classList.toggle('hidden', method !== 'paypal');
+    ['cardPayment', 'applePayment', 'googlePayment', 'paypalPayment'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', !id.startsWith(method));
+    });
 }
 
 /* ══════════════════════════════════════════
    CARD FORMATTING
 ══════════════════════════════════════════ */
 function formatCard(input) {
-    let val = input.value.replace(/\D/g, '');
-    val = val.substring(0, 16);
-    let formatted = '';
+    let val = input.value.replace(/\D/g, '').substring(0, 16);
+    let out = '';
     for (let i = 0; i < val.length; i++) {
-        if (i > 0 && i % 4 === 0) formatted += ' ';
-        formatted += val[i];
+        if (i > 0 && i % 4 === 0) out += ' ';
+        out += val[i];
     }
-    input.value = formatted;
+    input.value = out;
 }
 
 function formatExpiry(input) {
-    let val = input.value.replace(/\D/g, '');
-    val = val.substring(0, 4);
-    if (val.length >= 2) {
-        val = val.substring(0, 2) + ' / ' + val.substring(2);
-    }
+    let val = input.value.replace(/\D/g, '').substring(0, 4);
+    if (val.length >= 2) val = val.substring(0, 2) + ' / ' + val.substring(2);
+    input.value = val;
+}
+
+function formatPhone(input) {
+    let val = input.value.replace(/\D/g, '').substring(0, 10);
+    if (val.length >= 6) val = `(${val.substring(0,3)}) ${val.substring(3,6)}-${val.substring(6)}`;
+    else if (val.length >= 3) val = `(${val.substring(0,3)}) ${val.substring(3)}`;
     input.value = val;
 }
 
 /* ══════════════════════════════════════════
-   PLACE ORDER
+   PLACE ORDER → FIREBASE
 ══════════════════════════════════════════ */
 async function placeOrder() {
+    if (!validateStep3()) return;
+    if (cart.length === 0) { showToast('Your cart is empty!', 'error'); return; }
+
     const btn = document.getElementById('placeOrderBtn');
-
-    // Basic validation
-    const required = [
-        { id: 'firstName', label: 'First name' },
-        { id: 'lastName', label: 'Last name' },
-        { id: 'email', label: 'Email' },
-        { id: 'address1', label: 'Address' },
-        { id: 'city', label: 'City' },
-        { id: 'zip', label: 'ZIP code' },
-    ];
-
-    let hasError = false;
-    required.forEach(f => {
-        const el = document.getElementById(f.id);
-        if (!el.value.trim()) {
-            el.classList.add('error');
-            if (!hasError) {
-                showToast(`Please enter your ${f.label}`, 'error');
-                el.focus();
-            }
-            hasError = true;
-        } else {
-            el.classList.remove('error');
-        }
-    });
-
-    const state = document.getElementById('state').value;
-    if (!state) {
-        showToast('Please select a state', 'error');
-        hasError = true;
-    }
-
-    if (hasError) return;
-
-    // Check card (if card payment)
-    const cardPayment = document.getElementById('cardPayment');
-    if (!cardPayment.classList.contains('hidden')) {
-        const cardNum = document.getElementById('cardNum').value.replace(/\s/g, '');
-        const cardExp = document.getElementById('cardExp').value;
-        const cardCvc = document.getElementById('cardCvc').value;
-
-        if (cardNum.length < 13) {
-            showToast('Please enter a valid card number', 'error');
-            return;
-        }
-        if (cardExp.length < 7) {
-            showToast('Please enter expiry date', 'error');
-            return;
-        }
-        if (cardCvc.length < 3) {
-            showToast('Please enter CVC', 'error');
-            return;
-        }
-    }
-
-    // Processing
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner"></div> PROCESSING...';
 
-    // Simulate steps
-    updateStep(1, 'done');
-    updateStep(2, 'done');
-    updateStep(3, 'active');
+    try {
+        const subtotal  = getCartSubtotal();
+        const discount  = getDiscountAmount(subtotal);
+        const shipping  = getShippingCost();
+        const taxable   = subtotal - discount;
+        const tax       = taxable * 0.08;
+        const total     = taxable + shipping + tax;
 
-    await delay(1500);
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName  = document.getElementById('lastName').value.trim();
+        const email     = document.getElementById('email').value.trim().toLowerCase();
+        const phone     = document.getElementById('phone').value.trim();
 
-    updateStep(3, 'done');
-    await delay(800);
+        const orderNum = 'BD-' + Date.now().toString().slice(-6);
 
-    // Calculate totals
-    const subtotal = getCartSubtotal();
-    const discount = getDiscountAmount(subtotal);
-    const shipping = getShippingCost();
-    const taxable = subtotal - discount;
-    const tax = taxable * 0.08;
-    const total = taxable + shipping + tax;
+        const orderData = {
+            orderNumber: orderNum,
+            status: 'pending',
+            createdAt: serverTimestamp(),
+            customer: {
+                firstName, lastName,
+                email, phone,
+                name: `${firstName} ${lastName}`,
+            },
+            shippingAddress: {
+                address1: document.getElementById('address1').value.trim(),
+                address2: document.getElementById('address2').value.trim(),
+                city:     document.getElementById('city').value.trim(),
+                state:    document.getElementById('state').value,
+                zip:      document.getElementById('zip').value.trim(),
+                country:  document.getElementById('country').value,
+            },
+            items: cart.map(item => ({
+                productId: item.id || item.productId || '',
+                name:      item.name,
+                brand:     item.brand || '',
+                size:      item.size,
+                qty:       item.qty,
+                price:     parseFloat(item.price),
+                image:     item.image || '',
+            })),
+            pricing: {
+                subtotal:  +subtotal.toFixed(2),
+                discount:  +discount.toFixed(2),
+                shipping:  +shipping.toFixed(2),
+                tax:       +tax.toFixed(2),
+                total:     +total.toFixed(2),
+            },
+            shippingMethod: selectedShipping,
+            promoCode: appliedPromo ? (appliedPromo.code || '') : null,
+        };
 
-    // Generate order number
-    const orderNum = '#BD-' + Date.now().toString().slice(-6);
-    const email = document.getElementById('email').value;
+        // Save to Firestore
+        await addDoc(collection(db, 'orders'), orderData);
 
-    // Populate success page
-    document.getElementById('successEmail').textContent = email;
-    document.getElementById('successOrderNum').textContent = orderNum;
-    document.getElementById('successDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    document.getElementById('successTotal').textContent = formatCurrency(total);
+        // Calculate delivery date
+        const deliveryDays = selectedShipping === 'overnight' ? 1 : selectedShipping === 'express' ? 3 : 7;
+        const deliveryDate = new Date();
+        deliveryDate.setDate(deliveryDate.getDate() + deliveryDays);
 
-    const shippingOpt = SHIPPING_OPTIONS.find(s => s.id === selectedShipping);
-    const deliveryDays = selectedShipping === 'overnight' ? 1 : selectedShipping === 'express' ? 3 : 7;
-    const deliveryDate = new Date();
-    deliveryDate.setDate(deliveryDate.getDate() + deliveryDays);
-    document.getElementById('successDelivery').textContent = deliveryDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        // Populate success page
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set('successEmail',    email);
+        set('successOrderNum', '#' + orderNum);
+        set('successDate',     new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+        set('successTotal',    fmt(total));
+        set('successDelivery', deliveryDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }));
 
-    const cardNum = document.getElementById('cardNum').value;
-    const last4 = cardNum.replace(/\s/g, '').slice(-4) || '4242';
-    document.getElementById('successPayment').textContent = `Visa •••• ${last4}`;
+        const cardNum = document.getElementById('cardNum')?.value || '';
+        const last4   = cardNum.replace(/\s/g, '').slice(-4) || '****';
+        set('successPayment', `•••• ${last4}`);
 
-    // Clear cart
-    cart = [];
-    appliedPromo = null;
-    updateCartUI();
+        // Clear cart
+        clearCart();
+        appliedPromo = null;
 
-    // Show success
-    showPage('success');
-    showToast('Order placed successfully! 🎉');
+        // Show success
+        showPage('success');
+        showToast('Order placed successfully! 🎉');
 
-    // Reset button
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-lock"></i> PLACE ORDER';
+    } catch (err) {
+        console.error('Order failed:', err);
+        showToast('Order failed. Please try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-lock"></i> PLACE ORDER';
+    }
 }
 
-function updateStep(num, state) {
-    const el = document.getElementById('step' + num);
-    const label = document.getElementById('step' + num + 'l');
-    el.className = 'c-step-num';
-    label.className = 'c-step-label';
+/* ══════════════════════════════════════════
+   PAGES
+══════════════════════════════════════════ */
+function showPage(page) {
+    const storePage    = document.getElementById('storePage');
+    const checkoutPage = document.getElementById('checkoutPage');
+    const successPage  = document.getElementById('successPage');
 
-    if (state === 'active') {
-        el.classList.add('active');
-        label.classList.add('active');
-    } else if (state === 'done') {
-        el.classList.add('done');
-        el.innerHTML = '<i class="fa-solid fa-check" style="font-size:12px"></i>';
-        label.classList.add('active');
-    }
+    if (storePage)    storePage.style.display    = page === 'store'    ? 'block' : 'none';
+    if (checkoutPage) checkoutPage.classList.toggle('show', page === 'checkout');
+    if (successPage)  successPage.classList.toggle('show', page === 'success');
+
+    window.scrollTo(0, 0);
+}
+
+function goToCheckout() {
+    if (cart.length === 0) { showToast('Your cart is empty!', 'error'); return; }
+    closeCart();
+    showPage('checkout');
+    setStep(1);
+    updateCheckoutSummary();
 }
 
 /* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-    renderProducts();
-    updateCartUI();
+    loadCart();
+    updateCheckoutSummary();
 
-    // Clear error styling on input
-    document.querySelectorAll('.form-input').forEach(input => {
-        input.addEventListener('input', () => input.classList.remove('error'));
+    // Clear error state on input
+    document.querySelectorAll('.form-input, .form-select').forEach(el => {
+        el.addEventListener('input', () => el.classList.remove('error'));
+        el.addEventListener('change', () => el.classList.remove('error'));
     });
 
-    // Close cart on ESC
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeCart();
-    });
+    // ESC closes cart
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+
+    // Start at step 1
+    setStep(1);
 });
+
+// Expose functions globally for HTML onclick handlers
+window.openCart      = openCart;
+window.closeCart     = closeCart;
+window.goToCheckout  = goToCheckout;
+window.showPage      = showPage;
+window.applyPromo    = applyPromo;
+window.removeFromCart = removeFromCart;
+window.updateQty     = updateQty;
+window.setPayMethod  = setPayMethod;
+window.formatCard    = formatCard;
+window.formatExpiry  = formatExpiry;
+window.formatPhone   = formatPhone;
+window.selectShipping = selectShipping;
+window.placeOrder    = placeOrder;
+window.continueStep  = continueStep;
+window.prevStep      = prevStep;
