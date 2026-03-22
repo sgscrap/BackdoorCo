@@ -97,9 +97,7 @@ export function applyProductOverrides(product) {
 
     if (matchesBlackCat(nextProduct)) {
         nextProduct.name = String(nextProduct.name || "Jordan 4 Retro 'Black Cat' 2020").replace(/2025/g, '2020');
-        nextProduct.description = String(
-            nextProduct.description || 'Air Jordan 4 Retro Black Cat 2020. All-black colorway with premium nubuck.'
-        ).replace(/2025/g, '2020');
+        nextProduct.description = "Jordan Brand brings back a mid-2000s classic with the Jordan 4 Black Cat (2020), now available on StockX. Originally debuting in 2006, this is the first time the Black Cat colorway has seen a retro. The fourteen year Black Cat drought has officially ended.\n\nThis Jordan 4 is composed of a black nubuck suede upper with matching detailing. Black hardware, netting, and outsoles complete the design. These sneakers released in January 2020 and retailed for $190.";
         nextProduct.image = BLACK_CAT_IMAGES[0];
         nextProduct.images = [...BLACK_CAT_IMAGES];
         nextProduct.imageFit = nextProduct.imageFit || 'contain';
