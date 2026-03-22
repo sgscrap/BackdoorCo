@@ -8,6 +8,7 @@ import {
 import {
     applyProductOverrides,
     buildProductHref,
+    getProductCardImage,
     getProductCardImagePadding,
     getProductCardImageScale,
     getProductImageFit,
@@ -151,6 +152,7 @@ function renderProducts() {
             const soldOut = isOutOfStock(product);
             const backorder = isBackorder(product);
             const totalStock = getTotalStock(product);
+            const cardImage = getProductCardImage(product);
             const imageScale = getProductCardImageScale(product);
             const imagePadding = getProductCardImagePadding(product);
             const imageFit = getProductImageFit(product);
@@ -169,8 +171,8 @@ function renderProducts() {
                         ${statusBadge}
                         ${!soldOut && totalStock > 0 && totalStock <= 3 ? `<span class="low-badge">${totalStock} LEFT</span>` : ''}
                         ${soldOut && !backorder ? '<div class="sold-overlay"><span>OUT OF STOCK</span></div>' : ''}
-                        ${product.image
-                ? `<img src="${product.image}" alt="${product.name}" loading="${index < 4 ? 'eager' : 'lazy'}" style="object-fit:${imageFit};object-position:${imagePosition};padding:${imagePadding};--product-image-scale:${imageScale};--product-image-hover-scale:${(imageScale + 0.04).toFixed(2)}" onerror="this.style.display='none'">`
+                        ${cardImage
+                ? `<img src="${cardImage}" alt="${product.name}" loading="${index < 4 ? 'eager' : 'lazy'}" style="object-fit:${imageFit};object-position:${imagePosition};padding:${imagePadding};--product-image-scale:${imageScale};--product-image-hover-scale:${(imageScale + 0.04).toFixed(2)}" onerror="this.style.display='none'">`
                 : '<div class="no-img-placeholder"><i class="fa-solid fa-shoe-prints"></i></div>'}
                     </div>
                     <div class="shop-card-info">

@@ -7,6 +7,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import {
     applyProductOverrides,
+    getProductCardImage,
     getProductCardImagePadding,
     getProductCardImageScale,
     getProductImageFit,
@@ -95,6 +96,7 @@ function renderMostWanted() {
     productGrid.innerHTML = featuredFirst.map((product, index) => {
         const soldOut = isOutOfStock(product);
         const backorder = isBackorder(product);
+        const cardImage = getProductCardImage(product);
         const imageScale = getProductCardImageScale(product);
         const imagePadding = getProductCardImagePadding(product);
         const imageFit = getProductImageFit(product);
@@ -111,7 +113,7 @@ function renderMostWanted() {
                     <div class="mw-rank new-badge">#${index + 1}</div>
                     ${featuredBadge}
                     ${soldOut && !backorder ? '<div class="mw-sold-overlay sold-out-overlay"><span>OUT OF STOCK</span></div>' : ''}
-                    <img src="${product.image || ''}" alt="${product.name}" loading="${index < 2 ? 'eager' : 'lazy'}" style="object-fit:${imageFit};object-position:${imagePosition};padding:${imagePadding};--product-image-scale:${imageScale};--product-image-hover-scale:${(imageScale + 0.04).toFixed(2)}" onerror="this.src='https://via.placeholder.com/400x400/1a1a1a/c8f65d?text=Backdoor'">
+                    <img src="${cardImage || ''}" alt="${product.name}" loading="${index < 2 ? 'eager' : 'lazy'}" style="object-fit:${imageFit};object-position:${imagePosition};padding:${imagePadding};--product-image-scale:${imageScale};--product-image-hover-scale:${(imageScale + 0.04).toFixed(2)}" onerror="this.src='https://via.placeholder.com/400x400/1a1a1a/c8f65d?text=Backdoor'">
                 </div>
                 <div class="mw-card-info drop-card-info">
                     <p class="mw-card-brand drop-brand">${product.brand || product.category || ''} · ${product.category || 'Deadstock'}</p>
