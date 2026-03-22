@@ -810,7 +810,7 @@ async function handleProductSubmit(event) {
         price: basePrice,
         releaseDate: normalizeReleaseDate(document.getElementById('productReleaseDate').value) || 'TBD',
         description: document.getElementById('productDescription').value.trim(),
-        image: document.getElementById('productImage').value.trim(),
+        image: resolveImgurUrl(document.getElementById('productImage').value.trim()) || document.getElementById('productImage').value.trim(),
         imageFit,
         imagePosition: `${imageOffsetX}% ${imageOffsetY}%`,
         imageOffsetX,
@@ -867,7 +867,8 @@ function setProductImageFit(value) {
 
 function updateProductImagePreview() {
     const image = document.getElementById('productImagePreview');
-    const url = document.getElementById('productImage')?.value.trim();
+    const rawUrl = document.getElementById('productImage')?.value.trim();
+    const url = resolveImgurUrl(rawUrl) || rawUrl;
     const fit = normalizeImageFit(document.getElementById('productImageFit')?.value, {
         name: document.getElementById('productName')?.value,
         sku: document.getElementById('productSKU')?.value,
@@ -891,7 +892,12 @@ function updateProductImagePreview() {
     document.getElementById('productImagePreviewSummary').textContent = `${fit === 'contain' ? 'Contain' : 'Cover'} · ${Math.round(scale * 100)}%`;
 
     if (image) {
+        image.onerror = null;
         image.src = url || 'https://via.placeholder.com/500x500/111111/c6ff4c?text=Preview';
+        image.onerror = () => {
+            image.onerror = null;
+            image.src = 'https://via.placeholder.com/500x500/111111/c6ff4c?text=Preview';
+        };
         image.style.objectFit = fit;
         image.style.objectPosition = `${offsetX}% ${offsetY}%`;
         image.style.padding = padding;
