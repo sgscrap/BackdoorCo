@@ -17,16 +17,21 @@
 <body>
 
   <!-- ══ ANNOUNCEMENT BAR ══ -->
-  <div class="announce-bar" id="announceBar">
-    <span>🔥 New Jordan 4 Military Blue just dropped</span>
-    <span class="sep">|</span>
-    <span>🚚 Free shipping on orders over $150</span>
-    <span class="sep">|</span>
-    <span>✅ All shoes 100% authenticated</span>
-    <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-  </div>
+    <div class="announce-bar" id="announceBar">
+        <div class="announce-shell">
+            <div class="announce-copy">
+                <span class="announce-kicker">Just Dropped</span>
+                <span class="announce-headline">Jordan 4 Military Blue</span>
+            </div>
+            <div class="announce-pills" aria-label="Store highlights">
+                <span class="announce-pill">Free shipping $150+</span>
+                <span class="announce-pill">100% authenticated</span>
+            </div>
+        </div>
+        <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
 
   <!-- ══ NAVBAR ══ -->
   <nav class="navbar announce-offset" id="navbar">
