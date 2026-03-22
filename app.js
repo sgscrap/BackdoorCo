@@ -5,6 +5,14 @@ import {
     onSnapshot,
     query
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import {
+    applyProductOverrides,
+    getProductSizes,
+    getTotalStock,
+    isFeatured,
+    isHidden,
+    isOutOfStock
+} from './product-data.js';
 
 let products = [];
 let cart = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
@@ -27,46 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartUI();
 });
 
-function getProductSizes(product) {
-    if (Array.isArray(product?.sizes) && product.sizes.length > 0) {
-        return product.sizes.map((entry) => ({
-            size: String(entry.size || '').trim(),
-            stock: Math.max(0, Number(entry.stock) || 0),
-            price: Number(entry.price) || Number(product.price) || 0
-        })).filter((entry) => entry.size);
-    }
-
-    if (typeof product?.sizes === 'string' && product.sizes.trim()) {
-        return product.sizes.split(',').map((size) => ({
-            size: size.trim(),
-            stock: Math.max(0, Number(product.stock) || 1),
-            price: Number(product.price) || 0
-        })).filter((entry) => entry.size);
-    }
-
-    return [];
-}
-
-function getTotalStock(product) {
-    const sizes = getProductSizes(product);
-    if (sizes.length > 0) {
-        return sizes.reduce((sum, entry) => sum + Math.max(0, Number(entry.stock) || 0), 0);
-    }
-    return Math.max(0, Number(product?.stock) || 0);
-}
-
-function isHidden(product) {
-    return Boolean(product?.isHidden);
-}
-
-function isFeatured(product) {
-    return Boolean(product?.isFeatured);
-}
-
-function isOutOfStock(product) {
-    return Boolean(product?.isOutOfStock) || getTotalStock(product) <= 0;
-}
-
 function getVisibleProducts() {
     return products.filter((product) => product.status === 'active' && !isHidden(product));
 }
@@ -82,12 +50,12 @@ function getBadgeMeta(product) {
 }
 
 function normalizeProduct(doc) {
-    return {
+    return applyProductOverrides({
         id: doc.id,
         ...doc,
         price: Number(doc.price) || 0,
         sizes: getProductSizes(doc)
-    };
+    });
 }
 
 function initFirebaseSync() {

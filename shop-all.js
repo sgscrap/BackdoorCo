@@ -5,6 +5,14 @@ import {
     query,
     where
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import {
+    applyProductOverrides,
+    buildProductHref,
+    getTotalStock,
+    isFeatured,
+    isHidden,
+    isOutOfStock
+} from './product-data.js';
 
 let allProducts = [];
 let currentFilter = window.initialFilter || 'all';
@@ -19,37 +27,6 @@ const sortSelect = document.getElementById('shopSort');
 const searchInput = document.getElementById('shopSearch');
 const clearSearchBtn = document.getElementById('clearSearch');
 const clearFiltersBtn = document.getElementById('clearFiltersBtn');
-
-function getProductSizes(product) {
-    if (Array.isArray(product?.sizes) && product.sizes.length > 0) {
-        return product.sizes.map((entry) => ({
-            size: String(entry.size || '').trim(),
-            stock: Math.max(0, Number(entry.stock) || 0),
-            price: Number(entry.price) || Number(product.price) || 0
-        })).filter((entry) => entry.size);
-    }
-    return [];
-}
-
-function getTotalStock(product) {
-    const sizes = getProductSizes(product);
-    if (sizes.length > 0) {
-        return sizes.reduce((sum, entry) => sum + entry.stock, 0);
-    }
-    return Math.max(0, Number(product?.stock) || 0);
-}
-
-function isHidden(product) {
-    return Boolean(product?.isHidden);
-}
-
-function isFeatured(product) {
-    return Boolean(product?.isFeatured) || Boolean(product?.featured);
-}
-
-function isOutOfStock(product) {
-    return Boolean(product?.isOutOfStock) || getTotalStock(product) <= 0;
-}
 
 function getVisibleProducts() {
     return allProducts.filter((product) => !isHidden(product));
@@ -87,7 +64,7 @@ function loadAllProducts() {
 
     const productsQuery = query(collection(db, 'products'), where('status', '==', 'active'));
     onSnapshot(productsQuery, (snapshot) => {
-        allProducts = snapshot.docs.map((doc) => ({
+        allProducts = snapshot.docs.map((doc) => applyProductOverrides({
             id: doc.id,
             ...doc.data(),
             price: Number(doc.data().price) || 0
@@ -191,6 +168,7 @@ function renderProducts() {
                             <div>
                                 <p class="shop-card-label">${soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</p>
                                 <p class="shop-card-price">$${product.price.toFixed(0)}</p>
+                                <a class="product-page-link" href="${buildProductHref(product)}" onclick="event.stopPropagation()">View product page</a>
                             </div>
                             ${soldOut
                 ? '<span class="shop-sold-label">Sold Out</span>'
@@ -229,9 +207,7 @@ function updateSubtitle() {
 
 window.handleProductClick = (id) => {
     const product = allProducts.find((entry) => entry.id === id);
-    if (product && typeof window.showProductModal === 'function') {
-        window.showProductModal(product);
-    }
+    if (product) window.location.href = buildProductHref(product);
 };
 
 window.handleAddToCart = (id) => {

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backdoor | Product</title>
+    <meta name="description" content="Premium authenticated product details at Backdoor.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="store.css">
+</head>
+
+<body class="product-detail-page">
+    <div class="announce-bar" id="announceBar">
+        <span>Premium authenticated inventory, updated live.</span>
+        <span class="sep">|</span>
+        <span>Fast shipping on every order.</span>
+        <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <nav class="navbar announce-offset" id="navbar">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-mark">B</div>
+            BACK<span>DOOR</span>
+        </a>
+        <div class="nav-center">
+            <a class="nav-link" href="shop-all.html">SHOP</a>
+            <a class="nav-link" href="men.html">Men</a>
+            <a class="nav-link" href="women.html">Women</a>
+            <a class="nav-link" href="kids.html">Kids</a>
+            <a class="nav-link" href="shoes.html">Shoes</a>
+            <a class="nav-link" href="apparel.html">Apparel</a>
+            <a class="nav-link" href="accessories.html">Accessories</a>
+            <a class="nav-link" href="electronics.html">Electronics</a>
+        </div>
+        <div class="nav-right">
+            <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
+                <i class="fa-solid fa-bag-shopping"></i> Cart
+                <span class="cart-pill" id="cartCount">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="product-page-shell">
+        <div class="product-page-breadcrumb">
+            <a href="men.html">Men</a>
+            <span>/</span>
+            <span id="productBreadcrumbLabel">Product</span>
+        </div>
+
+        <section class="product-page-layout" id="productPageLayout">
+            <div class="product-page-gallery">
+                <div class="product-page-main-media">
+                    <img id="productMainImage" src="" alt="Product preview">
+                </div>
+                <div class="product-page-thumbs" id="productThumbs"></div>
+                <a id="productAlbumLink" class="product-album-link" href="#" target="_blank" rel="noreferrer">View full image album</a>
+            </div>
+
+            <div class="product-page-info">
+                <div class="product-page-eyebrow">
+                    <span id="productStatusBadge" class="modal-badge" style="display:none"></span>
+                    <span id="productCategoryLabel" class="product-page-category">Sneakers</span>
+                </div>
+                <h1 id="productName">Loading product...</h1>
+                <p id="productBrandLine" class="product-page-brand"></p>
+                <div class="product-page-price-row">
+                    <div class="product-page-price" id="productPrice">$0</div>
+                    <div class="product-page-stock" id="productStockLabel"></div>
+                </div>
+                <p id="productDescription" class="product-page-description"></p>
+
+                <div class="product-page-meta">
+                    <div class="product-meta-item">
+                        <span>SKU</span>
+                        <strong id="productSku">N/A</strong>
+                    </div>
+                    <div class="product-meta-item">
+                        <span>Colorway</span>
+                        <strong id="productColorway">N/A</strong>
+                    </div>
+                    <div class="product-meta-item">
+                        <span>Release Date</span>
+                        <strong id="productReleaseDate">TBD</strong>
+                    </div>
+                </div>
+
+                <div class="product-page-size-block">
+                    <h3>Select Size</h3>
+                    <div class="size-options" id="productSizeOptions"></div>
+                </div>
+
+                <div class="product-page-actions">
+                    <button class="add-to-cart-btn" id="productAddToCart">Add to Cart</button>
+                    <a class="btn-hero-secondary product-back-link" href="men.html">Back to Men</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="cart-close" id="cartClose" aria-label="Close Cart Sidebar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span class="cart-total-price" id="cartTotal">$0.00</span>
+            </div>
+            <button class="cart-checkout" onclick="window.location.href='checkout.html'">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script type="module" src="product-page.js"></script>
+    <script>
+        function closeAnnounce() {
+            const bar = document.getElementById('announceBar');
+            const nav = document.getElementById('navbar');
+            if (bar) bar.style.display = 'none';
+            if (nav) nav.classList.remove('announce-offset');
+        }
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+        });
+    </script>
+</body>
+
+</html>
