@@ -14,7 +14,7 @@ import {
 
 let currentProduct = null;
 let selectedSize = '';
-let cart = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+let cart = loadCartFromStorage();
 let productImages = [];
 let currentImageIndex = 0;
 
@@ -211,6 +211,7 @@ document.getElementById('productAddToCart')?.addEventListener('click', () => {
         cart.push({
             id: currentProduct.id,
             name: currentProduct.name,
+            brand: currentProduct.brand || '',
             price: Number(currentProduct.price) || 0,
             image: getProductImages(currentProduct)[0] || currentProduct.image || '',
             size: selectedSize,
@@ -218,12 +219,34 @@ document.getElementById('productAddToCart')?.addEventListener('click', () => {
         });
     }
 
-    localStorage.setItem('backdoor-cart', JSON.stringify(cart));
+    localStorage.setItem('backdoor-cart', JSON.stringify(cart.map(normalizeCartItem).filter((item) => item.name)));
     updateCartUI();
     showToast(`${currentProduct.name} added to cart.`);
 });
 
+function loadCartFromStorage() {
+    try {
+        const stored = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+        return Array.isArray(stored) ? stored.map(normalizeCartItem).filter((item) => item.name) : [];
+    } catch {
+        return [];
+    }
+}
+
+function normalizeCartItem(item) {
+    return {
+        id: item?.id || item?.productId || '',
+        name: String(item?.name || '').trim(),
+        brand: String(item?.brand || '').trim(),
+        price: Number(item?.price) || 0,
+        image: String(item?.image || '').trim(),
+        size: String(item?.size || 'One Size').trim() || 'One Size',
+        qty: Math.max(1, Number(item?.qty) || Number(item?.quantity) || 1)
+    };
+}
+
 function updateCartUI() {
+    cart = cart.map(normalizeCartItem).filter((item) => item.name);
     const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
     const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
@@ -235,30 +258,62 @@ function updateCartUI() {
     const cartItems = document.getElementById('cartItems');
     const cartTotal = document.getElementById('cartTotal');
     if (cartTotal) cartTotal.textContent = `$${totalPrice.toFixed(2)}`;
+    const checkoutButton = document.querySelector('#cartSidebar .cart-checkout');
+    if (checkoutButton) checkoutButton.disabled = cart.length === 0;
     if (!cartItems) return;
 
     if (cart.length === 0) {
-        cartItems.innerHTML = '<div class="empty-cart-msg">Your bag is empty.</div>';
+        cartItems.innerHTML = `
+            <div class="empty-cart-msg">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <h4>Your bag is empty.</h4>
+                <p>Add some heat and come back to checkout.</p>
+            </div>
+        `;
         return;
     }
 
     cartItems.innerHTML = cart.map((item, index) => `
         <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}">
+            <div class="cart-item-img">
+                ${item.image
+                    ? `<img src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                    : ''}
+                <span class="cart-item-fallback" ${item.image ? 'style="display:none"' : ''}><i class="fa-solid fa-shoe-prints"></i></span>
+            </div>
             <div class="cart-item-info">
                 <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-size">Size: ${item.size}</div>
-                <div class="cart-item-price">$${item.price.toFixed(0)}</div>
-                <div class="cart-item-qty"><span>Qty: ${item.qty}</span></div>
+                <div class="cart-item-meta">
+                    <span>Size ${item.size}</span>
+                    ${item.brand ? `<span>${item.brand}</span>` : ''}
+                </div>
+                <div class="cart-item-bottom">
+                    <div class="qty-control">
+                        <button class="qty-btn" type="button" onclick="updateCartQty(${index}, -1)" aria-label="Decrease quantity">−</button>
+                        <div class="qty-val">${item.qty}</div>
+                        <button class="qty-btn" type="button" onclick="updateCartQty(${index}, 1)" aria-label="Increase quantity">+</button>
+                    </div>
+                    <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+                </div>
+                <button class="cart-item-remove" type="button" onclick="removeFromCart(${index})">
+                    <i class="fa-solid fa-trash-can"></i> Remove
+                </button>
             </div>
-            <button class="cart-remove" onclick="removeFromCart(${index})">&times;</button>
         </div>
     `).join('');
 }
 
 window.removeFromCart = (index) => {
     cart.splice(index, 1);
-    localStorage.setItem('backdoor-cart', JSON.stringify(cart));
+    localStorage.setItem('backdoor-cart', JSON.stringify(cart.map(normalizeCartItem).filter((item) => item.name)));
+    updateCartUI();
+};
+
+window.updateCartQty = (index, delta) => {
+    const item = cart[index];
+    if (!item) return;
+    item.qty = Math.max(1, item.qty + delta);
+    localStorage.setItem('backdoor-cart', JSON.stringify(cart.map(normalizeCartItem).filter((entry) => entry.name)));
     updateCartUI();
 };
 

@@ -9,6 +9,7 @@ const pageData = {
     dashboard: { title: 'DASHBOARD', subtitle: "Welcome back - here's what's happening today." },
     orders: { title: 'ORDERS', subtitle: 'Manage and track all customer orders.' },
     products: { title: 'PRODUCTS', subtitle: 'Browse and manage your sneaker inventory.' },
+    reviews: { title: 'REVIEWS', subtitle: 'Create and manage customer-style review posts.' },
     customers: { title: 'CUSTOMERS', subtitle: 'View and manage your customer base.' },
     import: { title: 'IMPORT PRODUCTS', subtitle: 'Import products via SKU from Kickwho.' },
     analytics: { title: 'ANALYTICS', subtitle: 'Deep dive into your store performance.' },
@@ -27,17 +28,24 @@ const chartData = [
 let orders = [];
 let customers = [];
 let products = [];
+let reviews = [];
 let currentProduct = null;
+let currentReview = null;
 let selectedProductIds = new Set();
 let importerUrlRows = [];
 let importerPreviewItems = [];
 let importerSelectedImages = [];
 let importerRowCounter = 0;
 let importerSelectedSizes = [];
+let generatedReviews = [];
+
+const REVIEW_FIRST_NAMES = ['Mason', 'Jada', 'Chris', 'Avery', 'Jordan', 'Cam', 'Tiana', 'Malik', 'Ari', 'Noah', 'Nia', 'Jay', 'Kayla', 'Andre', 'Zoe', 'Micah', 'Savannah', 'Bryson', 'Laila', 'Darius', 'Jasmine', 'Ethan', 'Sofia', 'Tyrese', 'Mila', 'Zay', 'Kendall', 'Isaiah', 'Amaya', 'Luca', 'Brielle', 'Kobe', 'Nyla', 'Tristan', 'Aaliyah', 'Devin', 'Maya', 'Roman', 'Leah', 'Jalen'];
+const REVIEW_LAST_INITIALS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 document.addEventListener('DOMContentLoaded', () => {
     initFirebaseListeners();
     initImporter();
+    initReviewBuilder();
     setupEventListeners();
     checkAuth();
 });
@@ -100,6 +108,73 @@ function isProductOutOfStock(product) {
     return Boolean(product?.isOutOfStock) || getTotalStock(product) <= 0;
 }
 
+function normalizeReleaseDate(value) {
+    const raw = String(value || '').trim();
+    if (!raw || raw.toUpperCase() === 'TBD') return '';
+
+    const match = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (match) return match[1];
+
+    const parsed = new Date(raw);
+    if (Number.isNaN(parsed.getTime())) return '';
+
+    const year = parsed.getFullYear();
+    const month = `${parsed.getMonth() + 1}`.padStart(2, '0');
+    const day = `${parsed.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function formatReleaseDateDisplay(value) {
+    const normalized = normalizeReleaseDate(value);
+    if (!normalized) return 'TBD';
+
+    const [year, month, day] = normalized.split('-').map(Number);
+    const parsed = new Date(year, month - 1, day);
+    return parsed.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function getOrderTotal(order) {
+    return Number(order?.total ?? order?.pricing?.total ?? 0);
+}
+
+function getOrderItemCount(order) {
+    return (order?.items || []).reduce((sum, item) => sum + Math.max(1, Number(item?.quantity ?? item?.qty ?? 1)), 0);
+}
+
+function initReviewBuilder() {
+    renderGeneratedReviews();
+    renderReviews();
+}
+
+function hashString(value) {
+    return [...String(value || '')].reduce((acc, char) => ((acc << 5) - acc) + char.charCodeAt(0), 0);
+}
+
+function generateReviewName(seed, offset = 0) {
+    const hash = Math.abs(hashString(`${seed}|${offset}`));
+    const first = REVIEW_FIRST_NAMES[hash % REVIEW_FIRST_NAMES.length];
+    const initial = REVIEW_LAST_INITIALS[Math.floor(hash / REVIEW_FIRST_NAMES.length) % REVIEW_LAST_INITIALS.length];
+    return `${first} ${initial}.`;
+}
+
+function polishReviewComment(raw) {
+    let text = String(raw || '').trim();
+    if (!text) return '';
+
+    text = text.replace(/\s+/g, ' ');
+    text = text.replace(/\s+([,.!?])/g, '$1');
+    text = text.replace(/([!?.,])\1+/g, '$1');
+    text = text.replace(/\bi\b/g, 'I');
+    text = text.replace(/\bimo\b/gi, 'imo');
+    text = text.replace(/(^|[.!?]\s+)([a-z])/g, (_, prefix, letter) => `${prefix}${letter.toUpperCase()}`);
+
+    if (!/[.!?]$/.test(text)) {
+        text += '.';
+    }
+
+    return text;
+}
+
 function normalizeProduct(product) {
     const sizes = getProductSizes(product);
     return {
@@ -107,6 +182,7 @@ function normalizeProduct(product) {
         price: Number(product?.price) || 0,
         image: product?.image || '',
         sizes,
+        releaseDate: normalizeReleaseDate(product?.releaseDate),
         isHidden: isProductHidden(product),
         isOutOfStock: Boolean(product?.isOutOfStock) || sizes.every((entry) => entry.stock <= 0),
         isFeatured: isProductFeatured(product)
@@ -203,6 +279,16 @@ function initFirebaseListeners() {
         renderDashboard();
     });
 
+    db.collection('reviews').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+        reviews = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            rating: Math.min(5, Math.max(1, Number(doc.data().rating) || 5)),
+            isHidden: Boolean(doc.data().isHidden)
+        }));
+        renderReviews();
+    });
+
     db.collection('orders').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
         orders = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         renderOrders();
@@ -260,9 +346,17 @@ function setupEventListeners() {
     document.getElementById('productModalClose')?.addEventListener('click', closeModal);
     document.getElementById('cancelProductBtn')?.addEventListener('click', closeModal);
     document.getElementById('orderModalClose')?.addEventListener('click', closeOrderModal);
+    document.getElementById('reviewModalClose')?.addEventListener('click', closeReviewModal);
+    document.getElementById('cancelReviewBtn')?.addEventListener('click', closeReviewModal);
     document.getElementById('addProductBtnTop')?.addEventListener('click', () => openProductModal());
     document.getElementById('quickAddProduct')?.addEventListener('click', () => openProductModal());
     document.getElementById('productForm')?.addEventListener('submit', handleProductSubmit);
+    document.getElementById('reviewForm')?.addEventListener('submit', handleReviewSubmit);
+    document.getElementById('addReviewBtn')?.addEventListener('click', () => openReviewModal());
+    document.getElementById('generateReviewsBtn')?.addEventListener('click', generateReviewProfiles);
+    document.getElementById('shuffleReviewNamesBtn')?.addEventListener('click', shuffleGeneratedReviewNames);
+    document.getElementById('copyReviewsJsonBtn')?.addEventListener('click', copyGeneratedReviewsJson);
+    document.getElementById('saveGeneratedReviewsBtn')?.addEventListener('click', saveGeneratedReviews);
 
     const debouncedFilterProducts = debounce(filterProducts, 180);
     document.getElementById('productSearch')?.addEventListener('input', debouncedFilterProducts);
@@ -291,11 +385,12 @@ function switchTab(tab, el) {
     if (tab === 'dashboard') renderDashboard();
     if (tab === 'orders') renderOrders();
     if (tab === 'products') renderProducts();
+    if (tab === 'reviews') renderReviews();
     if (tab === 'customers') renderCustomers();
 }
 
 function renderDashboard() {
-    const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+    const totalRevenue = orders.reduce((sum, order) => sum + getOrderTotal(order), 0);
     const pendingCount = orders.filter((order) => order.status === 'pending').length;
 
     animateCounter(document.getElementById('revenueVal'), totalRevenue, '$');
@@ -321,7 +416,7 @@ function renderRecentOrders() {
         <tr onclick="viewOrder('${escapeHtml(order.id)}')" style="cursor:pointer">
             <td><span class="order-id">${escapeHtml(order.id)}</span></td>
             <td>${escapeHtml(order.customer?.name || 'Unknown')}</td>
-            <td style="color:var(--text-primary);font-weight:600">$${(order.total || 0).toFixed(2)}</td>
+            <td style="color:var(--text-primary);font-weight:600">$${getOrderTotal(order).toFixed(2)}</td>
             <td><span class="status-pill ${escapeHtml(order.status || 'pending')}">${escapeHtml(order.status || 'pending')}</span></td>
         </tr>
     `).join('') || '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted)">No orders yet.</td></tr>';
@@ -372,7 +467,7 @@ function renderProducts(filteredProducts = getFilteredProducts()) {
     if (!tbody) return;
 
     if (filteredProducts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="empty-state-row">No products match the current filters.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state-row">No products match the current filters.</td></tr>';
         renderBulkToolbar(filteredProducts);
         return;
     }
@@ -394,6 +489,17 @@ function renderProducts(filteredProducts = getFilteredProducts()) {
                 <td>$${product.price.toFixed(2)}</td>
                 <td>${totalStock} items</td>
                 <td>${escapeHtml(product.category || 'Uncategorized')}</td>
+                <td>
+                    <div class="release-date-cell">
+                        <input
+                            type="date"
+                            class="table-date-input"
+                            value="${escapeHtml(normalizeReleaseDate(product.releaseDate))}"
+                            onchange="updateProductReleaseDate('${escapeHtml(product.id)}', this.value)"
+                            aria-label="Release date for ${escapeHtml(product.name)}">
+                        <div class="table-subtext">${escapeHtml(formatReleaseDateDisplay(product.releaseDate))}</div>
+                    </div>
+                </td>
                 <td>
                     <div class="status-stack">
                         <span class="status-pill ${status.className}">${status.label}</span>
@@ -499,6 +605,7 @@ function openProductModal(id = null) {
         document.getElementById('productSKU').value = currentProduct.sku || '';
         document.getElementById('productCategory').value = currentProduct.category || 'Sneakers';
         document.getElementById('productPrice').value = currentProduct.price || '';
+        document.getElementById('productReleaseDate').value = normalizeReleaseDate(currentProduct.releaseDate);
         document.getElementById('productDescription').value = currentProduct.description || '';
         document.getElementById('productImage').value = currentProduct.image || '';
         renderSizeGrid(currentProduct.sizes);
@@ -548,6 +655,7 @@ async function handleProductSubmit(event) {
         sku: document.getElementById('productSKU').value.trim(),
         category: document.getElementById('productCategory').value,
         price: basePrice,
+        releaseDate: normalizeReleaseDate(document.getElementById('productReleaseDate').value) || 'TBD',
         description: document.getElementById('productDescription').value.trim(),
         image: document.getElementById('productImage').value.trim(),
         sizes: sizeEntries,
@@ -570,6 +678,25 @@ async function handleProductSubmit(event) {
     } finally {
         button.disabled = false;
         button.textContent = originalText;
+    }
+}
+
+async function updateProductReleaseDate(productId, value) {
+    const product = products.find((entry) => entry.id === productId);
+    if (!product) return;
+
+    const normalized = normalizeReleaseDate(value) || 'TBD';
+    if ((product.releaseDate || 'TBD') === normalized) return;
+
+    try {
+        await db.collection('products').doc(productId).set({
+            releaseDate: normalized,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast(normalized === 'TBD' ? 'Release date cleared.' : `Release date updated to ${formatReleaseDateDisplay(normalized)}.`);
+    } catch (error) {
+        console.error(error);
+        showToast(`Release date update failed: ${error.message}`, 'error');
     }
 }
 
@@ -637,8 +764,8 @@ function renderOrders() {
         <tr>
             <td><strong>${escapeHtml(order.id)}</strong></td>
             <td>${escapeHtml(order.customer?.name || 'Unknown')}</td>
-            <td>${(order.items || []).length} items</td>
-            <td><strong>$${(order.total || 0).toFixed(2)}</strong></td>
+            <td>${getOrderItemCount(order)} items</td>
+            <td><strong>$${getOrderTotal(order).toFixed(2)}</strong></td>
             <td><span class="status-pill ${escapeHtml(order.status || 'pending')}">${escapeHtml(order.status || 'pending')}</span></td>
             <td>${new Date(order.createdAt || Date.now()).toLocaleDateString()}</td>
             <td>
@@ -663,15 +790,15 @@ function viewOrder(id) {
             </div>
             <div>
                 <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase">Shipping</p>
-                <p>${escapeHtml(order.shippingAddress?.street || '')}, ${escapeHtml(order.shippingAddress?.city || '')}, ${escapeHtml(order.shippingAddress?.state || '')}</p>
+                <p>${escapeHtml(order.shippingAddress?.street || order.shippingAddress?.address1 || '')}, ${escapeHtml(order.shippingAddress?.city || '')}, ${escapeHtml(order.shippingAddress?.state || '')}</p>
             </div>
             <div>
                 <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase">Items</p>
-                ${(order.items || []).map((item) => `<p style="color:var(--text-primary)">- ${escapeHtml(item.name)} (Sz: ${escapeHtml(item.size)}) x${item.quantity} - $${item.price}</p>`).join('')}
+                ${(order.items || []).map((item) => `<p style="color:var(--text-primary)">- ${escapeHtml(item.name)} (Sz: ${escapeHtml(item.size)}) x${Number(item.quantity ?? item.qty ?? 1)} - $${item.price}</p>`).join('')}
             </div>
             <div style="padding-top:15px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
                 <span style="font-weight:700; color:var(--text-primary)">TOTAL</span>
-                <span style="font-family:'Bebas Neue'; font-size:24px; color:var(--accent)">$${(order.total || 0).toFixed(2)}</span>
+                <span style="font-family:'Bebas Neue'; font-size:24px; color:var(--accent)">$${getOrderTotal(order).toFixed(2)}</span>
             </div>
         </div>
     `;
@@ -696,6 +823,258 @@ function renderCustomers() {
             <td>${new Date(customer.lastOrder || Date.now()).toLocaleDateString()}</td>
         </tr>
     `).join('');
+}
+
+function generateReviewProfiles() {
+    const comments = (document.getElementById('reviewCommentsInput')?.value || '')
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+    const images = (document.getElementById('reviewImagesInput')?.value || '')
+        .split(/\r?\n/)
+        .map((line) => line.trim());
+
+    if (comments.length === 0) {
+        showToast('Paste at least one review comment first.', 'error');
+        return;
+    }
+
+    generatedReviews = comments.map((comment, index) => {
+        const image = images[index] || '';
+        return {
+            name: generateReviewName(`${comment}|${image}|${index}`),
+            comment: polishReviewComment(comment),
+            originalComment: comment,
+            image,
+            rating: 5,
+            productName: '',
+            isHidden: false
+        };
+    });
+
+    renderGeneratedReviews();
+    showToast(`${generatedReviews.length} review profiles generated.`);
+}
+
+function shuffleGeneratedReviewNames() {
+    if (generatedReviews.length === 0) {
+        showToast('Generate reviews first.', 'info');
+        return;
+    }
+
+    generatedReviews = generatedReviews.map((review, index) => ({
+        ...review,
+        name: generateReviewName(`${review.originalComment}|${review.image}|shuffle`, index + 7)
+    }));
+
+    renderGeneratedReviews();
+    showToast('Generated names shuffled.');
+}
+
+function renderGeneratedReviews() {
+    const grid = document.getElementById('reviewsPreviewGrid');
+    const output = document.getElementById('reviewsJsonOutput');
+    const stats = document.getElementById('reviewsLabStats');
+
+    if (stats) stats.textContent = `${generatedReviews.length} review${generatedReviews.length === 1 ? '' : 's'} generated`;
+    if (output) output.value = generatedReviews.length ? JSON.stringify(generatedReviews, null, 2) : '';
+
+    if (!grid) return;
+    if (generatedReviews.length === 0) {
+        grid.innerHTML = '<div class="reviews-empty-state">Generate a batch to preview names, comments, and export-ready review objects.</div>';
+        return;
+    }
+
+    grid.innerHTML = generatedReviews.map((review) => `
+        <article class="review-preview-card">
+            <div class="review-preview-media">
+                ${review.image ? `<img src="${escapeHtml(review.image)}" alt="${escapeHtml(review.name)}" onerror="this.parentElement.innerHTML='<i class=&quot;fa-solid fa-camera&quot;></i>'">` : '<i class="fa-solid fa-camera"></i>'}
+            </div>
+            <div class="review-preview-body">
+                <div class="review-preview-head">
+                    <div class="review-preview-name">${escapeHtml(review.name)}</div>
+                    <div class="review-preview-stars">${'&#9733;'.repeat(review.rating)}</div>
+                </div>
+                <div class="review-preview-comment">${escapeHtml(review.comment)}</div>
+                <div class="review-preview-raw">Raw: ${escapeHtml(review.originalComment)}</div>
+            </div>
+        </article>
+    `).join('');
+}
+
+async function copyGeneratedReviewsJson() {
+    if (generatedReviews.length === 0) {
+        showToast('Nothing to copy yet.', 'info');
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(JSON.stringify(generatedReviews, null, 2));
+        showToast('Review JSON copied.');
+    } catch (error) {
+        console.error(error);
+        showToast('Clipboard copy failed.', 'error');
+    }
+}
+
+async function saveGeneratedReviews() {
+    if (generatedReviews.length === 0) {
+        showToast('Generate reviews before saving.', 'error');
+        return;
+    }
+
+    try {
+        await Promise.all(generatedReviews.map((review) => db.collection('reviews').add({
+            name: review.name,
+            productName: review.productName || '',
+            comment: review.comment,
+            originalComment: review.originalComment,
+            image: review.image || '',
+            rating: review.rating,
+            isHidden: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        })));
+        showToast(`${generatedReviews.length} reviews saved.`);
+    } catch (error) {
+        console.error(error);
+        showToast(`Failed to save generated reviews: ${error.message}`, 'error');
+    }
+}
+
+function renderReviews() {
+    const tbody = document.getElementById('reviewsTableBody');
+    if (!tbody) return;
+
+    if (reviews.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state-row">No reviews yet.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = reviews.map((review) => `
+        <tr>
+            <td>
+                <strong>${escapeHtml(review.name || 'Anonymous')}</strong>
+                <div class="table-subtext">${escapeHtml(review.comment || '')}</div>
+            </td>
+            <td>${escapeHtml(review.productName || 'General store review')}</td>
+            <td>${'&#9733;'.repeat(Math.min(5, Math.max(1, Number(review.rating) || 5)))}</td>
+            <td><span class="status-pill ${review.isHidden ? 'inactive' : 'active'}">${review.isHidden ? 'Hidden' : 'Live'}</span></td>
+            <td>${review.updatedAt?.toDate ? review.updatedAt.toDate().toLocaleDateString() : 'Just now'}</td>
+            <td>
+                <div class="row-action-group">
+                    <button class="topbar-btn icon-btn-small" type="button" onclick="openReviewModal('${escapeHtml(review.id)}')" title="Edit review">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="topbar-btn icon-btn-small" type="button" onclick="toggleReviewVisibility('${escapeHtml(review.id)}')" title="${review.isHidden ? 'Show review' : 'Hide review'}">
+                        <i class="fa-solid ${review.isHidden ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                    </button>
+                    <button class="topbar-btn icon-btn-small" type="button" onclick="deleteReview('${escapeHtml(review.id)}')" title="Delete review">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openReviewModal(id = null) {
+    currentReview = id ? reviews.find((review) => review.id === id) : null;
+
+    const modal = document.getElementById('reviewModal');
+    const title = document.getElementById('reviewModalTitle');
+    const form = document.getElementById('reviewForm');
+    if (!modal || !title || !form) return;
+
+    title.textContent = currentReview ? 'EDIT REVIEW' : 'CREATE REVIEW';
+    form.reset();
+
+    if (currentReview) {
+        document.getElementById('reviewName').value = currentReview.name || '';
+        document.getElementById('reviewProduct').value = currentReview.productName || '';
+        document.getElementById('reviewRating').value = String(Math.min(5, Math.max(1, Number(currentReview.rating) || 5)));
+        document.getElementById('reviewImage').value = currentReview.image || '';
+        document.getElementById('reviewOriginalComment').value = currentReview.originalComment || '';
+        document.getElementById('reviewComment').value = currentReview.comment || '';
+        document.getElementById('reviewHidden').checked = Boolean(currentReview.isHidden);
+    }
+
+    modal.classList.add('open');
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModal')?.classList.remove('open');
+    currentReview = null;
+}
+
+async function handleReviewSubmit(event) {
+    event.preventDefault();
+
+    const button = event.target.querySelector('button[type="submit"]');
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Saving...';
+
+    const reviewData = {
+        name: document.getElementById('reviewName').value.trim(),
+        productName: document.getElementById('reviewProduct').value.trim(),
+        rating: Math.min(5, Math.max(1, Number(document.getElementById('reviewRating').value) || 5)),
+        image: document.getElementById('reviewImage').value.trim(),
+        originalComment: document.getElementById('reviewOriginalComment').value.trim(),
+        comment: polishReviewComment(document.getElementById('reviewComment').value.trim()),
+        isHidden: document.getElementById('reviewHidden').checked,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (!reviewData.originalComment) {
+        reviewData.originalComment = reviewData.comment;
+    }
+
+    try {
+        if (currentReview) {
+            await db.collection('reviews').doc(currentReview.id).set(reviewData, { merge: true });
+            showToast('Review updated.');
+        } else {
+            reviewData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('reviews').add(reviewData);
+            showToast('Review created.');
+        }
+        closeReviewModal();
+    } catch (error) {
+        console.error(error);
+        showToast(`Review save failed: ${error.message}`, 'error');
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}
+
+async function toggleReviewVisibility(reviewId) {
+    const review = reviews.find((entry) => entry.id === reviewId);
+    if (!review) return;
+
+    try {
+        await db.collection('reviews').doc(reviewId).set({
+            isHidden: !review.isHidden,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast(review.isHidden ? 'Review is visible again.' : 'Review hidden.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Review visibility failed: ${error.message}`, 'error');
+    }
+}
+
+async function deleteReview(reviewId) {
+    if (!confirm('Delete this review?')) return;
+
+    try {
+        await db.collection('reviews').doc(reviewId).delete();
+        showToast('Review deleted.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Delete failed: ${error.message}`, 'error');
+    }
 }
 
 function resolveImgurUrl(raw) {
@@ -918,6 +1297,7 @@ async function publishImporterProduct() {
         images: importerSelectedImages,
         sizes: importerSelectedSizes.map((size) => ({ size, stock: 10, price: resell })),
         category: 'Sneakers',
+        releaseDate: normalizeReleaseDate(document.getElementById('impReleaseDate').value) || 'TBD',
         description: document.getElementById('impDesc').value.trim(),
         status: 'active',
         isHidden: document.getElementById('impHidden').checked,
@@ -936,6 +1316,7 @@ async function publishImporterProduct() {
         document.getElementById('impRetail').value = '';
         document.getElementById('impResell').value = '';
         document.getElementById('impDesc').value = '';
+        document.getElementById('impReleaseDate').value = '';
         document.getElementById('impHidden').checked = false;
         document.getElementById('impOutOfStock').checked = false;
         document.getElementById('impFeatured').checked = false;
@@ -1006,11 +1387,16 @@ function toggleNotifPanel() {
 window.switchTab = switchTab;
 window.viewOrder = viewOrder;
 window.openProductModal = openProductModal;
+window.openReviewModal = openReviewModal;
 window.closeModal = closeModal;
 window.closeOrderModal = closeOrderModal;
+window.closeReviewModal = closeReviewModal;
+window.updateProductReleaseDate = updateProductReleaseDate;
 window.toggleProductVisibility = toggleProductVisibility;
 window.toggleProductFeatured = toggleProductFeatured;
 window.toggleOutOfStock = toggleOutOfStock;
+window.toggleReviewVisibility = toggleReviewVisibility;
+window.deleteReview = deleteReview;
 window.handleImporterTabSwitch = handleImporterTabSwitch;
 window.addImporterUrlRow = addImporterUrlRow;
 window.handleImporterUrlInput = handleImporterUrlInput;
@@ -1023,4 +1409,8 @@ window.resetImporterPreviews = resetImporterPreviews;
 window.confirmImporterImages = confirmImporterImages;
 window.toggleImporterSize = toggleImporterSize;
 window.publishImporterProduct = publishImporterProduct;
+window.generateReviewProfiles = generateReviewProfiles;
+window.shuffleGeneratedReviewNames = shuffleGeneratedReviewNames;
+window.copyGeneratedReviewsJson = copyGeneratedReviewsJson;
+window.saveGeneratedReviews = saveGeneratedReviews;
 window.toggleNotifPanel = toggleNotifPanel;

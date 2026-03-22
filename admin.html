@@ -84,6 +84,11 @@
                 Import Products
             </a>
 
+            <a class="nav-item" data-page="reviews" onclick="switchTab('reviews', this)">
+                <i class="nav-icon fa-solid fa-camera-retro"></i>
+                Reviews Lab
+            </a>
+
             <a class="nav-item" href="pricing.html">
                 <i class="nav-icon fa-solid fa-tags"></i>
                 Smart Pricing
@@ -533,6 +538,10 @@
                                     <textarea id="impDesc" class="form-textarea"
                                         placeholder="Features, history, condition..."></textarea>
                                 </div>
+                                <div class="form-group">
+                                    <label for="impReleaseDate">Release Date</label>
+                                    <input type="date" id="impReleaseDate" class="form-input">
+                                </div>
                                 <div class="product-flags-grid">
                                     <label class="toggle-card">
                                         <input type="checkbox" id="impHidden">
@@ -561,6 +570,82 @@
                     <div class="card">
                         <p class="text-muted text-center p-40">Advanced Analytics
                             coming soon...</p>
+                    </div>
+                </section>
+
+                <section class="content-section" id="reviewsSection">
+                    <div class="reviews-lab-layout">
+                        <div class="card reviews-lab-card">
+                            <div class="card-header">
+                                <span class="card-title">REVIEW NAME + COMMENT GENERATOR</span>
+                            </div>
+                            <p class="reviews-lab-copy">Paste one customer comment per line. Add one image URL per line if you want a matching post preview. The tool will generate privacy-safe names and lightly polish comments without making them sound fake.</p>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="reviewCommentsInput">Comments</label>
+                                    <textarea id="reviewCommentsInput" rows="12" placeholder="came in fast and they look crazy in hand&#10;quality is solid fr&#10;box was clean and shipping was quick"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reviewImagesInput">Image URLs (Optional)</label>
+                                    <textarea id="reviewImagesInput" rows="12" placeholder="https://...&#10;https://...&#10;https://..."></textarea>
+                                </div>
+                            </div>
+                            <div class="reviews-lab-actions">
+                                <button class="btn-primary" type="button" id="generateReviewsBtn">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Review Profiles
+                                </button>
+                                <button class="btn-secondary" type="button" id="shuffleReviewNamesBtn">
+                                    <i class="fa-solid fa-shuffle"></i> Shuffle Names
+                                </button>
+                                <button class="btn-secondary" type="button" id="saveGeneratedReviewsBtn">
+                                    <i class="fa-solid fa-floppy-disk"></i> Save Batch To Reviews
+                                </button>
+                                <button class="btn-secondary" type="button" id="copyReviewsJsonBtn">
+                                    <i class="fa-solid fa-copy"></i> Copy JSON
+                                </button>
+                            </div>
+                            <div class="reviews-lab-stats" id="reviewsLabStats">0 reviews generated</div>
+                        </div>
+
+                        <div class="card reviews-output-card">
+                            <div class="card-header">
+                                <span class="card-title">REVIEW PREVIEW</span>
+                            </div>
+                            <div class="reviews-preview-grid" id="reviewsPreviewGrid">
+                                <div class="reviews-empty-state">Generate a batch to preview names, comments, and export-ready review objects.</div>
+                            </div>
+                            <div class="form-group reviews-json-wrap">
+                                <label for="reviewsJsonOutput">Export JSON</label>
+                                <textarea id="reviewsJsonOutput" rows="10" readonly placeholder="Generated review JSON will appear here."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card reviews-manager-card">
+                        <div class="card-header">
+                            <span class="card-title">MANAGE LIVE REVIEWS</span>
+                            <button class="btn-secondary btn-sm" type="button" id="addReviewBtn">
+                                <i class="fa-solid fa-plus"></i> New Review
+                            </button>
+                        </div>
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Reviewer</th>
+                                        <th>Product</th>
+                                        <th>Rating</th>
+                                        <th>Status</th>
+                                        <th>Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reviewsTableBody">
+                                    <tr>
+                                        <td colspan="6" class="empty-state-row">No reviews yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
 
@@ -626,6 +711,10 @@
                     <label for="productPrice">Base Price ($)</label>
                     <input type="number" id="productPrice" placeholder="0.00" required>
                 </div>
+                <div class="form-group">
+                    <label for="productReleaseDate">Release Date</label>
+                    <input type="date" id="productReleaseDate">
+                </div>
 
                 <div class="form-group">
                     <label>Size Inventory (Stock & Price per size)</label>
@@ -676,6 +765,63 @@
     </div>
 
     <!-- ══ TOAST CONTAINER ══ -->
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="reviewModalTitle">CREATE REVIEW</h2>
+                <button class="modal-close" id="reviewModalClose" aria-label="Close Review Modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="reviewForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="reviewName">Reviewer Name</label>
+                        <input type="text" id="reviewName" placeholder="Mason T." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reviewProduct">Product</label>
+                        <input type="text" id="reviewProduct" placeholder="Jordan 4 Retro 'Black Cat' 2020">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="reviewRating">Rating</label>
+                        <select id="reviewRating">
+                            <option value="5">5 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="2">2 Stars</option>
+                            <option value="1">1 Star</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reviewImage">Image URL</label>
+                        <input type="url" id="reviewImage" placeholder="https://...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reviewOriginalComment">Original Comment</label>
+                    <textarea id="reviewOriginalComment" rows="3" placeholder="raw customer wording..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="reviewComment">Published Comment</label>
+                    <textarea id="reviewComment" rows="4" placeholder="polished but authentic review comment..." required></textarea>
+                </div>
+                <div class="product-flags-grid">
+                    <label class="toggle-card">
+                        <input type="checkbox" id="reviewHidden">
+                        <span>Hide review from storefront</span>
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelReviewBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Firebase SDKs -->

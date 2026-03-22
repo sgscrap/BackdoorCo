@@ -15,7 +15,7 @@ import {
 } from './product-data.js';
 
 let products = [];
-let cart = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+let cart = loadCartFromStorage();
 let selectedModalSize = '';
 let selectedModalProduct = null;
 
@@ -246,6 +246,7 @@ function addToCart(product, size) {
         cart.push({
             id: product.id,
             name: product.name,
+            brand: product.brand || '',
             price: Number(product.price) || 0,
             image: product.image || '',
             size,
@@ -258,11 +259,34 @@ function addToCart(product, size) {
     toggleCart();
 }
 
+function loadCartFromStorage() {
+    try {
+        const stored = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+        return Array.isArray(stored) ? stored.map(normalizeCartItem).filter((item) => item.name) : [];
+    } catch {
+        return [];
+    }
+}
+
+function normalizeCartItem(item) {
+    return {
+        id: item?.id || item?.productId || '',
+        name: String(item?.name || '').trim(),
+        brand: String(item?.brand || '').trim(),
+        price: Number(item?.price) || 0,
+        image: String(item?.image || '').trim(),
+        size: String(item?.size || 'One Size').trim() || 'One Size',
+        qty: Math.max(1, Number(item?.qty) || Number(item?.quantity) || 1)
+    };
+}
+
 function saveCart() {
+    cart = cart.map(normalizeCartItem).filter((item) => item.name);
     localStorage.setItem('backdoor-cart', JSON.stringify(cart));
 }
 
 function updateCartUI() {
+    cart = cart.map(normalizeCartItem).filter((item) => item.name);
     const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
     const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
@@ -276,31 +300,63 @@ function updateCartUI() {
 
     const cartTotal = document.getElementById('cartTotal');
     if (cartTotal) cartTotal.textContent = `$${totalPrice.toFixed(2)}`;
+    const checkoutButton = document.getElementById('cartCheckoutBtn') || document.querySelector('#cartSidebar .cart-checkout');
+    if (checkoutButton) checkoutButton.disabled = cart.length === 0;
 
     const cartItemsContainer = document.getElementById('cartItems');
     if (!cartItemsContainer) return;
 
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<div class="empty-cart-msg">Your bag is empty.</div>';
+        cartItemsContainer.innerHTML = `
+            <div class="empty-cart-msg">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <h4>Your bag is empty.</h4>
+                <p>Add some heat and come back to checkout.</p>
+            </div>
+        `;
         return;
     }
 
     cartItemsContainer.innerHTML = cart.map((item, index) => `
         <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}">
+            <div class="cart-item-img">
+                ${item.image
+                    ? `<img src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                    : ''}
+                <span class="cart-item-fallback" ${item.image ? 'style="display:none"' : ''}><i class="fa-solid fa-shoe-prints"></i></span>
+            </div>
             <div class="cart-item-info">
                 <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-size">Size: ${item.size}</div>
-                <div class="cart-item-price">$${item.price.toFixed(0)}</div>
-                <div class="cart-item-qty"><span>Qty: ${item.qty}</span></div>
+                <div class="cart-item-meta">
+                    <span>Size ${item.size}</span>
+                    ${item.brand ? `<span>${item.brand}</span>` : ''}
+                </div>
+                <div class="cart-item-bottom">
+                    <div class="qty-control">
+                        <button class="qty-btn" type="button" onclick="updateCartQty(${index}, -1)" aria-label="Decrease quantity">−</button>
+                        <div class="qty-val">${item.qty}</div>
+                        <button class="qty-btn" type="button" onclick="updateCartQty(${index}, 1)" aria-label="Increase quantity">+</button>
+                    </div>
+                    <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+                </div>
+                <button class="cart-item-remove" type="button" onclick="removeFromCart(${index})">
+                    <i class="fa-solid fa-trash-can"></i> Remove
+                </button>
             </div>
-            <button class="cart-remove" onclick="removeFromCart(${index})">&times;</button>
         </div>
     `).join('');
 }
 
 window.removeFromCart = (index) => {
     cart.splice(index, 1);
+    saveCart();
+    updateCartUI();
+};
+
+window.updateCartQty = (index, delta) => {
+    const item = cart[index];
+    if (!item) return;
+    item.qty = Math.max(1, item.qty + delta);
     saveCart();
     updateCartUI();
 };

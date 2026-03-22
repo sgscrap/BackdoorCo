@@ -44,6 +44,19 @@ let currentStep   = 1;       // 1 = Contact/Address, 2 = Shipping, 3 = Payment
 let selectedShipping = 'standard';
 let appliedPromo  = null;
 
+function normalizeCartItem(item) {
+    return {
+        id: item?.id || item?.productId || '',
+        productId: item?.productId || item?.id || '',
+        name: String(item?.name || '').trim(),
+        brand: String(item?.brand || '').trim(),
+        size: String(item?.size || 'One Size').trim() || 'One Size',
+        price: Number(item?.price) || 0,
+        image: String(item?.image || '').trim(),
+        qty: Math.max(1, Number(item?.qty) || Number(item?.quantity) || 1)
+    };
+}
+
 /* ══════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════ */
@@ -94,7 +107,8 @@ function getShippingCost() {
 ══════════════════════════════════════════ */
 function loadCart() {
     try {
-        cart = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+        const stored = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+        cart = Array.isArray(stored) ? stored.map(normalizeCartItem).filter(item => item.name) : [];
     } catch (e) {
         cart = [];
     }
@@ -125,6 +139,7 @@ function loadCart() {
 }
 
 function saveCart() {
+    cart = cart.map(normalizeCartItem).filter(item => item.name);
     localStorage.setItem('backdoor-cart', JSON.stringify(cart));
     updateFreeShippingBar(getCartSubtotal());
     updateCheckoutSummary();
@@ -469,7 +484,7 @@ function applyPromo() {
     const promo = PROMO_CODES[code];
     if (!promo) { showToast('Invalid promo code', 'error'); return; }
 
-    appliedPromo = promo;
+    appliedPromo = { ...promo, code };
     showToast(`Promo applied: ${promo.label}! 🎉`);
     updateCheckoutSummary();
 
@@ -544,6 +559,9 @@ async function placeOrder() {
 
         const orderData = {
             orderNumber: orderNum,
+            total: +total.toFixed(2),
+            subtotal: +subtotal.toFixed(2),
+            tax: +tax.toFixed(2),
             status: 'pending',
             createdAt: serverTimestamp(),
             customer: {
@@ -552,6 +570,7 @@ async function placeOrder() {
                 name: `${firstName} ${lastName}`,
             },
             shippingAddress: {
+                street: document.getElementById('address1').value.trim(),
                 address1: document.getElementById('address1').value.trim(),
                 address2: document.getElementById('address2').value.trim(),
                 city:     document.getElementById('city').value.trim(),
@@ -565,6 +584,7 @@ async function placeOrder() {
                 brand:     item.brand || '',
                 size:      item.size,
                 qty:       item.qty,
+                quantity:  item.qty,
                 price:     parseFloat(item.price),
                 image:     item.image || '',
             })),
@@ -576,7 +596,7 @@ async function placeOrder() {
                 total:     +total.toFixed(2),
             },
             shippingMethod: selectedShipping,
-            promoCode: appliedPromo ? (appliedPromo.code || '') : null,
+            promoCode: appliedPromo ? appliedPromo.code : null,
         };
 
         // Save to Firestore
