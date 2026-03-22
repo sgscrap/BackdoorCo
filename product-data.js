@@ -15,6 +15,43 @@ function buildImgurImageUrl(id, extension = 'jpg') {
 
 const SEEDED_PRODUCTS = [
     {
+        id: 'seed-men-travis-velvet-brown',
+        name: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+        sku: 'DM7866-202',
+        price: 250,
+        brand: 'Jordan',
+        category: 'Sneakers',
+        colorway: 'Velvet Brown/Black',
+        description: "The Travis Scott x Air Jordan 1 Retro Low OG SP 'Velvet Brown' showcases Scott's signature reverse Swoosh on the black tumbled leather and brown suede upper. A woven Nike Air tag sits atop the brown nylon tongue, while mismatched Cactus Jack and Jordan Wings branding adorns the back tab of each shoe. Anchoring the sneaker is a brown rubber cupsole with stitched sidewall construction and an encapsulated Air-sole unit in the heel.",
+        image: buildImgurImageUrl('ZOrZEnt'),
+        images: [
+            buildImgurImageUrl('ZOrZEnt'),
+            buildImgurImageUrl('rAHE2Iv'),
+            buildImgurImageUrl('TkQdpuE'),
+            buildImgurImageUrl('4pdSP5S'),
+            buildImgurImageUrl('QfIJ0PC'),
+            buildImgurImageUrl('YZfxHKh'),
+            buildImgurImageUrl('iDo2IAJ'),
+            buildImgurImageUrl('IHVvC6S'),
+            buildImgurImageUrl('gU63WYa'),
+            buildImgurImageUrl('tr5UsUI'),
+            buildImgurImageUrl('PYEiLrz')
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 52%',
+        imageScale: 1.1,
+        sizes: [
+            { size: 'US 12.5', stock: 1, price: 250 }
+        ],
+        releaseDate: 'TBD',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
         id: 'seed-kids-travis-black-phantom-ps',
         name: "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
         sku: 'DO5442-001',
