@@ -1,5 +1,3 @@
-import { mergeCatalogProducts } from './product-data.js';
-
 const firebase = window.firebase;
 const firebaseConfig = window.firebaseConfig;
 firebase.initializeApp(firebaseConfig);
@@ -54,6 +52,77 @@ const LEGACY_IMAGE_POSITIONS = {
     'left center': [24, 50],
     'right center': [76, 50]
 };
+const SEEDED_ADMIN_PRODUCTS = [
+    {
+        id: 'seed-men-travis-velvet-brown',
+        name: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+        sku: 'DM7866-202',
+        price: 250,
+        brand: 'Jordan',
+        category: 'Sneakers',
+        colorway: 'Velvet Brown/Black',
+        description: "The Travis Scott x Air Jordan 1 Retro Low OG SP 'Velvet Brown' showcases Scott's signature reverse Swoosh on the black tumbled leather and brown suede upper. A woven Nike Air tag sits atop the brown nylon tongue, while mismatched Cactus Jack and Jordan Wings branding adorns the back tab of each shoe. Anchoring the sneaker is a brown rubber cupsole with stitched sidewall construction and an encapsulated Air-sole unit in the heel.",
+        image: 'https://i.imgur.com/ZOrZEnt.jpg',
+        images: [
+            'https://i.imgur.com/ZOrZEnt.jpg',
+            'https://i.imgur.com/rAHE2Iv.jpg',
+            'https://i.imgur.com/TkQdpuE.jpg',
+            'https://i.imgur.com/4pdSP5S.jpg',
+            'https://i.imgur.com/QfIJ0PC.jpg',
+            'https://i.imgur.com/YZfxHKh.jpg',
+            'https://i.imgur.com/iDo2IAJ.jpg',
+            'https://i.imgur.com/IHVvC6S.jpg',
+            'https://i.imgur.com/gU63WYa.jpg',
+            'https://i.imgur.com/tr5UsUI.jpg',
+            'https://i.imgur.com/PYEiLrz.jpg'
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 52%',
+        imageOffsetX: 50,
+        imageOffsetY: 52,
+        imageScale: 1.1,
+        sizes: [{ size: 'US 12.5', stock: 1, price: 250 }],
+        releaseDate: 'TBD',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
+        id: 'seed-kids-travis-black-phantom-ps',
+        name: "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+        sku: 'DO5442-001',
+        price: 180,
+        brand: 'Jordan',
+        category: 'Kids',
+        colorway: 'Black/Black',
+        description: "Offered in little kid sizing, the Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom' combines a sleek finish with La Flame's signature touches. The low-top sports an all-black nubuck and suede upper with contrast white stitching throughout. Scott's backward Swoosh decorates the lateral side, while woven Nike tags embellish each tongue. Mismatched heel tabs display a Jordan Wings logo on the right shoe and a bee graphic on the left. Anchoring the sneaker is a black rubber cupsole with stitched sidewall construction.",
+        image: 'https://i.imgur.com/30H5NyD.jpg',
+        images: [
+            'https://i.imgur.com/30H5NyD.jpg',
+            'https://i.imgur.com/UutZVxq.jpg',
+            'https://i.imgur.com/israMgv.jpg',
+            'https://i.imgur.com/FXy3W3z.jpg',
+            'https://i.imgur.com/bG5UpTh.jpg',
+            'https://i.imgur.com/PNAbX10.jpg'
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 52%',
+        imageOffsetX: 50,
+        imageOffsetY: 52,
+        imageScale: 1.12,
+        sizes: [{ size: '12.5C', stock: 1, price: 180 }],
+        releaseDate: 'TBD',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    }
+];
 
 document.addEventListener('DOMContentLoaded', () => {
     initFirebaseListeners();
@@ -83,6 +152,38 @@ function escapeHtml(value) {
 
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
+}
+
+function slugify(value) {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+}
+
+function getAdminProductMatchKey(product) {
+    const sku = String(product?.sku || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (sku) return `sku:${sku}`;
+    return `name:${slugify(product?.name || '')}`;
+}
+
+function mergeAdminCatalogProducts(liveProducts = []) {
+    const merged = new Map();
+
+    SEEDED_ADMIN_PRODUCTS.forEach((product) => {
+        merged.set(product.id, product);
+    });
+
+    liveProducts.forEach((product) => {
+        const matchKey = getAdminProductMatchKey(product);
+        const seededMatch = [...merged.values()].find((entry) => getAdminProductMatchKey(entry) === matchKey);
+        if (seededMatch) {
+            merged.delete(seededMatch.id);
+        }
+        merged.set(product.id, product);
+    });
+
+    return [...merged.values()];
 }
 
 function getProductSizes(product) {
@@ -390,7 +491,7 @@ function getVisibleProductCount() {
 
 function initFirebaseListeners() {
     db.collection('products').onSnapshot((snapshot) => {
-        products = mergeCatalogProducts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))).map(normalizeProduct);
+        products = mergeAdminCatalogProducts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))).map(normalizeProduct);
         syncSelectedProductIds();
         renderProducts();
         renderDashboard();
