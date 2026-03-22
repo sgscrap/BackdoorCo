@@ -38,8 +38,8 @@ const SEEDED_PRODUCTS = [
             buildImgurImageUrl('PYEiLrz')
         ],
         imageFit: 'contain',
-        imagePosition: '50% 52%',
-        imageScale: 1.1,
+        imagePosition: '50% 55%',
+        imageScale: 1.16,
         sizes: [
             { size: 'US 12.5', stock: 1, price: 250 }
         ],
@@ -96,6 +96,12 @@ function matchesKidsTravisBlackPhantom(product) {
     const id = String(product?.id || '').toLowerCase();
     const name = String(product?.name || '').toLowerCase();
     return id === 'seed-kids-travis-black-phantom-ps' || (name.includes('travis scott') && name.includes('black phantom'));
+}
+
+function matchesVelvetBrown(product) {
+    const id = String(product?.id || '').toLowerCase();
+    const name = String(product?.name || '').toLowerCase();
+    return id === 'seed-men-travis-velvet-brown' || (name.includes('travis scott') && name.includes('velvet brown'));
 }
 
 function clamp(value, min, max) {
@@ -265,6 +271,7 @@ export function getProductCardImageScale(product) {
     }
     if (matchesBlackCat(product)) return 1.16;
     if (matchesKidsTravisBlackPhantom(product)) return 1.12;
+    if (matchesVelvetBrown(product)) return 1.16;
     if (isFootwearProduct(product)) return 1.08;
     return 1;
 }
@@ -273,6 +280,7 @@ export function getProductCardImagePadding(product) {
     if (String(product?.imageFit || '').toLowerCase() === 'cover') return '0';
     if (matchesBlackCat(product)) return '2px';
     if (matchesKidsTravisBlackPhantom(product)) return '2px';
+    if (matchesVelvetBrown(product)) return '2px';
     return isFootwearProduct(product) ? '4px' : '0';
 }
 
