@@ -11,6 +11,7 @@ import {
     getProductImages,
     getProductSizes,
     getTotalStock,
+    isBackorder,
     isFeatured,
     isOutOfStock
 } from './product-data.js';
@@ -98,23 +99,31 @@ function renderMissingProduct(message = 'Product not found.') {
 
 function renderProduct(product) {
     document.title = `${product.name} | Backdoor`;
+    const soldOut = isOutOfStock(product);
+    const backorder = isBackorder(product);
     document.getElementById('productBreadcrumbLabel').textContent = product.name;
     document.getElementById('productName').textContent = product.name;
     document.getElementById('productCategoryLabel').textContent = product.category || 'Product';
     document.getElementById('productBrandLine').textContent = formatBrandLine(product);
     document.getElementById('productPrice').textContent = `$${(Number(product.price) || 0).toFixed(0)}`;
-    document.getElementById('productDescription').textContent = product.description || 'Premium authenticated product from Backdoor.';
+    document.getElementById('productDescription').textContent = backorder
+        ? `${product.description || 'Premium authenticated product from Backdoor.'}\n\n${product.backorderLeadTime || 'Ships in 1.5-2 weeks'}.`
+        : (product.description || 'Premium authenticated product from Backdoor.');
     document.getElementById('productSku').textContent = product.sku || 'N/A';
     document.getElementById('productColorway').textContent = product.colorway || 'N/A';
     document.getElementById('productReleaseDate').textContent = product.releaseDate || 'TBD';
-
-    const soldOut = isOutOfStock(product);
     document.getElementById('productStockLabel').textContent = soldOut
         ? 'Out of stock'
+        : backorder
+            ? (product.backorderLeadTime || 'Ships in 1.5-2 weeks')
         : `${getTotalStock(product)} items available`;
 
     const badge = document.getElementById('productStatusBadge');
-    if (soldOut) {
+    if (backorder) {
+        badge.textContent = 'Backorder';
+        badge.className = 'modal-badge modal-badge--featured';
+        badge.style.display = 'inline-block';
+    } else if (soldOut) {
         badge.textContent = 'Out of Stock';
         badge.className = 'modal-badge modal-badge--out';
         badge.style.display = 'inline-block';
@@ -139,7 +148,7 @@ function renderProduct(product) {
     const sizes = getProductSizes(product);
     const sizeOptions = document.getElementById('productSizeOptions');
     sizeOptions.innerHTML = sizes.map((entry) => {
-        const sizeSoldOut = soldOut || entry.stock <= 0;
+        const sizeSoldOut = (soldOut || entry.stock <= 0) && !backorder;
         return `
             <button type="button" class="size-option ${sizeSoldOut ? 'out-of-stock' : ''}" ${sizeSoldOut ? 'disabled' : ''} data-size="${entry.size}" onclick="selectProductSize(this)">
                 ${entry.size}
@@ -149,7 +158,7 @@ function renderProduct(product) {
 
     const addToCartButton = document.getElementById('productAddToCart');
     addToCartButton.disabled = soldOut;
-    addToCartButton.textContent = soldOut ? 'Out of Stock' : sizes.length > 0 ? 'Select Size' : 'Add to Cart';
+    addToCartButton.textContent = soldOut ? 'Out of Stock' : backorder ? 'Select Size for Backorder' : sizes.length > 0 ? 'Select Size' : 'Add to Cart';
     if (!soldOut && sizes.length === 0) selectedSize = 'One Size';
 
     document.querySelector('.product-back-link')?.setAttribute('href', buildBackHref(product));

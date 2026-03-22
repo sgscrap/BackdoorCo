@@ -14,6 +14,7 @@ import {
     getProductImagePosition,
     mergeCatalogProducts,
     getTotalStock,
+    isBackorder,
     isFeatured,
     isHidden,
     isOutOfStock
@@ -148,23 +149,26 @@ function renderProducts() {
     if (grid) {
         grid.innerHTML = filtered.map((product, index) => {
             const soldOut = isOutOfStock(product);
+            const backorder = isBackorder(product);
             const totalStock = getTotalStock(product);
             const imageScale = getProductCardImageScale(product);
             const imagePadding = getProductCardImagePadding(product);
             const imageFit = getProductImageFit(product);
             const imagePosition = getProductImagePosition(product);
-            const statusBadge = soldOut
+            const statusBadge = backorder
+                ? '<span class="product-state-badge product-state-badge--featured">Backorder</span>'
+                : soldOut
                 ? '<span class="product-state-badge product-state-badge--out">Out of Stock</span>'
                 : isFeatured(product)
                     ? '<span class="product-state-badge product-state-badge--featured">Featured</span>'
                     : '';
 
             return `
-                <div class="shop-card ${soldOut ? 'shop-card--out-of-stock' : ''}" data-id="${product.id}" style="animation-delay:${Math.min(index * 0.04, 0.3)}s" onclick="handleProductClick('${product.id}')">
+                <div class="shop-card ${soldOut && !backorder ? 'shop-card--out-of-stock' : ''}" data-id="${product.id}" style="animation-delay:${Math.min(index * 0.04, 0.3)}s" onclick="handleProductClick('${product.id}')">
                     <div class="shop-card-img">
                         ${statusBadge}
                         ${!soldOut && totalStock > 0 && totalStock <= 3 ? `<span class="low-badge">${totalStock} LEFT</span>` : ''}
-                        ${soldOut ? '<div class="sold-overlay"><span>OUT OF STOCK</span></div>' : ''}
+                        ${soldOut && !backorder ? '<div class="sold-overlay"><span>OUT OF STOCK</span></div>' : ''}
                         ${product.image
                 ? `<img src="${product.image}" alt="${product.name}" loading="${index < 4 ? 'eager' : 'lazy'}" style="object-fit:${imageFit};object-position:${imagePosition};padding:${imagePadding};--product-image-scale:${imageScale};--product-image-hover-scale:${(imageScale + 0.04).toFixed(2)}" onerror="this.style.display='none'">`
                 : '<div class="no-img-placeholder"><i class="fa-solid fa-shoe-prints"></i></div>'}
@@ -175,11 +179,11 @@ function renderProducts() {
                         <p class="shop-card-cat">${(product.category || '').toUpperCase()}</p>
                         <div class="shop-card-bottom">
                             <div>
-                                <p class="shop-card-label">${soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</p>
+                                <p class="shop-card-label">${backorder ? (product.backorderLeadTime || 'Backorder') : soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</p>
                                 <p class="shop-card-price">$${product.price.toFixed(0)}</p>
                                 <a class="product-page-link" href="${buildProductHref(product)}" onclick="event.stopPropagation()">View product page</a>
                             </div>
-                            ${soldOut
+                            ${soldOut && !backorder
                 ? '<span class="shop-sold-label">Sold Out</span>'
                 : `<button class="shop-buy-btn" onclick="event.stopPropagation(); handleAddToCart('${product.id}')">Buy</button>`}
                         </div>

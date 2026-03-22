@@ -14,6 +14,7 @@ import {
     mergeCatalogProducts,
     getProductSizes,
     getTotalStock,
+    isBackorder,
     isFeatured,
     isHidden,
     isOutOfStock
@@ -45,6 +46,9 @@ function getVisibleProducts() {
 }
 
 function getBadgeMeta(product) {
+    if (isBackorder(product)) {
+        return { label: 'Backorder', className: 'modal-badge modal-badge--featured' };
+    }
     if (isOutOfStock(product)) {
         return { label: 'Out of Stock', className: 'modal-badge modal-badge--out' };
     }
@@ -90,20 +94,23 @@ function renderMostWanted() {
 
     productGrid.innerHTML = featuredFirst.map((product, index) => {
         const soldOut = isOutOfStock(product);
+        const backorder = isBackorder(product);
         const imageScale = getProductCardImageScale(product);
         const imagePadding = getProductCardImagePadding(product);
         const imageFit = getProductImageFit(product);
         const imagePosition = getProductImagePosition(product);
-        const featuredBadge = isFeatured(product)
+        const featuredBadge = backorder
+            ? '<div class="mw-status-badge">BACKORDER</div>'
+            : isFeatured(product)
             ? '<div class="mw-status-badge">FEATURED</div>'
             : '';
 
         return `
-            <div class="mw-card drop-card ${soldOut ? 'mw-card--out-of-stock' : ''}" data-id="${product.id}" style="animation-delay:${index * 0.1}s" onclick="openProductModal('${product.id}')">
+            <div class="mw-card drop-card ${soldOut && !backorder ? 'mw-card--out-of-stock' : ''}" data-id="${product.id}" style="animation-delay:${index * 0.1}s" onclick="openProductModal('${product.id}')">
                 <div class="mw-card-img drop-card-img-wrap">
                     <div class="mw-rank new-badge">#${index + 1}</div>
                     ${featuredBadge}
-                    ${soldOut ? '<div class="mw-sold-overlay sold-out-overlay"><span>OUT OF STOCK</span></div>' : ''}
+                    ${soldOut && !backorder ? '<div class="mw-sold-overlay sold-out-overlay"><span>OUT OF STOCK</span></div>' : ''}
                     <img src="${product.image || ''}" alt="${product.name}" loading="${index < 2 ? 'eager' : 'lazy'}" style="object-fit:${imageFit};object-position:${imagePosition};padding:${imagePadding};--product-image-scale:${imageScale};--product-image-hover-scale:${(imageScale + 0.04).toFixed(2)}" onerror="this.src='https://via.placeholder.com/400x400/1a1a1a/c8f65d?text=Backdoor'">
                 </div>
                 <div class="mw-card-info drop-card-info">
@@ -111,10 +118,10 @@ function renderMostWanted() {
                     <h3 class="mw-card-name drop-name">${product.name}</h3>
                     <div class="mw-price-row drop-bottom">
                         <div class="mw-price-block drop-price-wrap">
-                            <span class="mw-ask-label drop-price-label">${soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</span>
+                            <span class="mw-ask-label drop-price-label">${backorder ? (product.backorderLeadTime || 'Backorder') : soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</span>
                             <span class="mw-price drop-price">$${product.price.toFixed(0)}</span>
                         </div>
-                        ${soldOut
+                        ${soldOut && !backorder
                 ? '<span class="mw-sold drop-sold-text">Sold Out</span>'
                 : `<button class="mw-buy-btn drop-buy-btn" onclick="event.stopPropagation(); openProductModal('${product.id}')">Buy</button>`}
                     </div>
@@ -169,7 +176,9 @@ window.showProductModal = function showProductModal(product) {
     document.getElementById('modalColorway').textContent = product.colorway || '';
     document.getElementById('modalPrice').textContent = `$${(Number(product.price) || 0).toFixed(0)}`;
     document.getElementById('modalReleaseDate').textContent = product.releaseDate || 'TBD';
-    document.getElementById('modalDescription').textContent = product.desc || product.description || 'Premium quality authenticated product from Backdoor.';
+    document.getElementById('modalDescription').textContent = isBackorder(product)
+        ? `${product.desc || product.description || 'Premium quality authenticated product from Backdoor.'}\n\n${product.backorderLeadTime || 'Ships in 1.5-2 weeks'}.`
+        : (product.desc || product.description || 'Premium quality authenticated product from Backdoor.');
 
     const badge = document.getElementById('modalBadge');
     const badgeMeta = getBadgeMeta(product);
@@ -183,7 +192,7 @@ window.showProductModal = function showProductModal(product) {
     const sizes = getProductSizes(product);
     if (sizesContainer) {
         sizesContainer.innerHTML = sizes.map((entry) => {
-            const soldOut = isOutOfStock(product) || entry.stock <= 0;
+            const soldOut = (isOutOfStock(product) || entry.stock <= 0) && !isBackorder(product);
             return `
                 <button type="button" class="size-option ${soldOut ? 'out-of-stock' : ''}" ${soldOut ? 'disabled' : ''} data-size="${entry.size}" onclick="selectModalSize(this)">
                     ${entry.size}
@@ -200,7 +209,7 @@ window.showProductModal = function showProductModal(product) {
             addToCartButton.textContent = 'Add to Cart';
         } else {
             addToCartButton.disabled = isOutOfStock(product);
-            addToCartButton.textContent = isOutOfStock(product) ? 'Out of Stock' : 'Select Size';
+            addToCartButton.textContent = isOutOfStock(product) ? 'Out of Stock' : isBackorder(product) ? 'Select Size for Backorder' : 'Select Size';
         }
         addToCartButton.onclick = () => {
             if (!selectedModalProduct || isOutOfStock(selectedModalProduct)) return;
