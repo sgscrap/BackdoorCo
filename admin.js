@@ -1,3 +1,5 @@
+import { mergeCatalogProducts } from './product-data.js';
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
@@ -386,7 +388,7 @@ function getVisibleProductCount() {
 
 function initFirebaseListeners() {
     db.collection('products').onSnapshot((snapshot) => {
-        products = snapshot.docs.map((doc) => normalizeProduct({ id: doc.id, ...doc.data() }));
+        products = mergeCatalogProducts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))).map(normalizeProduct);
         syncSelectedProductIds();
         renderProducts();
         renderDashboard();
