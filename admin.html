@@ -49,9 +49,8 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header">
                 <h2>
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"
-                        xmlns="http://www.w3.org/2000/svg"
-                        style="display: inline-block; vertical-align: middle; margin-right: 8px; margin-bottom: 2px;">
+                    <svg class="sidebar-logo-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd"
                             d="M4 2C2.89543 2 2 2.89543 2 4V20C2 21.1046 2.89543 22 4 22H14C17.3137 22 20 19.3137 20 16C20 12.6863 17.3137 10 14 10V10C16.2091 10 18 8.20914 18 6C18 3.79086 16.2091 2 14 2H4ZM12 13C13.1046 13 14 13.8954 14 15C14 15.356 13.9066 15.6897 13.7441 15.9774L14.5 18H9.5L10.2559 15.9774C10.0934 15.6897 10 15.356 10 15C10 13.8954 10.8954 13 12 13Z" />
                     </svg>
@@ -60,14 +59,14 @@
             </div>
 
             <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" onclick="switchTab('dashboard')">
+                <a href="#" class="nav-item active" data-section="dashboard">
                     <span class="nav-icon">📊</span>
                     <span class="nav-text">Dashboard</span>
                 </a>
-                <a href="#" class="nav-item" onclick="switchTab('orders')">
+                <a href="#" class="nav-item" data-section="orders">
                     <span class="nav-icon">📦</span>
                     <span class="nav-text">Orders</span>
-                    <span class="nav-badge">10</span>
+                    <span class="nav-badge" id="pendingOrdersBadge">0</span>
                 </a>
                 <a href="#" class="nav-item" data-section="products">
                     <span class="nav-icon">👟</span>
@@ -179,7 +178,8 @@
                 <div class="section-toolbar">
                     <div class="toolbar-left">
                         <input type="text" class="search-input" id="orderSearch" placeholder="Search orders...">
-                        <select class="filter-select" id="orderStatusFilter">
+                        <select class="filter-select" id="orderStatusFilter" aria-label="Filter by order status"
+                            title="Filter by order status">
                             <option value="all">All Status</option>
                             <option value="pending">Pending</option>
                             <option value="processing">Processing</option>
@@ -219,10 +219,18 @@
                 <div class="section-toolbar">
                     <div class="toolbar-left">
                         <input type="text" class="search-input" id="productSearch" placeholder="Search products...">
-                        <select class="filter-select" id="productCategoryFilter">
+                        <select class="filter-select" id="productCategoryFilter" aria-label="Filter by product category"
+                            title="Filter by product category">
                             <option value="all">All Categories</option>
                             <option value="Sneakers">Sneakers</option>
                             <option value="Apparel">Apparel</option>
+                        </select>
+                        <select class="filter-select" id="productStatusFilter" aria-label="Filter by inventory status"
+                            title="Filter by inventory status">
+                            <option value="all">All Statuses</option>
+                            <option value="active">Live</option>
+                            <option value="hidden">Hidden</option>
+                            <option value="out-of-stock">Out of Stock</option>
                         </select>
                     </div>
                     <div class="toolbar-right">
@@ -231,10 +239,28 @@
                     </div>
                 </div>
 
+                <div class="bulk-toolbar" id="productBulkToolbar">
+                    <span class="bulk-selection-copy" id="productSelectionCount">0 selected</span>
+                    <select class="filter-select" id="productBulkAction" aria-label="Bulk product action"
+                        title="Bulk product action">
+                        <option value="">Bulk Actions</option>
+                        <option value="show">Show on Storefront</option>
+                        <option value="hide">Hide from Storefront</option>
+                        <option value="mark-in-stock">Mark In Stock</option>
+                        <option value="mark-out-of-stock">Mark Out of Stock</option>
+                        <option value="feature">Mark Featured</option>
+                        <option value="unfeature">Remove Featured</option>
+                    </select>
+                    <button class="btn-secondary" id="applyBulkActionBtn">Apply</button>
+                </div>
+
                 <div class="data-table-container">
                     <table class="data-table" id="productsTable">
                         <thead>
                             <tr>
+                                <th class="table-checkbox-cell">
+                                    <input type="checkbox" id="selectAllProducts" aria-label="Select all visible products">
+                                </th>
                                 <th>Image</th>
                                 <th>Name</th>
                                 <th>SKU</th>
@@ -284,7 +310,7 @@
 
 
             <!-- Import Product Section -->
-            <div id="import" class="content-section">
+            <section id="importSection" class="content-section">
                 <div class="import-container">
                     <div class="import-header">
                         <h2>Import from Kickwho</h2>
@@ -310,16 +336,20 @@
                             <div class="preview-details">
                                 <div class="form-group">
                                     <label>Product Name</label>
-                                    <input type="text" id="previewName">
+                                    <input type="text" id="previewName" aria-label="Product Name">
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Price ($)</label>
-                                        <input type="number" id="previewPrice">
+                                        <label>Brand</label>
+                                        <select id="previewBrand" aria-label="Product Brand">
+                                            <option value="Nike">Nike</option>
+                                            <option value="Jordan">Jordan</option>
+                                            <option value="Adidas">Adidas</option>
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label>Category</label>
-                                        <select id="previewCategory">
+                                        <select id="previewCategory" aria-label="Product Category">
                                             <option value="Sneakers">Sneakers</option>
                                             <option value="Apparel">Apparel</option>
                                             <option value="Accessories">Accessories</option>
@@ -328,23 +358,37 @@
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>SKU</label>
-                                        <input type="text" id="previewSKU" class="preview-input">
+                                        <label>Price ($)</label>
+                                        <input type="number" id="previewPrice" aria-label="Product Price">
                                     </div>
                                     <div class="form-group">
-                                        <label>Stock</label>
-                                        <input type="number" id="previewStock" class="preview-input" value="10">
+                                        <label>SKU</label>
+                                        <input type="text" id="previewSKU" class="preview-input" aria-label="Product SKU">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    aria-label="Product category">
-                                    <option value="Sneakers">Sneakers</option>
-                                    <option value="Apparel">Apparel</option>
-                                    </select>
+                                    <label>Stock</label>
+                                    <input type="number" id="previewStock" class="preview-input" value="10"
+                                        aria-label="Product Stock">
                                 </div>
                                 <div class="form-group">
                                     <label>Colorway</label>
-                                    <input type="text" id="previewColorway" class="preview-input">
+                                    <input type="text" id="previewColorway" class="preview-input"
+                                        aria-label="Product Colorway">
+                                </div>
+                                <div class="inventory-flags">
+                                    <label class="inventory-flag" for="previewHidden">
+                                        <input type="checkbox" id="previewHidden">
+                                        <span>Hide from storefront</span>
+                                    </label>
+                                    <label class="inventory-flag" for="previewOutOfStock">
+                                        <input type="checkbox" id="previewOutOfStock">
+                                        <span>Mark as out of stock</span>
+                                    </label>
+                                    <label class="inventory-flag" for="previewFeatured">
+                                        <input type="checkbox" id="previewFeatured">
+                                        <span>Feature on storefront</span>
+                                    </label>
                                 </div>
                                 <div class="import-actions">
                                     <button class="btn-secondary" id="cancelImportBtn">Cancel</button>
@@ -363,7 +407,7 @@
                         </div>
                     </div>
                 </div>
-                </section>
+            </section>
 
                 <!-- Analytics Section -->
                 <section class="content-section" id="analyticsSection">
@@ -480,6 +524,21 @@
                             <label for="productStock">Stock Quantity *</label>
                             <input type="number" id="productStock" required>
                         </div>
+                    </div>
+
+                    <div class="inventory-flags">
+                        <label class="inventory-flag" for="productHidden">
+                            <input type="checkbox" id="productHidden">
+                            <span>Hide from storefront</span>
+                        </label>
+                        <label class="inventory-flag" for="productOutOfStock">
+                            <input type="checkbox" id="productOutOfStock">
+                            <span>Mark as out of stock</span>
+                        </label>
+                        <label class="inventory-flag" for="productFeatured">
+                            <input type="checkbox" id="productFeatured">
+                            <span>Feature on storefront</span>
+                        </label>
                     </div>
 
                     <div class="form-group">
