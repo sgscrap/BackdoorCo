@@ -42,6 +42,46 @@ const BLACK_CAT_REVIEW_THREE = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const BLACK_CAT_REVIEW_FOUR = {
+    id: 'seed-black-cat-004',
+    name: 'Darius K.',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: "My fourth pair of these I've ordered for me and family. Awesome shoe and quality.",
+    originalComment: "My fourth pair of these I’ve ordered for me and family awesome shoe and quality",
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_FIVE = {
+    id: 'seed-black-cat-005',
+    name: 'Cam R.',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'Amazing shoes and amazing quality. Already wore them and got a lot of compliments. Prefer these over the 2025 version.',
+    originalComment: 'amazing shoes and amazing quality already wore them and got a lot of compliments prefer these over the 2025 version',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/FoqfYo7.jpg',
+        'https://i.imgur.com/0XR2zFC.jpg',
+        'https://i.imgur.com/JUxFWl1.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_SIX = {
+    id: 'seed-black-cat-006',
+    name: 'OG**',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'Great quality.',
+    originalComment: 'Great quality',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
 const KIDS_TRAVIS_REVIEW_ONE = {
     id: 'seed-kids-travis-001',
     name: 'Ho**',
@@ -120,6 +160,9 @@ export function getSeededReviews() {
         normalizeReview(BLACK_CAT_REVIEW),
         normalizeReview(BLACK_CAT_REVIEW_TWO),
         normalizeReview(BLACK_CAT_REVIEW_THREE),
+        normalizeReview(BLACK_CAT_REVIEW_FOUR),
+        normalizeReview(BLACK_CAT_REVIEW_FIVE),
+        normalizeReview(BLACK_CAT_REVIEW_SIX),
         normalizeReview(KIDS_TRAVIS_REVIEW_ONE),
         normalizeReview(KIDS_TRAVIS_REVIEW_TWO),
         normalizeReview(KIDS_TRAVIS_REVIEW_THREE),
