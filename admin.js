@@ -4,6 +4,7 @@ const db = firebase.firestore();
 
 const DEFAULT_SIZE_OPTIONS = ['US 7', 'US 7.5', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 11', 'US 12', 'US 13'];
 const IMPORTER_SIZES = [...DEFAULT_SIZE_OPTIONS];
+const ADMIN_AUTH_DISABLED = true;
 const pageData = {
     dashboard: { title: 'DASHBOARD', subtitle: "Welcome back - here's what's happening today." },
     orders: { title: 'ORDERS', subtitle: 'Manage and track all customer orders.' },
@@ -216,6 +217,13 @@ function initFirebaseListeners() {
 }
 
 function checkAuth() {
+    if (ADMIN_AUTH_DISABLED) {
+        document.getElementById('loginScreen')?.classList.add('hidden');
+        document.getElementById('adminDashboard')?.classList.remove('hidden');
+        renderDashboard();
+        return;
+    }
+
     auth.onAuthStateChanged((user) => {
         document.getElementById('loginScreen')?.classList.toggle('hidden', Boolean(user));
         document.getElementById('adminDashboard')?.classList.toggle('hidden', !user);
@@ -228,6 +236,11 @@ function setupEventListeners() {
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
+            if (ADMIN_AUTH_DISABLED) {
+                checkAuth();
+                return;
+            }
+
             const button = event.target.querySelector('button');
             const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
@@ -253,6 +266,11 @@ function setupEventListeners() {
     }
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        if (ADMIN_AUTH_DISABLED) {
+            showToast('Admin login is temporarily disabled.');
+            return;
+        }
+
         if (confirm('Logout?')) auth.signOut();
     });
 
