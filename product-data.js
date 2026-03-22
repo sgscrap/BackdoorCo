@@ -38,8 +38,8 @@ const SEEDED_PRODUCTS = [
             buildImgurImageUrl('PYEiLrz')
         ],
         imageFit: 'contain',
-        imagePosition: '50% 55%',
-        imageScale: 1.16,
+        imagePosition: '50% 58%',
+        imageScale: 1.28,
         sizes: [
             { size: 'US 12.5', stock: 1, price: 250 }
         ],
@@ -271,7 +271,7 @@ export function getProductCardImageScale(product) {
     }
     if (matchesBlackCat(product)) return 1.16;
     if (matchesKidsTravisBlackPhantom(product)) return 1.12;
-    if (matchesVelvetBrown(product)) return 1.16;
+    if (matchesVelvetBrown(product)) return 1.28;
     if (isFootwearProduct(product)) return 1.08;
     return 1;
 }
