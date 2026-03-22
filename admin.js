@@ -220,7 +220,22 @@ function checkAuth() {
     if (ADMIN_AUTH_DISABLED) {
         document.getElementById('loginScreen')?.classList.add('hidden');
         document.getElementById('adminDashboard')?.classList.remove('hidden');
-        renderDashboard();
+
+        const user = auth.currentUser;
+        if (user) {
+            renderDashboard();
+            return;
+        }
+
+        auth.signInAnonymously()
+            .then(() => {
+                renderDashboard();
+            })
+            .catch((error) => {
+                console.error('Anonymous auth failed:', error);
+                renderDashboard();
+                showToast(`Write access still requires Firebase auth: ${error.message}`, 'error');
+            });
         return;
     }
 
@@ -267,7 +282,12 @@ function setupEventListeners() {
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
         if (ADMIN_AUTH_DISABLED) {
-            showToast('Admin login is temporarily disabled.');
+            auth.signOut()
+                .catch((error) => console.error('Anonymous logout failed:', error))
+                .finally(() => {
+                    checkAuth();
+                    showToast('Admin login is temporarily disabled.');
+                });
             return;
         }
 
