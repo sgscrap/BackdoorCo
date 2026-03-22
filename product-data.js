@@ -54,6 +54,12 @@ function matchesBlackCat(product) {
     return (name.includes('jordan 4 retro') && name.includes('black cat')) || sku === 'fv5029 010';
 }
 
+function matchesKidsTravisBlackPhantom(product) {
+    const id = String(product?.id || '').toLowerCase();
+    const name = String(product?.name || '').toLowerCase();
+    return id === 'seed-kids-travis-black-phantom-ps' || (name.includes('travis scott') && name.includes('black phantom'));
+}
+
 function isFootwearProduct(product) {
     const category = String(product?.category || '').toLowerCase();
     const brand = String(product?.brand || '').toLowerCase();
@@ -193,6 +199,24 @@ export function getProductImagePosition(product) {
         'right center'
     ]);
     return allowed.has(value) ? value : 'center center';
+}
+
+export function getProductCardImageScale(product) {
+    const explicit = Number(product?.imageScale);
+    if (Number.isFinite(explicit) && explicit >= 0.8 && explicit <= 1.5) {
+        return explicit;
+    }
+    if (matchesBlackCat(product)) return 1.16;
+    if (matchesKidsTravisBlackPhantom(product)) return 1.12;
+    if (isFootwearProduct(product)) return 1.08;
+    return 1;
+}
+
+export function getProductCardImagePadding(product) {
+    if (String(product?.imageFit || '').toLowerCase() === 'cover') return '0';
+    if (matchesBlackCat(product)) return '2px';
+    if (matchesKidsTravisBlackPhantom(product)) return '2px';
+    return isFootwearProduct(product) ? '4px' : '0';
 }
 
 function slugify(value) {

@@ -3881,11 +3881,12 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transform: scale(var(--product-image-scale, 1));
     transition: transform 0.5s ease;
 }
 
 .mw-card:hover .mw-card-img img {
-    transform: scale(1.05);
+    transform: scale(var(--product-image-hover-scale, 1.05));
 }
 
 /* Rank Badge */
