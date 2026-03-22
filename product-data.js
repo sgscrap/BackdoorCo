@@ -23,9 +23,9 @@ const SEEDED_PRODUCTS = [
         category: 'Shoes',
         colorway: 'Onyx/Onyx/Onyx',
         description: 'First revealed in February 2022 at the Donda 2 listening event in Miami, the adidas Yeezy Slide Onyx features an all-black foam construction with a soft footbed for comfort. At the base, a grooved outsole adds stability and responsiveness.\n\nThe adidas Yeezy Slide Onyx released in March 2022 and retailed for $60.',
-        image: 'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/072/273/667/original/884794_01.jpg.jpeg?action=crop&width=750',
+        image: 'https://i.ebayimg.com/images/g/vWoAAOSwTSVoCn2L/s-l1600.webp',
         images: [
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/072/273/667/original/884794_01.jpg.jpeg?action=crop&width=750',
+            'https://i.ebayimg.com/images/g/vWoAAOSwTSVoCn2L/s-l1600.webp',
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/072/273/660/original/884794_04.jpg.jpeg?action=crop&width=750',
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/072/273/670/original/884794_02.jpg.jpeg?action=crop&width=750',
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/072/273/659/original/884794_03.jpg.jpeg?action=crop&width=750'
