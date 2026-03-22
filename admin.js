@@ -1,5 +1,6 @@
 import { mergeCatalogProducts } from './product-data.js';
 
+const firebase = window.firebase;
 const firebaseConfig = window.firebaseConfig;
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
