@@ -468,6 +468,134 @@ const VELVET_BROWN_REVIEW_FIFTEEN = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const YEEZY_SLIDE_ONYX_REVIEW_ONE = {
+    id: 'seed-yeezy-slide-onyx-001',
+    name: 'mt**',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'Very comfortable, fast QC, and quick shipping.',
+    originalComment: 'Very comfortable, fast QC, and quick shipping.',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/08/27/238487/202208270346171520309.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const YEEZY_SLIDE_ONYX_REVIEW_TWO = {
+    id: 'seed-yeezy-slide-onyx-002',
+    name: 'Dr**',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'Customer photo post.',
+    originalComment: 'Customer photo post.',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/09/04/109869/202209041850565721072.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const YEEZY_SLIDE_ONYX_REVIEW_THREE = {
+    id: 'seed-yeezy-slide-onyx-003',
+    name: 'Sn**',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'They came in today and my girl loves them. Thanks again Back Door!',
+    originalComment: "They came in today and my girl loves them Thanks again back door!'",
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/10/13/242445/202210130529599661967.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/10/13/242445/202210130529599421914.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/10/13/242445/20221013052959605862.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const YEEZY_SLIDE_ONYX_REVIEW_FOUR = {
+    id: 'seed-yeezy-slide-onyx-004',
+    name: 'im**',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: "I'm really impressed with what I got, and I would consider purchasing again tbh.",
+    originalComment: "This is a real review i promise like fr but I’m really impressed with what I got and I would consider purchasing tbh",
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/289340/202211030651369830998.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/289340/202211030651361233923.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/289340/202211030651369320909.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const YEEZY_SLIDE_ONYX_REVIEW_FIVE = {
+    id: 'seed-yeezy-slide-onyx-005',
+    name: 'Ari M.',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'Perfect!!! Amazing!!!',
+    originalComment: 'Perfect!!! Amazing!!!',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/225986/202211032217545226069.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/225986/202211032217544574144.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const YEEZY_SLIDE_ONYX_REVIEW_SIX = {
+    id: 'seed-yeezy-slide-onyx-006',
+    name: 'Vi**',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'Amazing quality! Thank you!!!',
+    originalComment: 'Amazing quality! Thank you!!!',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/26/285337/202211261008133034788.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const YEEZY_SLIDE_ONYX_REVIEW_SEVEN = {
+    id: 'seed-yeezy-slide-onyx-007',
+    name: 'Leo P.',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'Perfect. Always fast shipping and great customer service. Will always order again.',
+    originalComment: 'Perfect. Always fast shipping and great customer service, will always order from Kickwho!',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/202212090417233877420.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/202212090417239306431.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/202212090417233967901.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const YEEZY_SLIDE_ONYX_REVIEW_EIGHT = {
+    id: 'seed-yeezy-slide-onyx-008',
+    name: 'Nico R.',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'Perfect. Fast shipping and great customer service.',
+    originalComment: 'Perfect. Always fast shipping and great customer service, will always order from Kickwho!',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/202212090424457661304.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/20221209042445360049.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
 function normalizeReview(review) {
     const images = Array.isArray(review?.images)
         ? review.images.filter(Boolean)
@@ -521,7 +649,15 @@ export function getSeededReviews() {
         normalizeReview(VELVET_BROWN_REVIEW_TWELVE),
         normalizeReview(VELVET_BROWN_REVIEW_THIRTEEN),
         normalizeReview(VELVET_BROWN_REVIEW_FOURTEEN),
-        normalizeReview(VELVET_BROWN_REVIEW_FIFTEEN)
+        normalizeReview(VELVET_BROWN_REVIEW_FIFTEEN),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_ONE),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_TWO),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_THREE),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_FOUR),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_FIVE),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_SIX),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_SEVEN),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_EIGHT)
     ];
 }
 
