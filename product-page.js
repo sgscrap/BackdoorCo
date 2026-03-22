@@ -74,7 +74,7 @@ function renderProduct(product) {
     document.getElementById('productBreadcrumbLabel').textContent = product.name;
     document.getElementById('productName').textContent = product.name;
     document.getElementById('productCategoryLabel').textContent = product.category || 'Product';
-    document.getElementById('productBrandLine').textContent = `${product.brand || ''}${product.colorway ? ` · ${product.colorway}` : ''}`;
+    document.getElementById('productBrandLine').textContent = formatBrandLine(product);
     document.getElementById('productPrice').textContent = `$${(Number(product.price) || 0).toFixed(0)}`;
     document.getElementById('productDescription').textContent = product.description || 'Premium authenticated product from Backdoor.';
     document.getElementById('productSku').textContent = product.sku || 'N/A';
@@ -102,9 +102,10 @@ function renderProduct(product) {
     const images = getProductImages(product);
     productImages = images.length > 0 ? images : [product.image].filter(Boolean);
     currentImageIndex = 0;
+
     const mainImage = document.getElementById('productMainImage');
     mainImage.src = productImages[0] || '';
-    mainImage.alt = product.name;
+    mainImage.alt = `${product.name} image 1`;
 
     renderGalleryControls();
 
@@ -127,6 +128,14 @@ function renderProduct(product) {
     document.querySelector('.product-back-link')?.setAttribute('href', buildBackHref(product));
 }
 
+function formatBrandLine(product) {
+    const brand = String(product?.brand || '').trim();
+    const colorway = String(product?.colorway || '').trim();
+
+    if (brand && colorway) return `${brand} | ${colorway}`;
+    return brand || colorway || '';
+}
+
 function buildBackHref(product) {
     if (product.category === 'Apparel') return 'apparel.html';
     if (product.category === 'Accessories') return 'accessories.html';
@@ -147,7 +156,9 @@ function renderGalleryControls() {
     const hasMultiple = productImages.length > 1;
 
     if (hint) {
-        hint.textContent = hasMultiple ? 'Click image to see the next photo' : 'Single product preview';
+        hint.textContent = hasMultiple
+            ? `Image ${currentImageIndex + 1} / ${productImages.length} | Click image for next`
+            : 'Single product preview';
     }
 
     if (prevButton) prevButton.style.display = hasMultiple ? 'inline-flex' : 'none';
@@ -163,9 +174,14 @@ function renderGalleryControls() {
 
 function setProductImage(index) {
     if (productImages.length === 0) return;
+
     currentImageIndex = (index + productImages.length) % productImages.length;
     const mainImage = document.getElementById('productMainImage');
-    if (mainImage) mainImage.src = productImages[currentImageIndex];
+    if (mainImage) {
+        mainImage.src = productImages[currentImageIndex];
+        mainImage.alt = `${currentProduct?.name || 'Product'} image ${currentImageIndex + 1}`;
+    }
+
     renderGalleryControls();
 }
 

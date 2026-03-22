@@ -1,8 +1,14 @@
-export const BLACK_CAT_ALBUM_URL = 'https://imgur.com/a/pV1j1Rn';
 export const BLACK_CAT_IMAGES = [
-    'https://i.imgur.com/0LaAQgfh.jpg',
-    'https://i.imgur.com/0LaAQgf.png'
+    'https://i.imgur.com/0LaAQgf.png',
+    'https://i.imgur.com/3K8TkzE.png',
+    'https://i.imgur.com/q7uV2MM.png',
+    'https://i.imgur.com/XAzKOl2.png',
+    'https://i.imgur.com/o4zCCXe.png',
+    'https://i.imgur.com/ckIfHxm.png',
+    'https://i.imgur.com/RiQyQS4.png'
 ];
+
+const IMGUR_SIZE_SUFFIXES = new Set(['s', 'b', 't', 'm', 'l', 'h']);
 
 function matchesBlackCat(product) {
     const name = String(product?.name || '').toLowerCase();
@@ -19,10 +25,12 @@ export function applyProductOverrides(product) {
     };
 
     if (matchesBlackCat(nextProduct)) {
-        nextProduct.name = String(nextProduct.name || "Jordan 4 Retro 'Black Cat' 2025").replace(/2025/g, '2020');
+        nextProduct.name = String(nextProduct.name || "Jordan 4 Retro 'Black Cat' 2020").replace(/2025/g, '2020');
+        nextProduct.description = String(
+            nextProduct.description || 'Air Jordan 4 Retro Black Cat 2020. All-black colorway with premium nubuck.'
+        ).replace(/2025/g, '2020');
         nextProduct.image = BLACK_CAT_IMAGES[0];
         nextProduct.images = [...BLACK_CAT_IMAGES];
-        nextProduct.albumUrl = BLACK_CAT_ALBUM_URL;
     }
 
     return nextProduct;
@@ -55,10 +63,7 @@ export function getProductImages(product) {
         return overridden.images
             .filter(Boolean)
             .filter((image) => {
-                const normalized = String(image)
-                    .replace(/\?.*$/, '')
-                    .replace(/\.[a-z0-9]+$/i, '')
-                    .toLowerCase();
+                const normalized = normalizeImageKey(image);
 
                 if (seen.has(normalized)) {
                     return false;
@@ -69,6 +74,32 @@ export function getProductImages(product) {
             });
     }
     return overridden?.image ? [overridden.image] : [];
+}
+
+function normalizeImageKey(image) {
+    const rawValue = String(image || '').trim();
+    if (!rawValue) return '';
+
+    try {
+        const parsed = new URL(rawValue);
+        const segments = parsed.pathname.split('/').filter(Boolean);
+        let basename = segments[segments.length - 1] || '';
+        basename = basename.replace(/\.[a-z0-9]+$/i, '').toLowerCase();
+
+        if ((parsed.hostname === 'i.imgur.com' || parsed.hostname === 'imgur.com') && basename.length === 8) {
+            const suffix = basename.at(-1);
+            if (IMGUR_SIZE_SUFFIXES.has(suffix)) {
+                basename = basename.slice(0, -1);
+            }
+        }
+
+        return `${parsed.hostname.toLowerCase()}/${basename}`;
+    } catch {
+        return rawValue
+            .replace(/[?#].*$/, '')
+            .replace(/\.[a-z0-9]+$/i, '')
+            .toLowerCase();
+    }
 }
 
 export function getTotalStock(product) {
