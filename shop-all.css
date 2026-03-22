@@ -389,6 +389,38 @@
     color: rgba(255, 255, 255, 0.2);
 }
 
+.shop-card--out-of-stock {
+    opacity: 0.78;
+}
+
+.shop-card--out-of-stock .shop-card-img img {
+    filter: grayscale(1);
+}
+
+.product-state-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 3;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.product-state-badge--featured {
+    background: rgba(163, 230, 53, 0.16);
+    border: 1px solid rgba(163, 230, 53, 0.35);
+    color: #a3e635;
+}
+
+.product-state-badge--out {
+    background: rgba(239, 68, 68, 0.18);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #ff9a9a;
+}
+
 /* No Results */
 .shop-no-results {
     display: flex;

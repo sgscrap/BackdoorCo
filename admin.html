@@ -296,10 +296,47 @@
                 <!-- PRODUCTS SECTION -->
                 <section class="content-section" id="productsSection">
                     <div class="card">
+                        <div class="products-toolbar">
+                            <div class="products-toolbar-main">
+                                <input type="search" id="productSearch" class="form-input product-search-input"
+                                    placeholder="Search products by name, SKU, brand, or colorway">
+                                <select id="productCategoryFilter" class="form-select" aria-label="Filter by category">
+                                    <option value="all">All Categories</option>
+                                    <option value="Sneakers">Sneakers</option>
+                                    <option value="Shoes">Shoes</option>
+                                    <option value="Apparel">Apparel</option>
+                                    <option value="Accessories">Accessories</option>
+                                    <option value="Electronics">Electronics</option>
+                                </select>
+                                <select id="productStatusFilter" class="form-select" aria-label="Filter by status">
+                                    <option value="all">All Statuses</option>
+                                    <option value="active">Live</option>
+                                    <option value="hidden">Hidden</option>
+                                    <option value="out-of-stock">Out of Stock</option>
+                                    <option value="featured">Featured</option>
+                                </select>
+                            </div>
+                            <div class="products-bulk-bar">
+                                <span class="selection-count" id="productSelectionCount">0 selected</span>
+                                <select id="productBulkAction" class="form-select" aria-label="Bulk action">
+                                    <option value="">Bulk actions</option>
+                                    <option value="show">Show on storefront</option>
+                                    <option value="hide">Hide from storefront</option>
+                                    <option value="mark-in-stock">Mark in stock</option>
+                                    <option value="mark-out-of-stock">Mark out of stock</option>
+                                    <option value="feature">Feature products</option>
+                                    <option value="unfeature">Remove featured</option>
+                                </select>
+                                <button class="btn-secondary" id="applyBulkActionBtn" type="button" disabled>Apply</button>
+                            </div>
+                        </div>
                         <div class="data-table-container">
                             <table class="data-table">
                                 <thead>
                                     <tr>
+                                        <th class="checkbox-col">
+                                            <input type="checkbox" id="selectAllProducts" aria-label="Select all products">
+                                        </th>
                                         <th>Image</th>
                                         <th>Name</th>
                                         <th>SKU</th>
@@ -496,6 +533,20 @@
                                     <textarea id="impDesc" class="form-textarea"
                                         placeholder="Features, history, condition..."></textarea>
                                 </div>
+                                <div class="product-flags-grid">
+                                    <label class="toggle-card">
+                                        <input type="checkbox" id="impHidden">
+                                        <span>Hide product from storefront</span>
+                                    </label>
+                                    <label class="toggle-card">
+                                        <input type="checkbox" id="impOutOfStock">
+                                        <span>Publish as out of stock</span>
+                                    </label>
+                                    <label class="toggle-card">
+                                        <input type="checkbox" id="impFeatured">
+                                        <span>Feature on storefront</span>
+                                    </label>
+                                </div>
                                 <button class="btn-primary w-100 btn-load-preview" id="publishImporterBtn"
                                     onclick="publishImporterProduct()">
                                     <i class="fa-solid fa-rocket"></i> PUBLISH TO STORE
@@ -586,8 +637,22 @@
                     <textarea id="productDescription" rows="3" placeholder="Product details..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="productImage">Product Image (Upload)</label>
-                    <input type="file" id="productImage" accept="image/*" required>
+                    <label for="productImage">Product Image URL</label>
+                    <input type="url" id="productImage" placeholder="https://..." required>
+                </div>
+                <div class="product-flags-grid">
+                    <label class="toggle-card">
+                        <input type="checkbox" id="productHidden">
+                        <span>Hide product from storefront</span>
+                    </label>
+                    <label class="toggle-card">
+                        <input type="checkbox" id="productOutOfStock">
+                        <span>Keep visible but mark out of stock</span>
+                    </label>
+                    <label class="toggle-card">
+                        <input type="checkbox" id="productFeatured">
+                        <span>Feature on storefront</span>
+                    </label>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" id="cancelProductBtn">Cancel</button>

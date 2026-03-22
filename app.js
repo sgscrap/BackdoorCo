@@ -1,281 +1,290 @@
 import { db } from './admin/firebase-config.js';
 import {
-    collection, query,
-    orderBy, onSnapshot
+    collection,
+    orderBy,
+    onSnapshot,
+    query
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
-// ============================================
-// GLOBAL STATE
-// ============================================
 let products = [];
-let filteredProducts = [];
 let cart = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
-let selectedFilters = {
-    brands: [],
-    categories: [],
-    priceRange: [0, 1000],
-    collection: '',
-    searchQuery: ''
-};
-let currentSort = 'newest';
+let selectedModalSize = '';
+let selectedModalProduct = null;
 
-// ============================================
-// DOM ELEMENTS
-// ============================================
-const isHomePage = !!document.getElementById('mostWanted');
-const isShopPage = !!document.getElementById('shopAllGrid');
-
+const isHomePage = Boolean(document.getElementById('mostWanted'));
 const productGrid = document.getElementById('shopAllGrid') || document.getElementById('mwGrid') || document.getElementById('productGrid');
 const mwLoading = document.getElementById('mwLoading');
 const mwCatalogCount = document.getElementById('mwCatalogCount');
-
-// Modal Elements
 const productModal = document.getElementById('productModal');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalClose = document.getElementById('modalClose');
-
-// Cart Elements
 const cartSidebar = document.getElementById('cartSidebar');
 const cartCount = document.getElementById('cartCount');
 
-// ============================================
-// INITIALIZATION
-// ============================================
 document.addEventListener('DOMContentLoaded', () => {
     initFirebaseSync();
     initGlobalListeners();
     updateCartUI();
 });
 
-// ============================================
-// FIREBASE SYNC
-// ============================================
+function getProductSizes(product) {
+    if (Array.isArray(product?.sizes) && product.sizes.length > 0) {
+        return product.sizes.map((entry) => ({
+            size: String(entry.size || '').trim(),
+            stock: Math.max(0, Number(entry.stock) || 0),
+            price: Number(entry.price) || Number(product.price) || 0
+        })).filter((entry) => entry.size);
+    }
+
+    if (typeof product?.sizes === 'string' && product.sizes.trim()) {
+        return product.sizes.split(',').map((size) => ({
+            size: size.trim(),
+            stock: Math.max(0, Number(product.stock) || 1),
+            price: Number(product.price) || 0
+        })).filter((entry) => entry.size);
+    }
+
+    return [];
+}
+
+function getTotalStock(product) {
+    const sizes = getProductSizes(product);
+    if (sizes.length > 0) {
+        return sizes.reduce((sum, entry) => sum + Math.max(0, Number(entry.stock) || 0), 0);
+    }
+    return Math.max(0, Number(product?.stock) || 0);
+}
+
+function isHidden(product) {
+    return Boolean(product?.isHidden);
+}
+
+function isFeatured(product) {
+    return Boolean(product?.isFeatured);
+}
+
+function isOutOfStock(product) {
+    return Boolean(product?.isOutOfStock) || getTotalStock(product) <= 0;
+}
+
+function getVisibleProducts() {
+    return products.filter((product) => product.status === 'active' && !isHidden(product));
+}
+
+function getBadgeMeta(product) {
+    if (isOutOfStock(product)) {
+        return { label: 'Out of Stock', className: 'modal-badge modal-badge--out' };
+    }
+    if (isFeatured(product)) {
+        return { label: 'Featured', className: 'modal-badge modal-badge--featured' };
+    }
+    return { label: '', className: 'modal-badge' };
+}
+
+function normalizeProduct(doc) {
+    return {
+        id: doc.id,
+        ...doc,
+        price: Number(doc.price) || 0,
+        sizes: getProductSizes(doc)
+    };
+}
+
 function initFirebaseSync() {
-    const q = query(
-        collection(db, 'products'),
-        orderBy('createdAt', 'desc')
-    );
+    const productsQuery = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
 
-    onSnapshot(q, (snapshot) => {
-        products = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.status === 'active') {
-                products.push({ id: doc.id, ...data });
-            }
-        });
-
-        if (isHomePage) {
-            renderMostWanted();
-        }
+    onSnapshot(productsQuery, (snapshot) => {
+        products = snapshot.docs.map((doc) => normalizeProduct({ id: doc.id, ...doc.data() }));
+        if (isHomePage) renderMostWanted();
     });
 }
 
-// ============================================
-// HOMEPAGE: MOST WANTED (4 HIGHEST PRICED)
-// ============================================
 function renderMostWanted() {
     if (!productGrid || !isHomePage) return;
 
-    // Show 4 highest priced
-    const topPriced = [...products].sort((a, b) => parseFloat(b.price) - parseFloat(a.price)).slice(0, 4);
+    const visibleProducts = getVisibleProducts();
+    const featuredFirst = [...visibleProducts]
+        .sort((left, right) => (
+            Number(isFeatured(right)) - Number(isFeatured(left)) ||
+            right.price - left.price ||
+            (right.createdAt?.seconds || 0) - (left.createdAt?.seconds || 0)
+        ))
+        .slice(0, 4);
 
     if (mwLoading) mwLoading.style.display = 'none';
-    if (productGrid) {
-        productGrid.classList.remove('d-none');
-        productGrid.style.display = 'grid';
-    }
+    productGrid.classList.remove('d-none');
+    productGrid.style.display = 'grid';
 
-    productGrid.innerHTML = topPriced.map((p, i) => `
-        <div class="mw-card drop-card"
-             data-id="${p.id}"
-             style="animation-delay:${i * 0.1}s"
-             onclick="openProductModal('${p.id}')">
+    productGrid.innerHTML = featuredFirst.map((product, index) => {
+        const soldOut = isOutOfStock(product);
+        const featuredBadge = isFeatured(product)
+            ? '<div class="mw-status-badge">FEATURED</div>'
+            : '';
 
-            <!-- Image -->
-            <div class="mw-card-img drop-card-img-wrap">
-
-                <!-- Rank Badge -->
-                <div class="mw-rank new-badge">#${i + 1}</div>
-
-                <!-- Exclusive badge for top item -->
-                ${i === 0
-            ? `<div class="mw-exclusive-badge low-stock-badge" style="background:var(--accent); color:#000;">
-                           ⚡ EXCLUSIVE DROP
-                       </div>`
-            : ''
-        }
-
-                <!-- Sold out -->
-                ${p.stock === 0
-            ? `<div class="mw-sold-overlay sold-out-overlay">
-                           <span>SOLD OUT</span>
-                       </div>`
-            : ''
-        }
-
-                <img src="${p.image || ''}"
-                     alt="${p.name}"
-                     loading="${i < 2 ? 'eager' : 'lazy'}"
-                     onerror="this.src='https://via.placeholder.com/400x400/1a1a1a/8B5CF6?text=${encodeURIComponent(p.name)}'">
-            
-            </div>
-
-            <!-- Info -->
-            <div class="mw-card-info drop-card-info">
-                <p class="mw-card-brand drop-brand">
-                    ${p.brand || p.category} · 
-                    ${p.category || 'Deadstock'}
-                </p>
-                <h3 class="mw-card-name drop-name">${p.name}</h3>
-
-                <div class="mw-price-row drop-bottom">
-                    <div class="mw-price-block drop-price-wrap">
-                        <span class="mw-ask-label drop-price-label">
-                            Lowest Ask
-                        </span>
-                        <span class="mw-price drop-price">
-                            $${parseFloat(p.price).toFixed(0)}
-                        </span>
+        return `
+            <div class="mw-card drop-card ${soldOut ? 'mw-card--out-of-stock' : ''}" data-id="${product.id}" style="animation-delay:${index * 0.1}s" onclick="openProductModal('${product.id}')">
+                <div class="mw-card-img drop-card-img-wrap">
+                    <div class="mw-rank new-badge">#${index + 1}</div>
+                    ${featuredBadge}
+                    ${soldOut ? '<div class="mw-sold-overlay sold-out-overlay"><span>OUT OF STOCK</span></div>' : ''}
+                    <img src="${product.image || ''}" alt="${product.name}" loading="${index < 2 ? 'eager' : 'lazy'}" onerror="this.src='https://via.placeholder.com/400x400/1a1a1a/c8f65d?text=Backdoor'">
+                </div>
+                <div class="mw-card-info drop-card-info">
+                    <p class="mw-card-brand drop-brand">${product.brand || product.category || ''} · ${product.category || 'Deadstock'}</p>
+                    <h3 class="mw-card-name drop-name">${product.name}</h3>
+                    <div class="mw-price-row drop-bottom">
+                        <div class="mw-price-block drop-price-wrap">
+                            <span class="mw-ask-label drop-price-label">${soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</span>
+                            <span class="mw-price drop-price">$${product.price.toFixed(0)}</span>
+                        </div>
+                        ${soldOut
+                ? '<span class="mw-sold drop-sold-text">Sold Out</span>'
+                : `<button class="mw-buy-btn drop-buy-btn" onclick="event.stopPropagation(); openProductModal('${product.id}')">Buy</button>`}
                     </div>
-                    ${p.stock > 0
-            ? `<button class="mw-buy-btn drop-buy-btn"
-                               onclick="event.stopPropagation();
-                               openProductModal('${p.id}')">
-                               Buy
-                           </button>`
-            : `<span class="mw-sold drop-sold-text">Sold Out</span>`
-        }
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
-    if (mwCatalogCount) {
-        mwCatalogCount.textContent = `— ${products.length} items`;
-    }
+    if (mwCatalogCount) mwCatalogCount.textContent = `- ${visibleProducts.length} items`;
 }
 
-
-// ============================================
-// GLOBAL LISTENERS (Cart, Modal, Nav)
-// ============================================
 function initGlobalListeners() {
-    // Nav Scroll
     window.addEventListener('scroll', () => {
         const nav = document.getElementById('navbar');
         if (nav) nav.classList.toggle('scrolled', window.scrollY > 80);
     });
 
-    // Close Modal
     if (modalClose) modalClose.onclick = closeProductModal;
     if (modalOverlay) modalOverlay.onclick = closeProductModal;
 
-    // Cart Sidebar Close
     const cartClose = document.getElementById('cartClose');
-    if (cartClose) cartClose.onclick = () => cartSidebar.classList.remove('active');
+    if (cartClose) cartClose.onclick = () => cartSidebar?.classList.remove('active');
 
-    // Esc Key
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
             closeProductModal();
-            if (cartSidebar) cartSidebar.classList.remove('active');
+            cartSidebar?.classList.remove('active');
         }
     });
 
-    // Search Redirect from Homepage
     const navSearch = document.getElementById('navSearch');
     if (navSearch && isHomePage) {
-        navSearch.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const query = e.target.value.trim();
-                if (query) {
-                    window.location.href = `shop-all.html?search=${encodeURIComponent(query)}`;
-                }
+        navSearch.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                const search = event.target.value.trim();
+                if (search) window.location.href = `shop-all.html?search=${encodeURIComponent(search)}`;
             }
         });
     }
 }
 
-// ============================================
-// PRODUCT MODAL
-// ============================================
-window.showProductModal = function (product) {
-    if (!product) return;
-    const modal = document.getElementById('productModal');
-    if (!modal) return;
+window.showProductModal = function showProductModal(product) {
+    if (!product || !productModal) return;
 
-    // Fill data
-    document.getElementById('modalTitle').textContent = product.name;
-    document.getElementById('modalImage').src = product.image;
-    document.getElementById('modalCategory').textContent = product.category;
+    selectedModalProduct = product;
+    selectedModalSize = '';
+
+    document.getElementById('modalTitle').textContent = product.name || '';
+    document.getElementById('modalImage').src = product.image || '';
+    document.getElementById('modalCategory').textContent = product.category || '';
     document.getElementById('modalSku').textContent = `SKU: ${product.sku || 'N/A'}`;
-    document.getElementById('modalPrice').textContent = `$${parseFloat(product.price).toFixed(0)}`;
-    document.getElementById('modalDescription').textContent = product.desc || product.description || "Premium quality authenticated sneaker from Backdoor collection.";
+    document.getElementById('modalColorway').textContent = product.colorway || '';
+    document.getElementById('modalPrice').textContent = `$${(Number(product.price) || 0).toFixed(0)}`;
+    document.getElementById('modalReleaseDate').textContent = product.releaseDate || 'TBD';
+    document.getElementById('modalDescription').textContent = product.desc || product.description || 'Premium quality authenticated product from Backdoor.';
 
-    // Colorway
-    const colEl = document.getElementById('modalColorway');
-    if (colEl) colEl.textContent = product.colorway || "";
-
-    // Sizes
-    const sizesContainer = document.getElementById('modalSizeOptions');
-    if (sizesContainer) {
-        const sizes = product.sizes ? product.sizes.split(',').map(s => s.trim()) : ['8', '8.5', '9', '9.5', '10', '10.5', '11', '12'];
-        sizesContainer.innerHTML = sizes.map(size => `
-            <div class="size-option" onclick="selectModalSize(this)">${size}</div>
-        `).join('');
+    const badge = document.getElementById('modalBadge');
+    const badgeMeta = getBadgeMeta(product);
+    if (badge) {
+        badge.textContent = badgeMeta.label;
+        badge.className = badgeMeta.className;
+        badge.style.display = badgeMeta.label ? 'inline-block' : 'none';
     }
 
-    // ATC Button
-    const atcBtn = document.getElementById('modalAddToCart');
-    if (atcBtn) {
-        atcBtn.onclick = () => {
-            const selectedSize = document.querySelector('.size-option.selected')?.textContent || 'TBD';
-            addToCart(product, selectedSize);
+    const sizesContainer = document.getElementById('modalSizeOptions');
+    const sizes = getProductSizes(product);
+    if (sizesContainer) {
+        sizesContainer.innerHTML = sizes.map((entry) => {
+            const soldOut = isOutOfStock(product) || entry.stock <= 0;
+            return `
+                <button type="button" class="size-option ${soldOut ? 'out-of-stock' : ''}" ${soldOut ? 'disabled' : ''} data-size="${entry.size}" onclick="selectModalSize(this)">
+                    ${entry.size}
+                </button>
+            `;
+        }).join('');
+    }
+
+    const addToCartButton = document.getElementById('modalAddToCart');
+    if (addToCartButton) {
+        if (!isOutOfStock(product) && sizes.length === 0) {
+            selectedModalSize = 'One Size';
+            addToCartButton.disabled = false;
+            addToCartButton.textContent = 'Add to Cart';
+        } else {
+            addToCartButton.disabled = isOutOfStock(product);
+            addToCartButton.textContent = isOutOfStock(product) ? 'Out of Stock' : 'Select Size';
+        }
+        addToCartButton.onclick = () => {
+            if (!selectedModalProduct || isOutOfStock(selectedModalProduct)) return;
+            if (!selectedModalSize) {
+                alert('Please select a size');
+                return;
+            }
+            addToCart(selectedModalProduct, selectedModalSize);
             closeProductModal();
         };
     }
 
-    modal.classList.add('active');
-    if (modalOverlay) modalOverlay.classList.add('active');
+    productModal.classList.add('active');
+    modalOverlay?.classList.add('active');
     document.body.style.overflow = 'hidden';
-}; // End of showProductModal
+};
 
 export async function openProductModal(id) {
-    const product = products.find(p => p.id === id);
+    const product = products.find((entry) => entry.id === id);
     if (product) window.showProductModal(product);
 }
+
 window.openProductModal = openProductModal;
 
 function closeProductModal() {
-    const modal = document.getElementById('productModal');
-    if (modal) modal.classList.remove('active');
-    if (modalOverlay) modalOverlay.classList.remove('active');
+    productModal?.classList.remove('active');
+    modalOverlay?.classList.remove('active');
     document.body.style.overflow = '';
+    selectedModalProduct = null;
+    selectedModalSize = '';
 }
 
-window.selectModalSize = (el) => {
-    document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
-    el.classList.add('selected');
+window.selectModalSize = (element) => {
+    if (element.disabled) return;
+    document.querySelectorAll('.size-option').forEach((option) => option.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedModalSize = element.dataset.size || '';
+
+    const addToCartButton = document.getElementById('modalAddToCart');
+    if (addToCartButton && selectedModalProduct && !isOutOfStock(selectedModalProduct)) {
+        addToCartButton.disabled = false;
+        addToCartButton.textContent = 'Add to Cart';
+    }
 };
 
-// ============================================
-// CART SYSTEM
-// ============================================
 function addToCart(product, size) {
-    const existing = cart.find(item => item.id === product.id && item.size === size);
-    if (existing) {
-        existing.qty += 1;
-    } else {
+    if (!product || isOutOfStock(product)) return;
+
+    const existing = cart.find((item) => item.id === product.id && item.size === size);
+    if (existing) existing.qty += 1;
+    else {
         cart.push({
             id: product.id,
             name: product.name,
-            price: parseFloat(product.price),
-            image: product.image,
-            size: size,
+            price: Number(product.price) || 0,
+            image: product.image || '',
+            size,
             qty: 1
         });
     }
+
     saveCart();
     updateCartUI();
     toggleCart();
@@ -289,9 +298,11 @@ function updateCartUI() {
     const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
     const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
-    if (cartCount) cartCount.textContent = totalQty;
+    if (cartCount) {
+        cartCount.textContent = totalQty;
+        cartCount.style.display = totalQty > 0 ? 'flex' : 'none';
+    }
 
-    // Sync with header count if exists
     const headerCount = document.getElementById('cartHeaderCount');
     if (headerCount) headerCount.textContent = `(${totalQty})`;
 
@@ -313,9 +324,7 @@ function updateCartUI() {
                 <div class="cart-item-name">${item.name}</div>
                 <div class="cart-item-size">Size: ${item.size}</div>
                 <div class="cart-item-price">$${item.price.toFixed(0)}</div>
-                <div class="cart-item-qty">
-                    <span>Qty: ${item.qty}</span>
-                </div>
+                <div class="cart-item-qty"><span>Qty: ${item.qty}</span></div>
             </div>
             <button class="cart-remove" onclick="removeFromCart(${index})">&times;</button>
         </div>
@@ -329,13 +338,7 @@ window.removeFromCart = (index) => {
 };
 
 window.toggleCart = () => {
-    const cart = document.getElementById('cartSidebar');
-    if (cart) cart.classList.toggle('active');
+    cartSidebar?.classList.toggle('active');
 };
 
-// ============================================
-// GLOBAL EXPORTS
-// ============================================
-window.openProductModal = openProductModal;
 window.addToCart = addToCart;
-window.toggleCart = window.toggleCart; // Redundant but explicit

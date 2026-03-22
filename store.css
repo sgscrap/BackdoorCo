@@ -2860,6 +2860,56 @@ body {
     transform: translateY(-1px);
 }
 
+.mw-card--out-of-stock {
+    opacity: 0.82;
+}
+
+.mw-card--out-of-stock .mw-card-img img {
+    filter: grayscale(1);
+}
+
+.mw-status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(163, 230, 53, 0.14);
+    border: 1px solid rgba(163, 230, 53, 0.35);
+    color: #a3e635;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    z-index: 2;
+}
+
+.modal-badge--featured {
+    background: rgba(163, 230, 53, 0.14);
+    border: 1px solid rgba(163, 230, 53, 0.35);
+    color: #a3e635;
+}
+
+.modal-badge--out {
+    background: rgba(239, 68, 68, 0.16);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #ff7d7d;
+}
+
+.size-option:disabled,
+.size-option.out-of-stock {
+    opacity: 0.38;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.modal-add-to-cart:disabled,
+.add-to-cart-btn:disabled {
+    background: var(--bg4);
+    color: var(--text3);
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* ═══ CART SIDEBAR (old layout compat) ═══ */
 .cart-sidebar {
     position: fixed;

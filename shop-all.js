@@ -1,63 +1,72 @@
-// ================================
-// shop-all.js — FIXED v1.2
-// ================================
 import { db } from './admin/firebase-config.js';
 import {
     collection,
+    onSnapshot,
     query,
-    where,
-    onSnapshot
+    where
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
-// ================================
-// STATE
-// ================================// Global variables
 let allProducts = [];
-let currentFilter = window.initialFilter || 'all'; // Default to injected category, or 'all'
-let currentSort = 'price-high';
+let currentFilter = window.initialFilter || 'all';
+let currentSort = 'featured';
 let searchTerm = '';
 
-// ================================
-// DOM ELEMENTS
-// ================================
 const grid = document.getElementById('shopAllGrid');
 const loading = document.getElementById('shopLoading');
 const noResults = document.getElementById('shopNoResults');
 const resultsCount = document.getElementById('resultsCount');
+const sortSelect = document.getElementById('shopSort');
+const searchInput = document.getElementById('shopSearch');
+const clearSearchBtn = document.getElementById('clearSearch');
+const clearFiltersBtn = document.getElementById('clearFiltersBtn');
 
-// ================================
-// HIDE SKELETON — KEY FIX
-// ================================
-function showGrid() {
-    // Hide skeleton
-    if (loading) {
-        loading.style.display = 'none';
-        loading.classList.add('d-none');
+function getProductSizes(product) {
+    if (Array.isArray(product?.sizes) && product.sizes.length > 0) {
+        return product.sizes.map((entry) => ({
+            size: String(entry.size || '').trim(),
+            stock: Math.max(0, Number(entry.stock) || 0),
+            price: Number(entry.price) || Number(product.price) || 0
+        })).filter((entry) => entry.size);
     }
-    // Show grid
+    return [];
+}
+
+function getTotalStock(product) {
+    const sizes = getProductSizes(product);
+    if (sizes.length > 0) {
+        return sizes.reduce((sum, entry) => sum + entry.stock, 0);
+    }
+    return Math.max(0, Number(product?.stock) || 0);
+}
+
+function isHidden(product) {
+    return Boolean(product?.isHidden);
+}
+
+function isFeatured(product) {
+    return Boolean(product?.isFeatured) || Boolean(product?.featured);
+}
+
+function isOutOfStock(product) {
+    return Boolean(product?.isOutOfStock) || getTotalStock(product) <= 0;
+}
+
+function getVisibleProducts() {
+    return allProducts.filter((product) => !isHidden(product));
+}
+
+function showGrid() {
+    loading?.classList.add('d-none');
+    noResults?.classList.add('d-none');
     if (grid) {
         grid.style.display = 'grid';
         grid.classList.remove('d-none');
     }
-    // Hide no results
-    if (noResults) {
-        noResults.style.display = 'none';
-        noResults.classList.add('d-none');
-    }
 }
 
 function showNoResults() {
-    // Hide skeleton
-    if (loading) {
-        loading.style.display = 'none';
-        loading.classList.add('d-none');
-    }
-    // Hide grid
-    if (grid) {
-        grid.style.display = 'none';
-        grid.classList.add('d-none');
-    }
-    // Show no results
+    loading?.classList.add('d-none');
+    grid?.classList.add('d-none');
     if (noResults) {
         noResults.style.display = 'flex';
         noResults.classList.remove('d-none');
@@ -69,279 +78,170 @@ function showLoading() {
         loading.style.display = 'grid';
         loading.classList.remove('d-none');
     }
-    if (grid) {
-        grid.style.display = 'none';
-        grid.classList.add('d-none');
-    }
-    if (noResults) {
-        noResults.style.display = 'none';
-        noResults.classList.add('d-none');
-    }
+    grid?.classList.add('d-none');
+    noResults?.classList.add('d-none');
 }
 
-// ================================
-// LOAD ALL PRODUCTS FROM FIREBASE
-// ================================
 function loadAllProducts() {
     showLoading();
 
-    try {
-        const q = query(
-            collection(db, 'products'),
-            where('status', '==', 'active')
-        );
+    const productsQuery = query(collection(db, 'products'), where('status', '==', 'active'));
+    onSnapshot(productsQuery, (snapshot) => {
+        allProducts = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            price: Number(doc.data().price) || 0
+        }));
 
-        onSnapshot(q, (snapshot) => {
-            allProducts = [];
-            snapshot.forEach(doc => {
-                allProducts.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
-            });
-
-            updateFilterCounts();
-            renderProducts();
-            updateSubtitle();
-
-        }, (error) => {
-            console.error('Firebase error:', error);
-            // If Firebase fails fall back to
-            // showing no results cleanly
-            showNoResults();
-            if (resultsCount) {
-                resultsCount.textContent =
-                    'Error loading products.';
-            }
-        });
-
-    } catch (err) {
-        console.error('Load error:', err);
+        updateFilterCounts();
+        renderProducts();
+        updateSubtitle();
+    }, (error) => {
+        console.error('Firebase error:', error);
+        if (resultsCount) resultsCount.textContent = 'Error loading products.';
         showNoResults();
-    }
+    });
 }
 
-// ================================
-// RENDER PRODUCTS
-// ================================
-function renderProducts() {
-    let filtered = [...allProducts];
+function getFilteredProducts() {
+    let filtered = [...getVisibleProducts()];
 
-    // Apply category/brand filter
     if (currentFilter === 'Men') {
-        // Temporarily treat 'Men' as the default for all current shoes and apparel
-        filtered = filtered.filter(p => p.category !== 'Women' && p.category !== 'Kids');
+        filtered = filtered.filter((product) => product.category !== 'Women' && product.category !== 'Kids');
     } else if (currentFilter === 'Shoes') {
-        // 'Shoes' category should include both strict 'Shoes' and legacy 'Sneakers'
-        filtered = filtered.filter(p => p.category === 'Shoes' || p.category === 'Sneakers');
+        filtered = filtered.filter((product) => product.category === 'Shoes' || product.category === 'Sneakers');
     } else if (currentFilter !== 'all') {
-        filtered = filtered.filter(p =>
-            p.brand === currentFilter ||
-            p.category === currentFilter
-        );
+        filtered = filtered.filter((product) => product.brand === currentFilter || product.category === currentFilter);
     }
 
-    // Apply search
     if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        filtered = filtered.filter(p =>
-            p.name?.toLowerCase().includes(term) ||
-            p.brand?.toLowerCase().includes(term) ||
-            p.sku?.toLowerCase().includes(term) ||
-            p.colorway?.toLowerCase().includes(term)
-        );
+        filtered = filtered.filter((product) => (
+            product.name?.toLowerCase().includes(searchTerm) ||
+            product.brand?.toLowerCase().includes(searchTerm) ||
+            product.sku?.toLowerCase().includes(searchTerm) ||
+            (product.colorway || '').toLowerCase().includes(searchTerm)
+        ));
     }
 
-    // Apply sort
     switch (currentSort) {
         case 'price-high':
-            filtered.sort((a, b) => b.price - a.price);
+            filtered.sort((left, right) => right.price - left.price);
             break;
         case 'price-low':
-            filtered.sort((a, b) => a.price - b.price);
-            break;
-        case 'featured':
-            filtered.sort((a, b) =>
-                (b.featured ? 1 : 0) - (a.featured ? 1 : 0)
-            );
+            filtered.sort((left, right) => left.price - right.price);
             break;
         case 'name':
-            filtered.sort((a, b) =>
-                a.name.localeCompare(b.name)
-            );
+            filtered.sort((left, right) => (left.name || '').localeCompare(right.name || ''));
             break;
-        default: // newest
-            filtered.sort((a, b) =>
-                (b.createdAt?.seconds || 0) -
-                (a.createdAt?.seconds || 0)
-            );
+        case 'featured':
+            filtered.sort((left, right) => (
+                Number(isFeatured(right)) - Number(isFeatured(left)) ||
+                (right.createdAt?.seconds || 0) - (left.createdAt?.seconds || 0)
+            ));
+            break;
+        default:
+            filtered.sort((left, right) => (right.createdAt?.seconds || 0) - (left.createdAt?.seconds || 0));
+            break;
     }
 
-    // Update results count
+    return filtered;
+}
+
+function renderProducts() {
+    const filtered = getFilteredProducts();
+
     if (resultsCount) {
-        resultsCount.textContent =
-            `${filtered.length} product${filtered.length !== 1 ? 's' : ''
-            }`;
+        resultsCount.textContent = `${filtered.length} product${filtered.length !== 1 ? 's' : ''}`;
     }
 
-    // Handle empty state
     if (filtered.length === 0) {
-        // Update no results message
-        const msg = document.getElementById('noResultsMsg');
-        if (msg) {
-            msg.textContent = searchTerm
-                ? `No results for "${searchTerm}"`
-                : 'No products in this category yet.';
+        const message = document.getElementById('noResultsMsg');
+        if (message) {
+            message.textContent = searchTerm ? `No results for "${searchTerm}"` : 'No products in this category yet.';
         }
         showNoResults();
         return;
     }
 
-    // Build HTML
     if (grid) {
-        grid.innerHTML = filtered.map((p, i) => `
-            <div class="shop-card"
-                 data-id="${p.id}"
-                 style="animation-delay:${Math.min(i * 0.04, 0.3)}s"
-                 onclick="handleProductClick('${p.id}')">
+        grid.innerHTML = filtered.map((product, index) => {
+            const soldOut = isOutOfStock(product);
+            const totalStock = getTotalStock(product);
+            const statusBadge = soldOut
+                ? '<span class="product-state-badge product-state-badge--out">Out of Stock</span>'
+                : isFeatured(product)
+                    ? '<span class="product-state-badge product-state-badge--featured">Featured</span>'
+                    : '';
 
-                <div class="shop-card-img">
-                    ${p.featured
-                ? `<span class="hot-badge">HOT</span>`
-                : ''
-            }
-                    ${p.stock <= 3 && p.stock > 0
-                ? `<span class="low-badge">
-                               ${p.stock} LEFT
-                           </span>`
-                : ''
-            }
-                    ${p.stock === 0
-                ? `<div class="sold-overlay">
-                               <span>SOLD OUT</span>
-                           </div>`
-                : ''
-            }
-                    ${p.image
-                ? `<img src="${p.image}"
-                                alt="${p.name}"
-                                loading="${i < 4
-                    ? 'eager'
-                    : 'lazy'}"
-                                onerror="this.style.display='none'">`
-                : `<div class="no-img-placeholder">
-                               <i class="fa-solid fa-shoe-prints"></i>
-                           </div>`
-            }
-                </div>
-
-                <div class="shop-card-info">
-                    <p class="shop-card-brand">
-                        ${p.brand || p.category || ''}
-                    </p>
-                    <h3 class="shop-card-name">${p.name}</h3>
-                    <p class="shop-card-cat">
-                        ${(p.category || '').toUpperCase()}
-                    </p>
-                    <div class="shop-card-bottom">
-                        <div>
-                            <p class="shop-card-label">
-                                Lowest Ask
-                            </p>
-                            <p class="shop-card-price">
-                                $${parseFloat(p.price)
-                .toFixed(0)}
-                            </p>
+            return `
+                <div class="shop-card ${soldOut ? 'shop-card--out-of-stock' : ''}" data-id="${product.id}" style="animation-delay:${Math.min(index * 0.04, 0.3)}s" onclick="handleProductClick('${product.id}')">
+                    <div class="shop-card-img">
+                        ${statusBadge}
+                        ${!soldOut && totalStock > 0 && totalStock <= 3 ? `<span class="low-badge">${totalStock} LEFT</span>` : ''}
+                        ${soldOut ? '<div class="sold-overlay"><span>OUT OF STOCK</span></div>' : ''}
+                        ${product.image
+                ? `<img src="${product.image}" alt="${product.name}" loading="${index < 4 ? 'eager' : 'lazy'}" onerror="this.style.display='none'">`
+                : '<div class="no-img-placeholder"><i class="fa-solid fa-shoe-prints"></i></div>'}
+                    </div>
+                    <div class="shop-card-info">
+                        <p class="shop-card-brand">${product.brand || product.category || ''}</p>
+                        <h3 class="shop-card-name">${product.name}</h3>
+                        <p class="shop-card-cat">${(product.category || '').toUpperCase()}</p>
+                        <div class="shop-card-bottom">
+                            <div>
+                                <p class="shop-card-label">${soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</p>
+                                <p class="shop-card-price">$${product.price.toFixed(0)}</p>
+                            </div>
+                            ${soldOut
+                ? '<span class="shop-sold-label">Sold Out</span>'
+                : `<button class="shop-buy-btn" onclick="event.stopPropagation(); handleAddToCart('${product.id}')">Buy</button>`}
                         </div>
-                        ${p.stock > 0
-                ? `<button class="shop-buy-btn"
-                                   onclick="event.stopPropagation();
-                                   handleAddToCart('${p.id}')">
-                                   Buy
-                               </button>`
-                : `<span class="shop-sold-label">
-                                   Sold Out
-                               </span>`
-            }
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
-    // Show grid — hides skeletons
     showGrid();
 }
 
-// ================================
-// FILTER COUNTS
-// ================================
 function updateFilterCounts() {
+    const visible = getVisibleProducts();
     const counts = {
-        all: allProducts.length,
-        Jordan: allProducts.filter(
-            p => p.brand === 'Jordan'
-        ).length,
-        Nike: allProducts.filter(
-            p => p.brand === 'Nike'
-        ).length,
-        Adidas: allProducts.filter(
-            p => p.brand === 'Adidas'
-        ).length,
-        Sneakers: allProducts.filter(
-            p => p.category === 'Sneakers'
-        ).length,
-        Apparel: allProducts.filter(
-            p => p.category === 'Apparel'
-        ).length
+        all: visible.length,
+        Jordan: visible.filter((product) => product.brand === 'Jordan').length,
+        Nike: visible.filter((product) => product.brand === 'Nike').length,
+        Adidas: visible.filter((product) => product.brand === 'Adidas').length,
+        Sneakers: visible.filter((product) => product.category === 'Sneakers').length,
+        Apparel: visible.filter((product) => product.category === 'Apparel').length
     };
 
     Object.entries(counts).forEach(([key, count]) => {
-        const el = document.getElementById(`count-${key}`);
-        if (el) el.textContent = `(${count})`;
+        const element = document.getElementById(`count-${key}`);
+        if (element) element.textContent = `(${count})`;
     });
 }
 
-// ================================
-// UPDATE SUBTITLE
-// ================================
 function updateSubtitle() {
-    const sub = document.getElementById('shopAllSubtitle');
-    if (sub && allProducts.length > 0) {
-        sub.textContent =
-            `${allProducts.length} products available now.`;
-    }
+    const subtitle = document.getElementById('shopAllSubtitle');
+    if (subtitle) subtitle.textContent = `${getVisibleProducts().length} products available now.`;
 }
 
-// ================================
-// PRODUCT CLICK
-// ================================
 window.handleProductClick = (id) => {
-    const product = allProducts.find(p => p.id === id);
-    // Try to open globally accessible modal function in app.js
+    const product = allProducts.find((entry) => entry.id === id);
     if (product && typeof window.showProductModal === 'function') {
         window.showProductModal(product);
-    } else {
-        // Fallback
-        window.location.href = `product.html?id=${id}`;
     }
 };
 
-// ================================
-// ADD TO CART
-// ================================
 window.handleAddToCart = (id) => {
-    const product = allProducts.find(p => p.id === id);
-    if (!product) return;
+    const product = allProducts.find((entry) => entry.id === id);
+    if (!product || isOutOfStock(product)) return;
 
-    let cart = JSON.parse(
-        localStorage.getItem('backdoor-cart')
-    ) || [];
-
-    const existing = cart.find(item => item.id === id);
-    if (existing) {
-        existing.qty += 1;
-    } else {
+    const cart = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+    const existing = cart.find((item) => item.id === id);
+    if (existing) existing.qty += 1;
+    else {
         cart.push({
             id: product.id,
             name: product.name,
@@ -352,30 +252,13 @@ window.handleAddToCart = (id) => {
         });
     }
 
-    localStorage.setItem(
-        'backdoor-cart',
-        JSON.stringify(cart)
-    );
-
-    // Update cart count
+    localStorage.setItem('backdoor-cart', JSON.stringify(cart));
     updateCartDisplay();
-
-    // Show toast
-    const toast = document.getElementById('shopToast');
-    if (toast) {
-        toast.textContent = `✓ ${product.name} added!`;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
-    }
-};
+}
 
 function updateCartDisplay() {
-    const cart = JSON.parse(
-        localStorage.getItem('backdoor-cart')
-    ) || [];
-    const total = cart.reduce(
-        (sum, item) => sum + item.qty, 0
-    );
+    const cart = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+    const total = cart.reduce((sum, item) => sum + item.qty, 0);
     const badge = document.getElementById('cartCount');
     if (badge) {
         badge.textContent = total;
@@ -383,52 +266,32 @@ function updateCartDisplay() {
     }
 }
 
-// ================================
-// FILTER TABS
-// ================================
-document.querySelectorAll('.shop-filter-tab').forEach(tab => {
+document.querySelectorAll('.shop-filter-tab').forEach((tab) => {
     tab.addEventListener('click', () => {
-        document.querySelectorAll('.shop-filter-tab')
-            .forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.shop-filter-tab').forEach((item) => item.classList.remove('active'));
         tab.classList.add('active');
         currentFilter = tab.dataset.filter;
         renderProducts();
     });
 });
 
-// ================================
-// SORT
-// ================================
-const sortSelect = document.getElementById('shopSort');
 if (sortSelect) {
-    sortSelect.addEventListener('change', (e) => {
-        currentSort = e.target.value;
+    sortSelect.value = currentSort;
+    sortSelect.addEventListener('change', (event) => {
+        currentSort = event.target.value;
         renderProducts();
     });
 }
 
-// ================================
-// SEARCH
-// ================================
 let searchDebounce;
-const searchInput = document.getElementById('shopSearch');
-const clearSearchBtn = document.getElementById('clearSearch');
-
 if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        clearTimeout(searchDebounce);
-
-        if (clearSearchBtn) {
-            clearSearchBtn.classList.toggle(
-                'd-none',
-                !e.target.value
-            );
-        }
-
-        searchDebounce = setTimeout(() => {
-            searchTerm = e.target.value.toLowerCase().trim();
+    searchInput.addEventListener('input', (event) => {
+        window.clearTimeout(searchDebounce);
+        clearSearchBtn?.classList.toggle('d-none', !event.target.value);
+        searchDebounce = window.setTimeout(() => {
+            searchTerm = event.target.value.toLowerCase().trim();
             renderProducts();
-        }, 300);
+        }, 250);
     });
 }
 
@@ -441,54 +304,39 @@ if (clearSearchBtn) {
     });
 }
 
-// ================================
-// CLEAR FILTERS
-// ================================
-const clearFiltersBtn = document.getElementById('clearFiltersBtn');
 if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener('click', () => {
         currentFilter = 'all';
+        currentSort = 'featured';
         searchTerm = '';
-        currentSort = 'price-high';
-
         if (searchInput) searchInput.value = '';
-        if (clearSearchBtn) {
-            clearSearchBtn.classList.add('d-none');
-        }
-        if (sortSelect) sortSelect.value = 'price-high';
-
-        document.querySelectorAll('.shop-filter-tab')
-            .forEach(t => t.classList.remove('active'));
-        document.querySelector('[data-filter="all"]')
-            ?.classList.add('active');
-
+        if (sortSelect) sortSelect.value = currentSort;
+        clearSearchBtn?.classList.add('d-none');
+        document.querySelectorAll('.shop-filter-tab').forEach((item) => item.classList.remove('active'));
+        document.querySelector('[data-filter="all"]')?.classList.add('active');
         renderProducts();
     });
 }
 
-// ================================
-// URL PARAM — Auto sort
-// e.g. shop-all.html?sort=price-high
-// ================================
 function readUrlParams() {
     const params = new URLSearchParams(window.location.search);
     const sortParam = params.get('sort');
-    if (sortParam) {
-        currentSort = sortParam;
-        if (sortSelect) sortSelect.value = sortParam;
+    const searchParam = params.get('search');
+
+    if (sortParam) currentSort = sortParam;
+    if (searchParam) {
+        searchTerm = searchParam.toLowerCase().trim();
+        if (searchInput) searchInput.value = searchParam;
+        clearSearchBtn?.classList.remove('d-none');
     }
+    if (sortSelect) sortSelect.value = currentSort;
 }
 
-// ================================
-// BACK TO TOP
-// ================================
 const backBtn = document.getElementById('backTopBtn');
 if (backBtn) {
     window.addEventListener('scroll', () => {
-        backBtn.style.opacity =
-            window.scrollY > 400 ? '1' : '0';
-        backBtn.style.pointerEvents =
-            window.scrollY > 400 ? 'all' : 'none';
+        backBtn.style.opacity = window.scrollY > 400 ? '1' : '0';
+        backBtn.style.pointerEvents = window.scrollY > 400 ? 'all' : 'none';
     });
 
     backBtn.addEventListener('click', () => {
@@ -496,35 +344,22 @@ if (backBtn) {
     });
 }
 
-// ================================
-// SIDEBAR ACCORDIONS
-// ================================
-document.querySelectorAll('.accordion-header').forEach(header => {
+document.querySelectorAll('.accordion-header').forEach((header) => {
     header.addEventListener('click', () => {
-        const accordion = header.closest('.sidebar-accordion');
-        if (accordion) {
-            accordion.classList.toggle('open');
-        }
+        header.closest('.sidebar-accordion')?.classList.toggle('open');
     });
 });
 
-// ================================
-// INIT
-// ================================
 document.addEventListener('DOMContentLoaded', () => {
+    readUrlParams();
     if (window.initialFilter) {
-        document.querySelectorAll('.shop-filter-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.shop-filter-tab').forEach((item) => item.classList.remove('active'));
         const activeTab = document.querySelector(`[data-filter="${window.initialFilter}"]`);
         if (activeTab) {
-            // Expand the accordion containing this tab if it isn't the first one
-            const accordion = activeTab.closest('.sidebar-accordion');
-            if (accordion && !accordion.classList.contains('open')) {
-                accordion.classList.add('open');
-            }
             activeTab.classList.add('active');
+            activeTab.closest('.sidebar-accordion')?.classList.add('open');
         }
     }
-    readUrlParams();
-    updateCartDisplay();
     loadAllProducts();
+    updateCartDisplay();
 });
