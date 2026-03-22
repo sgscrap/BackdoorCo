@@ -7,6 +7,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import {
     applyProductOverrides,
+    getSeededProducts,
     getProductImages,
     getProductSizes,
     getTotalStock,
@@ -52,7 +53,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const snapshot = await getDoc(doc(db, 'products', productId));
         if (!snapshot.exists()) {
-            renderMissingProduct();
+            const seededProduct = getSeededProducts().find((product) => product.id === productId);
+            if (!seededProduct) {
+                renderMissingProduct();
+                return;
+            }
+
+            currentProduct = seededProduct;
+            renderProduct(currentProduct);
+            initProductReviews(currentProduct);
             return;
         }
 
@@ -207,6 +216,7 @@ function formatBrandLine(product) {
 }
 
 function buildBackHref(product) {
+    if (product.category === 'Kids') return 'kids.html';
     if (product.category === 'Apparel') return 'apparel.html';
     if (product.category === 'Accessories') return 'accessories.html';
     if (product.category === 'Electronics') return 'electronics.html';

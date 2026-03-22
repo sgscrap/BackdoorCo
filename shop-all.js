@@ -8,6 +8,9 @@ import {
 import {
     applyProductOverrides,
     buildProductHref,
+    getProductImageFit,
+    getProductImagePosition,
+    mergeCatalogProducts,
     getTotalStock,
     isFeatured,
     isHidden,
@@ -64,11 +67,11 @@ function loadAllProducts() {
 
     const productsQuery = query(collection(db, 'products'), where('status', '==', 'active'));
     onSnapshot(productsQuery, (snapshot) => {
-        allProducts = snapshot.docs.map((doc) => applyProductOverrides({
+        allProducts = mergeCatalogProducts(snapshot.docs.map((doc) => applyProductOverrides({
             id: doc.id,
             ...doc.data(),
             price: Number(doc.data().price) || 0
-        }));
+        })));
 
         updateFilterCounts();
         renderProducts();
@@ -144,6 +147,8 @@ function renderProducts() {
         grid.innerHTML = filtered.map((product, index) => {
             const soldOut = isOutOfStock(product);
             const totalStock = getTotalStock(product);
+            const imageFit = getProductImageFit(product);
+            const imagePosition = getProductImagePosition(product);
             const statusBadge = soldOut
                 ? '<span class="product-state-badge product-state-badge--out">Out of Stock</span>'
                 : isFeatured(product)
@@ -157,7 +162,7 @@ function renderProducts() {
                         ${!soldOut && totalStock > 0 && totalStock <= 3 ? `<span class="low-badge">${totalStock} LEFT</span>` : ''}
                         ${soldOut ? '<div class="sold-overlay"><span>OUT OF STOCK</span></div>' : ''}
                         ${product.image
-                ? `<img src="${product.image}" alt="${product.name}" loading="${index < 4 ? 'eager' : 'lazy'}" onerror="this.style.display='none'">`
+                ? `<img src="${product.image}" alt="${product.name}" loading="${index < 4 ? 'eager' : 'lazy'}" style="object-fit:${imageFit};object-position:${imagePosition};padding:${imageFit === 'contain' ? '10px' : '0'}" onerror="this.style.display='none'">`
                 : '<div class="no-img-placeholder"><i class="fa-solid fa-shoe-prints"></i></div>'}
                     </div>
                     <div class="shop-card-info">

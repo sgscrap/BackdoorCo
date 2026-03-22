@@ -41,6 +41,7 @@ let generatedReviews = [];
 
 const REVIEW_FIRST_NAMES = ['Mason', 'Jada', 'Chris', 'Avery', 'Jordan', 'Cam', 'Tiana', 'Malik', 'Ari', 'Noah', 'Nia', 'Jay', 'Kayla', 'Andre', 'Zoe', 'Micah', 'Savannah', 'Bryson', 'Laila', 'Darius', 'Jasmine', 'Ethan', 'Sofia', 'Tyrese', 'Mila', 'Zay', 'Kendall', 'Isaiah', 'Amaya', 'Luca', 'Brielle', 'Kobe', 'Nyla', 'Tristan', 'Aaliyah', 'Devin', 'Maya', 'Roman', 'Leah', 'Jalen'];
 const REVIEW_LAST_INITIALS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const IMAGE_POSITION_OPTIONS = new Set(['center center', 'center top', 'center bottom', 'left center', 'right center']);
 
 document.addEventListener('DOMContentLoaded', () => {
     initFirebaseListeners();
@@ -106,6 +107,48 @@ function isProductFeatured(product) {
 
 function isProductOutOfStock(product) {
     return Boolean(product?.isOutOfStock) || getTotalStock(product) <= 0;
+}
+
+function matchesBlackCatProduct(product) {
+    const name = String(product?.name || '').toLowerCase();
+    const sku = String(product?.sku || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    return (name.includes('jordan 4 retro') && name.includes('black cat')) || sku === 'fv5029010';
+}
+
+function isFootwearProduct(product) {
+    const category = String(product?.category || '').toLowerCase();
+    const brand = String(product?.brand || '').toLowerCase();
+    const name = String(product?.name || '').toLowerCase();
+    return (
+        ['sneakers', 'shoes', 'footwear'].includes(category) ||
+        name.includes('jordan') ||
+        name.includes('dunk') ||
+        name.includes('air max') ||
+        name.includes('yeezy') ||
+        (brand === 'jordan' && category !== 'apparel')
+    );
+}
+
+function normalizeImageFit(value, product = null) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'contain') {
+        return 'contain';
+    }
+    if (normalized === 'cover') {
+        return 'cover';
+    }
+    return matchesBlackCatProduct(product) || isFootwearProduct(product) ? 'contain' : 'cover';
+}
+
+function normalizeImagePosition(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+    return IMAGE_POSITION_OPTIONS.has(normalized) ? normalized : 'center center';
+}
+
+function getProductImageStyle(product, containPadding = 6) {
+    const fit = normalizeImageFit(product?.imageFit, product);
+    const position = normalizeImagePosition(product?.imagePosition);
+    return `object-fit:${fit};object-position:${position};padding:${fit === 'contain' ? `${containPadding}px` : '0'};`;
 }
 
 function normalizeReleaseDate(value) {
@@ -195,6 +238,8 @@ function normalizeProduct(product) {
         ...product,
         price: Number(product?.price) || 0,
         image: product?.image || '',
+        imageFit: normalizeImageFit(product?.imageFit, product),
+        imagePosition: normalizeImagePosition(product?.imagePosition),
         sizes,
         releaseDate: normalizeReleaseDate(product?.releaseDate),
         isHidden: isProductHidden(product),
@@ -449,11 +494,13 @@ function renderLowStock() {
                     id: product.id,
                     name: product.name,
                     size: size.size,
-                    stock: size.stock,
-                    img: product.image,
-                    brand: product.brand,
-                    price: size.price || product.price
-                });
+                stock: size.stock,
+                img: product.image,
+                imageFit: product.imageFit,
+                imagePosition: product.imagePosition,
+                brand: product.brand,
+                price: size.price || product.price
+            });
             }
         });
     });
@@ -462,7 +509,7 @@ function renderLowStock() {
 
     list.innerHTML = lowStock.slice(0, 4).map((entry) => `
         <div class="inventory-item" onclick="openProductModal('${escapeHtml(entry.id)}')">
-            <div class="shoe-thumb"><img src="${escapeHtml(entry.img)}" alt=""></div>
+            <div class="shoe-thumb"><img src="${escapeHtml(entry.img)}" alt="" style="${escapeHtml(getProductImageStyle(entry, 4))}"></div>
             <div class="shoe-info">
                 <div class="shoe-name">${escapeHtml(entry.name)} (${escapeHtml(entry.size)})</div>
                 <div class="shoe-brand">${escapeHtml(entry.brand)}</div>
@@ -494,7 +541,7 @@ function renderProducts(filteredProducts = getFilteredProducts()) {
                 <td class="checkbox-col">
                     <input class="product-select-checkbox" type="checkbox" value="${escapeHtml(product.id)}" ${selectedProductIds.has(product.id) ? 'checked' : ''} aria-label="Select ${escapeHtml(product.name)}">
                 </td>
-                <td><div class="shoe-thumb"><img src="${escapeHtml(product.image)}" alt=""></div></td>
+                <td><div class="shoe-thumb"><img src="${escapeHtml(product.image)}" alt="" style="${escapeHtml(getProductImageStyle(product, 4))}"></div></td>
                 <td>
                     <strong>${escapeHtml(product.name)}</strong>
                     <div class="table-subtext">${escapeHtml(product.brand || '')}</div>
@@ -622,8 +669,12 @@ function openProductModal(id = null) {
         document.getElementById('productReleaseDate').value = normalizeReleaseDate(currentProduct.releaseDate);
         document.getElementById('productDescription').value = currentProduct.description || '';
         document.getElementById('productImage').value = currentProduct.image || '';
+        document.getElementById('productImageFit').value = normalizeImageFit(currentProduct.imageFit, currentProduct);
+        document.getElementById('productImagePosition').value = normalizeImagePosition(currentProduct.imagePosition);
         renderSizeGrid(currentProduct.sizes);
     } else {
+        document.getElementById('productImageFit').value = 'cover';
+        document.getElementById('productImagePosition').value = 'center center';
         renderSizeGrid();
     }
 
@@ -663,15 +714,24 @@ async function handleProductSubmit(event) {
     }));
 
     const productId = currentProduct ? currentProduct.id : Date.now().toString();
+    const productName = document.getElementById('productName').value.trim();
+    const productSku = document.getElementById('productSKU').value.trim();
+    const imageFit = normalizeImageFit(document.getElementById('productImageFit').value, {
+        ...currentProduct,
+        name: productName,
+        sku: productSku
+    });
     const productData = {
-        name: document.getElementById('productName').value.trim(),
+        name: productName,
         brand: document.getElementById('productBrand').value,
-        sku: document.getElementById('productSKU').value.trim(),
+        sku: productSku,
         category: document.getElementById('productCategory').value,
         price: basePrice,
         releaseDate: normalizeReleaseDate(document.getElementById('productReleaseDate').value) || 'TBD',
         description: document.getElementById('productDescription').value.trim(),
         image: document.getElementById('productImage').value.trim(),
+        imageFit,
+        imagePosition: normalizeImagePosition(document.getElementById('productImagePosition').value),
         sizes: sizeEntries,
         isHidden: document.getElementById('productHidden').checked,
         isOutOfStock: document.getElementById('productOutOfStock').checked,
@@ -1314,6 +1374,8 @@ async function publishImporterProduct() {
         price: resell,
         image: importerSelectedImages[0],
         images: importerSelectedImages,
+        imageFit: normalizeImageFit('', { name, sku: document.getElementById('impSku').value.trim() }),
+        imagePosition: 'center center',
         sizes: importerSelectedSizes.map((size) => ({ size, stock: 10, price: resell })),
         category: 'Sneakers',
         releaseDate: normalizeReleaseDate(document.getElementById('impReleaseDate').value) || 'TBD',

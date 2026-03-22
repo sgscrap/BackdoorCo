@@ -8,12 +8,64 @@ export const BLACK_CAT_IMAGES = [
     'https://i.imgur.com/RiQyQS4.png'
 ];
 
+function buildImgurImageUrl(id, extension = 'jpg') {
+    return `https://i.imgur.com/${id}.${extension}`;
+}
+
+const SEEDED_PRODUCTS = [
+    {
+        id: 'seed-kids-travis-black-phantom-ps',
+        name: "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+        sku: 'DO5442-001',
+        price: 180,
+        brand: 'Jordan',
+        category: 'Kids',
+        colorway: 'Black/Black',
+        description: "Offered in little kid sizing, the Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom' combines a sleek finish with La Flame's signature touches. The low-top sports an all-black nubuck and suede upper with contrast white stitching throughout. Scott's backward Swoosh decorates the lateral side, while woven Nike tags embellish each tongue. Mismatched heel tabs display a Jordan Wings logo on the right shoe and a bee graphic on the left. Anchoring the sneaker is a black rubber cupsole with stitched sidewall construction.",
+        image: buildImgurImageUrl('30H5NyD'),
+        images: [
+            buildImgurImageUrl('30H5NyD'),
+            buildImgurImageUrl('UutZVxq'),
+            buildImgurImageUrl('israMgv'),
+            buildImgurImageUrl('FXy3W3z'),
+            buildImgurImageUrl('bG5UpTh'),
+            buildImgurImageUrl('PNAbX10')
+        ],
+        imageFit: 'contain',
+        imagePosition: 'center center',
+        sizes: [
+            { size: '12.5C', stock: 1, price: 180 }
+        ],
+        releaseDate: 'TBD',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    }
+];
+
 const IMGUR_SIZE_SUFFIXES = new Set(['s', 'b', 't', 'm', 'l', 'h']);
 
 function matchesBlackCat(product) {
     const name = String(product?.name || '').toLowerCase();
     const sku = String(product?.sku || '').toLowerCase();
     return (name.includes('jordan 4 retro') && name.includes('black cat')) || sku === 'fv5029 010';
+}
+
+function isFootwearProduct(product) {
+    const category = String(product?.category || '').toLowerCase();
+    const brand = String(product?.brand || '').toLowerCase();
+    const name = String(product?.name || '').toLowerCase();
+    return (
+        ['sneakers', 'shoes', 'footwear'].includes(category) ||
+        name.includes('jordan') ||
+        name.includes('dunk') ||
+        name.includes('air max') ||
+        name.includes('yeezy') ||
+        (brand === 'jordan' && category !== 'apparel')
+    );
 }
 
 export function applyProductOverrides(product) {
@@ -31,6 +83,8 @@ export function applyProductOverrides(product) {
         ).replace(/2025/g, '2020');
         nextProduct.image = BLACK_CAT_IMAGES[0];
         nextProduct.images = [...BLACK_CAT_IMAGES];
+        nextProduct.imageFit = nextProduct.imageFit || 'contain';
+        nextProduct.imagePosition = nextProduct.imagePosition || 'center center';
     }
 
     return nextProduct;
@@ -122,6 +176,25 @@ export function isOutOfStock(product) {
     return Boolean(product?.isOutOfStock) || getTotalStock(product) <= 0;
 }
 
+export function getProductImageFit(product) {
+    const value = String(product?.imageFit || '').toLowerCase();
+    if (value === 'contain') return 'contain';
+    if (value === 'cover') return 'cover';
+    return isFootwearProduct(product) ? 'contain' : 'cover';
+}
+
+export function getProductImagePosition(product) {
+    const value = String(product?.imagePosition || '').trim().toLowerCase();
+    const allowed = new Set([
+        'center center',
+        'center top',
+        'center bottom',
+        'left center',
+        'right center'
+    ]);
+    return allowed.has(value) ? value : 'center center';
+}
+
 function slugify(value) {
     return String(value || '')
         .toLowerCase()
@@ -134,4 +207,36 @@ export function buildProductHref(product) {
     const id = encodeURIComponent(overridden.id);
     const slug = encodeURIComponent(slugify(overridden.name));
     return `product.html?id=${id}&slug=${slug}`;
+}
+
+function getProductMatchKey(product) {
+    const sku = String(product?.sku || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (sku) return `sku:${sku}`;
+    return `name:${slugify(product?.name || '')}`;
+}
+
+export function getSeededProducts() {
+    return SEEDED_PRODUCTS.map((product) => applyProductOverrides(product));
+}
+
+export function mergeCatalogProducts(products = []) {
+    const merged = new Map();
+
+    getSeededProducts().forEach((product) => {
+        merged.set(product.id, product);
+    });
+
+    products.forEach((product) => {
+        const overridden = applyProductOverrides(product);
+        const matchKey = getProductMatchKey(overridden);
+        const seededMatch = [...merged.values()].find((entry) => getProductMatchKey(entry) === matchKey);
+
+        if (seededMatch) {
+            merged.delete(seededMatch.id);
+        }
+
+        merged.set(overridden.id, overridden);
+    });
+
+    return [...merged.values()];
 }

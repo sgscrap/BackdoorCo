@@ -42,6 +42,61 @@ const BLACK_CAT_REVIEW_THREE = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const KIDS_TRAVIS_REVIEW_ONE = {
+    id: 'seed-kids-travis-001',
+    name: 'Ho**',
+    productId: 'seed-kids-travis-black-phantom-ps',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+    comment: 'Bought these for my niece and she loved them. I also own a pair. Kick Who did an amazing job!',
+    originalComment: 'Bought these for my niece she loved them I also Own a pair kick who did an amazing job !',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KIDS_TRAVIS_REVIEW_TWO = {
+    id: 'seed-kids-travis-002',
+    name: 'SN**',
+    productId: 'seed-kids-travis-black-phantom-ps',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+    comment: 'Every color, we will be getting.',
+    originalComment: 'Every color we will be getting',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KIDS_TRAVIS_REVIEW_THREE = {
+    id: 'seed-kids-travis-003',
+    name: 'Jo**',
+    productId: 'seed-kids-travis-black-phantom-ps',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+    comment: 'I love these shoes. They are amazing and great quality.',
+    originalComment: 'I love this shoes they are amazing and good quality',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KIDS_TRAVIS_REVIEW_FOUR = {
+    id: 'seed-kids-travis-004',
+    name: 'Ch**',
+    productId: 'seed-kids-travis-black-phantom-ps',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+    comment: 'Very nice quality!!!',
+    originalComment: 'Very nice quality!!!',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/NgAQV5e.jpg',
+        'https://i.imgur.com/ki6ctgF.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
 function normalizeReview(review) {
     const images = Array.isArray(review?.images)
         ? review.images.filter(Boolean)
@@ -64,7 +119,11 @@ export function getSeededReviews() {
     return [
         normalizeReview(BLACK_CAT_REVIEW),
         normalizeReview(BLACK_CAT_REVIEW_TWO),
-        normalizeReview(BLACK_CAT_REVIEW_THREE)
+        normalizeReview(BLACK_CAT_REVIEW_THREE),
+        normalizeReview(KIDS_TRAVIS_REVIEW_ONE),
+        normalizeReview(KIDS_TRAVIS_REVIEW_TWO),
+        normalizeReview(KIDS_TRAVIS_REVIEW_THREE),
+        normalizeReview(KIDS_TRAVIS_REVIEW_FOUR)
     ];
 }
 

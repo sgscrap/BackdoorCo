@@ -729,6 +729,25 @@
                     <label for="productImage">Product Image URL</label>
                     <input type="url" id="productImage" placeholder="https://..." required>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productImageFit">Image Fit</label>
+                        <select id="productImageFit" aria-label="Select image fit">
+                            <option value="cover">Fill card</option>
+                            <option value="contain">Show full shoe</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productImagePosition">Image Focus</label>
+                        <select id="productImagePosition" aria-label="Select image focus">
+                            <option value="center center">Center</option>
+                            <option value="center top">Top</option>
+                            <option value="center bottom">Bottom</option>
+                            <option value="left center">Left</option>
+                            <option value="right center">Right</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="product-flags-grid">
                     <label class="toggle-card">
                         <input type="checkbox" id="productHidden">
