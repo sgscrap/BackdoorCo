@@ -2,8 +2,8 @@ const BLACK_CAT_REVIEW = {
     id: 'seed-black-cat-001',
     name: 'Je***',
     productName: "Jordan 4 Retro 'Black Cat' 2020",
-    comment: 'THE BEST BLACK CAT ❤️',
-    originalComment: 'THE BEST BLACK CAT ❤️',
+    comment: 'THE BEST BLACK CAT \u2764\uFE0F',
+    originalComment: 'THE BEST BLACK CAT \u2764\uFE0F',
     rating: 5,
     isHidden: false,
     images: [
@@ -16,7 +16,7 @@ const BLACK_CAT_REVIEW = {
 
 const BLACK_CAT_REVIEW_TWO = {
     id: 'seed-black-cat-002',
-    name: 'Yn***',
+    name: 'YN***',
     productName: "Jordan 4 Retro 'Black Cat' 2020",
     comment: 'Fast shipping! Best quality! Simply the best! My little brother will be happy! Thanks again.',
     originalComment: "Fast shipping! best quality! simply the best ! my little brother will be happy! thanks again'",
@@ -27,6 +27,18 @@ const BLACK_CAT_REVIEW_TWO = {
         'https://i.imgur.com/gFB1ti2.jpg',
         'https://i.imgur.com/yEu1MgJ.jpg'
     ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_THREE = {
+    id: 'seed-black-cat-003',
+    name: 'Mi**',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'True to size, amazing quality, incredible. 10/10. Fast shipping.',
+    originalComment: 'true to size amazing quality, incredible, 10/10 , Fast shipping',
+    rating: 5,
+    isHidden: false,
+    images: [],
     createdAtLabel: 'Verified buyer post'
 };
 
@@ -51,7 +63,8 @@ function normalizeReview(review) {
 export function getSeededReviews() {
     return [
         normalizeReview(BLACK_CAT_REVIEW),
-        normalizeReview(BLACK_CAT_REVIEW_TWO)
+        normalizeReview(BLACK_CAT_REVIEW_TWO),
+        normalizeReview(BLACK_CAT_REVIEW_THREE)
     ];
 }
 

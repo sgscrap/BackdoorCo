@@ -54,20 +54,34 @@
         </div>
 
         <section class="product-page-layout" id="productPageLayout">
-            <div class="product-page-gallery">
-                <div class="product-page-main-media">
-                    <button class="product-gallery-nav product-gallery-nav--prev" id="productPrevImage" type="button" aria-label="Previous image">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <img id="productMainImage" src="" alt="Product preview">
-                    <button class="product-gallery-nav product-gallery-nav--next" id="productNextImage" type="button" aria-label="Next image">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
+            <div class="product-page-gallery-column">
+                <div class="product-page-gallery">
+                    <div class="product-page-main-media">
+                        <button class="product-gallery-nav product-gallery-nav--prev" id="productPrevImage" type="button" aria-label="Previous image">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <img id="productMainImage" src="" alt="Product preview">
+                        <button class="product-gallery-nav product-gallery-nav--next" id="productNextImage" type="button" aria-label="Next image">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="product-gallery-meta">
+                        <span class="product-gallery-hint" id="productGalleryHint">Image 1 / 1 | Click image for next</span>
+                        <div class="product-gallery-dots" id="productGalleryDots"></div>
+                    </div>
                 </div>
-                <div class="product-gallery-meta">
-                    <span class="product-gallery-hint" id="productGalleryHint">Image 1 / 1 | Click image for next</span>
-                    <div class="product-gallery-dots" id="productGalleryDots"></div>
-                </div>
+                <section class="product-review-section" id="productReviewSection">
+                    <div class="product-review-section-head">
+                        <div>
+                            <p class="product-review-eyebrow">Customer Review</p>
+                            <h2 class="product-review-title">What buyers are saying</h2>
+                        </div>
+                        <a class="btn-hero-secondary product-review-link" href="reviews.html">All Reviews</a>
+                    </div>
+                    <div class="product-review-list" id="productReviewList">
+                        <div class="reviews-empty-state">Loading review posts...</div>
+                    </div>
+                </section>
             </div>
 
             <div class="product-page-info">
@@ -107,19 +121,6 @@
                     <button class="add-to-cart-btn" id="productAddToCart">Add to Cart</button>
                     <a class="btn-hero-secondary product-back-link" href="men.html">Back to Men</a>
                 </div>
-            </div>
-        </section>
-
-        <section class="product-review-section" id="productReviewSection">
-            <div class="product-review-section-head">
-                <div>
-                    <p class="product-review-eyebrow">Customer Review</p>
-                    <h2 class="product-review-title">What buyers are saying</h2>
-                </div>
-                <a class="btn-hero-secondary product-review-link" href="reviews.html">All Reviews</a>
-            </div>
-            <div class="product-review-list" id="productReviewList">
-                <div class="reviews-empty-state">Loading review posts...</div>
             </div>
         </section>
     </main>
