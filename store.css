@@ -473,6 +473,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 18px;
     padding: 0 40px;
     z-index: 900;
     transition: all 0.3s;
@@ -514,12 +515,13 @@ body {
 }
 
 .nav-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 28px;
+    justify-content: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+    padding: 0 20px;
 }
 
 .nav-link {
@@ -544,10 +546,86 @@ body {
     background: rgba(200, 246, 93, 0.08);
 }
 
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown summary {
+    list-style: none;
+}
+
+.nav-dropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+.nav-dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: transparent;
+}
+
+.nav-dropdown-toggle i {
+    font-size: 11px;
+    transition: transform 0.2s ease;
+}
+
+.nav-dropdown[open] .nav-dropdown-toggle i,
+.nav-dropdown:hover .nav-dropdown-toggle i,
+.nav-dropdown:focus-within .nav-dropdown-toggle i {
+    transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    padding: 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 15, 15, 0.98);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+    display: none;
+    z-index: 950;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu,
+.nav-dropdown[open] .nav-dropdown-menu {
+    display: grid;
+    gap: 4px;
+}
+
+.nav-dropdown-link {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-dropdown-link:hover {
+    color: var(--text);
+    background: var(--bg3);
+}
+
+.nav-dropdown-link.active {
+    color: var(--accent);
+    background: rgba(200, 246, 93, 0.08);
+}
+
 .nav-right {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 .nav-icon-btn {

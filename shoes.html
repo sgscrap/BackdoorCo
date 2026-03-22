@@ -48,10 +48,16 @@
             <a class="nav-link" href="men.html">Men</a>
             <a class="nav-link" href="women.html">Women</a>
             <a class="nav-link" href="kids.html">Kids</a>
-            <a class="nav-link active" href="shoes.html">Shoes</a>
-            <a class="nav-link" href="apparel.html">Apparel</a>
-            <a class="nav-link" href="accessories.html">Accessories</a>
-            <a class="nav-link" href="electronics.html">Electronics</a>
+            <details class="nav-dropdown">
+                <summary class="nav-link nav-dropdown-toggle active">Browse <i class="fa-solid fa-chevron-down"></i></summary>
+                <div class="nav-dropdown-menu">
+                    <a class="nav-dropdown-link active" href="shoes.html">Shoes</a>
+                    <a class="nav-dropdown-link" href="apparel.html">Apparel</a>
+                    <a class="nav-dropdown-link" href="accessories.html">Accessories</a>
+                    <a class="nav-dropdown-link" href="electronics.html">Electronics</a>
+                    <a class="nav-dropdown-link" href="reviews.html">Reviews</a>
+                </div>
+            </details>
         </div>
         <div class="nav-right">
             <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
