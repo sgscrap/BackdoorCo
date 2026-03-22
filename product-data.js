@@ -1,4 +1,5 @@
 export const BLACK_CAT_IMAGES = [
+    'https://i.imgur.com/RK5BAet.jpg',
     'https://i.imgur.com/0LaAQgf.png',
     'https://i.imgur.com/3K8TkzE.png',
     'https://i.imgur.com/q7uV2MM.png',
