@@ -1,7 +1,9 @@
 import { db } from './admin/firebase-config.js';
 import {
+    collection,
     doc,
-    getDoc
+    getDoc,
+    onSnapshot
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import {
     applyProductOverrides,
@@ -11,12 +13,27 @@ import {
     isFeatured,
     isOutOfStock
 } from './product-data.js';
+import {
+    mergeVisibleReviews,
+    reviewMatchesProduct
+} from './reviews-data.js';
 
 let currentProduct = null;
 let selectedSize = '';
 let cart = loadCartFromStorage();
 let productImages = [];
 let currentImageIndex = 0;
+let unsubscribeReviews = null;
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char]));
+}
 
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('id');
@@ -41,6 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         currentProduct = applyProductOverrides({ id: snapshot.id, ...snapshot.data() });
         renderProduct(currentProduct);
+        initProductReviews(currentProduct);
     } catch (error) {
         console.error(error);
         renderMissingProduct('Unable to load this product right now.');
@@ -127,6 +145,58 @@ function renderProduct(product) {
 
     document.querySelector('.product-back-link')?.setAttribute('href', buildBackHref(product));
 }
+
+function initProductReviews(product) {
+    if (unsubscribeReviews) unsubscribeReviews();
+
+    unsubscribeReviews = onSnapshot(collection(db, 'reviews'), (snapshot) => {
+        const dynamicReviews = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        const matched = mergeVisibleReviews(dynamicReviews).filter((review) => reviewMatchesProduct(review, product));
+        renderProductReviews(matched);
+    }, () => {
+        renderProductReviews(mergeVisibleReviews([]).filter((review) => reviewMatchesProduct(review, product)));
+    });
+}
+
+function renderProductReviews(reviews) {
+    const section = document.getElementById('productReviewSection');
+    const list = document.getElementById('productReviewList');
+    if (!section || !list) return;
+
+    if (!reviews.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    list.innerHTML = reviews.map((review) => `
+        <article class="product-review-card">
+            <div class="product-review-card-head">
+                <div>
+                    <div class="product-review-name">${escapeHtml(review.name)}</div>
+                    <div class="product-review-stars">${'&#9733;'.repeat(review.rating)}</div>
+                </div>
+                <div class="product-review-meta">${escapeHtml(review.createdAtLabel || 'Live review')}</div>
+            </div>
+            <p class="product-review-comment">${escapeHtml(review.comment)}</p>
+            <div class="product-review-gallery">
+                ${review.images.map((image, index) => `
+                    <button class="product-review-thumb" type="button" onclick="setProductReviewImage(${index}, '${image.replace(/'/g, "\\'")}')">
+                        <img src="${escapeHtml(image)}" alt="${escapeHtml(review.name)} review image ${index + 1}">
+                    </button>
+                `).join('')}
+            </div>
+        </article>
+    `).join('');
+}
+
+window.setProductReviewImage = (index, image) => {
+    if (!image) return;
+    const mainImage = document.getElementById('productMainImage');
+    if (!mainImage) return;
+    mainImage.src = image;
+    mainImage.alt = `${currentProduct?.name || 'Product'} review image ${index + 1}`;
+};
 
 function formatBrandLine(product) {
     const brand = String(product?.brand || '').trim();

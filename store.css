@@ -3161,6 +3161,174 @@ body {
     margin-bottom: 20px;
 }
 
+.product-review-section {
+    margin-top: 28px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px;
+}
+
+.product-review-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.product-review-eyebrow {
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+}
+
+.product-review-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 38px;
+    letter-spacing: 2px;
+}
+
+.product-review-list {
+    display: grid;
+    gap: 16px;
+}
+
+.product-review-card {
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 18px;
+}
+
+.product-review-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.product-review-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.product-review-stars {
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+}
+
+.product-review-meta {
+    color: var(--text3);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.product-review-comment {
+    color: var(--text2);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 14px;
+}
+
+.product-review-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.product-review-thumb {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg2);
+    padding: 0;
+    cursor: pointer;
+}
+
+.product-review-thumb img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+}
+
+.product-review-thumb--static {
+    cursor: default;
+}
+
+.reviews-page-shell {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 120px 24px 80px;
+}
+
+.reviews-hero {
+    margin-bottom: 28px;
+}
+
+.reviews-hero h1 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(44px, 8vw, 88px);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+}
+
+.reviews-hero p:last-child {
+    max-width: 700px;
+    color: var(--text2);
+    line-height: 1.7;
+}
+
+.reviews-page-grid {
+    display: grid;
+    gap: 18px;
+}
+
+.reviews-page-card {
+    display: grid;
+    grid-template-columns: minmax(240px, 320px) 1fr;
+    gap: 18px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.reviews-page-main-image {
+    min-height: 100%;
+    background: var(--bg4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text3);
+}
+
+.reviews-page-main-image img {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    object-fit: cover;
+    display: block;
+}
+
+.reviews-page-body-card {
+    padding: 22px;
+}
+
+.product-review-gallery--full .product-review-thumb img {
+    height: 110px;
+}
+
 @media (max-width: 900px) {
     .product-page-layout {
         grid-template-columns: 1fr;
@@ -3171,12 +3339,27 @@ body {
         padding: 18px;
     }
 
+    .product-review-section-head,
+    .product-review-card-head,
+    .reviews-page-card {
+        grid-template-columns: 1fr;
+        display: grid;
+    }
+
+    .product-review-gallery {
+        grid-template-columns: 1fr;
+    }
+
     .product-page-info h1 {
         font-size: 42px;
     }
 
     .product-page-price {
         font-size: 48px;
+    }
+
+    .reviews-page-main-image img {
+        min-height: 220px;
     }
 }
 
