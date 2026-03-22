@@ -257,6 +257,217 @@ const KIDS_TRAVIS_REVIEW_FOUR = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const VELVET_BROWN_REVIEW_ONE = {
+    id: 'seed-velvet-brown-001',
+    name: 'Dr**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'These are fiiiiiirrre.',
+    originalComment: 'These are fiiiiiirrre',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/5yWKb5K.jpg',
+        'https://i.imgur.com/ecNmijY.jpg',
+        'https://i.imgur.com/wEtE5U0.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_TWO = {
+    id: 'seed-velvet-brown-002',
+    name: 'Ac**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Highest quality. 10/10.',
+    originalComment: 'Highest Quality - 10/10',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/5Z1t456.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_THREE = {
+    id: 'seed-velvet-brown-003',
+    name: 'Mi**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'These are excellent quality, all correct materials, accessories, box, etc. Perfect autumn Travis Scotts.',
+    originalComment: 'These are excellent quality,all correct materials,accessories,box etc. Perfect Autumn Travis Scotts',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/e7ccepa.jpg',
+        'https://i.imgur.com/5O6oUcQ.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_FOUR = {
+    id: 'seed-velvet-brown-004',
+    name: 'La**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Amazing quality!!',
+    originalComment: 'Amazing quality!!',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/Ut2T0rn.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_FIVE = {
+    id: 'seed-velvet-brown-005',
+    name: 'Noah C.',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Top.',
+    originalComment: 'top',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_SIX = {
+    id: 'seed-velvet-brown-006',
+    name: 'As**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'No complaints.',
+    originalComment: 'No Complaints',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_SEVEN = {
+    id: 'seed-velvet-brown-007',
+    name: 'T **',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'This shoe is awesome!! Thank you!',
+    originalComment: 'This shoe is Awesome!! Thank you!',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_EIGHT = {
+    id: 'seed-velvet-brown-008',
+    name: 'Ke**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: "I didn't think I'd like the brown, but they pretty much complement anything. I was wrong for sure lol.",
+    originalComment: "I didnt think I'd like the brown but they will pretty much compliment anything. I was wrong for sure lol",
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_NINE = {
+    id: 'seed-velvet-brown-009',
+    name: 'Mi**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Shoe looks better in person.',
+    originalComment: 'Shoe looks better in person',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_TEN = {
+    id: 'seed-velvet-brown-010',
+    name: 'GL**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Loved the shoes. Fits perfectly.',
+    originalComment: 'Loved the shoes. Fits perfectly.',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/8MN75GW.jpg',
+        'https://i.imgur.com/nWvmCBY.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_ELEVEN = {
+    id: 'seed-velvet-brown-011',
+    name: 'Luca R.',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Spettacolari come sempre, numeri uno! ♥️',
+    originalComment: 'Spettacolari come sempre, numeri uno! ♥️',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_TWELVE = {
+    id: 'seed-velvet-brown-012',
+    name: 'Andre M.',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: "A+ amazing shoe. Can't go wrong with Backdoor. A+.",
+    originalComment: "A+ amazing shoe.. can’t go wrong with Backdoor A+",
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_THIRTEEN = {
+    id: 'seed-velvet-brown-013',
+    name: 'Gd**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Great shoe. Sold on StockX and it passed.',
+    originalComment: 'Great shoe sold on stockx and past',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_FOURTEEN = {
+    id: 'seed-velvet-brown-014',
+    name: 'Jo**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Thank you, really happy.',
+    originalComment: 'Thank you, really happy',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/cUPY5xX.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_FIFTEEN = {
+    id: 'seed-velvet-brown-015',
+    name: 'Xa**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Got these for my dad for Christmas and he was cheesing from ear to ear. Quality is amazing!',
+    originalComment: 'Got these for my dad for Christmas and he was cheesing from ear to ear quality is amazing!',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
 function normalizeReview(review) {
     const images = Array.isArray(review?.images)
         ? review.images.filter(Boolean)
@@ -295,7 +506,22 @@ export function getSeededReviews() {
         normalizeReview(KIDS_TRAVIS_REVIEW_ONE),
         normalizeReview(KIDS_TRAVIS_REVIEW_TWO),
         normalizeReview(KIDS_TRAVIS_REVIEW_THREE),
-        normalizeReview(KIDS_TRAVIS_REVIEW_FOUR)
+        normalizeReview(KIDS_TRAVIS_REVIEW_FOUR),
+        normalizeReview(VELVET_BROWN_REVIEW_ONE),
+        normalizeReview(VELVET_BROWN_REVIEW_TWO),
+        normalizeReview(VELVET_BROWN_REVIEW_THREE),
+        normalizeReview(VELVET_BROWN_REVIEW_FOUR),
+        normalizeReview(VELVET_BROWN_REVIEW_FIVE),
+        normalizeReview(VELVET_BROWN_REVIEW_SIX),
+        normalizeReview(VELVET_BROWN_REVIEW_SEVEN),
+        normalizeReview(VELVET_BROWN_REVIEW_EIGHT),
+        normalizeReview(VELVET_BROWN_REVIEW_NINE),
+        normalizeReview(VELVET_BROWN_REVIEW_TEN),
+        normalizeReview(VELVET_BROWN_REVIEW_ELEVEN),
+        normalizeReview(VELVET_BROWN_REVIEW_TWELVE),
+        normalizeReview(VELVET_BROWN_REVIEW_THIRTEEN),
+        normalizeReview(VELVET_BROWN_REVIEW_FOURTEEN),
+        normalizeReview(VELVET_BROWN_REVIEW_FIFTEEN)
     ];
 }
 
