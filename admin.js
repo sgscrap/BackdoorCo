@@ -175,6 +175,20 @@ function polishReviewComment(raw) {
     return text;
 }
 
+function parseReviewImagesInput(value) {
+    return String(value || '')
+        .split(/\r?\n|,/)
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+}
+
+function getReviewImages(review) {
+    if (Array.isArray(review?.images) && review.images.length > 0) {
+        return review.images.filter(Boolean);
+    }
+    return [review?.image].filter(Boolean);
+}
+
 function normalizeProduct(product) {
     const sizes = getProductSizes(product);
     return {
@@ -929,6 +943,7 @@ async function saveGeneratedReviews() {
             productName: review.productName || '',
             comment: review.comment,
             originalComment: review.originalComment,
+            images: review.image ? [review.image] : [],
             image: review.image || '',
             rating: review.rating,
             isHidden: false,
@@ -960,7 +975,10 @@ function renderReviews() {
             <td>${escapeHtml(review.productName || 'General store review')}</td>
             <td>${'&#9733;'.repeat(Math.min(5, Math.max(1, Number(review.rating) || 5)))}</td>
             <td><span class="status-pill ${review.isHidden ? 'inactive' : 'active'}">${review.isHidden ? 'Hidden' : 'Live'}</span></td>
-            <td>${review.updatedAt?.toDate ? review.updatedAt.toDate().toLocaleDateString() : 'Just now'}</td>
+            <td>
+                ${review.updatedAt?.toDate ? review.updatedAt.toDate().toLocaleDateString() : 'Just now'}
+                <div class="table-subtext">${getReviewImages(review).length} photo${getReviewImages(review).length === 1 ? '' : 's'}</div>
+            </td>
             <td>
                 <div class="row-action-group">
                     <button class="topbar-btn icon-btn-small" type="button" onclick="openReviewModal('${escapeHtml(review.id)}')" title="Edit review">
@@ -993,7 +1011,7 @@ function openReviewModal(id = null) {
         document.getElementById('reviewName').value = currentReview.name || '';
         document.getElementById('reviewProduct').value = currentReview.productName || '';
         document.getElementById('reviewRating').value = String(Math.min(5, Math.max(1, Number(currentReview.rating) || 5)));
-        document.getElementById('reviewImage').value = currentReview.image || '';
+        document.getElementById('reviewImages').value = getReviewImages(currentReview).join('\n');
         document.getElementById('reviewOriginalComment').value = currentReview.originalComment || '';
         document.getElementById('reviewComment').value = currentReview.comment || '';
         document.getElementById('reviewHidden').checked = Boolean(currentReview.isHidden);
@@ -1019,12 +1037,13 @@ async function handleReviewSubmit(event) {
         name: document.getElementById('reviewName').value.trim(),
         productName: document.getElementById('reviewProduct').value.trim(),
         rating: Math.min(5, Math.max(1, Number(document.getElementById('reviewRating').value) || 5)),
-        image: document.getElementById('reviewImage').value.trim(),
+        images: parseReviewImagesInput(document.getElementById('reviewImages').value),
         originalComment: document.getElementById('reviewOriginalComment').value.trim(),
         comment: polishReviewComment(document.getElementById('reviewComment').value.trim()),
         isHidden: document.getElementById('reviewHidden').checked,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
+    reviewData.image = reviewData.images[0] || '';
 
     if (!reviewData.originalComment) {
         reviewData.originalComment = reviewData.comment;
