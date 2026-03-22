@@ -748,6 +748,12 @@
                 <div class="form-group">
                     <label for="productImage">Product Image URL</label>
                     <input type="url" id="productImage" placeholder="https://..." required>
+                    <p class="form-help-text">Paste a direct image URL or a single-image Imgur page link.</p>
+                </div>
+                <div class="form-group">
+                    <label for="productImageGallery">Gallery Image URLs</label>
+                    <textarea id="productImageGallery" rows="4" placeholder="One image URL per line"></textarea>
+                    <p class="form-help-text">Optional. The first valid image becomes the cover image. Album links are not supported here.</p>
                 </div>
                 <div class="form-group">
                     <label>Card Image Framing</label>
@@ -761,7 +767,8 @@
                                 <span class="product-media-preview-badge">Preview</span>
                                 <img id="productImagePreview" alt="Product image preview">
                             </div>
-                            <p class="product-media-preview-note">Adjust zoom and framing until the storefront card looks right.</p>
+                            <div id="productImagePreviewThumbs" class="product-media-thumb-row"></div>
+                            <p id="productImagePreviewStatus" class="product-media-preview-note">Adjust zoom and framing until the storefront card looks right.</p>
                         </div>
                         <div class="product-media-controls">
                             <input type="hidden" id="productImageFit" value="cover">
