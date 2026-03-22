@@ -42,6 +42,13 @@ let generatedReviews = [];
 const REVIEW_FIRST_NAMES = ['Mason', 'Jada', 'Chris', 'Avery', 'Jordan', 'Cam', 'Tiana', 'Malik', 'Ari', 'Noah', 'Nia', 'Jay', 'Kayla', 'Andre', 'Zoe', 'Micah', 'Savannah', 'Bryson', 'Laila', 'Darius', 'Jasmine', 'Ethan', 'Sofia', 'Tyrese', 'Mila', 'Zay', 'Kendall', 'Isaiah', 'Amaya', 'Luca', 'Brielle', 'Kobe', 'Nyla', 'Tristan', 'Aaliyah', 'Devin', 'Maya', 'Roman', 'Leah', 'Jalen'];
 const REVIEW_LAST_INITIALS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const IMAGE_POSITION_OPTIONS = new Set(['center center', 'center top', 'center bottom', 'left center', 'right center']);
+const LEGACY_IMAGE_POSITIONS = {
+    'center center': [50, 50],
+    'center top': [50, 18],
+    'center bottom': [50, 82],
+    'left center': [24, 50],
+    'right center': [76, 50]
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     initFirebaseListeners();
@@ -67,6 +74,10 @@ function escapeHtml(value) {
         '"': '&quot;',
         "'": '&#39;'
     }[char]));
+}
+
+function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
 }
 
 function getProductSizes(product) {
@@ -142,13 +153,51 @@ function normalizeImageFit(value, product = null) {
 
 function normalizeImagePosition(value) {
     const normalized = String(value || '').trim().toLowerCase();
-    return IMAGE_POSITION_OPTIONS.has(normalized) ? normalized : 'center center';
+    if (IMAGE_POSITION_OPTIONS.has(normalized)) return normalized;
+    const match = normalized.match(/^(-?\d{1,3}(?:\.\d+)?)%\s+(-?\d{1,3}(?:\.\d+)?)%$/);
+    if (match) {
+        return `${clamp(Number(match[1]), 0, 100)}% ${clamp(Number(match[2]), 0, 100)}%`;
+    }
+    return '50% 50%';
+}
+
+function normalizeImageScale(value, product = null) {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed) && parsed >= 0.85 && parsed <= 1.4) {
+        return Number(parsed.toFixed(2));
+    }
+    if (matchesBlackCatProduct(product)) return 1.16;
+    return isFootwearProduct(product) ? 1.08 : 1;
+}
+
+function getImageOffsetsFromProduct(product = null) {
+    const rawX = Number(product?.imageOffsetX);
+    const rawY = Number(product?.imageOffsetY);
+    if (Number.isFinite(rawX) && Number.isFinite(rawY)) {
+        return [clamp(rawX, 0, 100), clamp(rawY, 0, 100)];
+    }
+
+    const normalized = normalizeImagePosition(product?.imagePosition);
+    const match = normalized.match(/^(-?\d{1,3}(?:\.\d+)?)%\s+(-?\d{1,3}(?:\.\d+)?)%$/);
+    if (match) {
+        return [clamp(Number(match[1]), 0, 100), clamp(Number(match[2]), 0, 100)];
+    }
+
+    return LEGACY_IMAGE_POSITIONS[normalized] || [50, 50];
+}
+
+function getProductImagePadding(product, containPadding = 6) {
+    if (normalizeImageFit(product?.imageFit, product) === 'cover') return '0';
+    if (matchesBlackCatProduct(product)) return `${Math.max(0, containPadding - 4)}px`;
+    return isFootwearProduct(product) ? `${Math.max(0, containPadding - 2)}px` : `${containPadding}px`;
 }
 
 function getProductImageStyle(product, containPadding = 6) {
     const fit = normalizeImageFit(product?.imageFit, product);
-    const position = normalizeImagePosition(product?.imagePosition);
-    return `object-fit:${fit};object-position:${position};padding:${fit === 'contain' ? `${containPadding}px` : '0'};`;
+    const [offsetX, offsetY] = getImageOffsetsFromProduct(product);
+    const scale = normalizeImageScale(product?.imageScale, product);
+    const padding = getProductImagePadding(product, containPadding);
+    return `object-fit:${fit};object-position:${offsetX}% ${offsetY}%;padding:${padding};transform:scale(${scale});`;
 }
 
 function normalizeReleaseDate(value) {
@@ -234,12 +283,16 @@ function getReviewImages(review) {
 
 function normalizeProduct(product) {
     const sizes = getProductSizes(product);
+    const [imageOffsetX, imageOffsetY] = getImageOffsetsFromProduct(product);
     return {
         ...product,
         price: Number(product?.price) || 0,
         image: product?.image || '',
         imageFit: normalizeImageFit(product?.imageFit, product),
         imagePosition: normalizeImagePosition(product?.imagePosition),
+        imageOffsetX,
+        imageOffsetY,
+        imageScale: normalizeImageScale(product?.imageScale, product),
         sizes,
         releaseDate: normalizeReleaseDate(product?.releaseDate),
         isHidden: isProductHidden(product),
@@ -425,6 +478,25 @@ function setupEventListeners() {
     document.getElementById('applyBulkActionBtn')?.addEventListener('click', applyBulkAction);
     document.getElementById('selectAllProducts')?.addEventListener('change', handleSelectAllProducts);
     document.getElementById('productsTableBody')?.addEventListener('change', handleProductTableSelection);
+    document.getElementById('productImage')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productImageScale')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productImageOffsetX')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productImageOffsetY')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productName')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productSKU')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productBrand')?.addEventListener('change', updateProductImagePreview);
+    document.getElementById('productCategory')?.addEventListener('change', updateProductImagePreview);
+    document.querySelectorAll('#productImageFitButtons .segmented-option').forEach((button) => {
+        button.addEventListener('click', () => {
+            setProductImageFit(button.dataset.fit || 'cover');
+        });
+    });
+    document.getElementById('productImageResetBtn')?.addEventListener('click', resetProductImageEditor);
+    document.getElementById('productImageShoePresetBtn')?.addEventListener('click', applyProductImageShoePreset);
+    document.getElementById('applyBulkStockBtn')?.addEventListener('click', applyBulkInventoryStock);
+    document.getElementById('applyBulkPriceBtn')?.addEventListener('click', applyBulkInventoryPrice);
+    document.getElementById('applyBasePriceBtn')?.addEventListener('click', applyBasePriceToInventory);
+    document.getElementById('clearInventoryBtn')?.addEventListener('click', clearInventoryStock);
 }
 
 function switchTab(tab, el) {
@@ -670,14 +742,21 @@ function openProductModal(id = null) {
         document.getElementById('productDescription').value = currentProduct.description || '';
         document.getElementById('productImage').value = currentProduct.image || '';
         document.getElementById('productImageFit').value = normalizeImageFit(currentProduct.imageFit, currentProduct);
-        document.getElementById('productImagePosition').value = normalizeImagePosition(currentProduct.imagePosition);
+        const [offsetX, offsetY] = getImageOffsetsFromProduct(currentProduct);
+        document.getElementById('productImageOffsetX').value = String(offsetX);
+        document.getElementById('productImageOffsetY').value = String(offsetY);
+        document.getElementById('productImageScale').value = String(normalizeImageScale(currentProduct.imageScale, currentProduct));
         renderSizeGrid(currentProduct.sizes);
     } else {
         document.getElementById('productImageFit').value = 'cover';
-        document.getElementById('productImagePosition').value = 'center center';
+        document.getElementById('productImageOffsetX').value = '50';
+        document.getElementById('productImageOffsetY').value = '50';
+        document.getElementById('productImageScale').value = '1';
         renderSizeGrid();
     }
 
+    syncProductImageFitButtons();
+    updateProductImagePreview();
     modal.classList.add('open');
 }
 
@@ -716,6 +795,8 @@ async function handleProductSubmit(event) {
     const productId = currentProduct ? currentProduct.id : Date.now().toString();
     const productName = document.getElementById('productName').value.trim();
     const productSku = document.getElementById('productSKU').value.trim();
+    const imageOffsetX = clamp(Number(document.getElementById('productImageOffsetX').value || 50), 0, 100);
+    const imageOffsetY = clamp(Number(document.getElementById('productImageOffsetY').value || 50), 0, 100);
     const imageFit = normalizeImageFit(document.getElementById('productImageFit').value, {
         ...currentProduct,
         name: productName,
@@ -731,7 +812,16 @@ async function handleProductSubmit(event) {
         description: document.getElementById('productDescription').value.trim(),
         image: document.getElementById('productImage').value.trim(),
         imageFit,
-        imagePosition: normalizeImagePosition(document.getElementById('productImagePosition').value),
+        imagePosition: `${imageOffsetX}% ${imageOffsetY}%`,
+        imageOffsetX,
+        imageOffsetY,
+        imageScale: normalizeImageScale(document.getElementById('productImageScale').value, {
+            ...currentProduct,
+            name: productName,
+            sku: productSku,
+            category: document.getElementById('productCategory').value,
+            brand: document.getElementById('productBrand').value
+        }),
         sizes: sizeEntries,
         isHidden: document.getElementById('productHidden').checked,
         isOutOfStock: document.getElementById('productOutOfStock').checked,
@@ -753,6 +843,112 @@ async function handleProductSubmit(event) {
         button.disabled = false;
         button.textContent = originalText;
     }
+}
+
+function syncProductImageFitButtons() {
+    const currentFit = document.getElementById('productImageFit')?.value || 'cover';
+    document.querySelectorAll('#productImageFitButtons .segmented-option').forEach((button) => {
+        button.classList.toggle('active', button.dataset.fit === currentFit);
+    });
+}
+
+function setProductImageFit(value) {
+    const fitInput = document.getElementById('productImageFit');
+    if (!fitInput) return;
+    fitInput.value = normalizeImageFit(value, {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    });
+    syncProductImageFitButtons();
+    updateProductImagePreview();
+}
+
+function updateProductImagePreview() {
+    const image = document.getElementById('productImagePreview');
+    const url = document.getElementById('productImage')?.value.trim();
+    const fit = normalizeImageFit(document.getElementById('productImageFit')?.value, {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    });
+    const scale = normalizeImageScale(document.getElementById('productImageScale')?.value, {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    });
+    const offsetX = clamp(Number(document.getElementById('productImageOffsetX')?.value || 50), 0, 100);
+    const offsetY = clamp(Number(document.getElementById('productImageOffsetY')?.value || 50), 0, 100);
+    const padding = getProductImagePadding({ imageFit: fit, category: document.getElementById('productCategory')?.value, brand: document.getElementById('productBrand')?.value, name: document.getElementById('productName')?.value, sku: document.getElementById('productSKU')?.value }, 6);
+
+    document.getElementById('productImagePosition').value = `${offsetX}% ${offsetY}%`;
+    document.getElementById('productImageScaleValue').textContent = `${Math.round(scale * 100)}%`;
+    document.getElementById('productImageOffsetXValue').textContent = `${Math.round(offsetX)}%`;
+    document.getElementById('productImageOffsetYValue').textContent = `${Math.round(offsetY)}%`;
+    document.getElementById('productImagePreviewSummary').textContent = `${fit === 'contain' ? 'Contain' : 'Cover'} · ${Math.round(scale * 100)}%`;
+
+    if (image) {
+        image.src = url || 'https://via.placeholder.com/500x500/111111/c6ff4c?text=Preview';
+        image.style.objectFit = fit;
+        image.style.objectPosition = `${offsetX}% ${offsetY}%`;
+        image.style.padding = padding;
+        image.style.transform = `scale(${scale})`;
+    }
+}
+
+function applyProductImageShoePreset() {
+    document.getElementById('productImageScale').value = '1.1';
+    document.getElementById('productImageOffsetX').value = '50';
+    document.getElementById('productImageOffsetY').value = '52';
+    setProductImageFit('contain');
+}
+
+function resetProductImageEditor() {
+    const contextProduct = {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    };
+    const fit = normalizeImageFit('', contextProduct);
+    document.getElementById('productImageScale').value = String(normalizeImageScale('', contextProduct));
+    document.getElementById('productImageOffsetX').value = '50';
+    document.getElementById('productImageOffsetY').value = '50';
+    setProductImageFit(fit);
+}
+
+function applyBulkInventoryStock() {
+    const value = Math.max(0, parseInt(document.getElementById('bulkStockValue')?.value, 10) || 0);
+    document.querySelectorAll('.size-stock').forEach((input) => {
+        input.value = value;
+    });
+    showToast(`Applied stock ${value} to all sizes.`);
+}
+
+function applyBulkInventoryPrice() {
+    const value = Math.max(0, parseFloat(document.getElementById('bulkPriceValue')?.value) || 0);
+    document.querySelectorAll('.size-price').forEach((input) => {
+        input.value = value ? value.toFixed(2) : '0.00';
+    });
+    showToast(`Applied price $${value.toFixed(2)} to all sizes.`);
+}
+
+function applyBasePriceToInventory() {
+    const basePrice = Math.max(0, parseFloat(document.getElementById('productPrice')?.value) || 0);
+    document.querySelectorAll('.size-price').forEach((input) => {
+        input.value = basePrice ? basePrice.toFixed(2) : '0.00';
+    });
+    showToast(`Applied base price $${basePrice.toFixed(2)} to all sizes.`);
+}
+
+function clearInventoryStock() {
+    document.querySelectorAll('.size-stock').forEach((input) => {
+        input.value = 0;
+    });
+    showToast('All size stock set to 0.', 'info');
 }
 
 async function updateProductReleaseDate(productId, value) {
@@ -1375,7 +1571,10 @@ async function publishImporterProduct() {
         image: importerSelectedImages[0],
         images: importerSelectedImages,
         imageFit: normalizeImageFit('', { name, sku: document.getElementById('impSku').value.trim() }),
-        imagePosition: 'center center',
+        imagePosition: '50% 52%',
+        imageOffsetX: 50,
+        imageOffsetY: 52,
+        imageScale: normalizeImageScale('', { name, brand: document.getElementById('impBrand').value, category: 'Sneakers' }),
         sizes: importerSelectedSizes.map((size) => ({ size, stock: 10, price: resell })),
         category: 'Sneakers',
         releaseDate: normalizeReleaseDate(document.getElementById('impReleaseDate').value) || 'TBD',

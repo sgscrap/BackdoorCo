@@ -61,6 +61,18 @@ function matchesKidsTravisBlackPhantom(product) {
     return id === 'seed-kids-travis-black-phantom-ps' || (name.includes('travis scott') && name.includes('black phantom'));
 }
 
+function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+}
+
+const LEGACY_IMAGE_POSITIONS = {
+    'center center': [50, 50],
+    'center top': [50, 18],
+    'center bottom': [50, 82],
+    'left center': [24, 50],
+    'right center': [76, 50]
+};
+
 function isFootwearProduct(product) {
     const category = String(product?.category || '').toLowerCase();
     const brand = String(product?.brand || '').toLowerCase();
@@ -191,15 +203,24 @@ export function getProductImageFit(product) {
 }
 
 export function getProductImagePosition(product) {
+    const rawX = Number(product?.imageOffsetX);
+    const rawY = Number(product?.imageOffsetY);
+    if (Number.isFinite(rawX) && Number.isFinite(rawY)) {
+        return `${clamp(rawX, 0, 100)}% ${clamp(rawY, 0, 100)}%`;
+    }
+
     const value = String(product?.imagePosition || '').trim().toLowerCase();
-    const allowed = new Set([
-        'center center',
-        'center top',
-        'center bottom',
-        'left center',
-        'right center'
-    ]);
-    return allowed.has(value) ? value : 'center center';
+    if (LEGACY_IMAGE_POSITIONS[value]) {
+        const [x, y] = LEGACY_IMAGE_POSITIONS[value];
+        return `${x}% ${y}%`;
+    }
+
+    const match = value.match(/^(-?\d{1,3}(?:\.\d+)?)%\s+(-?\d{1,3}(?:\.\d+)?)%$/);
+    if (match) {
+        return `${clamp(Number(match[1]), 0, 100)}% ${clamp(Number(match[2]), 0, 100)}%`;
+    }
+
+    return '50% 50%';
 }
 
 export function getProductCardImageScale(product) {

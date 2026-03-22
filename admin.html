@@ -718,6 +718,26 @@
 
                 <div class="form-group">
                     <label>Size Inventory (Stock & Price per size)</label>
+                    <div class="inventory-quickbar">
+                        <div class="inventory-quickbar-group">
+                            <label for="bulkStockValue">Set All Stock</label>
+                            <div class="inventory-quickbar-row">
+                                <input type="number" id="bulkStockValue" min="0" placeholder="0">
+                                <button type="button" class="btn-ghost" id="applyBulkStockBtn">Apply</button>
+                            </div>
+                        </div>
+                        <div class="inventory-quickbar-group">
+                            <label for="bulkPriceValue">Set All Prices</label>
+                            <div class="inventory-quickbar-row">
+                                <input type="number" id="bulkPriceValue" min="0" step="0.01" placeholder="0.00">
+                                <button type="button" class="btn-ghost" id="applyBulkPriceBtn">Apply</button>
+                            </div>
+                        </div>
+                        <div class="inventory-quickbar-actions">
+                            <button type="button" class="btn-ghost" id="applyBasePriceBtn">Use Base Price</button>
+                            <button type="button" class="btn-ghost danger" id="clearInventoryBtn">Zero Stock</button>
+                        </div>
+                    </div>
                     <div id="sizeInventoryGrid" class="size-inventory-grid"></div>
                 </div>
 
@@ -729,23 +749,56 @@
                     <label for="productImage">Product Image URL</label>
                     <input type="url" id="productImage" placeholder="https://..." required>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="productImageFit">Image Fit</label>
-                        <select id="productImageFit" aria-label="Select image fit">
-                            <option value="cover">Fill card</option>
-                            <option value="contain">Show full shoe</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="productImagePosition">Image Focus</label>
-                        <select id="productImagePosition" aria-label="Select image focus">
-                            <option value="center center">Center</option>
-                            <option value="center top">Top</option>
-                            <option value="center bottom">Bottom</option>
-                            <option value="left center">Left</option>
-                            <option value="right center">Right</option>
-                        </select>
+                <div class="form-group">
+                    <label>Card Image Framing</label>
+                    <div class="product-media-workbench">
+                        <div class="product-media-preview-panel">
+                            <div class="product-media-preview-head">
+                                <span>Live Card Preview</span>
+                                <span id="productImagePreviewSummary">Contain · 108%</span>
+                            </div>
+                            <div class="product-media-preview-card">
+                                <span class="product-media-preview-badge">Preview</span>
+                                <img id="productImagePreview" alt="Product image preview">
+                            </div>
+                            <p class="product-media-preview-note">Adjust zoom and framing until the storefront card looks right.</p>
+                        </div>
+                        <div class="product-media-controls">
+                            <input type="hidden" id="productImageFit" value="cover">
+                            <input type="hidden" id="productImagePosition" value="50% 50%">
+                            <div class="product-media-control-group">
+                                <label>Fit Mode</label>
+                                <div class="segmented-control" id="productImageFitButtons">
+                                    <button type="button" class="segmented-option" data-fit="contain">Show Full Shoe</button>
+                                    <button type="button" class="segmented-option" data-fit="cover">Fill Card</button>
+                                </div>
+                            </div>
+                            <div class="product-media-control-group">
+                                <div class="product-media-control-label">
+                                    <label for="productImageScale">Zoom</label>
+                                    <span id="productImageScaleValue">108%</span>
+                                </div>
+                                <input type="range" id="productImageScale" min="0.85" max="1.4" step="0.01" value="1.08">
+                            </div>
+                            <div class="product-media-control-group">
+                                <div class="product-media-control-label">
+                                    <label for="productImageOffsetX">Horizontal Focus</label>
+                                    <span id="productImageOffsetXValue">50%</span>
+                                </div>
+                                <input type="range" id="productImageOffsetX" min="0" max="100" step="1" value="50">
+                            </div>
+                            <div class="product-media-control-group">
+                                <div class="product-media-control-label">
+                                    <label for="productImageOffsetY">Vertical Focus</label>
+                                    <span id="productImageOffsetYValue">50%</span>
+                                </div>
+                                <input type="range" id="productImageOffsetY" min="0" max="100" step="1" value="50">
+                            </div>
+                            <div class="product-media-preset-row">
+                                <button type="button" class="btn-ghost" id="productImageShoePresetBtn">Shoe Preset</button>
+                                <button type="button" class="btn-ghost" id="productImageResetBtn">Reset Framing</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="product-flags-grid">
