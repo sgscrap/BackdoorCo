@@ -106,6 +106,102 @@ const BLACK_CAT_REVIEW_EIGHT = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const BLACK_CAT_REVIEW_NINE = {
+    id: 'seed-black-cat-009',
+    name: 'Ed**',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: "Honestly, these shoes took about a week to ship, but I'd say it's worth every dollar. There's nothing to worry about with it being a scam or anything like that. It's just a waiting game, but the shoes are so clean and worth it.",
+    originalComment: 'Honestly, these shoes took about a week to ship, but I would say it’s worth every single dollar. There’s nothing to worry about it being a scam or anything like that. It’s just a waiting game, but the shoes are so clean and worth it.',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_TEN = {
+    id: 'seed-black-cat-010',
+    name: 'Mi**',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'Fast shipping, good quality.',
+    originalComment: 'Fast shipping, good quality',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/SwydzfY.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_ELEVEN = {
+    id: 'seed-black-cat-011',
+    name: 'Avery T.',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'Superb quality.',
+    originalComment: 'Superb quality',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/SaRPNuL.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_TWELVE = {
+    id: 'seed-black-cat-012',
+    name: 'Sy**',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'Amazing quality and it arrived in like 5 days. Will be ordering again!',
+    originalComment: 'Amazing Quality and Arrived In Like 5 Days. Will be ordering again !',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/Ax0zKmx.jpg',
+        'https://i.imgur.com/Eaafpk5.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_THIRTEEN = {
+    id: 'seed-black-cat-013',
+    name: 'Mason J.',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'Took a week to get here, but it was worth the wait. They feel amazing, and I would personally buy from Backdoor again.',
+    originalComment: 'took a week to get here, but worth the wait, they feel amazing and i would personally buy from Backdoor again.',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_FOURTEEN = {
+    id: 'seed-black-cat-014',
+    name: 'Go**',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'Very, very good shoes. I love these. Clean all-black pair and I would buy again.',
+    originalComment: 'very very good shoes. I love these. They are just black like me.',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/mmZSLvZ.jpg',
+        'https://i.imgur.com/giaENyA.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_FIFTEEN = {
+    id: 'seed-black-cat-015',
+    name: 'Mi**',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'Another one that is fire. Thanks Backdoor.',
+    originalComment: 'another one that is fire.thanks Backdoor',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://i.imgur.com/mICQAuS.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
 const KIDS_TRAVIS_REVIEW_ONE = {
     id: 'seed-kids-travis-001',
     name: 'Ho**',
@@ -189,6 +285,13 @@ export function getSeededReviews() {
         normalizeReview(BLACK_CAT_REVIEW_SIX),
         normalizeReview(BLACK_CAT_REVIEW_SEVEN),
         normalizeReview(BLACK_CAT_REVIEW_EIGHT),
+        normalizeReview(BLACK_CAT_REVIEW_NINE),
+        normalizeReview(BLACK_CAT_REVIEW_TEN),
+        normalizeReview(BLACK_CAT_REVIEW_ELEVEN),
+        normalizeReview(BLACK_CAT_REVIEW_TWELVE),
+        normalizeReview(BLACK_CAT_REVIEW_THIRTEEN),
+        normalizeReview(BLACK_CAT_REVIEW_FOURTEEN),
+        normalizeReview(BLACK_CAT_REVIEW_FIFTEEN),
         normalizeReview(KIDS_TRAVIS_REVIEW_ONE),
         normalizeReview(KIDS_TRAVIS_REVIEW_TWO),
         normalizeReview(KIDS_TRAVIS_REVIEW_THREE),
