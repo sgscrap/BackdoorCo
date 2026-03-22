@@ -82,6 +82,30 @@ const BLACK_CAT_REVIEW_SIX = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const BLACK_CAT_REVIEW_SEVEN = {
+    id: 'seed-black-cat-007',
+    name: 'Ro**',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'First time ordering from BackDoor. Definitely worth it. Tracking never updated, but it came fast. Ordered on January 27 and it arrived February 3.',
+    originalComment: 'First time ordering from BackDoor definitely worth it. Tracking never updated but came fast ordered on jan 27th arrived feb 3rd',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const BLACK_CAT_REVIEW_EIGHT = {
+    id: 'seed-black-cat-008',
+    name: 'Ty**',
+    productName: "Jordan 4 Retro 'Black Cat' 2020",
+    comment: 'I was nervous at first, but now I am a believer.',
+    originalComment: 'I was nervous at first but now I am a believer',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
 const KIDS_TRAVIS_REVIEW_ONE = {
     id: 'seed-kids-travis-001',
     name: 'Ho**',
@@ -163,6 +187,8 @@ export function getSeededReviews() {
         normalizeReview(BLACK_CAT_REVIEW_FOUR),
         normalizeReview(BLACK_CAT_REVIEW_FIVE),
         normalizeReview(BLACK_CAT_REVIEW_SIX),
+        normalizeReview(BLACK_CAT_REVIEW_SEVEN),
+        normalizeReview(BLACK_CAT_REVIEW_EIGHT),
         normalizeReview(KIDS_TRAVIS_REVIEW_ONE),
         normalizeReview(KIDS_TRAVIS_REVIEW_TWO),
         normalizeReview(KIDS_TRAVIS_REVIEW_THREE),
