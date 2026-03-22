@@ -2955,6 +2955,8 @@ body {
     justify-content: center;
     overflow: hidden;
     margin-bottom: 18px;
+    position: relative;
+    cursor: pointer;
 }
 
 .product-page-main-media img {
@@ -2963,36 +2965,75 @@ body {
     object-fit: contain;
 }
 
-.product-page-thumbs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-    gap: 12px;
-}
-
-.product-thumb {
-    border: 1px solid var(--border);
-    background: var(--bg4);
-    border-radius: 16px;
-    overflow: hidden;
+.product-gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(10, 10, 10, 0.72);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    aspect-ratio: 1;
-    transition: border-color 0.2s, transform 0.2s;
+    z-index: 2;
+    transition: transform 0.2s, border-color 0.2s, background 0.2s;
 }
 
-.product-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.product-gallery-nav:hover {
+    border-color: rgba(200, 246, 93, 0.45);
+    background: rgba(10, 10, 10, 0.88);
+    transform: translateY(-50%) scale(1.04);
 }
 
-.product-thumb.active,
-.product-thumb:hover {
+.product-gallery-nav--prev {
+    left: 16px;
+}
+
+.product-gallery-nav--next {
+    right: 16px;
+}
+
+.product-gallery-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.product-gallery-hint {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.product-gallery-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.product-gallery-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+.product-gallery-dot.active,
+.product-gallery-dot:hover {
+    background: var(--accent);
     border-color: var(--accent);
-    transform: translateY(-2px);
+    transform: scale(1.08);
 }
 
 .product-album-link {
-    margin-top: 16px;
     display: none;
     align-items: center;
     gap: 8px;

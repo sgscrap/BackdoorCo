@@ -15,6 +15,8 @@ import {
 let currentProduct = null;
 let selectedSize = '';
 let cart = JSON.parse(localStorage.getItem('backdoor-cart')) || [];
+let productImages = [];
+let currentImageIndex = 0;
 
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('id');
@@ -47,8 +49,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function initShell() {
     document.getElementById('cartClose')?.addEventListener('click', () => cartSidebar?.classList.remove('active'));
+    document.getElementById('productPrevImage')?.addEventListener('click', () => changeProductImage(-1));
+    document.getElementById('productNextImage')?.addEventListener('click', () => changeProductImage(1));
+    document.getElementById('productMainImage')?.addEventListener('click', () => changeProductImage(1));
     window.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') cartSidebar?.classList.remove('active');
+        if (event.key === 'ArrowLeft') changeProductImage(-1);
+        if (event.key === 'ArrowRight') changeProductImage(1);
     });
 }
 
@@ -93,24 +100,13 @@ function renderProduct(product) {
     }
 
     const images = getProductImages(product);
+    productImages = images.length > 0 ? images : [product.image].filter(Boolean);
+    currentImageIndex = 0;
     const mainImage = document.getElementById('productMainImage');
-    mainImage.src = images[0] || product.image || '';
+    mainImage.src = productImages[0] || '';
     mainImage.alt = product.name;
 
-    const thumbs = document.getElementById('productThumbs');
-    thumbs.innerHTML = images.map((image, index) => `
-        <button class="product-thumb ${index === 0 ? 'active' : ''}" type="button" data-image="${image}" onclick="selectProductImage(this)">
-            <img src="${image}" alt="${product.name} preview ${index + 1}">
-        </button>
-    `).join('');
-
-    const albumLink = document.getElementById('productAlbumLink');
-    if (product.albumUrl) {
-        albumLink.href = product.albumUrl;
-        albumLink.style.display = 'inline-flex';
-    } else {
-        albumLink.style.display = 'none';
-    }
+    renderGalleryControls();
 
     const sizes = getProductSizes(product);
     const sizeOptions = document.getElementById('productSizeOptions');
@@ -139,10 +135,44 @@ function buildBackHref(product) {
 }
 
 window.selectProductImage = (button) => {
-    document.querySelectorAll('.product-thumb').forEach((thumb) => thumb.classList.remove('active'));
-    button.classList.add('active');
-    document.getElementById('productMainImage').src = button.dataset.image;
+    const nextIndex = Number(button.dataset.index || 0);
+    setProductImage(nextIndex);
 };
+
+function renderGalleryControls() {
+    const dots = document.getElementById('productGalleryDots');
+    const hint = document.getElementById('productGalleryHint');
+    const prevButton = document.getElementById('productPrevImage');
+    const nextButton = document.getElementById('productNextImage');
+    const hasMultiple = productImages.length > 1;
+
+    if (hint) {
+        hint.textContent = hasMultiple ? 'Click image to see the next photo' : 'Single product preview';
+    }
+
+    if (prevButton) prevButton.style.display = hasMultiple ? 'inline-flex' : 'none';
+    if (nextButton) nextButton.style.display = hasMultiple ? 'inline-flex' : 'none';
+
+    if (dots) {
+        dots.innerHTML = productImages.map((_, index) => `
+            <button class="product-gallery-dot ${index === currentImageIndex ? 'active' : ''}" type="button" data-index="${index}" onclick="selectProductImage(this)" aria-label="View image ${index + 1}"></button>
+        `).join('');
+        dots.style.display = hasMultiple ? 'flex' : 'none';
+    }
+}
+
+function setProductImage(index) {
+    if (productImages.length === 0) return;
+    currentImageIndex = (index + productImages.length) % productImages.length;
+    const mainImage = document.getElementById('productMainImage');
+    if (mainImage) mainImage.src = productImages[currentImageIndex];
+    renderGalleryControls();
+}
+
+function changeProductImage(direction) {
+    if (productImages.length <= 1) return;
+    setProductImage(currentImageIndex + direction);
+}
 
 window.selectProductSize = (button) => {
     if (button.disabled) return;

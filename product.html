@@ -56,10 +56,18 @@
         <section class="product-page-layout" id="productPageLayout">
             <div class="product-page-gallery">
                 <div class="product-page-main-media">
+                    <button class="product-gallery-nav product-gallery-nav--prev" id="productPrevImage" type="button" aria-label="Previous image">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
                     <img id="productMainImage" src="" alt="Product preview">
+                    <button class="product-gallery-nav product-gallery-nav--next" id="productNextImage" type="button" aria-label="Next image">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
                 </div>
-                <div class="product-page-thumbs" id="productThumbs"></div>
-                <a id="productAlbumLink" class="product-album-link" href="#" target="_blank" rel="noreferrer">View full image album</a>
+                <div class="product-gallery-meta">
+                    <span class="product-gallery-hint" id="productGalleryHint">Tap image to view next photo</span>
+                    <div class="product-gallery-dots" id="productGalleryDots"></div>
+                </div>
             </div>
 
             <div class="product-page-info">

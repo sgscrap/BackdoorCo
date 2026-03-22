@@ -51,7 +51,22 @@ export function getProductSizes(product) {
 export function getProductImages(product) {
     const overridden = applyProductOverrides(product);
     if (Array.isArray(overridden?.images) && overridden.images.length > 0) {
-        return overridden.images.filter(Boolean);
+        const seen = new Set();
+        return overridden.images
+            .filter(Boolean)
+            .filter((image) => {
+                const normalized = String(image)
+                    .replace(/\?.*$/, '')
+                    .replace(/\.[a-z0-9]+$/i, '')
+                    .toLowerCase();
+
+                if (seen.has(normalized)) {
+                    return false;
+                }
+
+                seen.add(normalized);
+                return true;
+            });
     }
     return overridden?.image ? [overridden.image] : [];
 }
