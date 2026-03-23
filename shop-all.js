@@ -14,8 +14,9 @@ import {
     getProductImageFit,
     getProductImagePosition,
     mergeCatalogProducts,
+    getBackorderLeadTime,
     getTotalStock,
-    isBackorder,
+    isBackorderOnly,
     isFeatured,
     isHidden,
     isOutOfStock
@@ -150,7 +151,7 @@ function renderProducts() {
     if (grid) {
         grid.innerHTML = filtered.map((product, index) => {
             const soldOut = isOutOfStock(product);
-            const backorder = isBackorder(product);
+            const backorder = isBackorderOnly(product);
             const totalStock = getTotalStock(product);
             const cardImage = getProductCardImage(product);
             const imageScale = getProductCardImageScale(product);
@@ -181,7 +182,7 @@ function renderProducts() {
                         <p class="shop-card-cat">${(product.category || '').toUpperCase()}</p>
                         <div class="shop-card-bottom">
                             <div>
-                                <p class="shop-card-label">${backorder ? (product.backorderLeadTime || 'Backorder') : soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</p>
+                                <p class="shop-card-label">${backorder ? getBackorderLeadTime(product) : soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</p>
                                 <p class="shop-card-price">$${product.price.toFixed(0)}</p>
                                 <a class="product-page-link" href="${buildProductHref(product)}" onclick="event.stopPropagation()">View product page</a>
                             </div>

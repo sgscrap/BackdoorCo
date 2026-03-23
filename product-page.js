@@ -10,8 +10,12 @@ import {
     getSeededProducts,
     getProductImages,
     getProductSizes,
+    getBackorderLeadTime,
     getTotalStock,
+    hasBackorderSizes,
+    hasInStockSizes,
     isBackorder,
+    isBackorderOnly,
     isFeatured,
     isOutOfStock
 } from './product-data.js';
@@ -22,6 +26,7 @@ import {
 
 let currentProduct = null;
 let selectedSize = '';
+let selectedSizeBackorder = false;
 let cart = loadCartFromStorage();
 let productImages = [];
 let currentImageIndex = 0;
@@ -100,7 +105,7 @@ function renderMissingProduct(message = 'Product not found.') {
 function renderProduct(product) {
     document.title = `${product.name} | Backdoor`;
     const soldOut = isOutOfStock(product);
-    const backorder = isBackorder(product);
+    const backorder = isBackorderOnly(product);
     document.getElementById('productBreadcrumbLabel').textContent = product.name;
     document.getElementById('productName').textContent = product.name;
     document.getElementById('productCategoryLabel').textContent = product.category || 'Product';
@@ -115,8 +120,10 @@ function renderProduct(product) {
     document.getElementById('productStockLabel').textContent = soldOut
         ? 'Out of stock'
         : backorder
-            ? (product.backorderLeadTime || 'Ships in 1.5-2 weeks')
-        : `${getTotalStock(product)} items available`;
+            ? getBackorderLeadTime(product)
+            : hasInStockSizes(product) && hasBackorderSizes(product)
+                ? `${getTotalStock(product)} item${getTotalStock(product) !== 1 ? 's' : ''} in stock | other sizes ${getBackorderLeadTime(product).toLowerCase()}`
+                : `${getTotalStock(product)} items available`;
 
     const badge = document.getElementById('productStatusBadge');
     if (backorder) {
@@ -148,10 +155,11 @@ function renderProduct(product) {
     const sizes = getProductSizes(product);
     const sizeOptions = document.getElementById('productSizeOptions');
     sizeOptions.innerHTML = sizes.map((entry) => {
-        const sizeSoldOut = (soldOut || entry.stock <= 0) && !backorder;
+        const sizeBackorder = isBackorder(product, entry) && entry.stock <= 0;
+        const sizeSoldOut = entry.stock <= 0 && !sizeBackorder;
         return `
-            <button type="button" class="size-option ${sizeSoldOut ? 'out-of-stock' : ''}" ${sizeSoldOut ? 'disabled' : ''} data-size="${entry.size}" onclick="selectProductSize(this)">
-                ${entry.size}
+            <button type="button" class="size-option ${sizeSoldOut ? 'out-of-stock' : ''} ${sizeBackorder ? 'backorder' : ''}" ${sizeSoldOut ? 'disabled' : ''} data-size="${entry.size}" data-backorder="${sizeBackorder}" onclick="selectProductSize(this)">
+                ${entry.size}${sizeBackorder ? '<span class="size-option-tag">BO</span>' : ''}
             </button>
         `;
     }).join('');
@@ -159,7 +167,10 @@ function renderProduct(product) {
     const addToCartButton = document.getElementById('productAddToCart');
     addToCartButton.disabled = soldOut;
     addToCartButton.textContent = soldOut ? 'Out of Stock' : backorder ? 'Select Size for Backorder' : sizes.length > 0 ? 'Select Size' : 'Add to Cart';
-    if (!soldOut && sizes.length === 0) selectedSize = 'One Size';
+    if (!soldOut && sizes.length === 0) {
+        selectedSize = 'One Size';
+        selectedSizeBackorder = backorder;
+    }
 
     document.querySelector('.product-back-link')?.setAttribute('href', buildBackHref(product));
 }
@@ -284,7 +295,8 @@ window.selectProductSize = (button) => {
     document.querySelectorAll('#productSizeOptions .size-option').forEach((option) => option.classList.remove('selected'));
     button.classList.add('selected');
     selectedSize = button.dataset.size || '';
-    document.getElementById('productAddToCart').textContent = 'Add to Cart';
+    selectedSizeBackorder = button.dataset.backorder === 'true';
+    document.getElementById('productAddToCart').textContent = selectedSizeBackorder ? 'Add Backorder' : 'Add to Cart';
 };
 
 document.getElementById('productAddToCart')?.addEventListener('click', () => {
@@ -295,8 +307,16 @@ document.getElementById('productAddToCart')?.addEventListener('click', () => {
     }
 
     const existing = cart.find((item) => item.id === currentProduct.id && item.size === selectedSize);
-    if (existing) existing.qty += 1;
+    if (existing) {
+        const sizeEntry = getProductSizes(currentProduct).find((entry) => entry.size === selectedSize);
+        const backorder = Boolean(selectedSizeBackorder || (sizeEntry && isBackorder(currentProduct, sizeEntry)));
+        existing.qty += 1;
+        existing.backorder = backorder;
+        existing.backorderLeadTime = backorder ? getBackorderLeadTime(currentProduct, sizeEntry) : '';
+    }
     else {
+        const sizeEntry = getProductSizes(currentProduct).find((entry) => entry.size === selectedSize);
+        const backorder = Boolean(selectedSizeBackorder || (sizeEntry && isBackorder(currentProduct, sizeEntry)));
         cart.push({
             id: currentProduct.id,
             name: currentProduct.name,
@@ -304,6 +324,8 @@ document.getElementById('productAddToCart')?.addEventListener('click', () => {
             price: Number(currentProduct.price) || 0,
             image: getProductImages(currentProduct)[0] || currentProduct.image || '',
             size: selectedSize,
+            backorder,
+            backorderLeadTime: backorder ? getBackorderLeadTime(currentProduct, sizeEntry) : '',
             qty: 1
         });
     }
@@ -330,6 +352,8 @@ function normalizeCartItem(item) {
         price: Number(item?.price) || 0,
         image: String(item?.image || '').trim(),
         size: String(item?.size || 'One Size').trim() || 'One Size',
+        backorder: Boolean(item?.backorder),
+        backorderLeadTime: String(item?.backorderLeadTime || '').trim(),
         qty: Math.max(1, Number(item?.qty) || Number(item?.quantity) || 1)
     };
 }
@@ -375,6 +399,7 @@ function updateCartUI() {
                 <div class="cart-item-meta">
                     <span>Size ${item.size}</span>
                     ${item.brand ? `<span>${item.brand}</span>` : ''}
+                    ${item.backorder ? `<span>Backorder${item.backorderLeadTime ? ` | ${item.backorderLeadTime}` : ''}</span>` : ''}
                 </div>
                 <div class="cart-item-bottom">
                     <div class="qty-control">

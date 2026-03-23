@@ -13,6 +13,8 @@ function buildImgurImageUrl(id, extension = 'jpg') {
     return `https://i.imgur.com/${id}.${extension}`;
 }
 
+const DEFAULT_ADULT_SIZE_OPTIONS = ['US 7', 'US 7.5', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 10.5', 'US 11', 'US 11.5', 'US 12', 'US 13', 'US 14', 'US 15'];
+
 const SEEDED_PRODUCTS = [
     {
         id: 'seed-kobe-5-alternate-bruce-lee',
@@ -145,6 +147,43 @@ const SEEDED_PRODUCTS = [
         createdAt: { seconds: 0 }
     },
     {
+        id: 'seed-men-travis-black-phantom',
+        name: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
+        sku: 'DM7866 001',
+        price: 250,
+        brand: 'Jordan',
+        category: 'Sneakers',
+        colorway: 'Black/Phantom/University Red',
+        description: "The Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom' brings La Flame's signature reverse Swoosh to a stealthy black suede build with contrast white stitching throughout. A woven Nike Air tag lands on the tongue, while mismatched Cactus Jack and Jordan Wings branding finish the heel tabs. University Red detailing adds a subtle hit of color to the monochrome low-top.",
+        image: 'https://www.snkrempire.com/wp-content/uploads/2022/09/Travis-Scott-x-Air-Jordan-1-Low-OG-BlackPhantom-1024x1024.png',
+        images: [
+            'https://www.snkrempire.com/wp-content/uploads/2022/09/Travis-Scott-x-Air-Jordan-1-Low-OG-BlackPhantom-1024x1024.png',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/983/original/1006990_01.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/986/original/1006990_02.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/985/original/1006990_03.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/987/original/1006990_04.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/988/original/1006990_05.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/990/original/1006990_06.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/991/original/1006990_07.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/992/original/1006990_08.jpg.jpeg?action=crop&width=600'
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 58%',
+        imageScale: 1.18,
+        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({
+            size,
+            stock: 1,
+            price: 250
+        })),
+        releaseDate: '12/15/2022',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
         id: 'seed-kids-travis-black-phantom-ps',
         name: "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
         sku: 'DO5442-001',
@@ -238,6 +277,20 @@ export function applyProductOverrides(product) {
         nextProduct.images = [...BLACK_CAT_IMAGES];
         nextProduct.imageFit = nextProduct.imageFit || 'contain';
         nextProduct.imagePosition = nextProduct.imagePosition || 'center center';
+        nextProduct.backorderLeadTime = nextProduct.backorderLeadTime || 'Ships in 1.5-2 weeks';
+        const basePrice = Number(nextProduct.price) || 0;
+        const existingSizeMap = new Map((Array.isArray(nextProduct.sizes) ? nextProduct.sizes : []).map((entry) => [String(entry?.size || '').trim(), entry]));
+        nextProduct.sizes = DEFAULT_ADULT_SIZE_OPTIONS.map((size) => {
+            const current = existingSizeMap.get(size) || {};
+            const inStock = size === 'US 10';
+            return {
+                size,
+                stock: inStock ? Math.max(1, Number(current.stock) || 1) : 0,
+                price: Number(current.price) || basePrice,
+                backorder: !inStock,
+                backorderLeadTime: nextProduct.backorderLeadTime
+            };
+        });
     }
 
     return nextProduct;
@@ -248,7 +301,9 @@ export function getProductSizes(product) {
         return product.sizes.map((entry) => ({
             size: String(entry.size || '').trim(),
             stock: Math.max(0, Number(entry.stock) || 0),
-            price: Number(entry.price) || Number(product.price) || 0
+            price: Number(entry.price) || Number(product.price) || 0,
+            backorder: Boolean(entry.backorder),
+            backorderLeadTime: String(entry.backorderLeadTime || product?.backorderLeadTime || '').trim()
         })).filter((entry) => entry.size);
     }
 
@@ -256,7 +311,9 @@ export function getProductSizes(product) {
         return product.sizes.split(',').map((size) => ({
             size: size.trim(),
             stock: Math.max(0, Number(product.stock) || 0),
-            price: Number(product.price) || 0
+            price: Number(product.price) || 0,
+            backorder: Boolean(product?.allowBackorder),
+            backorderLeadTime: String(product?.backorderLeadTime || '').trim()
         })).filter((entry) => entry.size);
     }
 
@@ -330,12 +387,31 @@ export function isFeatured(product) {
     return Boolean(product?.isFeatured) || Boolean(product?.featured);
 }
 
-export function isBackorder(product) {
+export function hasInStockSizes(product) {
+    return getProductSizes(product).some((entry) => entry.stock > 0);
+}
+
+export function hasBackorderSizes(product) {
+    return Boolean(product?.allowBackorder) || getProductSizes(product).some((entry) => Boolean(entry.backorder));
+}
+
+export function isBackorder(product, sizeEntry) {
+    if (sizeEntry) {
+        return Boolean(sizeEntry?.backorder) || (Boolean(product?.allowBackorder) && Math.max(0, Number(sizeEntry?.stock) || 0) <= 0);
+    }
     return Boolean(product?.allowBackorder);
 }
 
+export function isBackorderOnly(product) {
+    return hasBackorderSizes(product) && !hasInStockSizes(product);
+}
+
+export function getBackorderLeadTime(product, sizeEntry) {
+    return String(sizeEntry?.backorderLeadTime || product?.backorderLeadTime || 'Ships in 1.5-2 weeks').trim();
+}
+
 export function isOutOfStock(product) {
-    if (isBackorder(product)) return false;
+    if (hasBackorderSizes(product)) return false;
     return Boolean(product?.isOutOfStock) || getTotalStock(product) <= 0;
 }
 

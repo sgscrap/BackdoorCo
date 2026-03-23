@@ -53,6 +53,8 @@ function normalizeCartItem(item) {
         size: String(item?.size || 'One Size').trim() || 'One Size',
         price: Number(item?.price) || 0,
         image: String(item?.image || '').trim(),
+        backorder: Boolean(item?.backorder),
+        backorderLeadTime: String(item?.backorderLeadTime || '').trim(),
         qty: Math.max(1, Number(item?.qty) || Number(item?.quantity) || 1)
     };
 }
@@ -187,6 +189,7 @@ function renderCartDrawer() {
           <div class="cart-item-meta">
             <span>Size ${item.size}</span>
             <span>${item.brand || ''}</span>
+            ${item.backorder ? `<span>Backorder${item.backorderLeadTime ? ` | ${item.backorderLeadTime}` : ''}</span>` : ''}
           </div>
           <div class="cart-item-bottom">
             <div class="qty-control">

@@ -13,9 +13,11 @@ import {
     getProductImageFit,
     getProductImagePosition,
     mergeCatalogProducts,
+    getBackorderLeadTime,
     getProductSizes,
     getTotalStock,
     isBackorder,
+    isBackorderOnly,
     isFeatured,
     isHidden,
     isOutOfStock
@@ -24,6 +26,7 @@ import {
 let products = [];
 let cart = loadCartFromStorage();
 let selectedModalSize = '';
+let selectedModalBackorder = false;
 let selectedModalProduct = null;
 
 const isHomePage = Boolean(document.getElementById('mostWanted'));
@@ -47,7 +50,7 @@ function getVisibleProducts() {
 }
 
 function getBadgeMeta(product) {
-    if (isBackorder(product)) {
+    if (isBackorderOnly(product)) {
         return { label: 'Backorder', className: 'modal-badge modal-badge--featured' };
     }
     if (isOutOfStock(product)) {
@@ -95,7 +98,7 @@ function renderMostWanted() {
 
     productGrid.innerHTML = featuredFirst.map((product, index) => {
         const soldOut = isOutOfStock(product);
-        const backorder = isBackorder(product);
+        const backorder = isBackorderOnly(product);
         const cardImage = getProductCardImage(product);
         const imageScale = getProductCardImageScale(product);
         const imagePadding = getProductCardImagePadding(product);
@@ -120,7 +123,7 @@ function renderMostWanted() {
                     <h3 class="mw-card-name drop-name">${product.name}</h3>
                     <div class="mw-price-row drop-bottom">
                         <div class="mw-price-block drop-price-wrap">
-                            <span class="mw-ask-label drop-price-label">${backorder ? (product.backorderLeadTime || 'Backorder') : soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</span>
+                            <span class="mw-ask-label drop-price-label">${backorder ? getBackorderLeadTime(product) : soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</span>
                             <span class="mw-price drop-price">$${product.price.toFixed(0)}</span>
                         </div>
                         ${soldOut && !backorder
@@ -170,6 +173,7 @@ window.showProductModal = function showProductModal(product) {
 
     selectedModalProduct = product;
     selectedModalSize = '';
+    selectedModalBackorder = false;
 
     document.getElementById('modalTitle').textContent = product.name || '';
     document.getElementById('modalImage').src = product.image || '';
@@ -194,10 +198,11 @@ window.showProductModal = function showProductModal(product) {
     const sizes = getProductSizes(product);
     if (sizesContainer) {
         sizesContainer.innerHTML = sizes.map((entry) => {
-            const soldOut = (isOutOfStock(product) || entry.stock <= 0) && !isBackorder(product);
+            const sizeBackorder = isBackorder(product, entry) && entry.stock <= 0;
+            const soldOut = entry.stock <= 0 && !sizeBackorder;
             return `
-                <button type="button" class="size-option ${soldOut ? 'out-of-stock' : ''}" ${soldOut ? 'disabled' : ''} data-size="${entry.size}" onclick="selectModalSize(this)">
-                    ${entry.size}
+                <button type="button" class="size-option ${soldOut ? 'out-of-stock' : ''} ${sizeBackorder ? 'backorder' : ''}" ${soldOut ? 'disabled' : ''} data-size="${entry.size}" data-backorder="${sizeBackorder}" onclick="selectModalSize(this)">
+                    ${entry.size}${sizeBackorder ? '<span class="size-option-tag">BO</span>' : ''}
                 </button>
             `;
         }).join('');
@@ -207,6 +212,7 @@ window.showProductModal = function showProductModal(product) {
     if (addToCartButton) {
         if (!isOutOfStock(product) && sizes.length === 0) {
             selectedModalSize = 'One Size';
+            selectedModalBackorder = isBackorderOnly(product);
             addToCartButton.disabled = false;
             addToCartButton.textContent = 'Add to Cart';
         } else {
@@ -242,6 +248,7 @@ function closeProductModal() {
     document.body.style.overflow = '';
     selectedModalProduct = null;
     selectedModalSize = '';
+    selectedModalBackorder = false;
 }
 
 window.selectModalSize = (element) => {
@@ -249,19 +256,26 @@ window.selectModalSize = (element) => {
     document.querySelectorAll('.size-option').forEach((option) => option.classList.remove('selected'));
     element.classList.add('selected');
     selectedModalSize = element.dataset.size || '';
+    selectedModalBackorder = element.dataset.backorder === 'true';
 
     const addToCartButton = document.getElementById('modalAddToCart');
     if (addToCartButton && selectedModalProduct && !isOutOfStock(selectedModalProduct)) {
         addToCartButton.disabled = false;
-        addToCartButton.textContent = 'Add to Cart';
+        addToCartButton.textContent = selectedModalBackorder ? 'Add Backorder' : 'Add to Cart';
     }
 };
 
 function addToCart(product, size) {
     if (!product || isOutOfStock(product)) return;
+    const sizeEntry = getProductSizes(product).find((entry) => entry.size === size);
+    const backorder = Boolean(selectedModalBackorder || (sizeEntry && isBackorder(product, sizeEntry)));
 
     const existing = cart.find((item) => item.id === product.id && item.size === size);
-    if (existing) existing.qty += 1;
+    if (existing) {
+        existing.qty += 1;
+        existing.backorder = backorder;
+        existing.backorderLeadTime = backorder ? getBackorderLeadTime(product, sizeEntry) : '';
+    }
     else {
         cart.push({
             id: product.id,
@@ -270,6 +284,8 @@ function addToCart(product, size) {
             price: Number(product.price) || 0,
             image: product.image || '',
             size,
+            backorder,
+            backorderLeadTime: backorder ? getBackorderLeadTime(product, sizeEntry) : '',
             qty: 1
         });
     }
@@ -296,6 +312,8 @@ function normalizeCartItem(item) {
         price: Number(item?.price) || 0,
         image: String(item?.image || '').trim(),
         size: String(item?.size || 'One Size').trim() || 'One Size',
+        backorder: Boolean(item?.backorder),
+        backorderLeadTime: String(item?.backorderLeadTime || '').trim(),
         qty: Math.max(1, Number(item?.qty) || Number(item?.quantity) || 1)
     };
 }
@@ -350,6 +368,7 @@ function updateCartUI() {
                 <div class="cart-item-meta">
                     <span>Size ${item.size}</span>
                     ${item.brand ? `<span>${item.brand}</span>` : ''}
+                    ${item.backorder ? `<span>Backorder${item.backorderLeadTime ? ` | ${item.backorderLeadTime}` : ''}</span>` : ''}
                 </div>
                 <div class="cart-item-bottom">
                     <div class="qty-control">
