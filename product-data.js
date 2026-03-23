@@ -238,8 +238,8 @@ const SEEDED_PRODUCTS = [
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/649/original/793106_08.jpg.jpeg?action=crop&width=600'
         ],
         imageFit: 'contain',
-        imagePosition: '50% 54%',
-        imageScale: 1.1,
+        imagePosition: '50% 56%',
+        imageScale: 1.22,
         sizes: [
             { size: 'US 5', stock: 1, price: 185 },
             { size: 'US 5.5', stock: 1, price: 185 },
