@@ -16,10 +16,12 @@ import {
     mergeCatalogProducts,
     getBackorderLeadTime,
     getTotalStock,
-    isBackorderOnly,
     isFeatured,
     isHidden,
-    isOutOfStock
+    isOutOfStock,
+    hasBackorderSizes,
+    hasInStockSizes,
+    isBackorderOnly
 } from './product-data.js';
 
 let allProducts = [];
@@ -95,6 +97,12 @@ function getFilteredProducts() {
         filtered = filtered.filter((product) => product.category !== 'Women' && product.category !== 'Kids');
     } else if (currentFilter === 'Shoes') {
         filtered = filtered.filter((product) => product.category === 'Shoes' || product.category === 'Sneakers');
+    } else if (currentFilter === 'In Stock') {
+        filtered = filtered.filter((product) => hasInStockSizes(product) || (!hasInStockSizes(product) && getTotalStock(product) > 0));
+    } else if (currentFilter === 'Backorder Available') {
+        filtered = filtered.filter((product) => hasBackorderSizes(product));
+    } else if (currentFilter === 'Out of Stock') {
+        filtered = filtered.filter((product) => isOutOfStock(product));
     } else if (currentFilter !== 'all') {
         filtered = filtered.filter((product) => product.brand === currentFilter || product.category === currentFilter);
     }
@@ -209,7 +217,10 @@ function updateFilterCounts() {
         'New Balance': visible.filter((product) => product.brand === 'New Balance').length,
         'Acne Studios': visible.filter((product) => product.brand === 'Acne Studios').length,
         Sneakers: visible.filter((product) => product.category === 'Sneakers').length,
-        Apparel: visible.filter((product) => product.category === 'Apparel').length
+        Apparel: visible.filter((product) => product.category === 'Apparel').length,
+        'In Stock': visible.filter((product) => hasInStockSizes(product) || (!hasInStockSizes(product) && getTotalStock(product) > 0)).length,
+        'Backorder Available': visible.filter((product) => hasBackorderSizes(product)).length,
+        'Out of Stock': visible.filter((product) => isOutOfStock(product)).length
     };
 
     Object.entries(counts).forEach(([key, count]) => {
