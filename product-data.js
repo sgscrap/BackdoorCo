@@ -155,9 +155,9 @@ const SEEDED_PRODUCTS = [
         category: 'Sneakers',
         colorway: 'Black/Phantom/University Red',
         description: "The Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom' brings La Flame's signature reverse Swoosh to a stealthy black suede build with contrast white stitching throughout. A woven Nike Air tag lands on the tongue, while mismatched Cactus Jack and Jordan Wings branding finish the heel tabs. University Red detailing adds a subtle hit of color to the monochrome low-top.",
-        image: 'https://www.snkrempire.com/wp-content/uploads/2022/09/Travis-Scott-x-Air-Jordan-1-Low-OG-BlackPhantom-1024x1024.png',
+        image: 'https://soakthesauce.com/cdn/shop/files/Air-Jordan-X-Travis-Scott-1-Low-OG-SP-Black-Phantom-Crepslocker-Front-Side_970x_27f630dc-7966-4067-a352-2ab38bb50b1b.webp?v=1688058142&width=970',
         images: [
-            'https://www.snkrempire.com/wp-content/uploads/2022/09/Travis-Scott-x-Air-Jordan-1-Low-OG-BlackPhantom-1024x1024.png',
+            'https://soakthesauce.com/cdn/shop/files/Air-Jordan-X-Travis-Scott-1-Low-OG-SP-Black-Phantom-Crepslocker-Front-Side_970x_27f630dc-7966-4067-a352-2ab38bb50b1b.webp?v=1688058142&width=970',
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/983/original/1006990_01.jpg.jpeg?action=crop&width=600',
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/986/original/1006990_02.jpg.jpeg?action=crop&width=600',
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/985/original/1006990_03.jpg.jpeg?action=crop&width=600',
