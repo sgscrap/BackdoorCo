@@ -237,33 +237,45 @@
     </div>
     <div class="brands-grid">
       <div class="brand-card" onclick="filterByBrandClick('Jordan')">
-        <img src="products/jordan-4-black-cat.jpg" alt="Jordan" class="brand-card-img" />
+        <div class="brand-card-visual brand-card-visual--light">
+          <img src="https://th.bing.com/th/id/R.0139937c2f641ab61fd020844ccfd459?rik=Jeg6%2bRaQwcqadA&pid=ImgRaw&r=0"
+            alt="Jordan" class="brand-card-img brand-card-img--jordan" loading="lazy" decoding="async"
+            referrerpolicy="no-referrer" />
+        </div>
         <div class="brand-name">Jordan</div>
         <div class="brand-count">8 items</div>
       </div>
       <div class="brand-card" onclick="filterByBrandClick('Nike')">
-        <img src="products/kobe-6-reverse-grinch.jpg" alt="Nike" class="brand-card-img" />
+        <div class="brand-card-visual brand-card-visual--light">
+          <img src="https://i.pinimg.com/originals/08/c7/a6/08c7a6367523a3cee26872dc74221ce3.png" alt="Nike"
+            class="brand-card-img brand-card-img--nike" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+        </div>
         <div class="brand-name">Nike</div>
         <div class="brand-count">5 items</div>
       </div>
       <div class="brand-card" onclick="filterByBrandClick('Adidas')">
-        <img src="products/pharrell-jellyfish-blue.jpg" alt="Adidas" class="brand-card-img" />
+        <div class="brand-card-visual brand-card-visual--light">
+          <img src="https://www.freepnglogos.com/uploads/adidas-logo-png-transparent-24.png" alt="Adidas"
+            class="brand-card-img brand-card-img--adidas" loading="lazy" decoding="async"
+            referrerpolicy="no-referrer" />
+        </div>
         <div class="brand-name">Adidas</div>
         <div class="brand-count">2 items</div>
       </div>
-      <div class="brand-card" onclick="filterByBrandClick('Godspeed')">
-        <img src="products/godspeed-surf-day.png" alt="Godspeed" class="brand-card-img" />
-        <div class="brand-name">Godspeed</div>
-        <div class="brand-count">1 item</div>
-      </div>
-      <div class="brand-card" onclick="filterByBrandClick('Nike')">
-        <img src="products/nocta-sunset-jacket.jpg" alt="NOCTA" class="brand-card-img" />
-        <div class="brand-name">NOCTA</div>
-        <div class="brand-count">1 item</div>
-      </div>
-      <div class="brand-card" onclick="filterByBrandClick('Jordan')">
-        <img src="products/jordan-1-fragment-travis.jpg" alt="Travis Scott" class="brand-card-img" />
+      <div class="brand-card" onclick="filterByBrandClick('Travis Scott')">
+        <div class="brand-card-visual brand-card-visual--dark">
+          <img src="brand-logos/travis-scott.svg" alt="Travis Scott" class="brand-card-img brand-card-img--travis"
+            loading="lazy" decoding="async" />
+        </div>
         <div class="brand-name">Travis Scott</div>
+        <div class="brand-count">1 item</div>
+      </div>
+      <div class="brand-card" onclick="filterByBrandClick('Godspeed')">
+        <div class="brand-card-visual brand-card-visual--dark">
+          <img src="https://i.imgur.com/sSlKm7R.png" alt="Godspeed" class="brand-card-img brand-card-img--godspeed"
+            loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+        </div>
+        <div class="brand-name">Godspeed</div>
         <div class="brand-count">1 item</div>
       </div>
     </div>
@@ -478,6 +490,9 @@
     // Scroll to shop
     function scrollToShop() {
       window.location.href = 'shop-all.html?sort=price-high';
+    }
+    function filterByBrandClick(brand) {
+      window.location.href = 'shop-all.html?search=' + encodeURIComponent(brand);
     }
     // Navbar scroll effect
     window.addEventListener('scroll', () => {
