@@ -168,8 +168,8 @@ const SEEDED_PRODUCTS = [
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/992/original/1006990_08.jpg.jpeg?action=crop&width=600'
         ],
         imageFit: 'contain',
-        imagePosition: '50% 58%',
-        imageScale: 1.18,
+        imagePosition: '50% 60%',
+        imageScale: 1.24,
         sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({
             size,
             stock: 1,
