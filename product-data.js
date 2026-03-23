@@ -136,7 +136,7 @@ const SEEDED_PRODUCTS = [
         imagePosition: '50% 58%',
         imageScale: 1.28,
         sizes: [
-            { size: 'US 12.5', stock: 1, price: 400 }
+            { size: 'US 12.5', stock: 0, price: 400 }
         ],
         releaseDate: 'TBD',
         status: 'active',
@@ -169,7 +169,7 @@ const SEEDED_PRODUCTS = [
         imagePosition: '50% 52%',
         imageScale: 1.08,
         sizes: [
-            { size: 'One Size', stock: 1, price: 90 }
+            { size: 'One Size', stock: 0, price: 90 }
         ],
         releaseDate: '01/01/2019',
         status: 'active',
@@ -205,7 +205,7 @@ const SEEDED_PRODUCTS = [
         imageScale: 1.24,
         sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({
             size,
-            stock: 1,
+            stock: 0,
             price: 600
         })),
         releaseDate: '12/15/2022',
@@ -241,21 +241,21 @@ const SEEDED_PRODUCTS = [
         imagePosition: '50% 56%',
         imageScale: 1.22,
         sizes: [
-            { size: 'US 5', stock: 1, price: 185 },
-            { size: 'US 5.5', stock: 1, price: 185 },
-            { size: 'US 6', stock: 1, price: 185 },
-            { size: 'US 6.5', stock: 1, price: 185 },
-            { size: 'US 7', stock: 1, price: 185 },
-            { size: 'US 7.5', stock: 1, price: 185 },
-            { size: 'US 8', stock: 1, price: 185 },
-            { size: 'US 8.5', stock: 1, price: 185 },
-            { size: 'US 9', stock: 1, price: 185 },
-            { size: 'US 9.5', stock: 1, price: 185 },
-            { size: 'US 10', stock: 1, price: 185 },
-            { size: 'US 10.5', stock: 1, price: 185 },
-            { size: 'US 11', stock: 1, price: 185 },
-            { size: 'US 11.5', stock: 1, price: 185 },
-            { size: 'US 12', stock: 1, price: 185 }
+            { size: 'US 5', stock: 0, price: 185 },
+            { size: 'US 5.5', stock: 0, price: 185 },
+            { size: 'US 6', stock: 0, price: 185 },
+            { size: 'US 6.5', stock: 0, price: 185 },
+            { size: 'US 7', stock: 0, price: 185 },
+            { size: 'US 7.5', stock: 0, price: 185 },
+            { size: 'US 8', stock: 0, price: 185 },
+            { size: 'US 8.5', stock: 0, price: 185 },
+            { size: 'US 9', stock: 0, price: 185 },
+            { size: 'US 9.5', stock: 0, price: 185 },
+            { size: 'US 10', stock: 0, price: 185 },
+            { size: 'US 10.5', stock: 0, price: 185 },
+            { size: 'US 11', stock: 0, price: 185 },
+            { size: 'US 11.5', stock: 0, price: 185 },
+            { size: 'US 12', stock: 0, price: 185 }
         ],
         releaseDate: '04/01/2022',
         retailPrice: 150,
@@ -354,6 +354,12 @@ export function applyProductOverrides(product) {
         ...product,
         price: Number(product.price) || 0
     };
+
+    // Default shoes to backorder flow when out of stock
+    if (isFootwearProduct(nextProduct) && nextProduct.allowBackorder !== false) {
+        nextProduct.allowBackorder = true;
+        nextProduct.backorderLeadTime = nextProduct.backorderLeadTime || 'Ships in 1.5-2 weeks';
+    }
 
     if (matchesBlackCat(nextProduct)) {
         nextProduct.name = String(nextProduct.name || "Jordan 4 Retro 'Black Cat' 2020").replace(/2025/g, '2020');
