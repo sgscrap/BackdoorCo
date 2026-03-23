@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" role="img" aria-labelledby="title">
+  <title>Nike</title>
+  <rect width="900" height="320" fill="none"/>
+  <path
+    d="M98 210c18 11 43 17 75 17 36 0 80-7 132-22L760 55c16-6 31-9 44-9 5 0 10 0 14 1-10 12-24 23-44 35L338 255c-56 22-102 33-138 33-38 0-66-10-84-30-13-14-19-30-18-48z"
+    fill="#111216"/>
+</svg>
