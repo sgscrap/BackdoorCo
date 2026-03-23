@@ -15,6 +15,53 @@ function buildImgurImageUrl(id, extension = 'jpg') {
 
 const SEEDED_PRODUCTS = [
     {
+        id: 'seed-kobe-5-alternate-bruce-lee',
+        name: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+        sku: 'CD4991-101',
+        price: 770,
+        brand: 'Nike',
+        category: 'Sneakers',
+        colorway: 'White/Black/Varsity Maize',
+        description: "The Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee' flips the iconic Bruce Lee-inspired color blocking with a bold white and varsity maize upper, sharp black detailing, and red slash marks near the heel. The low-cut silhouette keeps the responsive Protro tooling and close-to-court feel that made the Kobe 5 a standout on and off the hardwood.",
+        image: 'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/655/original/639895_01.jpg.jpeg?action=crop&width=600',
+        images: [
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/655/original/639895_01.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/656/original/639895_02.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/657/original/639895_03.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/659/original/639895_04.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/660/original/639895_05.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/662/original/639895_06.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/667/original/639895_07.jpg.jpeg?action=crop&width=600',
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/668/original/639895_08.jpg.jpeg?action=crop&width=600'
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 54%',
+        imageScale: 1.14,
+        sizes: [
+            { size: 'US 8', stock: 0, price: 770 },
+            { size: 'US 8.5', stock: 0, price: 770 },
+            { size: 'US 9', stock: 0, price: 770 },
+            { size: 'US 9.5', stock: 0, price: 770 },
+            { size: 'US 10', stock: 0, price: 770 },
+            { size: 'US 10.5', stock: 0, price: 770 },
+            { size: 'US 11', stock: 0, price: 770 },
+            { size: 'US 11.5', stock: 0, price: 770 },
+            { size: 'US 12', stock: 0, price: 770 },
+            { size: 'US 13', stock: 0, price: 770 },
+            { size: 'US 14', stock: 0, price: 770 },
+            { size: 'US 15', stock: 0, price: 770 }
+        ],
+        releaseDate: '11/24/2020',
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
         id: 'seed-yeezy-slide-onyx',
         name: "adidas Yeezy Slide 'Onyx'",
         sku: 'HQ6448',

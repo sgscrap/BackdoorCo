@@ -596,6 +596,53 @@ const YEEZY_SLIDE_ONYX_REVIEW_EIGHT = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const YEEZY_SLIDE_ONYX_REVIEW_NINE = {
+    id: 'seed-yeezy-slide-onyx-009',
+    name: 'ir**',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'Packaging A-star, great quality slide, fast shipping, and great customer service. Thank you.',
+    originalComment: 'Packaging A⭐️, Great quality slide, fast shipping. Great customer service. Thank you',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/04/02/271160/202304020713054861922.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const YEEZY_SLIDE_ONYX_REVIEW_TEN = {
+    id: 'seed-yeezy-slide-onyx-010',
+    name: 'dv**',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'Look and feel amazing.',
+    originalComment: 'look & feel amazing',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/05/02/189816/202305021355294868994.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const YEEZY_SLIDE_ONYX_REVIEW_ELEVEN = {
+    id: 'seed-yeezy-slide-onyx-011',
+    name: 'Je**',
+    productId: 'seed-yeezy-slide-onyx',
+    productName: "adidas Yeezy Slide 'Onyx'",
+    comment: 'Amazing quality.',
+    originalComment: 'Amazing quality',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/05/10/229061/202305101019091309059.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/05/10/229061/20230510101909606832.jpg',
+        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/05/10/229061/202305101019095737159.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
 function normalizeReview(review) {
     const images = Array.isArray(review?.images)
         ? review.images.filter(Boolean)
@@ -657,7 +704,10 @@ export function getSeededReviews() {
         normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_FIVE),
         normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_SIX),
         normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_SEVEN),
-        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_EIGHT)
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_EIGHT),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_NINE),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_TEN),
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_ELEVEN)
     ];
 }
 
