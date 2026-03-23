@@ -585,6 +585,107 @@ const VELVET_BROWN_REVIEW_FIFTEEN = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const VELVET_BROWN_REVIEW_SIXTEEN = {
+    id: 'seed-velvet-brown-016',
+    name: 'Bi**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'KW delivers again as always!! These are nice.',
+    originalComment: 'KW delivers again as always!! These nice.',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/11/22//202511220412056822850.jpg',
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/11/22//20251122041206493310.jpg',
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/11/22//202511220412065587055.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_SEVENTEEN = {
+    id: 'seed-velvet-brown-017',
+    name: 'ma**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'I love Travis Scott shoes.',
+    originalComment: 'i love travis scott shoes',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_EIGHTEEN = {
+    id: 'seed-velvet-brown-018',
+    name: 'Bi**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Happy with my pair. Arrived fast from the US and they look great in hand.',
+    originalComment: 'Happy with my pair. Arrives fast from US and they look great in hand.',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_NINETEEN = {
+    id: 'seed-velvet-brown-019',
+    name: 'Rj**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Awesome quality and quick delivery.',
+    originalComment: 'Awesome quality and quick delivery.',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_TWENTY = {
+    id: 'seed-velvet-brown-020',
+    name: 'Ch**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'I like them. Will be buying more.',
+    originalComment: 'I like them. Will be buying more',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/10/11//202510112057165873703.jpg',
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/10/11//202510112057162933695.jpg',
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/10/11//202510112057161433001.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_TWENTY_ONE = {
+    id: 'seed-velvet-brown-021',
+    name: 'Es**',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: 'Always the best quality.',
+    originalComment: 'Always the best quality',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const VELVET_BROWN_REVIEW_TWENTY_TWO = {
+    id: 'seed-velvet-brown-022',
+    name: 'Eli P.',
+    productId: 'seed-men-travis-velvet-brown',
+    productName: "Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+    comment: "Can't be happier with the product.",
+    originalComment: 'Cant be happier with the product',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/DM7866-202-1/2024/12/29/485599/202412290135429959904.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
 const YEEZY_SLIDE_ONYX_REVIEW_ONE = {
     id: 'seed-yeezy-slide-onyx-001',
     name: 'mt**',
@@ -991,6 +1092,13 @@ export function getSeededReviews() {
         normalizeReview(VELVET_BROWN_REVIEW_THIRTEEN),
         normalizeReview(VELVET_BROWN_REVIEW_FOURTEEN),
         normalizeReview(VELVET_BROWN_REVIEW_FIFTEEN),
+        normalizeReview(VELVET_BROWN_REVIEW_SIXTEEN),
+        normalizeReview(VELVET_BROWN_REVIEW_SEVENTEEN),
+        normalizeReview(VELVET_BROWN_REVIEW_EIGHTEEN),
+        normalizeReview(VELVET_BROWN_REVIEW_NINETEEN),
+        normalizeReview(VELVET_BROWN_REVIEW_TWENTY),
+        normalizeReview(VELVET_BROWN_REVIEW_TWENTY_ONE),
+        normalizeReview(VELVET_BROWN_REVIEW_TWENTY_TWO),
         normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_ONE),
         normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_TWO),
         normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_THREE),
