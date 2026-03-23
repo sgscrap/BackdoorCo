@@ -257,6 +257,123 @@ const KIDS_TRAVIS_REVIEW_FOUR = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const ADULT_BLACK_PHANTOM_REVIEW_ONE = {
+    id: 'seed-adult-black-phantom-001',
+    name: 'ma**',
+    productId: 'seed-men-travis-black-phantom',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
+    comment: "I gotta say, the quality is very good. This was my first order and I really wasn't sure whether it would ship or if the quality would be any good. I'm satisfied with both.",
+    originalComment: 'I gotta say, the quality is very good. Made my first order and i really was unsure wether it would be shipped or the quality was any good. Both things im satisfied with.',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const ADULT_BLACK_PHANTOM_REVIEW_TWO = {
+    id: 'seed-adult-black-phantom-002',
+    name: 'ch**',
+    productId: 'seed-men-travis-black-phantom',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
+    comment: "Get yours today. Don't miss out. Best shoes on the market!",
+    originalComment: 'GET YOURS TODAY DONT MISS OUT BEST SHOES ON MARKET!',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2026/03/18//202603180428033041949.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const ADULT_BLACK_PHANTOM_REVIEW_THREE = {
+    id: 'seed-adult-black-phantom-003',
+    name: 'Ke**',
+    productId: 'seed-men-travis-black-phantom',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
+    comment: 'BD is the goat.',
+    originalComment: 'BD IS THE GOAT',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const ADULT_BLACK_PHANTOM_REVIEW_FOUR = {
+    id: 'seed-adult-black-phantom-004',
+    name: 'Fr**',
+    productId: 'seed-men-travis-black-phantom',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
+    comment: 'Amazing quality. It arrived in 16 days.',
+    originalComment: 'Amazing quality. 16 days and arrived',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const ADULT_BLACK_PHANTOM_REVIEW_FIVE = {
+    id: 'seed-adult-black-phantom-005',
+    name: 'lo**',
+    productId: 'seed-men-travis-black-phantom',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
+    comment: "Just like always, crazy. I've ordered a bunch from Backdoor and it's been perfect every time.",
+    originalComment: 'Just like always crazy ive ordered a bunch on backdoor and just Perfect each time',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2025/11/06//202511060549464196870.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const ADULT_BLACK_PHANTOM_REVIEW_SIX = {
+    id: 'seed-adult-black-phantom-006',
+    name: 'Sd**',
+    productId: 'seed-men-travis-black-phantom',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
+    comment: 'Looks amazing. Excellent quality.',
+    originalComment: 'Looks amazing excellent quality',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2025/08/30//202508302227376800267.jpg',
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2025/08/30//202508302227377230130.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const ADULT_BLACK_PHANTOM_REVIEW_SEVEN = {
+    id: 'seed-adult-black-phantom-007',
+    name: 'Co**',
+    productId: 'seed-men-travis-black-phantom',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
+    comment: '10/10. My son loves them. They look perfect.',
+    originalComment: '10/10. Son loves them. Look perfect',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2025/07/30//202507300908307184736.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const ADULT_BLACK_PHANTOM_REVIEW_EIGHT = {
+    id: 'seed-adult-black-phantom-008',
+    name: 'Milo J.',
+    productId: 'seed-men-travis-black-phantom',
+    productName: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
+    comment: 'Delivered very fast and very good quality. Will order again in the future.',
+    originalComment: 'delivered very fast and very good quality, will order again in the future',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/DM7866-001/2025/01/10/488049/202501100426155804099.jpg',
+        'https://www.kickwho.info/uploads/reviews/DM7866-001/2025/01/10/488049/202501100426156141271.jpg',
+        'https://www.kickwho.info/uploads/reviews/DM7866-001/2025/01/10/488049/202501100426152655847.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
 const VELVET_BROWN_REVIEW_ONE = {
     id: 'seed-velvet-brown-001',
     name: 'Dr**',
@@ -809,6 +926,14 @@ export function getSeededReviews() {
         normalizeReview(KIDS_TRAVIS_REVIEW_TWO),
         normalizeReview(KIDS_TRAVIS_REVIEW_THREE),
         normalizeReview(KIDS_TRAVIS_REVIEW_FOUR),
+        normalizeReview(ADULT_BLACK_PHANTOM_REVIEW_ONE),
+        normalizeReview(ADULT_BLACK_PHANTOM_REVIEW_TWO),
+        normalizeReview(ADULT_BLACK_PHANTOM_REVIEW_THREE),
+        normalizeReview(ADULT_BLACK_PHANTOM_REVIEW_FOUR),
+        normalizeReview(ADULT_BLACK_PHANTOM_REVIEW_FIVE),
+        normalizeReview(ADULT_BLACK_PHANTOM_REVIEW_SIX),
+        normalizeReview(ADULT_BLACK_PHANTOM_REVIEW_SEVEN),
+        normalizeReview(ADULT_BLACK_PHANTOM_REVIEW_EIGHT),
         normalizeReview(VELVET_BROWN_REVIEW_ONE),
         normalizeReview(VELVET_BROWN_REVIEW_TWO),
         normalizeReview(VELVET_BROWN_REVIEW_THREE),
