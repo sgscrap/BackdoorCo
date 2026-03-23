@@ -643,6 +643,133 @@ const YEEZY_SLIDE_ONYX_REVIEW_ELEVEN = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const KOBE_BRUCE_LEE_REVIEW_ONE = {
+    id: 'seed-kobe-bruce-lee-001',
+    name: 'La**',
+    productId: 'seed-kobe-5-alternate-bruce-lee',
+    productName: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+    comment: 'Amazing basketball shoe. I use it when hooping indoor on hardwood. Recommend for guards.',
+    originalComment: 'Amazing basketball shoe. I use it when hooping indoor (hard wood). Recommend for guards.',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KOBE_BRUCE_LEE_REVIEW_TWO = {
+    id: 'seed-kobe-bruce-lee-002',
+    name: 'Ja**',
+    productId: 'seed-kobe-5-alternate-bruce-lee',
+    productName: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+    comment: 'Used them for a good while and they still feel really good.',
+    originalComment: 'used for a good while and they still feel really good.',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://img.kickwho.info/images/uploads/reviews/CD4991-101/2025/10/04//202510040534269527516.jpg',
+        'https://img.kickwho.info/images/uploads/reviews/CD4991-101/2025/10/04//202510040534274452238.jpg',
+        'https://img.kickwho.info/images/uploads/reviews/CD4991-101/2025/10/04//202510040534278226265.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KOBE_BRUCE_LEE_REVIEW_THREE = {
+    id: 'seed-kobe-bruce-lee-003',
+    name: 'DA**',
+    productId: 'seed-kobe-5-alternate-bruce-lee',
+    productName: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+    comment: 'Insane quality.',
+    originalComment: 'Insane quality',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KOBE_BRUCE_LEE_REVIEW_FOUR = {
+    id: 'seed-kobe-bruce-lee-004',
+    name: 'OB**',
+    productId: 'seed-kobe-5-alternate-bruce-lee',
+    productName: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+    comment: 'If you get the yellow Bruce Lees and love them, just wait until you get a pair of the whites. Wow!!',
+    originalComment: 'If you get the yellow Bruce lees and love them, just wait till you get a pair of the whites. WOW!!',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KOBE_BRUCE_LEE_REVIEW_FIVE = {
+    id: 'seed-kobe-bruce-lee-005',
+    name: 'Evan T.',
+    productId: 'seed-kobe-5-alternate-bruce-lee',
+    productName: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+    comment: "They look good and feel good. They were easy to find, and the communication was very good and helpful. I can't wait to use them.",
+    originalComment: 'They look good and feel good they were easy to find and the communication was very good and very helpful I can’t wait to use them',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KOBE_BRUCE_LEE_REVIEW_SIX = {
+    id: 'seed-kobe-bruce-lee-006',
+    name: 'J **',
+    productId: 'seed-kobe-5-alternate-bruce-lee',
+    productName: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+    comment: 'These shoes lasted my son for over a year playing AAU and school ball. They still have great grip. Well worth the money.',
+    originalComment: 'These shoes lasted my son for over a year playing aau and school ball. Still have great grip. Well worth the money.',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KOBE_BRUCE_LEE_REVIEW_SEVEN = {
+    id: 'seed-kobe-bruce-lee-007',
+    name: 'Pa**',
+    productId: 'seed-kobe-5-alternate-bruce-lee',
+    productName: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+    comment: 'This is my third purchase, perfect every time. Thanks Backdoor.',
+    originalComment: 'This is my 3rd purchase, perfect every time. Thanks backdoor.',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KOBE_BRUCE_LEE_REVIEW_EIGHT = {
+    id: 'seed-kobe-bruce-lee-008',
+    name: 'Mo**',
+    productId: 'seed-kobe-5-alternate-bruce-lee',
+    productName: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+    comment: 'Took around 20 minutes to break in. The shoes are incredible quality and the performance is insane.',
+    originalComment: 'Took around 20 minutes to break in, shoes are incredible qaulity and the performance on them is insane,',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/CD4991-101/2024/11/26/377680/20241126200829715350.jpg',
+        'https://www.kickwho.info/uploads/reviews/CD4991-101/2024/11/26/377680/202411262008293165124.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const KOBE_BRUCE_LEE_REVIEW_NINE = {
+    id: 'seed-kobe-bruce-lee-009',
+    name: 'Sn**',
+    productId: 'seed-kobe-5-alternate-bruce-lee',
+    productName: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
+    comment: "One of the best I've seen!",
+    originalComment: 'One of the best I’ve seen!',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/CD4991-101/2024/11/22/464004/202411221456463305678.jpg',
+        'https://www.kickwho.info/uploads/reviews/CD4991-101/2024/11/22/464004/202411221456463092109.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
 function normalizeReview(review) {
     const images = Array.isArray(review?.images)
         ? review.images.filter(Boolean)
@@ -707,7 +834,16 @@ export function getSeededReviews() {
         normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_EIGHT),
         normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_NINE),
         normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_TEN),
-        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_ELEVEN)
+        normalizeReview(YEEZY_SLIDE_ONYX_REVIEW_ELEVEN),
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_ONE),
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_TWO),
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_THREE),
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_FOUR),
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_FIVE),
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_SIX),
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_SEVEN),
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_EIGHT),
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_NINE)
     ];
 }
 
