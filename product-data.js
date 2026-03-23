@@ -136,9 +136,42 @@ const SEEDED_PRODUCTS = [
         imagePosition: '50% 58%',
         imageScale: 1.28,
         sizes: [
-            { size: 'US 12.5', stock: 1, price: 250 }
+            { size: 'US 12.5', stock: 1, price: 400 }
         ],
         releaseDate: 'TBD',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
+        id: 'seed-off-white-industrial-belt-yellow-black',
+        name: 'OFF-WHITE Industrial Belt',
+        sku: 'OW-IND-BELT-YB-SS19',
+        price: 90,
+        brand: 'OFF-WHITE',
+        category: 'Accessories',
+        colorway: 'Yellow/Black',
+        season: 'SS19',
+        retailPrice: 225,
+        description: "The Off-White Industrial Belt is potentially the most well-recognized and popular item the brand has ever made. The yellow and black version is the most classic iteration of the belt and features Off-White branding as well as red stitching down the middle. This belt has been seen on celebrities both inside and outside of Virgil Abloh's direct circle, from Lil Uzi Vert to Tan France. This particular Off-White Industrial Belt retailed for $225 USD but has primarily resold on StockX for below retail.",
+        image: 'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/083/103/227/original/654066_01.jpg.jpeg?width=750',
+        cardImage: 'https://images.stockx.com/images/Off-White-Classic-Industrial-Belt-Yellow-Black.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1666885806',
+        images: [
+            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/083/103/227/original/654066_01.jpg.jpeg?width=750',
+            'https://images.stockx.com/images/Off-White-Classic-Industrial-Belt-Yellow-Black.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1666885806',
+            'https://tse3.mm.bing.net/th/id/OIP.nE5vDaPkpCUPwzOqWhL_VgHaNA?rs=1&pid=ImgDetMain&o=7&rm=3',
+            'https://tse2.mm.bing.net/th/id/OIP.MzpTNm0tD1jlpmx1sxMxAQHaLW?rs=1&pid=ImgDetMain&o=7&rm=3'
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 52%',
+        imageScale: 1.08,
+        sizes: [
+            { size: 'One Size', stock: 1, price: 90 }
+        ],
+        releaseDate: '01/01/2019',
         status: 'active',
         isHidden: false,
         isOutOfStock: false,
