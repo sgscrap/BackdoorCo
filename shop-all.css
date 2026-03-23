@@ -797,7 +797,7 @@
     transform: rotate(180deg);
 }
 
-.accordion-content.shop-filter-tabs {
+.sidebar-accordion.open .accordion-content.shop-filter-tabs {
     display: flex;
     flex-direction: column;
     gap: 16px;
