@@ -303,7 +303,6 @@ async function finalizeOrderFromSession(session) {
 }
 
 module.exports = {
-    CHECKOUT_FUNCTIONS_BASE,
     buildDraftOrder,
     buildLineItems,
     buildOrigin,

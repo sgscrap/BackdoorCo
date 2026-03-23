@@ -113,7 +113,7 @@ const SEEDED_PRODUCTS = [
         id: 'seed-men-travis-velvet-brown',
         name: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
         sku: 'DM7866-202',
-        price: 250,
+        price: 600,
         brand: 'Jordan',
         category: 'Sneakers',
         colorway: 'Velvet Brown/Black',
@@ -173,7 +173,7 @@ const SEEDED_PRODUCTS = [
         sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({
             size,
             stock: 1,
-            price: 250
+            price: 600
         })),
         releaseDate: '12/15/2022',
         status: 'active',
