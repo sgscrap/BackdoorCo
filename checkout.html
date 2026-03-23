@@ -143,10 +143,10 @@
                     </div>
                     <div class="form-group"><label class="form-label">Country</label>
                         <select class="form-select" id="country" title="Country">
-                            <option>United States</option>
-                            <option>Canada</option>
-                            <option>United Kingdom</option>
-                            <option>Australia</option>
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="GB">United Kingdom</option>
+                            <option value="AU">Australia</option>
                         </select>
                     </div>
                 </div>
@@ -172,16 +172,21 @@
                         </div>
                         <p class="secure-payment-copy">
                             After you confirm the order, Stripe handles payment on a secure hosted checkout page.
-                            Card, Apple Pay, and Google Pay show there automatically when supported.
+                            Card, Apple Pay, Google Pay, and pay-later options show there automatically when the
+                            order and customer country are eligible.
                         </p>
                         <div class="secure-payment-pills">
                             <span><i class="fa-regular fa-credit-card"></i> Cards</span>
                             <span><i class="fa-brands fa-apple"></i> Apple Pay</span>
                             <span><i class="fa-brands fa-google-pay"></i> Google Pay</span>
+                            <span>Klarna</span>
+                            <span>Afterpay</span>
+                            <span>Affirm</span>
                             <span><i class="fa-solid fa-building-columns"></i> Direct payouts to your bank</span>
                         </div>
                         <div class="secure-payment-note">
-                            Final payment, promo codes, and wallet options are completed inside Stripe checkout.
+                            Final payment, promo codes, wallets, and pay-later options are completed inside Stripe
+                            checkout.
                         </div>
                     </div>
                 </div>
