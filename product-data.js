@@ -183,7 +183,7 @@ const SEEDED_PRODUCTS = [
         id: 'seed-men-travis-black-phantom',
         name: "Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom'",
         sku: 'DM7866 001',
-        price: 250,
+        price: 600,
         brand: 'Jordan',
         category: 'Sneakers',
         colorway: 'Black/Phantom/University Red',
@@ -206,7 +206,7 @@ const SEEDED_PRODUCTS = [
         sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({
             size,
             stock: 1,
-            price: 400
+            price: 600
         })),
         releaseDate: '12/15/2022',
         status: 'active',
