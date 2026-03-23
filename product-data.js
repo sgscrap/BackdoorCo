@@ -171,6 +171,8 @@ const SEEDED_PRODUCTS = [
         sizes: [
             { size: 'One Size', stock: 0, price: 90 }
         ],
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
         releaseDate: '01/01/2019',
         status: 'active',
         isHidden: false,
