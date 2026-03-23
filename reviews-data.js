@@ -887,6 +887,48 @@ const KOBE_BRUCE_LEE_REVIEW_NINE = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const OFF_WHITE_BELT_REVIEW_ONE = {
+    id: 'seed-off-white-belt-001',
+    name: 'RB**',
+    productId: 'seed-off-white-industrial-belt-yellow-black',
+    productName: 'OFF-WHITE Industrial Belt',
+    comment: 'Great quality.',
+    originalComment: 'GREAT QUALITY',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const OFF_WHITE_BELT_REVIEW_TWO = {
+    id: 'seed-off-white-belt-002',
+    name: 'Dr**',
+    productId: 'seed-off-white-industrial-belt-yellow-black',
+    productName: 'OFF-WHITE Industrial Belt',
+    comment: 'Good!! Good quality.',
+    originalComment: 'Good !! Good quality',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/F68804/2024/08/21/422192/20240821022429176656.jpg',
+        'https://www.kickwho.info/uploads/reviews/F68804/2024/08/21/422192/202408210224292189614.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const OFF_WHITE_BELT_REVIEW_THREE = {
+    id: 'seed-off-white-belt-003',
+    name: 'W3**',
+    productId: 'seed-off-white-industrial-belt-yellow-black',
+    productName: 'OFF-WHITE Industrial Belt',
+    comment: 'Fire.',
+    originalComment: 'fire',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
 function normalizeReview(review) {
     const images = Array.isArray(review?.images)
         ? review.images.filter(Boolean)
@@ -968,7 +1010,10 @@ export function getSeededReviews() {
         normalizeReview(KOBE_BRUCE_LEE_REVIEW_SIX),
         normalizeReview(KOBE_BRUCE_LEE_REVIEW_SEVEN),
         normalizeReview(KOBE_BRUCE_LEE_REVIEW_EIGHT),
-        normalizeReview(KOBE_BRUCE_LEE_REVIEW_NINE)
+        normalizeReview(KOBE_BRUCE_LEE_REVIEW_NINE),
+        normalizeReview(OFF_WHITE_BELT_REVIEW_ONE),
+        normalizeReview(OFF_WHITE_BELT_REVIEW_TWO),
+        normalizeReview(OFF_WHITE_BELT_REVIEW_THREE)
     ];
 }
 
