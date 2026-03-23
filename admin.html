@@ -715,9 +715,94 @@
                     <label for="productReleaseDate">Release Date</label>
                     <input type="date" id="productReleaseDate">
                 </div>
+                <div class="form-group">
+                    <label>Market Pricing Tracker</label>
+                    <div class="market-pricing-card">
+                        <p class="form-help-text market-pricing-copy">Paste live links from StockX, GOAT, and eBay, then refresh comps to benchmark the lowest market and apply a discounted list price fast.</p>
+                        <div class="form-row market-pricing-url-grid">
+                            <div class="form-group market-pricing-field">
+                                <label for="marketStockxUrl">StockX URL</label>
+                                <input type="url" id="marketStockxUrl" placeholder="https://stockx.com/...">
+                            </div>
+                            <div class="form-group market-pricing-field">
+                                <label for="marketGoatUrl">GOAT URL</label>
+                                <input type="url" id="marketGoatUrl" placeholder="https://www.goat.com/...">
+                            </div>
+                            <div class="form-group market-pricing-field">
+                                <label for="marketEbayUrl">eBay URL</label>
+                                <input type="url" id="marketEbayUrl" placeholder="https://www.ebay.com/...">
+                            </div>
+                        </div>
+                        <div class="market-pricing-actions">
+                            <button type="button" class="btn-ghost" id="refreshMarketPricingBtn">Refresh Market Comps</button>
+                            <button type="button" class="btn-ghost" id="applyMarketMinus100Btn">Apply -$100</button>
+                            <button type="button" class="btn-ghost" id="applyMarketMinus20Btn">Apply -20%</button>
+                            <button type="button" class="btn-ghost" id="applyMarketSmartBtn">Apply Smart</button>
+                        </div>
+                        <div class="market-pricing-metrics">
+                            <div class="market-pricing-metric">
+                                <span class="market-pricing-label">Benchmark</span>
+                                <strong id="marketBenchmarkValue">No data</strong>
+                                <small id="marketBenchmarkMeta">Refresh comps to calculate a market anchor.</small>
+                            </div>
+                            <div class="market-pricing-metric">
+                                <span class="market-pricing-label">-$100</span>
+                                <strong id="marketMinus100Value">--</strong>
+                                <small>Lowest market minus $100</small>
+                            </div>
+                            <div class="market-pricing-metric">
+                                <span class="market-pricing-label">-20%</span>
+                                <strong id="marketMinus20Value">--</strong>
+                                <small>Lowest market minus 20%</small>
+                            </div>
+                            <div class="market-pricing-metric">
+                                <span class="market-pricing-label">Smart Deal</span>
+                                <strong id="marketSmartValue">--</strong>
+                                <small>Larger discount between -$100 and -20%</small>
+                            </div>
+                        </div>
+                        <div class="market-pricing-source-grid">
+                            <div class="market-source-card" id="marketSourceCardStockx">
+                                <span class="market-source-title">StockX</span>
+                                <strong id="marketSourceValueStockx">No link</strong>
+                                <small id="marketSourceMetaStockx">Add a source URL.</small>
+                            </div>
+                            <div class="market-source-card" id="marketSourceCardGoat">
+                                <span class="market-source-title">GOAT</span>
+                                <strong id="marketSourceValueGoat">No link</strong>
+                                <small id="marketSourceMetaGoat">Add a source URL.</small>
+                            </div>
+                            <div class="market-source-card" id="marketSourceCardEbay">
+                                <span class="market-source-title">eBay</span>
+                                <strong id="marketSourceValueEbay">No link</strong>
+                                <small id="marketSourceMetaEbay">Add an authenticity-guaranteed listing URL.</small>
+                            </div>
+                        </div>
+                        <p class="form-help-text" id="marketPricingStatus">Benchmark uses the lowest valid tracked market price. Save the product to keep the snapshot.</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Backorder Setup</label>
+                    <div class="inventory-quickbar backorder-quickbar">
+                        <label class="toggle-card">
+                            <input type="checkbox" id="productAllowBackorder">
+                            <span>Auto-backorder any size that hits zero stock</span>
+                        </label>
+                        <div class="inventory-quickbar-group">
+                            <label for="productBackorderLeadTime">Lead Time</label>
+                            <div class="inventory-quickbar-row">
+                                <input type="text" id="productBackorderLeadTime" placeholder="Ships in 1.5-2 weeks">
+                            </div>
+                        </div>
+                        <div class="inventory-quickbar-actions">
+                            <button type="button" class="btn-ghost" id="applyZeroStockBackorderBtn">Backorder Zero Stock</button>
+                            <button type="button" class="btn-ghost danger" id="clearBackorderFlagsBtn">Clear Backorder</button>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="form-group">
-                    <label>Size Inventory (Stock & Price per size)</label>
+                    <label>Size Inventory (Stock, Price & Backorder)</label>
                     <div class="inventory-quickbar">
                         <div class="inventory-quickbar-group">
                             <label for="bulkStockValue">Set All Stock</label>
@@ -735,6 +820,7 @@
                         </div>
                         <div class="inventory-quickbar-actions">
                             <button type="button" class="btn-ghost" id="applyBasePriceBtn">Use Base Price</button>
+                            <button type="button" class="btn-ghost" id="applyMarketPriceToInventoryBtn">Use Market Price</button>
                             <button type="button" class="btn-ghost danger" id="clearInventoryBtn">Zero Stock</button>
                         </div>
                     </div>

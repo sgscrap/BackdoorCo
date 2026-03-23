@@ -6,6 +6,7 @@ const db = firebase.firestore();
 
 const DEFAULT_SIZE_OPTIONS = ['US 7', 'US 7.5', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 11', 'US 12', 'US 13'];
 const IMPORTER_SIZES = [...DEFAULT_SIZE_OPTIONS];
+const MARKET_SOURCE_KEYS = ['stockx', 'goat', 'ebay'];
 const ADMIN_AUTH_DISABLED = false;
 const pageData = {
     dashboard: { title: 'DASHBOARD', subtitle: "Welcome back - here's what's happening today." },
@@ -41,6 +42,8 @@ let importerRowCounter = 0;
 let importerSelectedSizes = [];
 let generatedReviews = [];
 let activeProductPreviewIndex = 0;
+let currentMarketSnapshot = null;
+let seededCatalogProducts = [...SEEDED_ADMIN_PRODUCTS];
 
 const REVIEW_FIRST_NAMES = ['Mason', 'Jada', 'Chris', 'Avery', 'Jordan', 'Cam', 'Tiana', 'Malik', 'Ari', 'Noah', 'Nia', 'Jay', 'Kayla', 'Andre', 'Zoe', 'Micah', 'Savannah', 'Bryson', 'Laila', 'Darius', 'Jasmine', 'Ethan', 'Sofia', 'Tyrese', 'Mila', 'Zay', 'Kendall', 'Isaiah', 'Amaya', 'Luca', 'Brielle', 'Kobe', 'Nyla', 'Tristan', 'Aaliyah', 'Devin', 'Maya', 'Roman', 'Leah', 'Jalen'];
 const REVIEW_LAST_INITIALS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -124,7 +127,8 @@ const SEEDED_ADMIN_PRODUCTS = [
     }
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadSeededCatalogProducts();
     initFirebaseListeners();
     initImporter();
     initReviewBuilder();
@@ -170,7 +174,7 @@ function getAdminProductMatchKey(product) {
 function mergeAdminCatalogProducts(liveProducts = []) {
     const merged = new Map();
 
-    SEEDED_ADMIN_PRODUCTS.forEach((product) => {
+    seededCatalogProducts.forEach((product) => {
         merged.set(product.id, product);
     });
 
@@ -186,12 +190,26 @@ function mergeAdminCatalogProducts(liveProducts = []) {
     return [...merged.values()];
 }
 
+async function loadSeededCatalogProducts() {
+    try {
+        const module = await import(`./product-data.js?v=${Date.now()}`);
+        if (typeof module?.getSeededProducts === 'function') {
+            seededCatalogProducts = module.getSeededProducts();
+        }
+    } catch (error) {
+        console.warn('Unable to load seeded catalog products for admin sync.', error);
+        seededCatalogProducts = [...SEEDED_ADMIN_PRODUCTS];
+    }
+}
+
 function getProductSizes(product) {
     if (Array.isArray(product?.sizes) && product.sizes.length > 0) {
         return product.sizes.map((entry) => ({
             size: String(entry.size || '').trim(),
             stock: Math.max(0, Number(entry.stock) || 0),
-            price: Number(entry.price) || Number(product.price) || 0
+            price: Number(entry.price) || Number(product.price) || 0,
+            backorder: Boolean(entry.backorder),
+            backorderLeadTime: String(entry.backorderLeadTime || product?.backorderLeadTime || '').trim()
         })).filter((entry) => entry.size);
     }
 
@@ -199,14 +217,18 @@ function getProductSizes(product) {
         return product.sizes.split(',').map((size) => ({
             size: size.trim(),
             stock: Math.max(0, Number(product.stock) || 0),
-            price: Number(product.price) || 0
+            price: Number(product.price) || 0,
+            backorder: Boolean(product?.allowBackorder),
+            backorderLeadTime: String(product?.backorderLeadTime || '').trim()
         })).filter((entry) => entry.size);
     }
 
     return DEFAULT_SIZE_OPTIONS.map((size) => ({
         size,
         stock: 0,
-        price: Number(product?.price) || 0
+        price: Number(product?.price) || 0,
+        backorder: Boolean(product?.allowBackorder),
+        backorderLeadTime: String(product?.backorderLeadTime || '').trim()
     }));
 }
 
@@ -223,7 +245,11 @@ function isProductFeatured(product) {
 }
 
 function isProductOutOfStock(product) {
-    return Boolean(product?.isOutOfStock) || getTotalStock(product) <= 0;
+    return Boolean(product?.isOutOfStock) || (getTotalStock(product) <= 0 && !hasBackorderEnabled(product));
+}
+
+function hasBackorderEnabled(product) {
+    return Boolean(product?.allowBackorder) || getProductSizes(product).some((entry) => Boolean(entry.backorder));
 }
 
 function matchesBlackCatProduct(product) {
@@ -331,6 +357,209 @@ function formatReleaseDateDisplay(value) {
     return parsed.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function formatCurrency(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount) || amount <= 0) return '--';
+    return `$${amount.toFixed(0)}`;
+}
+
+function normalizeMarketSources(product = {}) {
+    const raw = product?.marketSources || {};
+    return MARKET_SOURCE_KEYS.reduce((acc, key) => {
+        acc[key] = String(raw?.[key] || '').trim();
+        return acc;
+    }, {});
+}
+
+function buildMarketSuggestions(benchmarkPrice) {
+    const benchmark = Number(benchmarkPrice) || 0;
+    if (!benchmark) {
+        return { minus100: 0, minus20: 0, smart: 0 };
+    }
+
+    const minus100 = Math.max(0, Number((benchmark - 100).toFixed(2)));
+    const minus20 = Math.max(0, Number((benchmark * 0.8).toFixed(2)));
+    const smart = Math.max(0, Math.min(minus100, minus20));
+
+    return { minus100, minus20, smart };
+}
+
+function normalizeMarketSnapshot(snapshot = null) {
+    if (!snapshot || typeof snapshot !== 'object') return null;
+
+    const normalizedSources = MARKET_SOURCE_KEYS.reduce((acc, key) => {
+        const source = snapshot?.sources?.[key] || {};
+        acc[key] = {
+            price: Number(source?.price) || 0,
+            authenticated: source?.authenticated !== false,
+            status: String(source?.status || '').trim() || (Number(source?.price) > 0 ? 'live' : 'idle'),
+            message: String(source?.message || '').trim(),
+            url: String(source?.url || '').trim()
+        };
+        return acc;
+    }, {});
+
+    const benchmarkPrice = Number(snapshot?.benchmarkPrice) || 0;
+    return {
+        benchmarkPrice,
+        benchmarkSourceKey: String(snapshot?.benchmarkSourceKey || '').trim(),
+        refreshedAt: String(snapshot?.refreshedAt || '').trim(),
+        sources: normalizedSources,
+        suggestions: buildMarketSuggestions(benchmarkPrice)
+    };
+}
+
+function setMarketSnapshot(snapshot = null) {
+    currentMarketSnapshot = normalizeMarketSnapshot(snapshot);
+    updateMarketPricingPanel();
+}
+
+function readMarketSourceInputs() {
+    return {
+        stockx: String(document.getElementById('marketStockxUrl')?.value || '').trim(),
+        goat: String(document.getElementById('marketGoatUrl')?.value || '').trim(),
+        ebay: String(document.getElementById('marketEbayUrl')?.value || '').trim()
+    };
+}
+
+function applyMarketSourcesToInputs(product = null) {
+    const sources = normalizeMarketSources(product || {});
+    document.getElementById('marketStockxUrl').value = sources.stockx;
+    document.getElementById('marketGoatUrl').value = sources.goat;
+    document.getElementById('marketEbayUrl').value = sources.ebay;
+}
+
+function updateMarketPricingPanel() {
+    const snapshot = currentMarketSnapshot;
+    const benchmarkValue = document.getElementById('marketBenchmarkValue');
+    const benchmarkMeta = document.getElementById('marketBenchmarkMeta');
+    const minus100 = document.getElementById('marketMinus100Value');
+    const minus20 = document.getElementById('marketMinus20Value');
+    const smart = document.getElementById('marketSmartValue');
+    const status = document.getElementById('marketPricingStatus');
+
+    if (benchmarkValue) benchmarkValue.textContent = formatCurrency(snapshot?.benchmarkPrice);
+    if (minus100) minus100.textContent = formatCurrency(snapshot?.suggestions?.minus100);
+    if (minus20) minus20.textContent = formatCurrency(snapshot?.suggestions?.minus20);
+    if (smart) smart.textContent = formatCurrency(snapshot?.suggestions?.smart);
+
+    if (benchmarkMeta) {
+        if (snapshot?.benchmarkPrice) {
+            const sourceLabel = snapshot.benchmarkSourceKey ? snapshot.benchmarkSourceKey.toUpperCase() : 'tracked sources';
+            benchmarkMeta.textContent = `Lowest authenticated source: ${sourceLabel}`;
+        } else {
+            benchmarkMeta.textContent = 'Refresh comps to calculate a market anchor.';
+        }
+    }
+
+    MARKET_SOURCE_KEYS.forEach((key) => {
+        const valueEl = document.getElementById(`marketSourceValue${key.charAt(0).toUpperCase()}${key.slice(1)}`);
+        const metaEl = document.getElementById(`marketSourceMeta${key.charAt(0).toUpperCase()}${key.slice(1)}`);
+        const cardEl = document.getElementById(`marketSourceCard${key.charAt(0).toUpperCase()}${key.slice(1)}`);
+        const source = snapshot?.sources?.[key];
+        const hasInput = Boolean(readMarketSourceInputs()[key]);
+
+        if (cardEl) {
+            cardEl.classList.toggle('is-live', Boolean(source?.price));
+            cardEl.classList.toggle('is-error', Boolean(source && !source.price));
+        }
+
+        if (!valueEl || !metaEl) return;
+
+        if (!hasInput) {
+            valueEl.textContent = 'No link';
+            metaEl.textContent = key === 'ebay' ? 'Add an authenticity-guaranteed listing URL.' : 'Add a source URL.';
+            return;
+        }
+
+        if (!source) {
+            valueEl.textContent = 'Ready';
+            metaEl.textContent = 'Link saved. Refresh comps to pull a live price.';
+            return;
+        }
+
+        if (source?.price) {
+            valueEl.textContent = formatCurrency(source.price);
+            metaEl.textContent = source.message || (key === 'ebay' && source.authenticated === false
+                ? 'Listing found, but authenticity guarantee was not detected.'
+                : 'Live market comp captured.');
+        } else {
+            valueEl.textContent = 'No price';
+            metaEl.textContent = source?.message || 'Could not extract a usable price from this page.';
+        }
+    });
+
+    if (status) {
+        if (snapshot?.benchmarkPrice) {
+            const refreshed = snapshot.refreshedAt ? new Date(snapshot.refreshedAt).toLocaleString() : 'just now';
+            status.textContent = `Benchmark uses the lowest authenticated tracked source. Last refreshed ${refreshed}.`;
+        } else {
+            status.textContent = 'Benchmark uses the lowest valid tracked market price. Save the product to keep the snapshot.';
+        }
+    }
+
+    document.getElementById('applyMarketMinus100Btn').disabled = !snapshot?.suggestions?.minus100;
+    document.getElementById('applyMarketMinus20Btn').disabled = !snapshot?.suggestions?.minus20;
+    document.getElementById('applyMarketSmartBtn').disabled = !snapshot?.suggestions?.smart;
+}
+
+async function refreshMarketPricing() {
+    const sources = readMarketSourceInputs();
+    if (!Object.values(sources).some(Boolean)) {
+        showToast('Add at least one StockX, GOAT, or eBay link first.', 'error');
+        return;
+    }
+
+    const button = document.getElementById('refreshMarketPricingBtn');
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Refreshing...';
+
+    try {
+        const response = await fetch('/.netlify/functions/market-price-snapshot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productName: String(document.getElementById('productName')?.value || '').trim(),
+                sku: String(document.getElementById('productSKU')?.value || '').trim(),
+                sources
+            })
+        });
+
+        const payload = await response.json();
+        if (!response.ok) {
+            throw new Error(payload?.error || 'Unable to refresh market pricing.');
+        }
+
+        setMarketSnapshot(payload);
+        showToast(payload?.benchmarkPrice
+            ? `Market pricing updated from ${payload.sourceCount || 0} source${payload.sourceCount === 1 ? '' : 's'}.`
+            : 'Links saved, but no usable prices were detected.', payload?.benchmarkPrice ? 'info' : 'warn');
+    } catch (error) {
+        console.error(error);
+        showToast(`Market pricing failed: ${error.message}`, 'error');
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}
+
+function applyMarketSuggestedPrice(mode) {
+    const value = Number(currentMarketSnapshot?.suggestions?.[mode]) || 0;
+    if (!value) {
+        showToast('Refresh market pricing first.', 'error');
+        return;
+    }
+
+    const priceInput = document.getElementById('productPrice');
+    if (priceInput) {
+        priceInput.value = value.toFixed(2);
+    }
+
+    applyBasePriceToInventory();
+    showToast(`Applied market price ${formatCurrency(value)} to the product and all sizes.`);
+}
+
 function getOrderTotal(order) {
     return Number(order?.total ?? order?.pricing?.total ?? 0);
 }
@@ -401,8 +630,12 @@ function normalizeProduct(product) {
         imageScale: normalizeImageScale(product?.imageScale, product),
         sizes,
         releaseDate: normalizeReleaseDate(product?.releaseDate),
+        allowBackorder: Boolean(product?.allowBackorder),
+        backorderLeadTime: String(product?.backorderLeadTime || '').trim(),
+        marketSources: normalizeMarketSources(product),
+        marketSnapshot: normalizeMarketSnapshot(product?.marketSnapshot),
         isHidden: isProductHidden(product),
-        isOutOfStock: Boolean(product?.isOutOfStock) || sizes.every((entry) => entry.stock <= 0),
+        isOutOfStock: Boolean(product?.isOutOfStock) || (sizes.every((entry) => entry.stock <= 0) && !hasBackorderEnabled(product)),
         isFeatured: isProductFeatured(product)
     };
 }
@@ -410,6 +643,9 @@ function normalizeProduct(product) {
 function getProductStatusMeta(product) {
     if (isProductHidden(product)) {
         return { label: 'Hidden', className: 'inactive' };
+    }
+    if (hasBackorderEnabled(product) && getTotalStock(product) <= 0) {
+        return { label: 'Backorder', className: 'shipped' };
     }
     if (isProductOutOfStock(product)) {
         return { label: 'Out of Stock', className: 'cancelled' };
@@ -479,9 +715,18 @@ function renderBulkToolbar(filteredProducts = getFilteredProducts()) {
 function restoreInventorySizes(product) {
     const sizes = getProductSizes(product).map((entry) => ({ ...entry }));
     if (sizes.some((entry) => entry.stock > 0)) return sizes;
-    if (sizes.length === 0) return [{ size: 'US 9', stock: 1, price: Number(product?.price) || 0 }];
+    if (sizes.length === 0) {
+        return [{
+            size: 'US 9',
+            stock: 1,
+            price: Number(product?.price) || 0,
+            backorder: false,
+            backorderLeadTime: String(product?.backorderLeadTime || '').trim()
+        }];
+    }
     sizes[0].stock = 1;
     if (!sizes[0].price) sizes[0].price = Number(product?.price) || 0;
+    sizes[0].backorder = false;
     return sizes;
 }
 
@@ -610,7 +855,24 @@ function setupEventListeners() {
     document.getElementById('applyBulkStockBtn')?.addEventListener('click', applyBulkInventoryStock);
     document.getElementById('applyBulkPriceBtn')?.addEventListener('click', applyBulkInventoryPrice);
     document.getElementById('applyBasePriceBtn')?.addEventListener('click', applyBasePriceToInventory);
+    document.getElementById('applyMarketPriceToInventoryBtn')?.addEventListener('click', () => {
+        const price = Math.max(0, parseFloat(document.getElementById('productPrice')?.value) || 0);
+        document.querySelectorAll('.size-price').forEach((input) => {
+            input.value = price ? price.toFixed(2) : '0.00';
+        });
+        showToast(`Applied current product price ${formatCurrency(price)} to all sizes.`);
+    });
     document.getElementById('clearInventoryBtn')?.addEventListener('click', clearInventoryStock);
+    document.getElementById('refreshMarketPricingBtn')?.addEventListener('click', refreshMarketPricing);
+    document.getElementById('applyMarketMinus100Btn')?.addEventListener('click', () => applyMarketSuggestedPrice('minus100'));
+    document.getElementById('applyMarketMinus20Btn')?.addEventListener('click', () => applyMarketSuggestedPrice('minus20'));
+    document.getElementById('applyMarketSmartBtn')?.addEventListener('click', () => applyMarketSuggestedPrice('smart'));
+    document.getElementById('applyZeroStockBackorderBtn')?.addEventListener('click', applyBackorderToZeroStock);
+    document.getElementById('clearBackorderFlagsBtn')?.addEventListener('click', clearBackorderFlags);
+    document.getElementById('productAllowBackorder')?.addEventListener('change', updateMarketPricingPanel);
+    document.getElementById('marketStockxUrl')?.addEventListener('input', updateMarketPricingPanel);
+    document.getElementById('marketGoatUrl')?.addEventListener('input', updateMarketPricingPanel);
+    document.getElementById('marketEbayUrl')?.addEventListener('input', updateMarketPricingPanel);
 }
 
 function switchTab(tab, el) {
@@ -722,6 +984,9 @@ function renderProducts(filteredProducts = getFilteredProducts()) {
     tbody.innerHTML = filteredProducts.map((product) => {
         const totalStock = getTotalStock(product);
         const status = getProductStatusMeta(product);
+        const stockLabel = hasBackorderEnabled(product) && totalStock <= 0
+            ? 'Backorder only'
+            : `${totalStock} items`;
         return `
             <tr class="${isProductOutOfStock(product) ? 'product-row-muted' : ''}">
                 <td class="checkbox-col">
@@ -734,7 +999,7 @@ function renderProducts(filteredProducts = getFilteredProducts()) {
                 </td>
                 <td><code>${escapeHtml(product.sku || 'N/A')}</code></td>
                 <td>$${product.price.toFixed(2)}</td>
-                <td>${totalStock} items</td>
+                <td>${stockLabel}</td>
                 <td>${escapeHtml(product.category || 'Uncategorized')}</td>
                 <td>
                     <div class="release-date-cell">
@@ -842,10 +1107,14 @@ function openProductModal(id = null) {
     title.textContent = currentProduct ? 'EDIT PRODUCT' : 'ADD PRODUCT';
     form.reset();
     activeProductPreviewIndex = 0;
+    currentMarketSnapshot = null;
 
     document.getElementById('productHidden').checked = currentProduct ? isProductHidden(currentProduct) : false;
     document.getElementById('productOutOfStock').checked = currentProduct ? Boolean(currentProduct.isOutOfStock) : false;
     document.getElementById('productFeatured').checked = currentProduct ? isProductFeatured(currentProduct) : false;
+    document.getElementById('productAllowBackorder').checked = currentProduct ? Boolean(currentProduct.allowBackorder) : false;
+    document.getElementById('productBackorderLeadTime').value = currentProduct?.backorderLeadTime || 'Ships in 1.5-2 weeks';
+    applyMarketSourcesToInputs(currentProduct);
 
     if (currentProduct) {
         document.getElementById('productName').value = currentProduct.name || '';
@@ -864,26 +1133,35 @@ function openProductModal(id = null) {
         document.getElementById('productImageOffsetX').value = String(offsetX);
         document.getElementById('productImageOffsetY').value = String(offsetY);
         document.getElementById('productImageScale').value = String(normalizeImageScale(currentProduct.imageScale, currentProduct));
-        renderSizeGrid(currentProduct.sizes);
+        renderSizeGrid(currentProduct.sizes, currentProduct);
+        setMarketSnapshot(currentProduct.marketSnapshot);
     } else {
         document.getElementById('productImageGallery').value = '';
         document.getElementById('productImageFit').value = 'cover';
         document.getElementById('productImageOffsetX').value = '50';
         document.getElementById('productImageOffsetY').value = '50';
         document.getElementById('productImageScale').value = '1';
+        document.getElementById('productBackorderLeadTime').value = 'Ships in 1.5-2 weeks';
         renderSizeGrid();
+        setMarketSnapshot(null);
     }
 
     syncProductImageFitButtons();
     updateProductImagePreview();
+    updateMarketPricingPanel();
     modal.classList.add('open');
 }
 
-function renderSizeGrid(existingSizes = []) {
+function renderSizeGrid(existingSizes = [], contextProduct = currentProduct || {}) {
     const grid = document.getElementById('sizeInventoryGrid');
     if (!grid) return;
 
-    const sizeMap = new Map(getProductSizes({ sizes: existingSizes }).map((entry) => [entry.size, entry]));
+    const leadTime = String(document.getElementById('productBackorderLeadTime')?.value || contextProduct?.backorderLeadTime || 'Ships in 1.5-2 weeks').trim();
+    const sizeMap = new Map(getProductSizes({
+        ...contextProduct,
+        sizes: existingSizes,
+        backorderLeadTime: leadTime
+    }).map((entry) => [entry.size, entry]));
     grid.innerHTML = DEFAULT_SIZE_OPTIONS.map((size) => {
         const entry = sizeMap.get(size);
         return `
@@ -891,6 +1169,10 @@ function renderSizeGrid(existingSizes = []) {
                 <span>${size}</span>
                 <input type="number" placeholder="Stock" class="size-stock" data-size="${size}" min="0" value="${entry ? entry.stock : 0}">
                 <input type="number" placeholder="Price" class="size-price" data-size="${size}" min="0" step="0.01" value="${entry ? entry.price : ''}">
+                <label class="size-backorder-toggle">
+                    <input type="checkbox" class="size-backorder" data-size="${size}" ${entry?.backorder ? 'checked' : ''}>
+                    <span>Backorder</span>
+                </label>
             </div>
         `;
     }).join('');
@@ -905,10 +1187,14 @@ async function handleProductSubmit(event) {
     button.textContent = 'Saving...';
 
     const basePrice = parseFloat(document.getElementById('productPrice').value) || 0;
+    const allowBackorder = document.getElementById('productAllowBackorder').checked;
+    const backorderLeadTime = String(document.getElementById('productBackorderLeadTime').value || '').trim() || 'Ships in 1.5-2 weeks';
     const sizeEntries = [...document.querySelectorAll('.size-item')].map((item) => ({
         size: item.querySelector('span').textContent.trim(),
         stock: Math.max(0, parseInt(item.querySelector('.size-stock').value, 10) || 0),
-        price: parseFloat(item.querySelector('.size-price').value) || basePrice
+        price: parseFloat(item.querySelector('.size-price').value) || basePrice,
+        backorder: item.querySelector('.size-backorder')?.checked || false,
+        backorderLeadTime
     }));
 
     const productId = currentProduct ? currentProduct.id : Date.now().toString();
@@ -950,6 +1236,10 @@ async function handleProductSubmit(event) {
             brand: document.getElementById('productBrand').value
         }),
         sizes: sizeEntries,
+        allowBackorder,
+        backorderLeadTime,
+        marketSources: readMarketSourceInputs(),
+        marketSnapshot: currentMarketSnapshot,
         isHidden: document.getElementById('productHidden').checked,
         isOutOfStock: document.getElementById('productOutOfStock').checked,
         isFeatured: document.getElementById('productFeatured').checked,
@@ -1115,6 +1405,25 @@ function clearInventoryStock() {
         input.value = 0;
     });
     showToast('All size stock set to 0.', 'info');
+}
+
+function applyBackorderToZeroStock() {
+    document.querySelectorAll('.size-item').forEach((item) => {
+        const stock = Math.max(0, parseInt(item.querySelector('.size-stock')?.value, 10) || 0);
+        const checkbox = item.querySelector('.size-backorder');
+        if (checkbox) {
+            checkbox.checked = stock <= 0;
+        }
+    });
+    showToast('Backorder enabled for all zero-stock sizes.');
+}
+
+function clearBackorderFlags() {
+    document.querySelectorAll('.size-backorder').forEach((input) => {
+        input.checked = false;
+    });
+    document.getElementById('productAllowBackorder').checked = false;
+    showToast('Backorder flags cleared.', 'info');
 }
 
 async function updateProductReleaseDate(productId, value) {

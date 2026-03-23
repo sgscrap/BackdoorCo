@@ -1098,6 +1098,93 @@ body {
     color: var(--text-muted);
 }
 
+.market-pricing-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 16px;
+}
+
+.market-pricing-copy {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+.market-pricing-url-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.market-pricing-field {
+    margin-bottom: 0;
+}
+
+.market-pricing-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 14px 0;
+}
+
+.market-pricing-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.market-pricing-metric,
+.market-source-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.market-pricing-label,
+.market-source-title {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.market-pricing-metric strong,
+.market-source-card strong {
+    display: block;
+    font-size: 20px;
+    color: var(--text-primary);
+}
+
+.market-pricing-metric small,
+.market-source-card small {
+    display: block;
+    margin-top: 6px;
+    color: var(--text-muted);
+    line-height: 1.45;
+}
+
+.market-pricing-source-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+}
+
+.market-source-card.is-live {
+    border-color: rgba(198, 255, 76, 0.25);
+}
+
+.market-source-card.is-error {
+    border-color: rgba(255, 115, 115, 0.25);
+}
+
+.backorder-quickbar {
+    align-items: stretch;
+}
+
 .size-item {
     display: flex;
     flex-direction: column;
@@ -1119,6 +1206,23 @@ body {
     font-size: 12px;
     background: var(--bg-hover);
     border-radius: 8px;
+}
+
+.size-backorder-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.size-backorder-toggle input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
 }
 
 .product-media-workbench {
