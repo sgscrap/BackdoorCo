@@ -207,6 +207,7 @@ function updateFilterCounts() {
         Nike: visible.filter((product) => product.brand === 'Nike').length,
         Adidas: visible.filter((product) => product.brand === 'Adidas').length,
         'New Balance': visible.filter((product) => product.brand === 'New Balance').length,
+        'Acne Studios': visible.filter((product) => product.brand === 'Acne Studios').length,
         Sneakers: visible.filter((product) => product.category === 'Sneakers').length,
         Apparel: visible.filter((product) => product.category === 'Apparel').length
     };

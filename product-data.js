@@ -237,7 +237,7 @@ const SEEDED_PRODUCTS = [
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/642/original/793106_07.jpg.jpeg?action=crop&width=600',
             'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/649/original/793106_08.jpg.jpeg?action=crop&width=600'
         ],
-        imageFit: 'contain',
+        imageFit: 'cover',
         imagePosition: '50% 56%',
         imageScale: 1.22,
         sizes: [
