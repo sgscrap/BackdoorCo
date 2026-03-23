@@ -1030,6 +1030,51 @@ const OFF_WHITE_BELT_REVIEW_THREE = {
     createdAtLabel: 'Verified buyer post'
 };
 
+const NB_2002R_SEA_SALT_REVIEW_ONE = {
+    id: 'seed-nb-2002r-sea-salt-001',
+    name: '**',
+    productId: 'seed-nb-2002r-protection-pack-sea-salt',
+    productName: "New Balance 2002R 'Protection Pack Sea Salt'",
+    comment: 'Very good shoes.',
+    originalComment: 'very good shoes',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/M2002RDC/2023/08/15/165239/20230815002628580776.jpg',
+        'https://www.kickwho.info/uploads/reviews/M2002RDC/2023/08/15/165239/202308150026284419340.jpg',
+        'https://www.kickwho.info/uploads/reviews/M2002RDC/2023/08/15/165239/202308150026281627791.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const NB_2002R_SEA_SALT_REVIEW_TWO = {
+    id: 'seed-nb-2002r-sea-salt-002',
+    name: 'Sa**',
+    productId: 'seed-nb-2002r-protection-pack-sea-salt',
+    productName: "New Balance 2002R 'Protection Pack Sea Salt'",
+    comment: '10/10.',
+    originalComment: '10/10',
+    rating: 5,
+    isHidden: false,
+    images: [],
+    createdAtLabel: 'Verified buyer post'
+};
+
+const NB_2002R_SEA_SALT_REVIEW_THREE = {
+    id: 'seed-nb-2002r-sea-salt-003',
+    name: 'Ac**',
+    productId: 'seed-nb-2002r-protection-pack-sea-salt',
+    productName: "New Balance 2002R 'Protection Pack Sea Salt'",
+    comment: 'A beautiful sneaker. 10/10 perfection.',
+    originalComment: 'A beautiful sneaker. 10/10 perfection.',
+    rating: 5,
+    isHidden: false,
+    images: [
+        'https://www.kickwho.info/uploads/reviews/M2002RDC/2025/01/08/275836/202501080815331986249.jpg'
+    ],
+    createdAtLabel: 'Verified buyer post'
+};
+
 function normalizeReview(review) {
     const images = Array.isArray(review?.images)
         ? review.images.filter(Boolean)
@@ -1121,7 +1166,10 @@ export function getSeededReviews() {
         normalizeReview(KOBE_BRUCE_LEE_REVIEW_NINE),
         normalizeReview(OFF_WHITE_BELT_REVIEW_ONE),
         normalizeReview(OFF_WHITE_BELT_REVIEW_TWO),
-        normalizeReview(OFF_WHITE_BELT_REVIEW_THREE)
+        normalizeReview(OFF_WHITE_BELT_REVIEW_THREE),
+        normalizeReview(NB_2002R_SEA_SALT_REVIEW_ONE),
+        normalizeReview(NB_2002R_SEA_SALT_REVIEW_TWO),
+        normalizeReview(NB_2002R_SEA_SALT_REVIEW_THREE)
     ];
 }
 
