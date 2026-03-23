@@ -259,6 +259,8 @@ const SEEDED_PRODUCTS = [
         ],
         releaseDate: '04/01/2022',
         retailPrice: 150,
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
         status: 'active',
         isHidden: false,
         isOutOfStock: false,
