@@ -7,10 +7,10 @@
 ══════════════════════════════════════════ */
 
 /* ── FIREBASE ── */
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+const CHECKOUT_FUNCTIONS_BASE = '/.netlify/functions';
+const SUCCESS_QUERY_KEY = 'checkout';
 
-const firebaseConfig = {
+/* Firebase checkout writes removed in favor of Stripe Checkout.
     apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
     authDomain: "coalition-aec44.firebaseapp.com",
     projectId: "coalition-aec44",
@@ -19,7 +19,7 @@ const firebaseConfig = {
     appId: "1:312196142925:web:ba090f602c8b5a31b20904"
 };
 const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
+const db = getFirestore(firebaseApp); */
 
 /* ── PROMO CODES ── */
 const PROMO_CODES = {
@@ -365,24 +365,6 @@ function validateStep2() {
 }
 
 function validateStep3() {
-    const cardPayment = document.getElementById('cardPayment');
-    if (!cardPayment || cardPayment.classList.contains('hidden')) return true;
-
-    const cardNum = document.getElementById('cardNum')?.value.replace(/\s/g, '') || '';
-    const cardExp = document.getElementById('cardExp')?.value || '';
-    const cardCvc = document.getElementById('cardCvc')?.value || '';
-    const cardName = document.getElementById('cardName')?.value.trim() || '';
-
-    if (cardNum.length < 13) { showToast('Please enter a valid card number', 'error'); return false; }
-    if (cardExp.length < 7)  { showToast('Please enter your expiry date (MM / YY)', 'error'); return false; }
-    if (cardCvc.length < 3)  { showToast('Please enter your CVC', 'error'); return false; }
-    if (!cardName)           { showToast('Please enter the name on your card', 'error'); return false; }
-
-    // Expiry not in past
-    const [mm, yy] = cardExp.split(' / ');
-    const expDate = new Date(2000 + parseInt(yy), parseInt(mm) - 1, 1);
-    if (expDate < new Date()) { showToast('Your card appears to be expired', 'error'); return false; }
-
     return true;
 }
 
@@ -454,13 +436,13 @@ function updateCheckoutSummary() {
     const discount  = getDiscountAmount(subtotal);
     const shipping  = getShippingCost();
     const taxable   = subtotal - discount;
-    const tax       = taxable * 0.08;
+    const tax       = 0;
     const total     = taxable + shipping + tax;
 
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     set('summarySubtotal', fmt(subtotal));
     set('summaryShipping', shipping === 0 ? 'FREE' : fmt(shipping));
-    set('summaryTax',      fmt(tax));
+    set('summaryTax',      tax === 0 ? 'Calculated in Stripe' : fmt(tax));
     set('summaryTotal',    fmt(total));
 
     const discountLine = document.getElementById('discountLine');
@@ -641,6 +623,150 @@ async function placeOrder() {
 /* ══════════════════════════════════════════
    PAGES
 ══════════════════════════════════════════ */
+function getShippingSelection() {
+    return SHIPPING_OPTIONS.find((option) => option.id === selectedShipping) || SHIPPING_OPTIONS[0];
+}
+
+function buildCheckoutRequestPayload() {
+    return {
+        customer: {
+            firstName: document.getElementById('firstName')?.value.trim() || '',
+            lastName: document.getElementById('lastName')?.value.trim() || '',
+            email: document.getElementById('email')?.value.trim() || '',
+            phone: document.getElementById('phone')?.value.trim() || ''
+        },
+        shippingAddress: {
+            address1: document.getElementById('address1')?.value.trim() || '',
+            address2: document.getElementById('address2')?.value.trim() || '',
+            city: document.getElementById('city')?.value.trim() || '',
+            state: document.getElementById('state')?.value || '',
+            zip: document.getElementById('zip')?.value.trim() || '',
+            country: document.getElementById('country')?.value || 'United States'
+        },
+        shippingMethod: getShippingSelection().id,
+        cart: cart.map(normalizeCartItem)
+    };
+}
+
+function setCheckoutButtonLoading(isLoading) {
+    const btn = document.getElementById('placeOrderBtn');
+    if (!btn) return;
+    btn.disabled = isLoading;
+    btn.innerHTML = isLoading
+        ? '<div class="spinner"></div> OPENING SECURE CHECKOUT...'
+        : '<i class="fa-solid fa-lock"></i> CONTINUE TO SECURE PAYMENT';
+}
+
+function formatMoneyDisplay(amount, currency = 'USD') {
+    try {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(Number(amount || 0));
+    } catch {
+        return fmt(amount || 0);
+    }
+}
+
+function formatDeliveryEstimate(shippingMethod) {
+    const days = shippingMethod === 'overnight' ? 1 : shippingMethod === 'express' ? 3 : 7;
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+async function loadCheckoutSessionStatus(sessionId) {
+    const response = await fetch(`${CHECKOUT_FUNCTIONS_BASE}/checkout-session-status?session_id=${encodeURIComponent(sessionId)}`, {
+        headers: { 'Accept': 'application/json' }
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+        throw new Error(payload.error || 'Unable to verify Stripe checkout.');
+    }
+    return payload;
+}
+
+async function hydrateSuccessPage(sessionId) {
+    const summary = await loadCheckoutSessionStatus(sessionId);
+    const set = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+
+    set('successEmail', summary.customerEmail || '');
+    set('successOrderNum', summary.orderNumber ? `#${summary.orderNumber}` : '#BACKDOOR');
+    set('successDate', new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+    set('successPayment', summary.paymentLabel || 'Stripe Checkout');
+    set('successTotal', formatMoneyDisplay(summary.total, summary.currency || 'USD'));
+    set('successDelivery', formatDeliveryEstimate(summary.shippingMethod));
+
+    clearCart();
+    appliedPromo = null;
+    showPage('success');
+    return summary;
+}
+
+async function placeOrder() {
+    if (!validateStep3()) return;
+    if (cart.length === 0) { showToast('Your cart is empty!', 'error'); return; }
+
+    setCheckoutButtonLoading(true);
+
+    try {
+        const response = await fetch(`${CHECKOUT_FUNCTIONS_BASE}/create-checkout-session`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(buildCheckoutRequestPayload())
+        });
+
+        const payload = await response.json();
+        if (!response.ok || !payload.url) {
+            throw new Error(payload.error || 'Unable to start Stripe checkout.');
+        }
+
+        window.location.href = payload.url;
+    } catch (error) {
+        console.error('Stripe checkout start failed:', error);
+        showToast(error.message || 'Unable to start secure checkout.', 'error');
+        setCheckoutButtonLoading(false);
+    }
+}
+
+function applyPromo() {
+    const cartInput = document.getElementById('promoCode');
+    const checkoutInput = document.getElementById('checkoutPromo');
+    if (cartInput) cartInput.value = '';
+    if (checkoutInput) checkoutInput.value = '';
+    showToast('Promo codes are entered in secure Stripe checkout.', 'info');
+}
+
+async function handleCheckoutReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const state = params.get(SUCCESS_QUERY_KEY);
+    const sessionId = params.get('session_id');
+
+    if (state === 'cancelled') {
+        showPage('checkout');
+        setStep(Number(params.get('step')) || 3);
+        showToast('Stripe checkout was canceled.', 'info');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+    }
+
+    if (state === 'success' && sessionId) {
+        try {
+            await hydrateSuccessPage(sessionId);
+            showToast('Payment confirmed.', 'success');
+        } catch (error) {
+            console.error('Stripe checkout confirmation failed:', error);
+            showToast(error.message || 'Payment confirmation is still processing.', 'info');
+            showPage('success');
+        } finally {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+}
+
 function showPage(page) {
     const storePage    = document.getElementById('storePage');
     const checkoutPage = document.getElementById('checkoutPage');
@@ -664,7 +790,7 @@ function goToCheckout() {
 /* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     loadCart();
     updateCheckoutSummary();
 
@@ -679,6 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start at step 1
     setStep(1);
+    await handleCheckoutReturn();
 });
 
 // Expose functions globally for HTML onclick handlers
@@ -689,9 +816,6 @@ window.showPage      = showPage;
 window.applyPromo    = applyPromo;
 window.removeFromCart = removeFromCart;
 window.updateQty     = updateQty;
-window.setPayMethod  = setPayMethod;
-window.formatCard    = formatCard;
-window.formatExpiry  = formatExpiry;
 window.formatPhone   = formatPhone;
 window.selectShipping = selectShipping;
 window.placeOrder    = placeOrder;
