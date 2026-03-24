@@ -73,7 +73,7 @@
                         <button class="product-gallery-nav product-gallery-nav--prev" id="productPrevImage" type="button" aria-label="Previous image">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
-                        <img id="productMainImage" src="" alt="Product preview">
+                        <img id="productMainImage" src="" alt="Product preview" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
                         <button class="product-gallery-nav product-gallery-nav--next" id="productNextImage" type="button" aria-label="Next image">
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
@@ -132,6 +132,7 @@
 
                 <div class="product-page-actions">
                     <button class="add-to-cart-btn" id="productAddToCart">Add to Cart</button>
+                    <button class="btn-hero-secondary product-offer-trigger" id="productOfferBtn" type="button">Make Offer</button>
                     <a class="btn-hero-secondary product-back-link" href="men.html">Back to Men</a>
                 </div>
             </div>
@@ -155,10 +156,76 @@
         </div>
     </div>
 
+    <div class="modal" id="offerModal">
+        <div class="modal-overlay" id="offerModalOverlay"></div>
+        <div class="modal-content small product-offer-modal">
+            <button class="modal-close" id="offerModalClose" aria-label="Close offer modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="product-offer-shell">
+                <p class="product-review-eyebrow">Make An Offer</p>
+                <h2 class="product-offer-title">Send your best number</h2>
+                <p class="product-offer-copy">Submit a lower price for this pair and it will land directly in the admin offer queue.</p>
+                <div class="product-offer-price-row">
+                    <span>Current ask</span>
+                    <strong id="offerAskPrice">$0</strong>
+                </div>
+                <form id="offerForm" class="product-offer-form">
+                    <div class="product-offer-grid">
+                        <label class="product-offer-field">
+                            <span>Name</span>
+                            <input type="text" id="offerCustomerName" placeholder="Your name" required>
+                        </label>
+                        <label class="product-offer-field">
+                            <span>Email</span>
+                            <input type="email" id="offerCustomerEmail" placeholder="you@example.com" required>
+                        </label>
+                    </div>
+                    <div class="product-offer-grid">
+                        <label class="product-offer-field">
+                            <span>Phone (optional)</span>
+                            <input type="tel" id="offerCustomerPhone" placeholder="(555) 555-5555">
+                        </label>
+                        <label class="product-offer-field">
+                            <span>Size</span>
+                            <select id="offerSize" required></select>
+                        </label>
+                    </div>
+                    <label class="product-offer-field">
+                        <span>Offer amount</span>
+                        <input type="number" id="offerAmount" min="1" step="1" placeholder="Enter your offer" required>
+                    </label>
+                    <label class="product-offer-field">
+                        <span>Message (optional)</span>
+                        <textarea id="offerMessage" rows="3" placeholder="Any note for this offer..."></textarea>
+                    </label>
+                    <button class="add-to-cart-btn" id="offerSubmitBtn" type="submit">Submit Offer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="toast-container" id="toastContainer"></div>
+
+    <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out;">
+        <img id="lightboxImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none;" oncontextmenu="return false;" draggable="false">
+    </div>
 
     <script type="module" src="product-page.js"></script>
     <script>
+        window.openLightbox = (src) => {
+            const lb = document.getElementById('imageLightbox');
+            const img = document.getElementById('lightboxImage');
+            if (lb && img && src) {
+                img.src = src;
+                lb.style.display = 'flex';
+            }
+        };
+        window.closeLightbox = (e) => {
+            const lb = document.getElementById('imageLightbox');
+            if (lb) lb.style.display = 'none';
+        };
+
         function closeAnnounce() {
             const bar = document.getElementById('announceBar');
             const nav = document.getElementById('navbar');

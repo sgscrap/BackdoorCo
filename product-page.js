@@ -85,8 +85,15 @@ function initShell() {
     document.getElementById('productPrevImage')?.addEventListener('click', () => changeProductImage(-1));
     document.getElementById('productNextImage')?.addEventListener('click', () => changeProductImage(1));
     document.getElementById('productMainImage')?.addEventListener('click', () => changeProductImage(1));
+    document.getElementById('productOfferBtn')?.addEventListener('click', openOfferModal);
+    document.getElementById('offerModalClose')?.addEventListener('click', closeOfferModal);
+    document.getElementById('offerModalOverlay')?.addEventListener('click', closeOfferModal);
+    document.getElementById('offerForm')?.addEventListener('submit', handleOfferSubmit);
     window.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') cartSidebar?.classList.remove('active');
+        if (event.key === 'Escape') {
+            cartSidebar?.classList.remove('active');
+            closeOfferModal();
+        }
         if (event.key === 'ArrowLeft') changeProductImage(-1);
         if (event.key === 'ArrowRight') changeProductImage(1);
     });
@@ -173,6 +180,7 @@ function renderProduct(product) {
     }
 
     document.querySelector('.product-back-link')?.setAttribute('href', buildBackHref(product));
+    syncOfferForm(product);
 }
 
 function initProductReviews(product) {
@@ -210,8 +218,8 @@ function renderProductReviews(reviews) {
             <p class="product-review-comment">${escapeHtml(review.comment)}</p>
             <div class="product-review-gallery">
                 ${review.images.map((image, index) => `
-                    <button class="product-review-thumb" type="button" onclick="setProductReviewImage(${index}, '${image.replace(/'/g, "\\'")}')">
-                        <img src="${escapeHtml(image)}" alt="${escapeHtml(review.name)} review image ${index + 1}">
+                    <button class="product-review-thumb" type="button" onclick="openLightbox('${escapeHtml(image)}')">
+                        <img src="${escapeHtml(image)}" alt="${escapeHtml(review.name)} review image ${index + 1}" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
                     </button>
                 `).join('')}
             </div>
@@ -219,13 +227,6 @@ function renderProductReviews(reviews) {
     `).join('');
 }
 
-window.setProductReviewImage = (index, image) => {
-    if (!image) return;
-    const mainImage = document.getElementById('productMainImage');
-    if (!mainImage) return;
-    mainImage.src = image;
-    mainImage.alt = `${currentProduct?.name || 'Product'} review image ${index + 1}`;
-};
 
 function formatBrandLine(product) {
     const brand = String(product?.brand || '').trim();
@@ -297,6 +298,9 @@ window.selectProductSize = (button) => {
     selectedSize = button.dataset.size || '';
     selectedSizeBackorder = button.dataset.backorder === 'true';
     document.getElementById('productAddToCart').textContent = selectedSizeBackorder ? 'Add Backorder' : 'Add to Cart';
+
+    const offerSize = document.getElementById('offerSize');
+    if (offerSize) offerSize.value = selectedSize;
 };
 
 document.getElementById('productAddToCart')?.addEventListener('click', () => {
@@ -444,4 +448,108 @@ function showToast(message, type = 'success') {
     toast.innerHTML = `<span>+</span><span>${message}</span>`;
     container.appendChild(toast);
     window.setTimeout(() => toast.remove(), 2500);
+}
+
+// --- OFFER LOGIC ---
+
+function syncOfferForm(product) {
+    const askPrice = document.getElementById('offerAskPrice');
+    const sizeSelect = document.getElementById('offerSize');
+    const offerAmount = document.getElementById('offerAmount');
+    const offerButton = document.getElementById('productOfferBtn');
+    if (!product || !sizeSelect) return;
+
+    const sizes = getProductSizes(product);
+    const options = sizes.length > 0
+        ? sizes.map((entry) => {
+            const sizeBackorder = isBackorder(product, entry) && entry.stock <= 0;
+            const sizeSoldOut = entry.stock <= 0 && !sizeBackorder;
+            return `<option value="${escapeHtml(entry.size)}">${escapeHtml(entry.size)}${sizeBackorder ? ' (backorder)' : sizeSoldOut ? ' (out of stock)' : ''}</option>`;
+        }).join('')
+        : '<option value="One Size">One Size</option>';
+
+    sizeSelect.innerHTML = options;
+    sizeSelect.value = selectedSize || sizeSelect.options[0]?.value || 'One Size';
+
+    if (askPrice) askPrice.textContent = `$${(Number(product.price) || 0).toFixed(0)}`;
+    if (offerAmount) offerAmount.value = String(Math.max(1, Math.round((Number(product.price) || 0) * 0.9)));
+    if (offerButton) offerButton.disabled = false;
+}
+
+function openOfferModal() {
+    if (!currentProduct) return;
+    syncOfferForm(currentProduct);
+    document.getElementById('offerModal')?.classList.add('active');
+}
+
+function closeOfferModal() {
+    document.getElementById('offerModal')?.classList.remove('active');
+}
+
+async function handleOfferSubmit(event) {
+    event.preventDefault();
+    if (!currentProduct) return;
+
+    const submitButton = document.getElementById('offerSubmitBtn');
+    const originalLabel = submitButton?.textContent || 'Submit Offer';
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending...';
+    }
+
+    const size = document.getElementById('offerSize')?.value || selectedSize || 'One Size';
+    const offerAmount = Math.max(1, Number.parseFloat(document.getElementById('offerAmount')?.value || '0') || 0);
+    const offerData = {
+        productId: currentProduct.id,
+        productName: currentProduct.name,
+        productSku: currentProduct.sku || '',
+        productImage: getProductImages(currentProduct)[0] || currentProduct.image || '',
+        size,
+        brand: currentProduct.brand || '',
+        askingPrice: Number(currentProduct.price) || 0,
+        offerAmount,
+        customerName: String(document.getElementById('offerCustomerName')?.value || '').trim(),
+        customerEmail: String(document.getElementById('offerCustomerEmail')?.value || '').trim(),
+        customerPhone: String(document.getElementById('offerCustomerPhone')?.value || '').trim(),
+        message: String(document.getElementById('offerMessage')?.value || '').trim(),
+        status: 'pending',
+        source: 'product-page'
+    };
+
+    if (!offerData.customerName || !offerData.customerEmail || !size || !offerAmount) {
+        showToast('Name, email, size, and offer amount are required.', 'error');
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalLabel;
+        }
+        return;
+    }
+
+    try {
+        const response = await fetch('/.netlify/functions/create-offer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(offerData)
+        });
+
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(result?.error || 'Offer submission failed.');
+        }
+
+        document.getElementById('offerForm')?.reset();
+        syncOfferForm(currentProduct);
+        closeOfferModal();
+        showToast('Offer submitted. We will review it and follow up.');
+    } catch (error) {
+        console.error(error);
+        showToast(error.message || 'Offer submission failed.', 'error');
+    } finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalLabel;
+        }
+    }
 }

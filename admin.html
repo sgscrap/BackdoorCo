@@ -66,6 +66,12 @@
                 <span class="nav-badge" id="orderBadge">0</span>
             </a>
 
+            <a class="nav-item" data-page="offers" onclick="switchTab('offers', this)">
+                <i class="nav-icon fa-solid fa-hand-holding-dollar"></i>
+                Offers
+                <span class="nav-badge" id="offerBadge">0</span>
+            </a>
+
             <a class="nav-item" data-page="products" onclick="switchTab('products', this)">
                 <i class="nav-icon fa-solid fa-shoe-prints"></i>
                 Products
@@ -293,6 +299,36 @@
                                     </tr>
                                 </thead>
                                 <tbody id="ordersTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-section" id="offersSection">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">CUSTOMER OFFERS</span>
+                            <button class="btn-secondary btn-sm" type="button" onclick="renderOffers()">
+                                <i class="fa-solid fa-rotate"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Product</th>
+                                        <th>Offer</th>
+                                        <th>Status</th>
+                                        <th>Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="offersTableBody">
+                                    <tr>
+                                        <td colspan="6" class="empty-state-row">No offers yet.</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>

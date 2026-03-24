@@ -4446,3 +4446,123 @@ body {
         gap: 14px;
     }
 }
+
+
+/* --- MAKE OFFER STYLES --- */
+
+.product-offer-trigger {
+    min-width: 154px;
+    justify-content: center;
+}
+
+.product-offer-modal {
+    max-width: 560px;
+}
+
+.product-offer-shell {
+    padding: 32px;
+    display: grid;
+    gap: 18px;
+}
+
+.product-offer-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 40px;
+    letter-spacing: 2px;
+    line-height: 0.95;
+}
+
+.product-offer-copy {
+    color: var(--text2);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.product-offer-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.product-offer-price-row span {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+}
+
+.product-offer-price-row strong {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--accent);
+}
+
+.product-offer-form {
+    display: grid;
+    gap: 14px;
+}
+
+.product-offer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.product-offer-field {
+    display: grid;
+    gap: 8px;
+}
+
+.product-offer-field span {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+}
+
+.product-offer-field input,
+.product-offer-field select,
+.product-offer-field textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.product-offer-field input:focus,
+.product-offer-field select:focus,
+.product-offer-field textarea:focus {
+    outline: none;
+    border-color: rgba(200, 246, 93, 0.42);
+    box-shadow: 0 0 0 3px rgba(200, 246, 93, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.product-offer-field textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+@media (max-width: 768px) {
+    .product-offer-shell {
+        padding: 24px;
+    }
+
+    .product-offer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

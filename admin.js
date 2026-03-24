@@ -4,13 +4,14 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const DEFAULT_SIZE_OPTIONS = ['US 7', 'US 7.5', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 11', 'US 12', 'US 13'];
+const DEFAULT_SIZE_OPTIONS = ['US 7', 'US 7.5', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 10.5', 'US 11', 'US 11.5', 'US 12', 'US 13', 'US 14', 'US 15'];
 const IMPORTER_SIZES = [...DEFAULT_SIZE_OPTIONS];
 const MARKET_SOURCE_KEYS = ['stockx', 'goat', 'ebay'];
 const ADMIN_AUTH_DISABLED = false;
 const pageData = {
     dashboard: { title: 'DASHBOARD', subtitle: "Welcome back - here's what's happening today." },
     orders: { title: 'ORDERS', subtitle: 'Manage and track all customer orders.' },
+    offers: { title: 'OFFERS', subtitle: 'Review and respond to customer price offers.' },
     products: { title: 'PRODUCTS', subtitle: 'Browse and manage your sneaker inventory.' },
     reviews: { title: 'REVIEWS', subtitle: 'Create and manage customer-style review posts.' },
     customers: { title: 'CUSTOMERS', subtitle: 'View and manage your customer base.' },
@@ -29,6 +30,7 @@ const chartData = [
 ];
 
 let orders = [];
+let offers = [];
 let customers = [];
 let products = [];
 let reviews = [];
@@ -742,6 +744,15 @@ function initFirebaseListeners() {
         renderDashboard();
     });
 
+    db.collection('offers').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+        offers = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        renderOffers();
+        renderDashboard();
+    });
+
     db.collection('reviews').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
         reviews = snapshot.docs.map((doc) => ({
             id: doc.id,
@@ -891,9 +902,14 @@ function switchTab(tab, el) {
 
     if (tab === 'dashboard') renderDashboard();
     if (tab === 'orders') renderOrders();
+    if (tab === 'offers') renderOffers();
     if (tab === 'products') renderProducts();
     if (tab === 'reviews') renderReviews();
     if (tab === 'customers') renderCustomers();
+}
+
+function getPendingOfferCount() {
+    return offers.filter((offer) => String(offer.status || 'pending').toLowerCase() === 'pending').length;
 }
 
 function renderDashboard() {
@@ -906,8 +922,10 @@ function renderDashboard() {
     animateCounter(document.getElementById('customersVal'), customers.length);
 
     const orderBadge = document.getElementById('orderBadge');
+    const offerBadge = document.getElementById('offerBadge');
     const productBadge = document.getElementById('productBadge');
     if (orderBadge) orderBadge.textContent = String(pendingCount);
+    if (offerBadge) offerBadge.textContent = String(getPendingOfferCount());
     if (productBadge) productBadge.textContent = String(getVisibleProductCount());
 
     renderChart();
@@ -1555,6 +1573,62 @@ function closeOrderModal() {
     document.getElementById('orderModal')?.classList.remove('open');
 }
 
+function renderOffers() {
+    const tbody = document.getElementById('offersTableBody');
+    if (!tbody) return;
+
+    if (offers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state-row">No offers yet.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = offers.map((offer) => {
+        const status = String(offer.status || 'pending').toLowerCase();
+        const updatedAt = offer.updatedAt?.toDate ? offer.updatedAt.toDate().toLocaleDateString() : offer.createdAt?.toDate ? offer.createdAt.toDate().toLocaleDateString() : 'Just now';
+        const offerAmount = Number(offer.offerAmount || 0);
+        const askingPrice = Number(offer.askingPrice || 0);
+        const counterAmount = Number(offer.counterAmount || 0);
+
+        return `
+            <tr>
+                <td>
+                    <strong>${escapeHtml(offer.customerName || 'Anonymous')}</strong>
+                    <div class="table-subtext">${escapeHtml(offer.customerEmail || 'No email provided')}</div>
+                    ${offer.customerPhone ? `<div class="table-subtext">${escapeHtml(offer.customerPhone)}</div>` : ''}
+                </td>
+                <td>
+                    <strong>${escapeHtml(offer.productName || 'Unknown product')}</strong>
+                    <div class="table-subtext">${escapeHtml(offer.size || 'No size selected')}</div>
+                    ${offer.message ? `<div class="table-subtext">${escapeHtml(offer.message)}</div>` : ''}
+                </td>
+                <td>
+                    <strong>${formatCurrency(offerAmount)}</strong>
+                    <div class="table-subtext">Ask ${formatCurrency(askingPrice)}</div>
+                    ${counterAmount > 0 ? `<div class="table-subtext">Counter ${formatCurrency(counterAmount)}</div>` : ''}
+                </td>
+                <td><span class="status-pill ${escapeHtml(status)}">${escapeHtml(status)}</span></td>
+                <td>${updatedAt}</td>
+                <td>
+                    <div class="row-action-group">
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="updateOfferStatus('${escapeHtml(offer.id)}', 'accepted')" title="Accept offer">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="counterOffer('${escapeHtml(offer.id)}')" title="Send counter offer">
+                            <i class="fa-solid fa-reply-dollar"></i>
+                        </button>
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="updateOfferStatus('${escapeHtml(offer.id)}', 'rejected')" title="Reject offer">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="deleteOffer('${escapeHtml(offer.id)}')" title="Delete offer">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
 function renderCustomers() {
     const tbody = document.getElementById('customersTableBody');
     if (!tbody) return;
@@ -1568,6 +1642,52 @@ function renderCustomers() {
             <td>${new Date(customer.lastOrder || Date.now()).toLocaleDateString()}</td>
         </tr>
     `).join('');
+}
+
+async function updateOfferStatus(offerId, status, extra = {}) {
+    const offer = offers.find((entry) => entry.id === offerId);
+    if (!offer) return;
+
+    try {
+        await db.collection('offers').doc(offerId).set({
+            status,
+            ...extra,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast(`Offer ${status}.`);
+    } catch (error) {
+        console.error(error);
+        showToast(`Offer update failed: ${error.message}`, 'error');
+    }
+}
+
+async function counterOffer(offerId) {
+    const offer = offers.find((entry) => entry.id === offerId);
+    if (!offer) return;
+
+    const currentValue = Number(offer.counterAmount || offer.offerAmount || offer.askingPrice || 0);
+    const response = prompt('Enter the counter amount for this offer:', currentValue ? String(currentValue) : '');
+    if (response === null) return;
+
+    const counterAmount = Math.max(0, Number.parseFloat(response) || 0);
+    if (!counterAmount) {
+        showToast('Enter a valid counter amount.', 'error');
+        return;
+    }
+
+    await updateOfferStatus(offerId, 'countered', { counterAmount });
+}
+
+async function deleteOffer(offerId) {
+    if (!confirm('Delete this offer?')) return;
+
+    try {
+        await db.collection('offers').doc(offerId).delete();
+        showToast('Offer deleted.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Delete failed: ${error.message}`, 'error');
+    }
 }
 
 function generateReviewProfiles() {
@@ -2232,6 +2352,10 @@ window.selectProductPreviewImage = (index) => {
 
 window.switchTab = switchTab;
 window.viewOrder = viewOrder;
+window.renderOffers = renderOffers;
+window.updateOfferStatus = updateOfferStatus;
+window.counterOffer = counterOffer;
+window.deleteOffer = deleteOffer;
 window.openProductModal = openProductModal;
 window.openReviewModal = openReviewModal;
 window.closeModal = closeModal;
