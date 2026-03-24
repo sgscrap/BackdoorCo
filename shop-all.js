@@ -140,7 +140,7 @@ function getFilteredProducts() {
     return filtered;
 }
 
-function renderProducts() {
+window.renderProducts = function() {
     const filtered = getFilteredProducts();
 
     if (resultsCount) {

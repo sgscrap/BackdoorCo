@@ -3,9 +3,9 @@
    Handles Firebase User Session & Nav Updates across all pages
 ══════════════════════════════════════════ */
 
-let globalUser = null;
-let globalProfile = null;
-let globalWishlist = [];
+window.globalUser = null;
+window.globalProfile = null;
+window.globalWishlist = [];
 
 function initGlobalAuth() {
     if (!window.firebaseConfig) return;
@@ -16,20 +16,41 @@ function initGlobalAuth() {
     const db = firebase.firestore();
 
     auth.onAuthStateChanged(async (user) => {
-        globalUser = user;
+        window.globalUser = user;
         if (user) {
             try {
-                const snap = await db.collection('users').doc(user.uid).get();
-                globalProfile = snap.exists ? snap.data() : null;
-                globalWishlist = globalProfile?.wishlist || [];
+                // Real-time profile listener
+                db.collection('users').doc(user.uid).onSnapshot((snap) => {
+                    window.globalProfile = snap.exists ? snap.data() : null;
+                    window.globalWishlist = window.globalProfile?.wishlist || [];
+                    
+                    updateGlobalNavUI();
+                    
+                    // Notify other scripts
+                    window.dispatchEvent(new CustomEvent('backdoor-auth-changed', { 
+                        detail: { user: window.globalUser, profile: window.globalProfile } 
+                    }));
+
+                    if (typeof updateWishlistBtnUI === 'function') updateWishlistBtnUI();
+                    if (typeof renderProducts === 'function') renderProducts();
+                    if (typeof renderMostWanted === 'function') renderMostWanted();
+                });
             } catch (e) {
-                console.error("Global auth profile load error:", e);
+                console.error("Global auth profile listener error:", e);
             }
         } else {
-            globalProfile = null;
-            globalWishlist = [];
+            window.globalProfile = null;
+            window.globalWishlist = [];
+            updateGlobalNavUI();
+            
+            window.dispatchEvent(new CustomEvent('backdoor-auth-changed', { 
+                detail: { user: null, profile: null } 
+            }));
+
+            if (typeof updateWishlistBtnUI === 'function') updateWishlistBtnUI();
+            if (typeof renderProducts === 'function') renderProducts();
+            if (typeof renderMostWanted === 'function') renderMostWanted();
         }
-        updateGlobalNavUI();
     });
 }
 
@@ -44,11 +65,11 @@ function updateGlobalNavUI() {
     if (existingSignBtn) existingSignBtn.remove();
     if (existingUserBtn) existingUserBtn.remove();
 
-    if (globalUser) {
+    if (window.globalUser) {
         // Logged In State -> Show Avatar Dropdown
-        const first = globalProfile?.first || globalUser.displayName?.split(' ')[0] || 'User';
+        const first = window.globalProfile?.first || window.globalUser.displayName?.split(' ')[0] || 'User';
         const initials = first[0]?.toUpperCase() || 'U';
-        const email = globalProfile?.email || globalUser.email || '';
+        const email = window.globalProfile?.email || window.globalUser.email || '';
 
         const wrapper = document.createElement('div');
         wrapper.className = 'user-menu-wrap';
@@ -91,7 +112,12 @@ function updateGlobalNavUI() {
         });
 
         // Update wishlist behavior
-        const wishBtn = navRight.querySelector('.fa-heart')?.parentElement;
+        const wishBtn = document.getElementById('navWishlistBtn');
+        const countBadge = document.getElementById('wishlistCountBadge');
+        if (countBadge) {
+            countBadge.textContent = globalWishlist.length;
+            countBadge.style.display = globalWishlist.length > 0 ? 'flex' : 'none';
+        }
         if (wishBtn) {
             wishBtn.onclick = () => window.location.href = 'accounts.html#wishlist';
             wishBtn.title = 'View Wishlist';
@@ -113,7 +139,9 @@ function updateGlobalNavUI() {
         }
         
         // Update wishlist behavior
-        var wishBtn = navRight.querySelector('.fa-heart')?.parentElement;
+        const wishBtn = document.getElementById('navWishlistBtn');
+        const countBadge = document.getElementById('wishlistCountBadge');
+        if (countBadge) countBadge.style.display = 'none';
         if (wishBtn) {
             wishBtn.onclick = () => {
                 if(typeof showToast === 'function') showToast('Sign in to view wishlist', 'info');
@@ -122,6 +150,39 @@ function updateGlobalNavUI() {
         }
     }
 }
+
+window.toggleWishlist = async (productId) => {
+    if (!window.globalUser) {
+        if (typeof showToast === 'function') showToast('Sign in to save favorites', 'info');
+        else alert('Please sign in to save favorites');
+        window.location.href = 'accounts.html';
+        return;
+    }
+
+    const db = firebase.firestore();
+    const userRef = db.collection('users').doc(window.globalUser.uid);
+    let newWishlist = [...(window.globalWishlist || [])];
+
+    if (newWishlist.includes(productId)) {
+        newWishlist = newWishlist.filter(id => id !== productId);
+        if (typeof showToast === 'function') showToast('Removed from favorites');
+    } else {
+        newWishlist.push(productId);
+        if (typeof showToast === 'function') showToast('Added to favorites!');
+    }
+
+    try {
+        // Use update instead of set to avoid permission issues if doc exists but rules are strict
+        await userRef.update({ wishlist: newWishlist });
+    } catch (e) {
+        if (e.code === 'not-found' || e.message?.includes('No document')) {
+            await userRef.set({ wishlist: newWishlist }, { merge: true });
+        } else {
+            console.error("Wishlist sync error:", e);
+            if (typeof showToast === 'function') showToast('Sync failed (Permissions)', 'error');
+        }
+    }
+};
 
 // Add CSS for the new nav avatar
 document.head.insertAdjacentHTML('beforeend', `

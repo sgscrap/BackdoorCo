@@ -41,21 +41,22 @@ function fmt(ts) {
 ══════════════════════════════════════════ */
 function initFirebase() {
     if (!window.firebaseConfig) return;
-    if (!firebase.apps.length) {
-        firebase.initializeApp(window.firebaseConfig);
-    }
-    auth = firebase.auth();
-    db   = firebase.firestore();
-
-    auth.onAuthStateChanged(async (user) => {
+    
+    // Listen for the master auth event from auth.js
+    window.addEventListener('backdoor-auth-changed', async (event) => {
+        const { user, profile } = event.detail;
+        
         if (user) {
             currentUser = user;
-            await loadUserProfile(user.uid);
-            await loadWishlist(user.uid);
+            userProfile = profile;
+            wishlist = profile?.wishlist || [];
+            
             updateNavUI();
             renderProductsGrid();
+            
             // If already on account page, refresh
-            if (!document.getElementById('accountPage').classList.contains('hidden')) {
+            const accountPage = document.getElementById('accountPage');
+            if (accountPage && !accountPage.classList.contains('hidden')) {
                 populateAccountPage();
             }
         } else {
@@ -67,6 +68,15 @@ function initFirebase() {
             showPage('home');
         }
     });
+
+    // Initial check if auth.js already finished
+    if (window.globalUser || window.globalProfile) {
+        currentUser = window.globalUser;
+        userProfile = window.globalProfile;
+        wishlist = window.globalWishlist || [];
+        updateNavUI();
+        renderProductsGrid();
+    }
 }
 
 /* ══════════════════════════════════════════

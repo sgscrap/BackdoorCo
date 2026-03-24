@@ -34,42 +34,40 @@
     </div>
 
   <!-- ══ NAVBAR ══ -->
-  <nav class="navbar announce-offset" id="navbar">
-    <a class="nav-logo" href="#">
-      <div class="nav-logo-mark">B</div>
-      BACK<span>DOOR</span>
+  <nav class="navbar" id="navbar">
+    <a class="nav-logo" href="index.html">
+        <div class="nav-logo-mark">B</div>
+        BACK<span>DOOR</span>
     </a>
     <div class="nav-center">
-    <a class="nav-link " href="shop-all.html">Shop</a>
-    <div class="nav-dropdown">
-        <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
-        <div class="nav-dropdown-menu">
-            <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
-            <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
-            <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
-            <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
-            <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
+        <a class="nav-link " href="shop-all.html">Shop</a>
+        <div class="nav-dropdown">
+            <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+            <div class="nav-dropdown-menu">
+                <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
+                <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+                <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
+                <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
+                <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
+            </div>
+        </div>
+        <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
+        <a class="nav-link " href="about.html">About</a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-icons-group">
+            <a class="nav-icon-link" href="#" id="navWishlistBtn">
+                <i class="fa-regular fa-heart"></i>
+                <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
+            </a>
+            <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span>Cart</span>
+                <span class="cart-badge" id="cartCount" style="display: none;">0</span>
+            </button>
         </div>
     </div>
-    <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
-    <a class="nav-link " href="about.html">About</a>
-</div>
-    <div class="nav-right">
-      <div class="nav-search-wrap">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" class="nav-search" placeholder="Search brand, name..."
-          title="Search products" />
-      </div>
-      <button class="nav-icon-btn" title="Wishlist" onclick="showToast('Sign in to view wishlist','info')">
-        <i class="fa-regular fa-heart"></i>
-      </button>
-      <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
-        <i class="fa-solid fa-bag-shopping"></i> Cart
-        <span class="cart-pill" id="cartCount">0</span>
-      </button>
-      <button class="btn-signup-nav" onclick="window.location.href='accounts.html'">Sign In</button>
-    </div>
-  </nav>
+</nav>
 
   <!-- ══ HERO ══ -->
   <section class="hero announce-offset-section">

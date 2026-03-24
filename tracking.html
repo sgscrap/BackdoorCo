@@ -15,13 +15,40 @@
 <body>
 
     <!-- ══ NAVBAR ══ -->
-    <nav class="navbar">
-        <a class="nav-logo" href="index.html">BACK<span>DOOR</span></a>
-        <div class="nav-links">
-            <a onclick="showPage('lookup')" id="navLookup" class="active">Track Order</a>
-            <a onclick="showPage('admin')" id="navAdmin">Admin Panel</a>
+    <nav class="navbar" id="navbar">
+    <a class="nav-logo" href="index.html">
+        <div class="nav-logo-mark">B</div>
+        BACK<span>DOOR</span>
+    </a>
+    <div class="nav-center">
+        <a class="nav-link " href="shop-all.html">Shop</a>
+        <div class="nav-dropdown">
+            <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+            <div class="nav-dropdown-menu">
+                <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
+                <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+                <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
+                <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
+                <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
+            </div>
         </div>
-    </nav>
+        <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
+        <a class="nav-link " href="about.html">About</a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-icons-group">
+            <a class="nav-icon-link" href="#" id="navWishlistBtn">
+                <i class="fa-regular fa-heart"></i>
+                <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
+            </a>
+            <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span>Cart</span>
+                <span class="cart-badge" id="cartCount" style="display: none;">0</span>
+            </button>
+        </div>
+    </div>
+</nav>
 
     <!-- ══ LOOKUP PAGE ══ -->
     <div class="page show" id="lookupPage">
@@ -367,6 +394,23 @@
     </script>
     <script src="tracking.js"></script>
     <script src="analytics.js"></script>
+
+  <!-- Firebase SDKs & Global Auth -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+      window.firebaseConfig = {
+          apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+          authDomain: "coalition-aec44.firebaseapp.com",
+          projectId: "coalition-aec44",
+          storageBucket: "coalition-aec44.firebasestorage.app",
+          messagingSenderId: "312196142925",
+          appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+      };
+  </script>
+  <script src="auth.js"></script>
+
 </body>
 
 </html>

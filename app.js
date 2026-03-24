@@ -109,7 +109,7 @@ function initFirebaseSync() {
     });
 }
 
-function renderMostWanted() {
+window.renderMostWanted = function() {
     if (!productGrid || !isHomePage) return;
 
     const visibleProducts = getVisibleProducts();
@@ -454,43 +454,4 @@ window.toggleCart = () => {
 
 window.addToCart = addToCart;
 
-window.toggleWishlist = async (productId) => {
-    if (!window.globalUser) {
-        if(typeof showToast === 'function') showToast('Please sign in to save items to your wishlist', 'info');
-        window.location.href = 'accounts.html';
-        return;
-    }
-
-    if (!window.globalWishlist) window.globalWishlist = [];
-    const idx = window.globalWishlist.indexOf(productId);
-    const added = idx === -1;
-
-    if (added) {
-        window.globalWishlist.push(productId);
-    } else {
-        window.globalWishlist.splice(idx, 1);
-    }
-
-    // Attempt to update icon immediately for fast feedback
-    const icons = document.querySelectorAll(`#wishlist-icon-${productId}`);
-    icons.forEach(icon => {
-        icon.className = added ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-        const btn = icon.parentElement;
-        if (btn && btn.classList.contains('heart-btn')) {
-            btn.classList.toggle('wishlisted', added);
-        }
-    });
-
-    if(typeof showToast === 'function') {
-        showToast(added ? 'Added to wishlist' : 'Removed from wishlist', 'success');
-    }
-
-    // Sync to DB
-    try {
-        await firebase.firestore().collection('users').doc(window.globalUser.uid).set({
-            wishlist: window.globalWishlist
-        }, { merge: true });
-    } catch(e) {
-        console.warn('Wishlist sync failed:', e);
-    }
-};
+// Unified toggleWishlist is handled by auth.js

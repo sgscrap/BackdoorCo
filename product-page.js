@@ -108,7 +108,7 @@ function initShell() {
     });
 }
 
-function updateWishlistBtnUI() {
+window.updateWishlistBtnUI = function() {
     const btn = document.getElementById('productWishlistBtn');
     if (!btn || !currentProduct) return;
     const icon = btn.querySelector('i');
