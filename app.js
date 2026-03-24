@@ -156,8 +156,8 @@ function renderMostWanted() {
                             <span class="mw-price drop-price">$${product.price.toFixed(0)}</span>
                         </div>
                         <div class="actions-row" style="display:flex; gap:8px;">
-                            <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist('${product.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;">
-                                <i class="${window.globalWishlist?.includes(product.id) ? 'fa-solid' : 'fa-regular'} fa-heart" id="wishlist-icon-${product.id}" style="${window.globalWishlist?.includes(product.id) ? 'color:var(--accent)' : ''}"></i>
+                            <button class="heart-btn ${window.globalWishlist?.includes(product.id) ? 'wishlisted' : ''}" onclick="event.stopPropagation(); toggleWishlist('${product.id}')" title="Add to Wishlist">
+                                <i class="${window.globalWishlist?.includes(product.id) ? 'fa-solid' : 'fa-regular'} fa-heart" id="wishlist-icon-${product.id}"></i>
                             </button>
                             ${soldOut && !backorder
                                 ? '<span class="mw-sold drop-sold-text" style="display:flex;align-items:center;">Sold Out</span>'
@@ -475,7 +475,10 @@ window.toggleWishlist = async (productId) => {
     const icons = document.querySelectorAll(`#wishlist-icon-${productId}`);
     icons.forEach(icon => {
         icon.className = added ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-        icon.style.color = added ? 'var(--accent)' : '';
+        const btn = icon.parentElement;
+        if (btn && btn.classList.contains('heart-btn')) {
+            btn.classList.toggle('wishlisted', added);
+        }
     });
 
     if(typeof showToast === 'function') {
