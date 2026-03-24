@@ -1,10 +1,11 @@
-import { db } from './admin/firebase-config.js';
+import { db, auth } from './admin/firebase-config.js';
 import {
     collection,
     doc,
     getDoc,
     onSnapshot
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import {
     applyProductOverrides,
     getSeededProducts,
@@ -497,6 +498,19 @@ function syncOfferForm(product) {
 function openOfferModal() {
     if (!currentProduct) return;
     syncOfferForm(currentProduct);
+
+    // Auto-fill for authenticated users
+    if (auth.currentUser) {
+        const nameField = document.getElementById('offerCustomerName');
+        const emailField = document.getElementById('offerCustomerEmail');
+        if (nameField && !nameField.value) {
+            nameField.value = auth.currentUser.displayName || '';
+        }
+        if (emailField && !emailField.value) {
+            emailField.value = auth.currentUser.email || '';
+        }
+    }
+
     document.getElementById('offerModal')?.classList.add('active');
 }
 
@@ -533,6 +547,25 @@ async function handleOfferSubmit(event) {
         status: 'pending',
         source: 'product-page'
     };
+
+    // Validation improvements
+    if (offerAmount >= (Number(currentProduct.price) || 0)) {
+        showToast('Offer must be lower than the current asking price.', 'warn');
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalLabel;
+        }
+        return;
+    }
+
+    if (offerAmount < (Number(currentProduct.price) || 0) * 0.4) {
+        showToast('Your offer is too low. Please enter a more competitive amount.', 'warn');
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalLabel;
+        }
+        return;
+    }
 
     if (!offerData.customerName || !offerData.customerEmail || !size || !offerAmount) {
         showToast('Name, email, size, and offer amount are required.', 'error');

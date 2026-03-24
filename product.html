@@ -43,11 +43,20 @@
             BACK<span>DOOR</span>
         </a>
         <div class="nav-center">
-            <a class="nav-link" href="shop-all.html">Shop</a>
-            <a class="nav-link" href="#">Brands</a>
-            <a class="nav-link" href="#">New Drops</a>
-            <a class="nav-link" href="about.html">About</a>
+    <a class="nav-link " href="shop-all.html">SHOP</a>
+    <a class="nav-link " href="men.html">Men</a>
+    <a class="nav-link " href="women.html">Women</a>
+    <a class="nav-link " href="kids.html">Kids</a>
+    <div class="nav-dropdown">
+        <a class="nav-link nav-dropdown-toggle" href="#">Browse <i class="fa-solid fa-chevron-down"></i></a>
+        <div class="nav-dropdown-menu">
+            <a href="shoes.html" class="nav-dropdown-item">Shoes</a>
+            <a href="apparel.html" class="nav-dropdown-item">Apparel</a>
+            <a href="accessories.html" class="nav-dropdown-item" data-category="accessories">Accessories</a>
+            <a href="electronics.html" class="nav-dropdown-item">Electronics</a>
         </div>
+    </div>
+</div>
         <div class="nav-right">
             <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
                 <i class="fa-solid fa-bag-shopping"></i> Cart
@@ -105,6 +114,14 @@
                     <div class="product-page-price" id="productPrice">$0</div>
                     <div class="product-page-stock" id="productStockLabel"></div>
                 </div>
+
+                <div class="product-page-offer-wrap">
+                    <button class="btn-hero-secondary product-offer-trigger prominent-trigger" id="productOfferBtn" type="button">
+                        <i class="fa-solid fa-tag"></i> MAKE AN OFFER
+                    </button>
+                    <p class="offer-hint">Don't like the price? Send us your best number.</p>
+                </div>
+
                 <p id="productDescription" class="product-page-description"></p>
 
                 <div class="product-page-meta">
@@ -132,7 +149,6 @@
                     <button class="btn-hero-secondary product-wishlist-fixed" id="productWishlistBtn" type="button" title="Add to Wishlist" aria-label="Add to Wishlist">
                         <i class="fa-regular fa-heart"></i>
                     </button>
-                    <button class="btn-hero-secondary product-offer-trigger" id="productOfferBtn" type="button">Make Offer</button>
                     <a class="btn-hero-secondary product-back-link" href="men.html">Back to Men</a>
                 </div>
             </div>
@@ -164,11 +180,11 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div class="product-offer-shell">
-                <p class="product-review-eyebrow">Make An Offer</p>
-                <h2 class="product-offer-title">Send your best number</h2>
-                <p class="product-offer-copy">Submit a lower price for this pair and it will land directly in the admin offer queue.</p>
+                <p class="product-review-eyebrow">OFFER SYSTEM</p>
+                <h2 class="product-offer-title">SEND YOUR BEST OFFER</h2>
+                <p class="product-offer-copy">Submit a competitive price for this pair. Our team reviews every offer for approval.</p>
                 <div class="product-offer-price-row">
-                    <span>Current ask</span>
+                    <span>CURRENT ASK</span>
                     <strong id="offerAskPrice">$0</strong>
                 </div>
                 <form id="offerForm" class="product-offer-form">
@@ -184,23 +200,23 @@
                     </div>
                     <div class="product-offer-grid">
                         <label class="product-offer-field">
-                            <span>Phone (optional)</span>
+                            <span>PHONE (OPTIONAL)</span>
                             <input type="tel" id="offerCustomerPhone" placeholder="(555) 555-5555">
                         </label>
                         <label class="product-offer-field">
-                            <span>Size</span>
+                            <span>SIZE</span>
                             <select id="offerSize" required></select>
                         </label>
                     </div>
                     <label class="product-offer-field">
-                        <span>Offer amount</span>
+                        <span>OFFER AMOUNT</span>
                         <input type="number" id="offerAmount" min="1" step="1" placeholder="Enter your offer" required>
                     </label>
                     <label class="product-offer-field">
-                        <span>Message (optional)</span>
+                        <span>MESSAGE (OPTIONAL)</span>
                         <textarea id="offerMessage" rows="3" placeholder="Any note for this offer..."></textarea>
                     </label>
-                    <button class="add-to-cart-btn" id="offerSubmitBtn" type="submit">Submit Offer</button>
+                    <button class="add-to-cart-btn" id="offerSubmitBtn" type="submit">SUBMIT OFFER</button>
                 </form>
             </div>
         </div>
