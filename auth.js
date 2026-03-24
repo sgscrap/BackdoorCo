@@ -45,23 +45,50 @@ function updateGlobalNavUI() {
     if (existingUserBtn) existingUserBtn.remove();
 
     if (globalUser) {
-        // Logged In State -> Show Avatar Button linking to Accounts
+        // Logged In State -> Show Avatar Dropdown
         const first = globalProfile?.first || globalUser.displayName?.split(' ')[0] || 'User';
         const initials = first[0]?.toUpperCase() || 'U';
+        const email = globalProfile?.email || globalUser.email || '';
 
-        const userBtn = document.createElement('button');
-        userBtn.className = 'nav-user-btn';
-        userBtn.title = 'My Account';
-        userBtn.onclick = () => window.location.href = 'accounts.html';
-        userBtn.innerHTML = `<div class="nav-avatar">${initials}</div>`;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'user-menu-wrap';
+        wrapper.id = 'globalUserMenu';
+        
+        wrapper.innerHTML = `
+            <div class="user-avatar-btn" onclick="document.getElementById('globalUserDropdown').classList.toggle('open')" id="globalUserAvatarBtn">
+                <div class="user-avatar" id="navAvatar">${initials}</div>
+                <span id="navName">${first}</span>
+                <i class="fa-solid fa-chevron-down chevron-icon"></i>
+            </div>
+            <div class="user-dropdown" id="globalUserDropdown">
+                <div class="dropdown-header">
+                    <p id="dropName">${first}</p>
+                    <span id="dropEmail">${email}</span>
+                </div>
+                <a class="dropdown-item" href="accounts.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a class="dropdown-item" href="accounts.html#orders"><i class="fa-solid fa-box"></i> My Orders</a>
+                <a class="dropdown-item" href="accounts.html#wishlist"><i class="fa-regular fa-heart"></i> Wishlist</a>
+                <a class="dropdown-item" href="accounts.html#profile"><i class="fa-solid fa-user"></i> Profile</a>
+                <a class="dropdown-item danger" href="#" onclick="firebase.auth().signOut(); window.location.reload(); return false;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        `;
         
         // Insert before the cart button if possible, else append
         const cartBtn = document.getElementById('cartButton');
         if (cartBtn) {
-            navRight.insertBefore(userBtn, cartBtn.nextSibling); // put after cart
+            navRight.insertBefore(wrapper, cartBtn); // put BEFORE cart
         } else {
-            navRight.appendChild(userBtn);
+            navRight.appendChild(wrapper);
         }
+
+        // Click outside to close
+        document.addEventListener('click', (e) => {
+            const drop = document.getElementById('globalUserDropdown');
+            const btn = document.getElementById('globalUserAvatarBtn');
+            if (drop && drop.classList.contains('open') && !drop.contains(e.target) && (!btn || !btn.contains(e.target))) {
+                drop.classList.remove('open');
+            }
+        });
 
         // Update wishlist behavior
         const wishBtn = navRight.querySelector('.fa-heart')?.parentElement;
@@ -77,10 +104,16 @@ function updateGlobalNavUI() {
         signBtn.textContent = 'Sign In';
         signBtn.onclick = () => window.location.href = 'accounts.html';
         
-        navRight.appendChild(signBtn);
+        // Insert before cart if available
+        const cartBtn = document.getElementById('cartButton');
+        if (cartBtn) {
+            navRight.insertBefore(signBtn, cartBtn);
+        } else {
+            navRight.appendChild(signBtn);
+        }
         
         // Update wishlist behavior
-        const wishBtn = navRight.querySelector('.fa-heart')?.parentElement;
+        var wishBtn = navRight.querySelector('.fa-heart')?.parentElement;
         if (wishBtn) {
             wishBtn.onclick = () => {
                 if(typeof showToast === 'function') showToast('Sign in to view wishlist', 'info');
@@ -93,30 +126,101 @@ function updateGlobalNavUI() {
 // Add CSS for the new nav avatar
 document.head.insertAdjacentHTML('beforeend', `
 <style>
-.nav-user-btn {
-    background: none;
-    border: none;
-    padding: 0;
+.user-menu-wrap {
+    position: relative;
     margin-left: 12px;
+}
+.user-avatar-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 6px;
+    background: var(--bg3, #161616);
+    border: 1px solid var(--border2, #2a2a2a);
+    border-radius: 50px;
     cursor: pointer;
-    border-radius: 50%;
-    transition: transform 0.2s ease;
+    transition: all 0.2s;
 }
-.nav-user-btn:hover {
-    transform: scale(1.05);
+.user-avatar-btn:hover {
+    border-color: var(--accent, #c8f65d);
 }
-.nav-avatar {
-    width: 36px;
-    height: 36px;
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--accent, #c8f65d);
     border-radius: 50%;
-    background: var(--accent);
-    color: var(--bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
     font-size: 14px;
-    border: 2px solid transparent;
+    font-weight: 700;
+    color: #000;
+}
+.user-avatar-btn span {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text, #fff);
+}
+.chevron-icon {
+    font-size: 10px;
+    color: var(--text3, #444);
+}
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 220px;
+    background: var(--bg2, #111);
+    border: 1px solid var(--border2, #2a2a2a);
+    border-radius: 14px;
+    padding: 8px;
+    display: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+.user-dropdown.open {
+    display: block;
+}
+.dropdown-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border, #222);
+    margin-bottom: 6px;
+}
+.dropdown-header p {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text, #fff);
+    margin: 0;
+}
+.dropdown-header span {
+    font-size: 11px;
+    color: var(--text3, #444);
+    margin: 0;
+}
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2, #888);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+}
+.dropdown-item:hover {
+    background: var(--bg4, #1e1e1e);
+    color: var(--text, #fff);
+}
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+}
+.dropdown-item.danger:hover {
+    color: var(--red, #ff4d4d);
+    background: rgba(255, 77, 77, 0.08);
 }
 </style>
 `);
