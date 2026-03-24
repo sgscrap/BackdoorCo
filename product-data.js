@@ -136,8 +136,22 @@ const SEEDED_PRODUCTS = [
         imagePosition: '50% 58%',
         imageScale: 1.28,
         sizes: [
-            { size: 'US 12.5', stock: 0, price: 400 }
+            { size: 'M/US7', stock: 0, price: 400, backorder: true },
+            { size: 'M/US7.5', stock: 0, price: 400, backorder: true },
+            { size: 'M/US8', stock: 0, price: 400, backorder: true },
+            { size: 'M/US8.5', stock: 0, price: 400, backorder: true },
+            { size: 'M/US9', stock: 0, price: 400, backorder: true },
+            { size: 'M/US9.5', stock: 0, price: 400, backorder: true },
+            { size: 'M/US10', stock: 0, price: 400, backorder: true },
+            { size: 'M/US10.5', stock: 0, price: 400, backorder: true },
+            { size: 'M/US11', stock: 0, price: 400, backorder: true },
+            { size: 'M/US11.5', stock: 0, price: 400, backorder: true },
+            { size: 'M/US12', stock: 0, price: 400, backorder: true },
+            { size: 'M/US13', stock: 0, price: 400, backorder: true },
+            { size: 'M/US14', stock: 0, price: 400, backorder: true }
         ],
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
         releaseDate: 'TBD',
         status: 'active',
         isHidden: false,
