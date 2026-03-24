@@ -126,6 +126,16 @@ let selectedRows = new Set();
 let sortField = 'date';
 let sortDir = 'desc';
 let filteredOrders = [...ORDERS];
+let db = null;
+
+/* ── FIREBASE INIT ── */
+function initFirebase() {
+    if (!window.firebaseConfig) return;
+    try {
+        if (!firebase.apps.length) firebase.initializeApp(window.firebaseConfig);
+        db = firebase.firestore();
+    } catch (e) { console.warn('Firebase init failed', e); }
+}
 
 /* ══════════════════════════════════════════
    HELPERS
@@ -204,29 +214,107 @@ function quickLookup(orderId) {
     lookupOrder();
 }
 
-async function lookupOrder() {
-    const input = document.getElementById('lookupInput').value.trim();
-    const btn = document.getElementById('lookupBtn');
+async function lookupOrder(autoInput) {
+    const rawInput = autoInput || document.getElementById('lookupInput').value.trim();
+    const input    = rawInput.replace(/^#/, '').trim();
+    const btn      = document.getElementById('lookupBtn');
     if (!input) { showToast('Please enter an order number or email', 'warn'); return; }
 
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner"></div>';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner"></div>'; }
 
-    await new Promise(r => setTimeout(r, 800));
+    let order = null;
 
-    // Search by order ID or email
-    const order = ORDERS.find(o =>
-        o.id.toLowerCase() === input.toLowerCase() ||
-        o.customer.email.toLowerCase() === input.toLowerCase()
-    );
+    // 1. Try Firestore first
+    if (db) {
+        try {
+            // Search by orderNumber field
+            const snap = await db.collection('orders')
+                .where('orderNumber', '==', input)
+                .limit(1).get();
+            if (!snap.empty) {
+                const data = snap.docs[0].data();
+                order = normalizeFirestoreOrder(snap.docs[0].id, data);
+            } else if (input.includes('@')) {
+                // Search by email
+                const snap2 = await db.collection('orders')
+                    .where('customerEmail', '==', input)
+                    .orderBy('createdAt', 'desc')
+                    .limit(1).get();
+                if (!snap2.empty) {
+                    order = normalizeFirestoreOrder(snap2.docs[0].id, snap2.docs[0].data());
+                }
+            }
+        } catch (e) { console.warn('Firestore lookup error', e); }
+    }
 
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> TRACK';
+    // 2. Fall back to demo orders
+    if (!order) {
+        order = ORDERS.find(o =>
+            o.id.toLowerCase().replace(/^#/, '') === input.toLowerCase() ||
+            o.customer?.email?.toLowerCase() === input.toLowerCase()
+        );
+    }
 
-    if (!order) { showToast('Order not found. Try a demo order!', 'error'); return; }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> TRACK'; }
+
+    if (!order) { showToast('Order not found. Check your order number.', 'error'); return; }
 
     currentOrderId = order.id;
     showTrackingDetail(order);
+}
+
+/* Convert a Firestore order document into the tracking detail shape */
+function normalizeFirestoreOrder(docId, data) {
+    const pricing  = data.pricing || {};
+    const addr     = data.shippingAddress || {};
+    const custName = data.customerName || (addr.name || data.customerEmail || 'Customer');
+    const carrier  = data.carrier ? {
+        name: data.carrier.toUpperCase(),
+        service: data.carrier + ' Shipping',
+        tracking: data.trackingNumber || '',
+        logo: '📦',
+        color: '#333',
+        url: data.trackingUrl || '#'
+    } : null;
+
+    const statusRaw = (data.status || 'processing').toLowerCase();
+
+    // Build a basic events array from status
+    const events = [];
+    if (data.deliveredAt)   events.push({ title: 'Delivered', desc: 'Package delivered', time: data.deliveredAt?.toDate?.().toISOString() || data.deliveredAt, icon: 'fa-house', color: 'var(--green)' });
+    if (data.shippedAt)     events.push({ title: 'Shipped', desc: 'Package shipped', time: data.shippedAt?.toDate?.().toISOString() || data.shippedAt, icon: 'fa-truck', color: 'var(--purple)' });
+    if (data.confirmedAt)   events.push({ title: 'Confirmed', desc: 'Order confirmed', time: data.confirmedAt?.toDate?.().toISOString() || data.confirmedAt, icon: 'fa-circle-check', color: 'var(--blue)' });
+    const createdISO = data.createdAt?.toDate?.().toISOString() || data.createdAt || new Date().toISOString();
+    events.push({ title: 'Order Placed', desc: 'Order created', time: createdISO, icon: 'fa-cart-shopping', color: 'var(--accent)' });
+
+    return {
+        id: '#' + (data.orderNumber || docId),
+        customer: { name: custName, email: data.customerEmail || '', initials: custName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2) },
+        date: createdISO,
+        status: statusRaw,
+        total: Number(pricing.total || 0),
+        subtotal: Number(pricing.subtotal || pricing.total || 0),
+        discount: Number(pricing.discount || 0),
+        shipping: Number(pricing.shipping || 0),
+        tax: Number(pricing.tax || 0),
+        items: (data.items || []).map(item => ({
+            emoji: '👟',
+            name: item.name || item.title || 'Item',
+            brand: item.brand || '',
+            size: item.size || '—',
+            qty: item.quantity || item.qty || 1,
+            price: item.price || 0
+        })),
+        address: {
+            name: addr.name || custName,
+            street: [addr.line1, addr.line2].filter(Boolean).join(', ') || addr.address || '—',
+            city: [addr.city, addr.state, addr.postal_code].filter(Boolean).join(', ') || '—',
+            country: addr.country || 'United States'
+        },
+        carrier,
+        estimatedDelivery: data.estimatedDelivery || null,
+        events
+    };
 }
 
 /* ══════════════════════════════════════════
@@ -659,16 +747,28 @@ function exportOrders() {
 /* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-    // Check for URL hash - e.g. tracking.html#BD-1042
+document.addEventListener('DOMContentLoaded', async () => {
+    initFirebase();
+
+    // Check for ?order= URL param (from accounts page Track button)
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderParam = urlParams.get('order');
+    if (orderParam) {
+        const input = document.getElementById('lookupInput');
+        if (input) input.value = '#' + orderParam.replace(/^#/, '');
+        await lookupOrder(orderParam);
+        return;
+    }
+
+    // Check for URL hash - e.g. tracking.html#BD-1042 (legacy)
     const hash = window.location.hash.replace('#', '').trim();
     if (hash) {
         const orderId = hash.startsWith('BD-') ? '#' + hash : hash;
         const order = ORDERS.find(o => o.id === orderId);
-        if (order) {
-            showTrackingDetail(order);
-            return;
-        }
+        if (order) { showTrackingDetail(order); return; }
+        // Try Firestore lookup
+        await lookupOrder(hash);
+        return;
     }
 
     // ESC to close modals
