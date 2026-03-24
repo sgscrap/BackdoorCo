@@ -9,10 +9,14 @@ let userProfile = null;     // Firestore profile data
 let wishlist = [];          // array of product IDs
 
 /* ── FIREBASE REFS ── */
-// Use accessor functions so we always get a fresh reference
-// regardless of when Firebase was initialized.
-function getAuth() { return firebase.auth(); }
-function getDb()   { return firebase.firestore(); }
+// Always initialize before returning a reference.
+function ensureFirebase() {
+    if (window.firebaseConfig && !firebase.apps.length) {
+        firebase.initializeApp(window.firebaseConfig);
+    }
+}
+function getAuth() { ensureFirebase(); return firebase.auth(); }
+function getDb()   { ensureFirebase(); return firebase.firestore(); }
 
 /* ══════════════════════════════════════════
    HELPERS
