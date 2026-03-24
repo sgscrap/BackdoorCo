@@ -34,6 +34,9 @@ function initGlobalAuth() {
                     if (typeof updateWishlistBtnUI === 'function') updateWishlistBtnUI();
                     if (typeof renderProducts === 'function') renderProducts();
                     if (typeof renderMostWanted === 'function') renderMostWanted();
+                }, (err) => {
+                    console.warn("Global profile listener error:", err);
+                    updateGlobalNavUI(); // Fallback to show navbar even if sync fails
                 });
             } catch (e) {
                 console.error("Global auth profile listener error:", e);

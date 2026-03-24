@@ -23,8 +23,12 @@ NAV_TEMPLATE = """<nav class="navbar" id="navbar">
         <a class="nav-link {about_active}" href="about.html">About</a>
     </div>
     <div class="nav-right">
+        <div class="nav-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="navSearch" placeholder="Search sneakers..." />
+        </div>
         <div class="nav-icons-group">
-            <a class="nav-icon-link" href="#" id="navWishlistBtn">
+            <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
                 <i class="fa-regular fa-heart"></i>
                 <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
             </a>
