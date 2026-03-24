@@ -51,8 +51,23 @@
                 <span class="cart-badge" id="cartCount" style="display: none;">0</span>
             </button>
         </div>
+        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
+            <span></span><span></span><span></span>
+        </button>
     </div>
 </nav>
+<div class="nav-mobile-menu" id="navMobileMenu">
+    <a class="nav-link" href="shop-all.html">Shop All</a>
+    <p class="nav-mobile-section">Brands</p>
+    <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
+    <a class="nav-link" href="shop-all.html?filter=Nike">Nike</a>
+    <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
+    <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
+    <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
+    <p class="nav-mobile-section">Explore</p>
+    <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+    <a class="nav-link" href="about.html">About</a>
+</div>
 
     <!-- ══ AUTH MODAL ══ -->
     <div class="modal-overlay" id="authModal" onclick="closeAuthOnOverlay(event)">

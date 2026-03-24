@@ -231,19 +231,24 @@ document.head.insertAdjacentHTML('beforeend', `
 }
 .user-dropdown {
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100% + 12px);
     right: 0;
     width: 220px;
     background: var(--bg2, #111);
     border: 1px solid var(--border2, #2a2a2a);
     border-radius: 14px;
     padding: 8px;
-    display: none;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    z-index: 1200;
 }
 .user-dropdown.open {
-    display: block;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
 }
 .dropdown-header {
     padding: 10px 12px;
@@ -289,4 +294,29 @@ document.head.insertAdjacentHTML('beforeend', `
 </style>
 `);
 
-document.addEventListener('DOMContentLoaded', initGlobalAuth);
+document.addEventListener('DOMContentLoaded', () => {
+    initGlobalAuth();
+
+    // ── navSearch wiring ──
+    const navSearch = document.getElementById('navSearch');
+    if (navSearch) {
+        // Pre-fill from URL ?search= param on the shop page
+        const sp = new URLSearchParams(window.location.search);
+        const term = sp.get('search');
+        if (term) navSearch.value = term;
+
+        navSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && navSearch.value.trim()) {
+                const q = encodeURIComponent(navSearch.value.trim());
+                // If already on shop-all, update shopSearch too
+                const shopInput = document.getElementById('shopSearch');
+                if (shopInput) {
+                    shopInput.value = navSearch.value.trim();
+                    shopInput.dispatchEvent(new Event('input'));
+                } else {
+                    window.location.href = `shop-all.html?search=${q}`;
+                }
+            }
+        });
+    }
+});
