@@ -5,7 +5,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth
 
 const firebaseConfig = {
     apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
-    authDomain: "coalition-aec44.firebaseapp.com",
+    authDomain: "backdoorco.xyz",
     projectId: "coalition-aec44",
     storageBucket: "coalition-aec44.firebasestorage.app",
     messagingSenderId: "312196142925",
