@@ -330,9 +330,21 @@ if (clearFiltersBtn) {
 
 function readUrlParams() {
     const params = new URLSearchParams(window.location.search);
+    const filterParam = params.get('filter');
     const sortParam = params.get('sort');
     const searchParam = params.get('search');
 
+    if (filterParam) {
+        currentFilter = filterParam;
+        // Sync the sidebar UI
+        document.querySelectorAll('.shop-filter-tab').forEach((item) => item.classList.remove('active'));
+        const activeTab = document.querySelector(`[data-filter="${filterParam}"]`);
+        if (activeTab) {
+            activeTab.classList.add('active');
+            activeTab.closest('.sidebar-accordion')?.classList.add('open');
+        }
+    }
+    
     if (sortParam) currentSort = sortParam;
     if (searchParam) {
         searchTerm = searchParam.toLowerCase().trim();

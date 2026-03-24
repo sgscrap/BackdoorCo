@@ -4,8 +4,17 @@ import re
 # Navigation template
 NAV_TEMPLATE = """<div class="nav-center">
     <a class="nav-link {shop_active}" href="shop-all.html">Shop</a>
-    <a class="nav-link {brands_active}" href="#">Brands</a>
-    <a class="nav-link {drops_active}" href="#">New Drops</a>
+    <div class="nav-dropdown">
+        <a class="nav-link nav-dropdown-toggle {brands_active}" href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+        <div class="nav-dropdown-menu">
+            <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
+            <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+            <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
+            <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
+            <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
+        </div>
+    </div>
+    <a class="nav-link {drops_active}" href="shop-all.html?sort=newest">New Drops</a>
     <a class="nav-link {about_active}" href="about.html">About</a>
 </div>"""
 
