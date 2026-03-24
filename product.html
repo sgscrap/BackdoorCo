@@ -11,6 +11,13 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="store.css">
+    <style>
+        .product-img-preview { pointer-events: none; }
+        .product-wishlist-fixed { width: 50px; flex-shrink: 0; }
+        .lightbox-fixed { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out; }
+        .lightbox-img-fixed { max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none; }
+        .hidden-badge { display: none; }
+    </style>
 </head>
 
 <body class="product-detail-page">
@@ -36,20 +43,10 @@
             BACK<span>DOOR</span>
         </a>
         <div class="nav-center">
-            <a class="nav-link" href="shop-all.html">SHOP</a>
-            <a class="nav-link" href="men.html">Men</a>
-            <a class="nav-link" href="women.html">Women</a>
-            <a class="nav-link" href="kids.html">Kids</a>
-            <details class="nav-dropdown">
-                <summary class="nav-link nav-dropdown-toggle">Browse <i class="fa-solid fa-chevron-down"></i></summary>
-                <div class="nav-dropdown-menu">
-                    <a class="nav-dropdown-link" href="shoes.html">Shoes</a>
-                    <a class="nav-dropdown-link" href="apparel.html">Apparel</a>
-                    <a class="nav-dropdown-link" href="accessories.html">Accessories</a>
-                    <a class="nav-dropdown-link" href="electronics.html">Electronics</a>
-                    <a class="nav-dropdown-link" href="reviews.html">Reviews</a>
-                </div>
-            </details>
+            <a class="nav-link" href="shop-all.html">Shop</a>
+            <a class="nav-link" href="#">Brands</a>
+            <a class="nav-link" href="#">New Drops</a>
+            <a class="nav-link" href="about.html">About</a>
         </div>
         <div class="nav-right">
             <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
@@ -73,7 +70,7 @@
                         <button class="product-gallery-nav product-gallery-nav--prev" id="productPrevImage" type="button" aria-label="Previous image">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
-                        <img id="productMainImage" src="" alt="Product preview" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
+                        <img id="productMainImage" src="" alt="Product preview" oncontextmenu="return false;" draggable="false" class="product-img-preview">
                         <button class="product-gallery-nav product-gallery-nav--next" id="productNextImage" type="button" aria-label="Next image">
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
@@ -99,7 +96,7 @@
 
             <div class="product-page-info">
                 <div class="product-page-eyebrow">
-                    <span id="productStatusBadge" class="modal-badge" style="display:none"></span>
+                    <span id="productStatusBadge" class="modal-badge hidden-badge"></span>
                     <span id="productCategoryLabel" class="product-page-category">Sneakers</span>
                 </div>
                 <h1 id="productName">Loading product...</h1>
@@ -132,7 +129,7 @@
 
                 <div class="product-page-actions">
                     <button class="add-to-cart-btn" id="productAddToCart">Add to Cart</button>
-                    <button class="btn-hero-secondary" id="productWishlistBtn" type="button" style="width:50px; flex-shrink:0;">
+                    <button class="btn-hero-secondary product-wishlist-fixed" id="productWishlistBtn" type="button" title="Add to Wishlist" aria-label="Add to Wishlist">
                         <i class="fa-regular fa-heart"></i>
                     </button>
                     <button class="btn-hero-secondary product-offer-trigger" id="productOfferBtn" type="button">Make Offer</button>
@@ -211,8 +208,8 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out;">
-        <img id="lightboxImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none;" oncontextmenu="return false;" draggable="false">
+    <div id="imageLightbox" class="lightbox-overlay lightbox-fixed" onclick="closeLightbox(event)">
+        <img id="lightboxImage" src="" class="lightbox-img-fixed" oncontextmenu="return false;" draggable="false" alt="Lightbox image view">
     </div>
 
     <script type="module" src="product-page.js"></script>
