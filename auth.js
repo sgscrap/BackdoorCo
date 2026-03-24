@@ -58,8 +58,8 @@ function initGlobalAuth() {
 }
 
 function updateGlobalNavUI() {
-    // Look for the auth button in the navbar Right area
-    const navRight = document.querySelector('.nav-right');
+    // Look for the auth button in the navbar icons group
+    const navRight = document.querySelector('.nav-icons-group') || document.querySelector('.nav-right');
     if (!navRight) return;
 
     // Remove existing auth buttons or user menus
