@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" role="img" aria-labelledby="title">
+  <title>Nike</title>
+  <rect width="900" height="320" fill="none"/>
+  <text x="450" y="106" text-anchor="middle" fill="#101216" font-size="106"
+    font-family="Arial Black, Impact, Arial, sans-serif" letter-spacing="10">NIKE</text>
+  <path
+    d="M156 234c22 14 51 21 89 21 44 0 96-9 156-28L732 96c18-7 34-10 48-10 8 0 14 1 20 2-12 14-30 29-55 43L434 253c-66 26-121 39-165 39-46 0-81-12-104-35-16-17-23-35-21-56z"
+    fill="#101216"/>
+</svg>

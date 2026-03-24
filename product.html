@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backdoor | Product</title>
+    <meta name="description" content="Premium authenticated product details at Backdoor.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="store.css">
+</head>
+
+<body class="product-detail-page">
+    <div class="announce-bar" id="announceBar">
+        <div class="announce-shell">
+            <div class="announce-copy">
+                <span class="announce-kicker">Just Dropped</span>
+                <span class="announce-headline">Jordan 4 Military Blue</span>
+            </div>
+            <div class="announce-pills" aria-label="Store highlights">
+                <span class="announce-pill">Free shipping $150+</span>
+                <span class="announce-pill">100% authenticated</span>
+            </div>
+        </div>
+        <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <nav class="navbar announce-offset" id="navbar">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-mark">B</div>
+            BACK<span>DOOR</span>
+        </a>
+        <div class="nav-center">
+            <a class="nav-link" href="shop-all.html">SHOP</a>
+            <a class="nav-link" href="men.html">Men</a>
+            <a class="nav-link" href="women.html">Women</a>
+            <a class="nav-link" href="kids.html">Kids</a>
+            <details class="nav-dropdown">
+                <summary class="nav-link nav-dropdown-toggle">Browse <i class="fa-solid fa-chevron-down"></i></summary>
+                <div class="nav-dropdown-menu">
+                    <a class="nav-dropdown-link" href="shoes.html">Shoes</a>
+                    <a class="nav-dropdown-link" href="apparel.html">Apparel</a>
+                    <a class="nav-dropdown-link" href="accessories.html">Accessories</a>
+                    <a class="nav-dropdown-link" href="electronics.html">Electronics</a>
+                    <a class="nav-dropdown-link" href="reviews.html">Reviews</a>
+                </div>
+            </details>
+        </div>
+        <div class="nav-right">
+            <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
+                <i class="fa-solid fa-bag-shopping"></i> Cart
+                <span class="cart-pill" id="cartCount">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="product-page-shell">
+        <div class="product-page-breadcrumb">
+            <a href="men.html">Men</a>
+            <span>/</span>
+            <span id="productBreadcrumbLabel">Product</span>
+        </div>
+
+        <section class="product-page-layout" id="productPageLayout">
+            <div class="product-page-gallery-column">
+                <div class="product-page-gallery">
+                    <div class="product-page-main-media">
+                        <button class="product-gallery-nav product-gallery-nav--prev" id="productPrevImage" type="button" aria-label="Previous image">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <img id="productMainImage" src="" alt="Product preview" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
+                        <button class="product-gallery-nav product-gallery-nav--next" id="productNextImage" type="button" aria-label="Next image">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="product-gallery-meta">
+                        <span class="product-gallery-hint" id="productGalleryHint">Image 1 / 1 | Click image for next</span>
+                        <div class="product-gallery-dots" id="productGalleryDots"></div>
+                    </div>
+                </div>
+                <section class="product-review-section" id="productReviewSection">
+                    <div class="product-review-section-head">
+                        <div>
+                            <p class="product-review-eyebrow">Customer Review</p>
+                            <h2 class="product-review-title">What buyers are saying</h2>
+                        </div>
+                        <a class="btn-hero-secondary product-review-link" href="reviews.html">All Reviews</a>
+                    </div>
+                    <div class="product-review-list" id="productReviewList">
+                        <div class="reviews-empty-state">Loading review posts...</div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="product-page-info">
+                <div class="product-page-eyebrow">
+                    <span id="productStatusBadge" class="modal-badge" style="display:none"></span>
+                    <span id="productCategoryLabel" class="product-page-category">Sneakers</span>
+                </div>
+                <h1 id="productName">Loading product...</h1>
+                <p id="productBrandLine" class="product-page-brand"></p>
+                <div class="product-page-price-row">
+                    <div class="product-page-price" id="productPrice">$0</div>
+                    <div class="product-page-stock" id="productStockLabel"></div>
+                </div>
+                <p id="productDescription" class="product-page-description"></p>
+
+                <div class="product-page-meta">
+                    <div class="product-meta-item">
+                        <span>SKU</span>
+                        <strong id="productSku">N/A</strong>
+                    </div>
+                    <div class="product-meta-item">
+                        <span>Colorway</span>
+                        <strong id="productColorway">N/A</strong>
+                    </div>
+                    <div class="product-meta-item">
+                        <span>Release Date</span>
+                        <strong id="productReleaseDate">TBD</strong>
+                    </div>
+                </div>
+
+                <div class="product-page-size-block">
+                    <h3>Select Size</h3>
+                    <div class="size-options" id="productSizeOptions"></div>
+                </div>
+
+                <div class="product-page-actions">
+                    <button class="add-to-cart-btn" id="productAddToCart">Add to Cart</button>
+                    <button class="btn-hero-secondary" id="productWishlistBtn" type="button" style="width:50px; flex-shrink:0;">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                    <button class="btn-hero-secondary product-offer-trigger" id="productOfferBtn" type="button">Make Offer</button>
+                    <a class="btn-hero-secondary product-back-link" href="men.html">Back to Men</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="cart-close" id="cartClose" aria-label="Close Cart Sidebar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span class="cart-total-price" id="cartTotal">$0.00</span>
+            </div>
+            <button class="cart-checkout" onclick="window.location.href='checkout.html'">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <div class="modal" id="offerModal">
+        <div class="modal-overlay" id="offerModalOverlay"></div>
+        <div class="modal-content small product-offer-modal">
+            <button class="modal-close" id="offerModalClose" aria-label="Close offer modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="product-offer-shell">
+                <p class="product-review-eyebrow">Make An Offer</p>
+                <h2 class="product-offer-title">Send your best number</h2>
+                <p class="product-offer-copy">Submit a lower price for this pair and it will land directly in the admin offer queue.</p>
+                <div class="product-offer-price-row">
+                    <span>Current ask</span>
+                    <strong id="offerAskPrice">$0</strong>
+                </div>
+                <form id="offerForm" class="product-offer-form">
+                    <div class="product-offer-grid">
+                        <label class="product-offer-field">
+                            <span>Name</span>
+                            <input type="text" id="offerCustomerName" placeholder="Your name" required>
+                        </label>
+                        <label class="product-offer-field">
+                            <span>Email</span>
+                            <input type="email" id="offerCustomerEmail" placeholder="you@example.com" required>
+                        </label>
+                    </div>
+                    <div class="product-offer-grid">
+                        <label class="product-offer-field">
+                            <span>Phone (optional)</span>
+                            <input type="tel" id="offerCustomerPhone" placeholder="(555) 555-5555">
+                        </label>
+                        <label class="product-offer-field">
+                            <span>Size</span>
+                            <select id="offerSize" required></select>
+                        </label>
+                    </div>
+                    <label class="product-offer-field">
+                        <span>Offer amount</span>
+                        <input type="number" id="offerAmount" min="1" step="1" placeholder="Enter your offer" required>
+                    </label>
+                    <label class="product-offer-field">
+                        <span>Message (optional)</span>
+                        <textarea id="offerMessage" rows="3" placeholder="Any note for this offer..."></textarea>
+                    </label>
+                    <button class="add-to-cart-btn" id="offerSubmitBtn" type="submit">Submit Offer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out;">
+        <img id="lightboxImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none;" oncontextmenu="return false;" draggable="false">
+    </div>
+
+    <script type="module" src="product-page.js"></script>
+    <script>
+        window.openLightbox = (src) => {
+            const lb = document.getElementById('imageLightbox');
+            const img = document.getElementById('lightboxImage');
+            if (lb && img && src) {
+                img.src = src;
+                lb.style.display = 'flex';
+            }
+        };
+        window.closeLightbox = (e) => {
+            const lb = document.getElementById('imageLightbox');
+            if (lb) lb.style.display = 'none';
+        };
+
+        function closeAnnounce() {
+            const bar = document.getElementById('announceBar');
+            const nav = document.getElementById('navbar');
+            if (bar) bar.style.display = 'none';
+            if (nav) nav.classList.remove('announce-offset');
+        }
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+        });
+    </script>
+
+  <!-- Firebase SDKs & Global Auth -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+      window.firebaseConfig = {
+          apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+          authDomain: "coalition-aec44.firebaseapp.com",
+          projectId: "coalition-aec44",
+          storageBucket: "coalition-aec44.firebasestorage.app",
+          messagingSenderId: "312196142925",
+          appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+      };
+  </script>
+  <script src="auth.js"></script>
+</body>
+
+
+</html>

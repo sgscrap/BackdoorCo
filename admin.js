@@ -1,1353 +1,2386 @@
-// ============================================
-// BACKDOOR ADMIN DASHBOARD - JAVASCRIPT
-// ============================================
+const firebase = window.firebase;
+const firebaseConfig = window.firebaseConfig;
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-// ============================================
-// CONFIGURATION
-// ============================================
-const ADMIN_PASSWORD = 'admin123';
-const STORAGE_KEYS = {
-    AUTH: 'backdoor_admin_auth',
-    ORDERS: 'backdoor_orders',
-    CUSTOMERS: 'backdoor_customers',
-    PRODUCTS: 'backdoor_products'
+const DEFAULT_SIZE_OPTIONS = ['US 7', 'US 7.5', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 10.5', 'US 11', 'US 11.5', 'US 12', 'US 13', 'US 14', 'US 15'];
+const IMPORTER_SIZES = [...DEFAULT_SIZE_OPTIONS];
+const MARKET_SOURCE_KEYS = ['stockx', 'goat', 'ebay'];
+const ADMIN_AUTH_DISABLED = false;
+const pageData = {
+    dashboard: { title: 'DASHBOARD', subtitle: "Welcome back - here's what's happening today." },
+    orders: { title: 'ORDERS', subtitle: 'Manage and track all customer orders.' },
+    offers: { title: 'OFFERS', subtitle: 'Review and respond to customer price offers.' },
+    products: { title: 'PRODUCTS', subtitle: 'Browse and manage your sneaker inventory.' },
+    reviews: { title: 'REVIEWS', subtitle: 'Create and manage customer-style review posts.' },
+    customers: { title: 'CUSTOMERS', subtitle: 'View and manage your customer base.' },
+    import: { title: 'IMPORT PRODUCTS', subtitle: 'Import products via SKU from Kickwho.' },
+    analytics: { title: 'ANALYTICS', subtitle: 'Deep dive into your store performance.' },
+    settings: { title: 'SETTINGS', subtitle: 'Configure your admin preferences.' }
 };
-const IMPORT_HISTORY_KEY = 'backdoor_import_history';
+const chartData = [
+    { label: 'MON', val: 20 },
+    { label: 'TUE', val: 55 },
+    { label: 'WED', val: 35 },
+    { label: 'THU', val: 75 },
+    { label: 'FRI', val: 60 },
+    { label: 'SAT', val: 90 },
+    { label: 'SUN', val: 45, active: true }
+];
 
-// ============================================
-// STATE MANAGEMENT
-// ============================================
 let orders = [];
+let offers = [];
 let customers = [];
-let currentSection = 'dashboard';
-let currentOrder = null;
+let products = [];
+let reviews = [];
 let currentProduct = null;
+let currentReview = null;
 let selectedProductIds = new Set();
+let importerUrlRows = [];
+let importerPreviewItems = [];
+let importerSelectedImages = [];
+let importerRowCounter = 0;
+let importerSelectedSizes = [];
+let generatedReviews = [];
+let activeProductPreviewIndex = 0;
+let currentMarketSnapshot = null;
+let seededCatalogProducts = [...SEEDED_ADMIN_PRODUCTS];
 
-// Import products from main app
-const products = [
+const REVIEW_FIRST_NAMES = ['Mason', 'Jada', 'Chris', 'Avery', 'Jordan', 'Cam', 'Tiana', 'Malik', 'Ari', 'Noah', 'Nia', 'Jay', 'Kayla', 'Andre', 'Zoe', 'Micah', 'Savannah', 'Bryson', 'Laila', 'Darius', 'Jasmine', 'Ethan', 'Sofia', 'Tyrese', 'Mila', 'Zay', 'Kendall', 'Isaiah', 'Amaya', 'Luca', 'Brielle', 'Kobe', 'Nyla', 'Tristan', 'Aaliyah', 'Devin', 'Maya', 'Roman', 'Leah', 'Jalen'];
+const REVIEW_LAST_INITIALS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const IMAGE_POSITION_OPTIONS = new Set(['center center', 'center top', 'center bottom', 'left center', 'right center']);
+const LEGACY_IMAGE_POSITIONS = {
+    'center center': [50, 50],
+    'center top': [50, 18],
+    'center bottom': [50, 82],
+    'left center': [24, 50],
+    'right center': [76, 50]
+};
+const SEEDED_ADMIN_PRODUCTS = [
     {
-        id: 1,
-        name: "Pharrell x VIRGINIA x Adistar Jellyfish 'Royal Blue'",
-        brand: "Adidas",
-        price: 249.00,
-        sku: "JP9263",
-        colorway: "Royal Blue/Core Black/Focus Olive",
-        releaseDate: "10/25/25",
-        category: "Sneakers",
-        stock: 25,
-        image: "products/pharrell-jellyfish-blue.jpg",
-        status: "active"
+        id: 'seed-men-travis-velvet-brown',
+        name: "Godkiller Travis Scott x Air Jordan 1 Low OG SP 'Velvet Brown'",
+        sku: 'DM7866-202',
+        price: 250,
+        brand: 'Jordan',
+        category: 'Sneakers',
+        colorway: 'Velvet Brown/Black',
+        description: "The Travis Scott x Air Jordan 1 Retro Low OG SP 'Velvet Brown' showcases Scott's signature reverse Swoosh on the black tumbled leather and brown suede upper. A woven Nike Air tag sits atop the brown nylon tongue, while mismatched Cactus Jack and Jordan Wings branding adorns the back tab of each shoe. Anchoring the sneaker is a brown rubber cupsole with stitched sidewall construction and an encapsulated Air-sole unit in the heel.",
+        image: 'https://i.imgur.com/ZOrZEnt.jpg',
+        images: [
+            'https://i.imgur.com/ZOrZEnt.jpg',
+            'https://i.imgur.com/rAHE2Iv.jpg',
+            'https://i.imgur.com/TkQdpuE.jpg',
+            'https://i.imgur.com/4pdSP5S.jpg',
+            'https://i.imgur.com/QfIJ0PC.jpg',
+            'https://i.imgur.com/YZfxHKh.jpg',
+            'https://i.imgur.com/iDo2IAJ.jpg',
+            'https://i.imgur.com/IHVvC6S.jpg',
+            'https://i.imgur.com/gU63WYa.jpg',
+            'https://i.imgur.com/tr5UsUI.jpg',
+            'https://i.imgur.com/PYEiLrz.jpg'
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 52%',
+        imageOffsetX: 50,
+        imageOffsetY: 52,
+        imageScale: 1.1,
+        sizes: [{ size: 'US 12.5', stock: 1, price: 250 }],
+        releaseDate: 'TBD',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
     },
     {
-        id: 2,
-        name: "Pharrell x VIRGINIA x Adistar Jellyfish 'Solid Grey Black'",
-        brand: "Adidas",
-        price: 249.00,
-        sku: "JP9265",
-        colorway: "Mgh Solid Grey/Core Black/Clear Onix",
-        releaseDate: "10/11/25",
-        category: "Sneakers",
-        stock: 18,
-        image: "products/pharrell-jellyfish-grey.jpg",
-        status: "active"
-    },
-    {
-        id: 3,
-        name: "Caitlin Clark x Zoom Kobe 6 Protro 'Light Armory Blue'",
-        brand: "Nike",
-        price: 249.00,
-        sku: "IO3672 400",
-        colorway: "Light Armory Blue/White/Baltic Blue",
-        releaseDate: "11/12/25",
-        category: "Sneakers",
-        stock: 12,
-        image: "products/kobe-6-caitlin-clark.jpg",
-        status: "active"
-    },
-    {
-        id: 4,
-        name: "Cactus Plant Flea Market x Air Force 1 Low Premium 'Moss'",
-        brand: "Nike",
-        price: 299.00,
-        sku: "FQ7069 300",
-        colorway: "Moss/Moss",
-        releaseDate: "5/1/24",
-        category: "Sneakers",
-        stock: 8,
-        image: "products/af1-cpfm-moss.jpg",
-        status: "active"
-    },
-    {
-        id: 5,
-        name: "Fragment Design x Travis Scott x Jordan 1 Low OG SP 'Sail Military Blue'",
-        brand: "Jordan",
-        price: 899.00,
-        sku: "DM7866 140",
-        colorway: "Sail/Black/Muslin/Military Blue",
-        releaseDate: "7/29/21",
-        category: "Sneakers",
-        stock: 3,
-        image: "products/jordan-1-fragment-travis.jpg",
-        status: "active"
-    },
-    {
-        id: 6,
-        name: "Steve Wiebe x Jordan 10 Retro 'HOH'",
-        brand: "Jordan",
-        price: 499.00,
-        sku: "DD0587 002",
-        colorway: "Light Graphite/White/Wolf Grey",
-        releaseDate: "1/10/26",
-        category: "Sneakers",
-        stock: 15,
-        image: "products/jordan-10-hoh.jpg",
-        status: "active"
-    },
-    {
-        id: 7,
-        name: "Jordan 5 Retro 'Wolf Grey' 2026 GS",
-        brand: "Jordan",
-        price: 260.00,
-        sku: "DD0587 002",
-        colorway: "Light Graphite/White/Wolf Grey",
-        releaseDate: "1/10/26",
-        category: "Sneakers",
-        stock: 22,
-        image: "products/jordan-5-wolf-grey.jpg",
-        status: "active"
-    },
-    {
-        id: 8,
-        name: "Jordan 10 Retro 'Shadow' 2025",
-        brand: "Jordan",
-        price: 260.00,
-        sku: "HJ6779 001",
-        colorway: "Charred Grey/True Red/Black",
-        releaseDate: "11/19/25",
-        category: "Sneakers",
-        stock: 30,
-        image: "products/jordan-10-shadow.jpg",
-        status: "active"
-    },
-    {
-        id: 9,
-        name: "Paris Saint-Germain x Jordan 5 Retro 'Off Noir'",
-        brand: "Jordan",
-        price: 250.00,
-        sku: "HQ3004 001",
-        colorway: "Off Noir/Particle Rose/Anthracite/Pearl Pink/Sail",
-        releaseDate: "12/3/25",
-        category: "Sneakers",
-        stock: 20,
-        image: "products/jordan-5-psg.jpg",
-        status: "active"
-    },
-    {
-        id: 10,
-        name: "Jalen Brunson x Zoom Kobe 6 Protro 'Statue of Liberty'",
-        brand: "Nike",
-        price: 250.00,
-        sku: "IQ5774 300",
-        colorway: "Hyper Turquoise/Metallic Copper",
-        releaseDate: "12/15/24",
-        category: "Sneakers",
-        stock: 14,
-        image: "products/kobe-6-brunson.jpg",
-        status: "active"
-    },
-    {
-        id: 11,
-        name: "Jordan 4 Retro 'Black Cat' 2025",
-        brand: "Jordan",
-        price: 250.00,
-        sku: "FV5029 010",
-        colorway: "Black/Black/Light Graphite",
-        releaseDate: "11/28/25",
-        category: "Sneakers",
-        stock: 35,
-        image: "products/jordan-4-black-cat.jpg",
-        status: "active"
-    },
-    {
-        id: 12,
-        name: "Zoom Kobe 6 Protro 'Reverse Grinch'",
-        brand: "Nike",
-        price: 260.00,
-        sku: "FV4921 600",
-        colorway: "Bright Crimson/Black/Electric Green",
-        releaseDate: "12/15/23",
-        category: "Sneakers",
-        stock: 5,
-        image: "products/kobe-6-reverse-grinch.jpg",
-        status: "active"
-    },
-    {
-        id: 13,
-        name: "Air Jordan 3 Retro OG SP 'For The Love'",
-        brand: "Jordan",
-        price: 190.00,
-        sku: "HV8571 100",
-        colorway: "White/Diffused Blue/Anthracite/Muslin",
-        releaseDate: "4/15/25",
-        category: "Sneakers",
-        stock: 28,
-        image: "products/jordan-3-for-the-love.jpg",
-        status: "active"
-    },
-    {
-        id: 14,
-        name: "Jordan 14 'Black University Blue'",
-        brand: "Jordan",
-        price: 275.00,
-        sku: "DH4121 041",
-        colorway: "Black/University Blue",
-        releaseDate: "2/15/25",
-        category: "Sneakers",
-        stock: 19,
-        image: "products/jordan-14-black-blue.jpg",
-        status: "active"
-    },
-    {
-        id: 15,
-        name: "Nike x NOCTA 'Sunset' Puffer Jacket – Mica Green / Cyber",
-        brand: "Nike",
-        price: 420.00,
-        sku: "FN8196-330",
-        colorway: "Mica Green/Cyber",
-        releaseDate: "11/1/24",
-        category: "Apparel",
-        stock: 10,
-        image: "products/nocta-sunset-jacket.jpg",
-        status: "active"
+        id: 'seed-kids-travis-black-phantom-ps',
+        name: "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+        sku: 'DO5442-001',
+        price: 180,
+        brand: 'Jordan',
+        category: 'Kids',
+        colorway: 'Black/Black',
+        description: "Offered in little kid sizing, the Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom' combines a sleek finish with La Flame's signature touches. The low-top sports an all-black nubuck and suede upper with contrast white stitching throughout. Scott's backward Swoosh decorates the lateral side, while woven Nike tags embellish each tongue. Mismatched heel tabs display a Jordan Wings logo on the right shoe and a bee graphic on the left. Anchoring the sneaker is a black rubber cupsole with stitched sidewall construction.",
+        image: 'https://i.imgur.com/30H5NyD.jpg',
+        images: [
+            'https://i.imgur.com/30H5NyD.jpg',
+            'https://i.imgur.com/UutZVxq.jpg',
+            'https://i.imgur.com/israMgv.jpg',
+            'https://i.imgur.com/FXy3W3z.jpg',
+            'https://i.imgur.com/bG5UpTh.jpg',
+            'https://i.imgur.com/PNAbX10.jpg'
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 52%',
+        imageOffsetX: 50,
+        imageOffsetY: 52,
+        imageScale: 1.12,
+        sizes: [{ size: '12.5C', stock: 1, price: 180 }],
+        releaseDate: 'TBD',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
     }
 ];
 
-const defaultProducts = products.map(product => ({ ...product }));
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadSeededCatalogProducts();
+    initFirebaseListeners();
+    initImporter();
+    initReviewBuilder();
+    setupEventListeners();
+    checkAuth();
+});
 
 function debounce(fn, delay) {
     let timeoutId = null;
-
     return (...args) => {
         window.clearTimeout(timeoutId);
         timeoutId = window.setTimeout(() => fn(...args), delay);
     };
 }
 
-function getEffectiveOutOfStock(product) {
-    return Boolean(product?.isOutOfStock) || Number(product?.stock) <= 0;
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char]));
 }
 
-function normalizeProduct(product) {
-    const stock = Number.isFinite(Number(product.stock)) ? Math.max(0, Number(product.stock)) : 0;
-    const isHidden = Boolean(product.isHidden);
-    const isOutOfStock = getEffectiveOutOfStock({ ...product, stock });
-    const isFeatured = Boolean(product.isFeatured);
-
-    return {
-        ...product,
-        stock,
-        status: isHidden ? 'hidden' : isOutOfStock ? 'out-of-stock' : 'active',
-        isHidden,
-        isOutOfStock,
-        isFeatured
-    };
+function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
 }
 
-function replaceProducts(nextProducts) {
-    products.splice(0, products.length, ...nextProducts.map(normalizeProduct));
-    syncSelectedProductIds();
+function slugify(value) {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
 }
 
-function getNextProductId() {
-    return products.reduce((maxId, product) => Math.max(maxId, Number(product.id) || 0), 0) + 1;
+function getAdminProductMatchKey(product) {
+    const sku = String(product?.sku || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (sku) return `sku:${sku}`;
+    return `name:${slugify(product?.name || '')}`;
 }
 
-function syncSelectedProductIds() {
-    selectedProductIds = new Set(
-        [...selectedProductIds].filter(productId => products.some(product => product.id === productId))
-    );
+function mergeAdminCatalogProducts(liveProducts = []) {
+    const merged = new Map();
+
+    seededCatalogProducts.forEach((product) => {
+        merged.set(product.id, product);
+    });
+
+    liveProducts.forEach((product) => {
+        const matchKey = getAdminProductMatchKey(product);
+        const seededMatch = [...merged.values()].find((entry) => getAdminProductMatchKey(entry) === matchKey);
+        if (seededMatch) {
+            merged.delete(seededMatch.id);
+        }
+        merged.set(product.id, product);
+    });
+
+    return [...merged.values()];
 }
 
-function loadProducts() {
-    const savedProducts = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-    if (savedProducts) {
-        replaceProducts(JSON.parse(savedProducts));
-        return;
-    }
-
-    replaceProducts(defaultProducts);
-    saveProducts();
-}
-
-function saveProducts() {
-    const normalizedProducts = products.map(normalizeProduct);
-    products.splice(0, products.length, ...normalizedProducts);
-    syncSelectedProductIds();
-
-    localStorage.setItem(
-        STORAGE_KEYS.PRODUCTS,
-        JSON.stringify(normalizedProducts.map(product => {
-            const { isHidden, isOutOfStock, ...rest } = product;
-            return {
-                ...rest,
-                isHidden,
-                isOutOfStock
-            };
-        }))
-    );
-}
-
-function getProductInventoryState(product) {
-    if (product.isHidden) {
-        return { label: 'Hidden', className: 'hidden' };
-    }
-
-    if (getEffectiveOutOfStock(product)) {
-        return { label: 'Out of Stock', className: 'out-of-stock' };
-    }
-
-    return { label: 'Live', className: 'active' };
-}
-
-// ============================================
-// INITIALIZATION
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    loadData();
-    checkAuth();
-    setupEventListeners();
-});
-
-// ============================================
-// AUTHENTICATION
-// ============================================
-function checkAuth() {
-    const isAuthenticated = sessionStorage.getItem(STORAGE_KEYS.AUTH) === 'true';
-
-    if (isAuthenticated) {
-        showDashboard();
-    } else {
-        showLogin();
+async function loadSeededCatalogProducts() {
+    try {
+        const module = await import(`./product-data.js?v=${Date.now()}`);
+        if (typeof module?.getSeededProducts === 'function') {
+            seededCatalogProducts = module.getSeededProducts();
+        }
+    } catch (error) {
+        console.warn('Unable to load seeded catalog products for admin sync.', error);
+        seededCatalogProducts = [...SEEDED_ADMIN_PRODUCTS];
     }
 }
 
-function showLogin() {
-    document.getElementById('loginScreen').classList.remove('hidden');
-    document.getElementById('adminDashboard').classList.add('hidden');
-}
-
-function showDashboard() {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('adminDashboard').classList.remove('hidden');
-    switchSection('dashboard');
-}
-
-function handleLogin(e) {
-    e.preventDefault();
-    const password = document.getElementById('adminPassword').value;
-
-    if (password === ADMIN_PASSWORD) {
-        sessionStorage.setItem(STORAGE_KEYS.AUTH, 'true');
-        showDashboard();
-    } else {
-        alert('Incorrect password');
-    }
-}
-
-function handleLogout() {
-    sessionStorage.removeItem(STORAGE_KEYS.AUTH);
-    showLogin();
-}
-
-// ============================================
-// DATA MANAGEMENT
-// ============================================
-function loadData() {
-    loadProducts();
-
-    // Load orders from localStorage
-    const savedOrders = localStorage.getItem(STORAGE_KEYS.ORDERS);
-    if (savedOrders) {
-        orders = JSON.parse(savedOrders);
-    } else {
-        // Generate sample orders for demo
-        orders = generateSampleOrders();
-        saveOrders();
+function getProductSizes(product) {
+    if (Array.isArray(product?.sizes) && product.sizes.length > 0) {
+        return product.sizes.map((entry) => ({
+            size: String(entry.size || '').trim(),
+            stock: Math.max(0, Number(entry.stock) || 0),
+            price: Number(entry.price) || Number(product.price) || 0,
+            backorder: Boolean(entry.backorder),
+            backorderLeadTime: String(entry.backorderLeadTime || product?.backorderLeadTime || '').trim()
+        })).filter((entry) => entry.size);
     }
 
-    // Load customers from localStorage
-    const savedCustomers = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
-    if (savedCustomers) {
-        customers = JSON.parse(savedCustomers);
-    } else {
-        // Generate sample customers
-        customers = generateSampleCustomers();
-        saveCustomers();
-    }
-}
-
-function saveOrders() {
-    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
-}
-
-function saveCustomers() {
-    localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(customers));
-}
-
-function generateSampleOrders() {
-    const sampleOrders = [];
-    const statuses = ['pending', 'processing', 'shipped', 'delivered'];
-    const customerNames = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Williams', 'David Brown'];
-
-    for (let i = 1; i <= 25; i++) {
-        const randomProduct = products[Math.floor(Math.random() * products.length)];
-        const randomCustomer = customerNames[Math.floor(Math.random() * customerNames.length)];
-        const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-
-        sampleOrders.push({
-            id: `ORD-${String(i).padStart(3, '0')}`,
-            orderNumber: `BD-2025-${String(i).padStart(3, '0')}`,
-            customer: {
-                name: randomCustomer,
-                email: randomCustomer.toLowerCase().replace(' ', '.') + '@example.com',
-                phone: '+1234567890'
-            },
-            items: [
-                {
-                    productId: randomProduct.id,
-                    name: randomProduct.name,
-                    size: '10',
-                    quantity: 1,
-                    price: randomProduct.price,
-                    image: randomProduct.image
-                }
-            ],
-            subtotal: randomProduct.price,
-            shipping: 15.00,
-            tax: randomProduct.price * 0.09,
-            total: randomProduct.price + 15.00 + (randomProduct.price * 0.09),
-            status: randomStatus,
-            shippingAddress: {
-                street: '123 Main St',
-                city: 'New York',
-                state: 'NY',
-                zip: '10001',
-                country: 'USA'
-            },
-            paymentMethod: 'Credit Card',
-            paymentStatus: 'paid',
-            createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-            updatedAt: new Date().toISOString(),
-            notes: ''
-        });
+    if (typeof product?.sizes === 'string' && product.sizes.trim()) {
+        return product.sizes.split(',').map((size) => ({
+            size: size.trim(),
+            stock: Math.max(0, Number(product.stock) || 0),
+            price: Number(product.price) || 0,
+            backorder: Boolean(product?.allowBackorder),
+            backorderLeadTime: String(product?.backorderLeadTime || '').trim()
+        })).filter((entry) => entry.size);
     }
 
-    return sampleOrders;
-}
-
-function generateSampleCustomers() {
-    const names = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Williams', 'David Brown'];
-    return names.map((name, i) => ({
-        id: i + 1,
-        name,
-        email: name.toLowerCase().replace(' ', '.') + '@example.com',
-        phone: '+1234567890',
-        totalOrders: Math.floor(Math.random() * 10) + 1,
-        totalSpent: (Math.random() * 2000 + 500).toFixed(2),
-        lastOrder: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-        createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString()
+    return DEFAULT_SIZE_OPTIONS.map((size) => ({
+        size,
+        stock: 0,
+        price: Number(product?.price) || 0,
+        backorder: Boolean(product?.allowBackorder),
+        backorderLeadTime: String(product?.backorderLeadTime || '').trim()
     }));
 }
 
-// ============================================
-// EVENT LISTENERS
-// ============================================
-function setupEventListeners() {
-    const debouncedOrderFilter = debounce(filterOrders, 180);
-    const debouncedProductFilter = debounce(filterProducts, 180);
-    const debouncedCustomerFilter = debounce(filterCustomers, 180);
+function getTotalStock(product) {
+    return getProductSizes(product).reduce((sum, entry) => sum + Math.max(0, Number(entry.stock) || 0), 0);
+}
 
-    // Login
-    document.getElementById('loginForm').addEventListener('submit', handleLogin);
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+function isProductHidden(product) {
+    return Boolean(product?.isHidden);
+}
 
-    // Navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const section = item.dataset.section;
-            switchSection(section);
-        });
-    });
+function isProductFeatured(product) {
+    return Boolean(product?.isFeatured);
+}
 
-    document.querySelectorAll('.view-all-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const section = link.dataset.section;
-            switchSection(section);
-        });
-    });
+function isProductOutOfStock(product) {
+    return Boolean(product?.isOutOfStock) || (getTotalStock(product) <= 0 && !hasBackorderEnabled(product));
+}
 
-    // Modals
-    document.getElementById('orderModalClose').addEventListener('click', () => closeModal('orderModal'));
-    document.getElementById('productModalClose').addEventListener('click', () => closeModal('productModal'));
-    document.getElementById('cancelProductBtn').addEventListener('click', () => closeModal('productModal'));
+function hasBackorderEnabled(product) {
+    return Boolean(product?.allowBackorder) || getProductSizes(product).some((entry) => Boolean(entry.backorder));
+}
 
-    // Product form
-    document.getElementById('addProductBtn').addEventListener('click', () => openProductModal());
-    document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
+function matchesBlackCatProduct(product) {
+    const name = String(product?.name || '').toLowerCase();
+    const sku = String(product?.sku || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    return (name.includes('jordan 4 retro') && name.includes('black cat')) || sku === 'fv5029010';
+}
 
-    // Export buttons
-    document.getElementById('exportOrdersBtn').addEventListener('click', () => exportToCSV(orders, 'orders'));
-    document.getElementById('exportProductsBtn').addEventListener('click', () => exportToCSV(products, 'products'));
-    document.getElementById('exportCustomersBtn').addEventListener('click', () => exportToCSV(customers, 'customers'));
+function isFootwearProduct(product) {
+    const category = String(product?.category || '').toLowerCase();
+    const brand = String(product?.brand || '').toLowerCase();
+    const name = String(product?.name || '').toLowerCase();
+    return (
+        ['sneakers', 'shoes', 'footwear'].includes(category) ||
+        name.includes('jordan') ||
+        name.includes('dunk') ||
+        name.includes('air max') ||
+        name.includes('yeezy') ||
+        (brand === 'jordan' && category !== 'apparel')
+    );
+}
 
-    // Search and filters
-    document.getElementById('orderSearch').addEventListener('input', debouncedOrderFilter);
-    document.getElementById('orderStatusFilter').addEventListener('change', filterOrders);
-    document.getElementById('productSearch').addEventListener('input', debouncedProductFilter);
-    document.getElementById('productCategoryFilter').addEventListener('change', filterProducts);
-    document.getElementById('productStatusFilter').addEventListener('change', filterProducts);
-    document.getElementById('productBulkAction').addEventListener('change', renderBulkToolbar);
-    document.getElementById('selectAllProducts').addEventListener('change', handleSelectAllProducts);
-    document.getElementById('productsTableBody').addEventListener('change', handleProductTableSelection);
-    document.getElementById('applyBulkActionBtn').addEventListener('click', applyBulkAction);
-    document.getElementById('customerSearch').addEventListener('input', debouncedCustomerFilter);
+function normalizeImageFit(value, product = null) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'contain') {
+        return 'contain';
+    }
+    if (normalized === 'cover') {
+        return 'cover';
+    }
+    return matchesBlackCatProduct(product) || isFootwearProduct(product) ? 'contain' : 'cover';
+}
 
-    // Import functionality
-    setupImportListeners();
+function normalizeImagePosition(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (IMAGE_POSITION_OPTIONS.has(normalized)) return normalized;
+    const match = normalized.match(/^(-?\d{1,3}(?:\.\d+)?)%\s+(-?\d{1,3}(?:\.\d+)?)%$/);
+    if (match) {
+        return `${clamp(Number(match[1]), 0, 100)}% ${clamp(Number(match[2]), 0, 100)}%`;
+    }
+    return '50% 50%';
+}
 
-    window.addEventListener('storage', (event) => {
-        if (event.key !== STORAGE_KEYS.PRODUCTS) {
+function normalizeImageScale(value, product = null) {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed) && parsed >= 0.85 && parsed <= 1.4) {
+        return Number(parsed.toFixed(2));
+    }
+    if (matchesBlackCatProduct(product)) return 1.16;
+    return isFootwearProduct(product) ? 1.08 : 1;
+}
+
+function getImageOffsetsFromProduct(product = null) {
+    const rawX = Number(product?.imageOffsetX);
+    const rawY = Number(product?.imageOffsetY);
+    if (Number.isFinite(rawX) && Number.isFinite(rawY)) {
+        return [clamp(rawX, 0, 100), clamp(rawY, 0, 100)];
+    }
+
+    const normalized = normalizeImagePosition(product?.imagePosition);
+    const match = normalized.match(/^(-?\d{1,3}(?:\.\d+)?)%\s+(-?\d{1,3}(?:\.\d+)?)%$/);
+    if (match) {
+        return [clamp(Number(match[1]), 0, 100), clamp(Number(match[2]), 0, 100)];
+    }
+
+    return LEGACY_IMAGE_POSITIONS[normalized] || [50, 50];
+}
+
+function getProductImagePadding(product, containPadding = 6) {
+    if (normalizeImageFit(product?.imageFit, product) === 'cover') return '0';
+    if (matchesBlackCatProduct(product)) return `${Math.max(0, containPadding - 4)}px`;
+    return isFootwearProduct(product) ? `${Math.max(0, containPadding - 2)}px` : `${containPadding}px`;
+}
+
+function getProductImageStyle(product, containPadding = 6) {
+    const fit = normalizeImageFit(product?.imageFit, product);
+    const [offsetX, offsetY] = getImageOffsetsFromProduct(product);
+    const scale = normalizeImageScale(product?.imageScale, product);
+    const padding = getProductImagePadding(product, containPadding);
+    return `object-fit:${fit};object-position:${offsetX}% ${offsetY}%;padding:${padding};transform:scale(${scale});`;
+}
+
+function normalizeReleaseDate(value) {
+    const raw = String(value || '').trim();
+    if (!raw || raw.toUpperCase() === 'TBD') return '';
+
+    const match = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (match) return match[1];
+
+    const parsed = new Date(raw);
+    if (Number.isNaN(parsed.getTime())) return '';
+
+    const year = parsed.getFullYear();
+    const month = `${parsed.getMonth() + 1}`.padStart(2, '0');
+    const day = `${parsed.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function formatReleaseDateDisplay(value) {
+    const normalized = normalizeReleaseDate(value);
+    if (!normalized) return 'TBD';
+
+    const [year, month, day] = normalized.split('-').map(Number);
+    const parsed = new Date(year, month - 1, day);
+    return parsed.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatCurrency(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount) || amount <= 0) return '--';
+    return `$${amount.toFixed(0)}`;
+}
+
+function normalizeMarketSources(product = {}) {
+    const raw = product?.marketSources || {};
+    return MARKET_SOURCE_KEYS.reduce((acc, key) => {
+        acc[key] = String(raw?.[key] || '').trim();
+        return acc;
+    }, {});
+}
+
+function buildMarketSuggestions(benchmarkPrice) {
+    const benchmark = Number(benchmarkPrice) || 0;
+    if (!benchmark) {
+        return { minus100: 0, minus20: 0, smart: 0 };
+    }
+
+    const minus100 = Math.max(0, Number((benchmark - 100).toFixed(2)));
+    const minus20 = Math.max(0, Number((benchmark * 0.8).toFixed(2)));
+    const smart = Math.max(0, Math.min(minus100, minus20));
+
+    return { minus100, minus20, smart };
+}
+
+function normalizeMarketSnapshot(snapshot = null) {
+    if (!snapshot || typeof snapshot !== 'object') return null;
+
+    const normalizedSources = MARKET_SOURCE_KEYS.reduce((acc, key) => {
+        const source = snapshot?.sources?.[key] || {};
+        acc[key] = {
+            price: Number(source?.price) || 0,
+            authenticated: source?.authenticated !== false,
+            status: String(source?.status || '').trim() || (Number(source?.price) > 0 ? 'live' : 'idle'),
+            message: String(source?.message || '').trim(),
+            url: String(source?.url || '').trim()
+        };
+        return acc;
+    }, {});
+
+    const benchmarkPrice = Number(snapshot?.benchmarkPrice) || 0;
+    return {
+        benchmarkPrice,
+        benchmarkSourceKey: String(snapshot?.benchmarkSourceKey || '').trim(),
+        refreshedAt: String(snapshot?.refreshedAt || '').trim(),
+        sources: normalizedSources,
+        suggestions: buildMarketSuggestions(benchmarkPrice)
+    };
+}
+
+function setMarketSnapshot(snapshot = null) {
+    currentMarketSnapshot = normalizeMarketSnapshot(snapshot);
+    updateMarketPricingPanel();
+}
+
+function readMarketSourceInputs() {
+    return {
+        stockx: String(document.getElementById('marketStockxUrl')?.value || '').trim(),
+        goat: String(document.getElementById('marketGoatUrl')?.value || '').trim(),
+        ebay: String(document.getElementById('marketEbayUrl')?.value || '').trim()
+    };
+}
+
+function applyMarketSourcesToInputs(product = null) {
+    const sources = normalizeMarketSources(product || {});
+    document.getElementById('marketStockxUrl').value = sources.stockx;
+    document.getElementById('marketGoatUrl').value = sources.goat;
+    document.getElementById('marketEbayUrl').value = sources.ebay;
+}
+
+function updateMarketPricingPanel() {
+    const snapshot = currentMarketSnapshot;
+    const benchmarkValue = document.getElementById('marketBenchmarkValue');
+    const benchmarkMeta = document.getElementById('marketBenchmarkMeta');
+    const minus100 = document.getElementById('marketMinus100Value');
+    const minus20 = document.getElementById('marketMinus20Value');
+    const smart = document.getElementById('marketSmartValue');
+    const status = document.getElementById('marketPricingStatus');
+
+    if (benchmarkValue) benchmarkValue.textContent = formatCurrency(snapshot?.benchmarkPrice);
+    if (minus100) minus100.textContent = formatCurrency(snapshot?.suggestions?.minus100);
+    if (minus20) minus20.textContent = formatCurrency(snapshot?.suggestions?.minus20);
+    if (smart) smart.textContent = formatCurrency(snapshot?.suggestions?.smart);
+
+    if (benchmarkMeta) {
+        if (snapshot?.benchmarkPrice) {
+            const sourceLabel = snapshot.benchmarkSourceKey ? snapshot.benchmarkSourceKey.toUpperCase() : 'tracked sources';
+            benchmarkMeta.textContent = `Lowest authenticated source: ${sourceLabel}`;
+        } else {
+            benchmarkMeta.textContent = 'Refresh comps to calculate a market anchor.';
+        }
+    }
+
+    MARKET_SOURCE_KEYS.forEach((key) => {
+        const valueEl = document.getElementById(`marketSourceValue${key.charAt(0).toUpperCase()}${key.slice(1)}`);
+        const metaEl = document.getElementById(`marketSourceMeta${key.charAt(0).toUpperCase()}${key.slice(1)}`);
+        const cardEl = document.getElementById(`marketSourceCard${key.charAt(0).toUpperCase()}${key.slice(1)}`);
+        const source = snapshot?.sources?.[key];
+        const hasInput = Boolean(readMarketSourceInputs()[key]);
+
+        if (cardEl) {
+            cardEl.classList.toggle('is-live', Boolean(source?.price));
+            cardEl.classList.toggle('is-error', Boolean(source && !source.price));
+        }
+
+        if (!valueEl || !metaEl) return;
+
+        if (!hasInput) {
+            valueEl.textContent = 'No link';
+            metaEl.textContent = key === 'ebay' ? 'Add an authenticity-guaranteed listing URL.' : 'Add a source URL.';
             return;
         }
 
-        loadProducts();
+        if (!source) {
+            valueEl.textContent = 'Ready';
+            metaEl.textContent = 'Link saved. Refresh comps to pull a live price.';
+            return;
+        }
 
-        if (currentSection === 'products') {
-            filterProducts();
-        } else if (currentSection === 'dashboard') {
-            renderDashboard();
-        } else if (currentSection === 'analytics') {
-            renderAnalytics();
+        if (source?.price) {
+            valueEl.textContent = formatCurrency(source.price);
+            metaEl.textContent = source.message || (key === 'ebay' && source.authenticated === false
+                ? 'Listing found, but authenticity guarantee was not detected.'
+                : 'Live market comp captured.');
+        } else {
+            valueEl.textContent = 'No price';
+            metaEl.textContent = source?.message || 'Could not extract a usable price from this page.';
         }
     });
+
+    if (status) {
+        if (snapshot?.benchmarkPrice) {
+            const refreshed = snapshot.refreshedAt ? new Date(snapshot.refreshedAt).toLocaleString() : 'just now';
+            status.textContent = `Benchmark uses the lowest authenticated tracked source. Last refreshed ${refreshed}.`;
+        } else {
+            status.textContent = 'Benchmark uses the lowest valid tracked market price. Save the product to keep the snapshot.';
+        }
+    }
+
+    document.getElementById('applyMarketMinus100Btn').disabled = !snapshot?.suggestions?.minus100;
+    document.getElementById('applyMarketMinus20Btn').disabled = !snapshot?.suggestions?.minus20;
+    document.getElementById('applyMarketSmartBtn').disabled = !snapshot?.suggestions?.smart;
 }
 
-// ============================================
-// NAVIGATION
-// ============================================
-function switchSection(section) {
-    if (!section) {
+async function refreshMarketPricing() {
+    const sources = readMarketSourceInputs();
+    if (!Object.values(sources).some(Boolean)) {
+        showToast('Add at least one StockX, GOAT, or eBay link first.', 'error');
         return;
     }
 
-    currentSection = section;
+    const button = document.getElementById('refreshMarketPricingBtn');
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Refreshing...';
 
-    // Update nav
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.section === section);
-    });
+    try {
+        const response = await fetch('/.netlify/functions/market-price-snapshot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productName: String(document.getElementById('productName')?.value || '').trim(),
+                sku: String(document.getElementById('productSKU')?.value || '').trim(),
+                sources
+            })
+        });
 
-    // Update sections
-    document.querySelectorAll('.content-section').forEach(sec => {
-        sec.classList.toggle('active', sec.id === section + 'Section');
-    });
+        const payload = await response.json();
+        if (!response.ok) {
+            throw new Error(payload?.error || 'Unable to refresh market pricing.');
+        }
 
-    // Update title
-    const titles = {
-        dashboard: 'Dashboard',
-        orders: 'Orders',
-        products: 'Products',
-        customers: 'Customers',
-        import: 'Import Products',
-        analytics: 'Analytics'
+        setMarketSnapshot(payload);
+        showToast(payload?.benchmarkPrice
+            ? `Market pricing updated from ${payload.sourceCount || 0} source${payload.sourceCount === 1 ? '' : 's'}.`
+            : 'Links saved, but no usable prices were detected.', payload?.benchmarkPrice ? 'info' : 'warn');
+    } catch (error) {
+        console.error(error);
+        showToast(`Market pricing failed: ${error.message}`, 'error');
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}
+
+function applyMarketSuggestedPrice(mode) {
+    const value = Number(currentMarketSnapshot?.suggestions?.[mode]) || 0;
+    if (!value) {
+        showToast('Refresh market pricing first.', 'error');
+        return;
+    }
+
+    const priceInput = document.getElementById('productPrice');
+    if (priceInput) {
+        priceInput.value = value.toFixed(2);
+    }
+
+    applyBasePriceToInventory();
+    showToast(`Applied market price ${formatCurrency(value)} to the product and all sizes.`);
+}
+
+function getOrderTotal(order) {
+    return Number(order?.total ?? order?.pricing?.total ?? 0);
+}
+
+function getOrderItemCount(order) {
+    return (order?.items || []).reduce((sum, item) => sum + Math.max(1, Number(item?.quantity ?? item?.qty ?? 1)), 0);
+}
+
+function initReviewBuilder() {
+    renderGeneratedReviews();
+    renderReviews();
+}
+
+function hashString(value) {
+    return [...String(value || '')].reduce((acc, char) => ((acc << 5) - acc) + char.charCodeAt(0), 0);
+}
+
+function generateReviewName(seed, offset = 0) {
+    const hash = Math.abs(hashString(`${seed}|${offset}`));
+    const first = REVIEW_FIRST_NAMES[hash % REVIEW_FIRST_NAMES.length];
+    const initial = REVIEW_LAST_INITIALS[Math.floor(hash / REVIEW_FIRST_NAMES.length) % REVIEW_LAST_INITIALS.length];
+    return `${first} ${initial}.`;
+}
+
+function polishReviewComment(raw) {
+    let text = String(raw || '').trim();
+    if (!text) return '';
+
+    text = text.replace(/\s+/g, ' ');
+    text = text.replace(/\s+([,.!?])/g, '$1');
+    text = text.replace(/([!?.,])\1+/g, '$1');
+    text = text.replace(/\bi\b/g, 'I');
+    text = text.replace(/\bimo\b/gi, 'imo');
+    text = text.replace(/(^|[.!?]\s+)([a-z])/g, (_, prefix, letter) => `${prefix}${letter.toUpperCase()}`);
+
+    if (!/[.!?]$/.test(text)) {
+        text += '.';
+    }
+
+    return text;
+}
+
+function parseReviewImagesInput(value) {
+    return String(value || '')
+        .split(/\r?\n|,/)
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+}
+
+function getReviewImages(review) {
+    if (Array.isArray(review?.images) && review.images.length > 0) {
+        return review.images.filter(Boolean);
+    }
+    return [review?.image].filter(Boolean);
+}
+
+function normalizeProduct(product) {
+    const sizes = getProductSizes(product);
+    const [imageOffsetX, imageOffsetY] = getImageOffsetsFromProduct(product);
+    return {
+        ...product,
+        price: Number(product?.price) || 0,
+        image: product?.image || '',
+        imageFit: normalizeImageFit(product?.imageFit, product),
+        imagePosition: normalizeImagePosition(product?.imagePosition),
+        imageOffsetX,
+        imageOffsetY,
+        imageScale: normalizeImageScale(product?.imageScale, product),
+        sizes,
+        releaseDate: normalizeReleaseDate(product?.releaseDate),
+        allowBackorder: Boolean(product?.allowBackorder),
+        backorderLeadTime: String(product?.backorderLeadTime || '').trim(),
+        marketSources: normalizeMarketSources(product),
+        marketSnapshot: normalizeMarketSnapshot(product?.marketSnapshot),
+        isHidden: isProductHidden(product),
+        isOutOfStock: Boolean(product?.isOutOfStock) || (sizes.every((entry) => entry.stock <= 0) && !hasBackorderEnabled(product)),
+        isFeatured: isProductFeatured(product)
     };
-    document.getElementById('sectionTitle').textContent = titles[section];
-
-    // Render section
-    switch (section) {
-        case 'dashboard':
-            renderDashboard();
-            break;
-        case 'orders':
-            renderOrders();
-            break;
-        case 'products':
-            renderProducts();
-            break;
-        case 'customers':
-            renderCustomers();
-            break;
-        case 'import':
-            renderImportHistory();
-            break;
-        case 'analytics':
-            renderAnalytics();
-            break;
-    }
 }
 
-// ============================================
-// DASHBOARD RENDERING
-// ============================================
-function renderDashboard() {
-    // Calculate stats
-    const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
-    const pendingOrdersCount = orders.filter(o => o.status === 'pending').length;
-    const lowStockProducts = products.filter(p => !p.isHidden && !p.isOutOfStock && p.stock < 10);
-
-    // Update stats
-    document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
-    document.getElementById('totalOrders').textContent = orders.length;
-    document.getElementById('pendingOrders').textContent = pendingOrdersCount;
-    document.getElementById('totalCustomers').textContent = customers.length;
-    const pendingOrdersBadge = document.getElementById('pendingOrdersBadge');
-    if (pendingOrdersBadge) {
-        pendingOrdersBadge.textContent = String(pendingOrdersCount);
+function getProductStatusMeta(product) {
+    if (isProductHidden(product)) {
+        return { label: 'Hidden', className: 'inactive' };
     }
-
-    // Render recent orders
-    const recentOrders = orders.slice(0, 5);
-    document.getElementById('recentOrdersList').innerHTML = recentOrders.map(order => `
-        <div class="list-item">
-            <div class="list-item-info">
-                <div class="list-item-title">${order.orderNumber}</div>
-                <div class="list-item-subtitle">${order.customer.name} • ${new Date(order.createdAt).toLocaleDateString()}</div>
-            </div>
-            <span class="status-badge status-${order.status}">${order.status}</span>
-        </div>
-    `).join('');
-
-    // Render low stock
-    document.getElementById('lowStockList').innerHTML = lowStockProducts.length > 0
-        ? lowStockProducts.slice(0, 5).map(product => `
-            <div class="list-item">
-                <div class="list-item-info">
-                    <div class="list-item-title">${product.name}</div>
-                    <div class="list-item-subtitle">SKU: ${product.sku}</div>
-                </div>
-                <div class="list-item-value">${product.stock} left</div>
-            </div>
-        `).join('')
-        : '<div class="list-item"><div class="list-item-info"><div class="list-item-subtitle">All products are well stocked</div></div></div>';
-}
-
-// ============================================
-// ORDERS RENDERING
-// ============================================
-function renderOrders(filteredOrders = orders) {
-    const tbody = document.getElementById('ordersTableBody');
-    tbody.innerHTML = filteredOrders.map(order => `
-        <tr>
-            <td><strong>${order.orderNumber}</strong></td>
-            <td>${order.customer.name}</td>
-            <td>${order.items.length} item(s)</td>
-            <td><strong>$${order.total.toFixed(2)}</strong></td>
-            <td><span class="status-badge status-${order.status}">${order.status}</span></td>
-            <td>${new Date(order.createdAt).toLocaleDateString()}</td>
-            <td>
-                <button class="action-btn view" onclick="viewOrder('${order.id}')">View</button>
-                <button class="action-btn edit" onclick="updateOrderStatus('${order.id}')">Update</button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-function filterOrders() {
-    const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
-    const statusFilter = document.getElementById('orderStatusFilter').value;
-
-    let filtered = orders;
-
-    if (searchTerm) {
-        filtered = filtered.filter(order =>
-            order.orderNumber.toLowerCase().includes(searchTerm) ||
-            order.customer.name.toLowerCase().includes(searchTerm) ||
-            order.customer.email.toLowerCase().includes(searchTerm)
-        );
+    if (hasBackorderEnabled(product) && getTotalStock(product) <= 0) {
+        return { label: 'Backorder', className: 'shipped' };
     }
-
-    if (statusFilter !== 'all') {
-        filtered = filtered.filter(order => order.status === statusFilter);
+    if (isProductOutOfStock(product)) {
+        return { label: 'Out of Stock', className: 'cancelled' };
     }
-
-    renderOrders(filtered);
-}
-
-function viewOrder(orderId) {
-    const order = orders.find(o => o.id === orderId);
-    if (!order) return;
-
-    const modal = document.getElementById('orderModal');
-    const modalBody = document.getElementById('orderModalBody');
-
-    modalBody.innerHTML = `
-        <div style="display: grid; gap: 24px;">
-            <div>
-                <h3 style="margin-bottom: 16px;">Order Information</h3>
-                <div style="display: grid; gap: 12px;">
-                    <div><strong>Order Number:</strong> ${order.orderNumber}</div>
-                    <div><strong>Status:</strong> <span class="status-badge status-${order.status}">${order.status}</span></div>
-                    <div><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</div>
-                    <div><strong>Payment:</strong> ${order.paymentMethod} (${order.paymentStatus})</div>
-                </div>
-            </div>
-            
-            <div>
-                <h3 style="margin-bottom: 16px;">Customer</h3>
-                <div style="display: grid; gap: 12px;">
-                    <div><strong>Name:</strong> ${order.customer.name}</div>
-                    <div><strong>Email:</strong> ${order.customer.email}</div>
-                    <div><strong>Phone:</strong> ${order.customer.phone}</div>
-                </div>
-            </div>
-            
-            <div>
-                <h3 style="margin-bottom: 16px;">Shipping Address</h3>
-                <div>
-                    ${order.shippingAddress.street}<br>
-                    ${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zip}<br>
-                    ${order.shippingAddress.country}
-                </div>
-            </div>
-            
-            <div>
-                <h3 style="margin-bottom: 16px;">Items</h3>
-                ${order.items.map(item => `
-                    <div style="display: flex; gap: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 8px;">
-                        <img src="${item.image}" style="width: 60px; height: 60px; object-fit: contain; border-radius: 4px; background: white;">
-                        <div style="flex: 1;">
-                            <div><strong>${item.name}</strong></div>
-                            <div style="font-size: 13px; color: #666;">Size: ${item.size} • Qty: ${item.quantity}</div>
-                        </div>
-                        <div style="font-weight: 700;">$${item.price.toFixed(2)}</div>
-                    </div>
-                `).join('')}
-            </div>
-            
-            <div>
-                <h3 style="margin-bottom: 16px;">Order Total</h3>
-                <div style="display: grid; gap: 8px;">
-                    <div style="display: flex; justify-content: space-between;"><span>Subtotal:</span><span>$${order.subtotal.toFixed(2)}</span></div>
-                    <div style="display: flex; justify-content: space-between;"><span>Shipping:</span><span>$${order.shipping.toFixed(2)}</span></div>
-                    <div style="display: flex; justify-content: space-between;"><span>Tax:</span><span>$${order.tax.toFixed(2)}</span></div>
-                    <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; padding-top: 8px; border-top: 2px solid #e0e0e0;"><span>Total:</span><span>$${order.total.toFixed(2)}</span></div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    modal.classList.add('active');
-}
-
-function updateOrderStatus(orderId) {
-    const order = orders.find(o => o.id === orderId);
-    if (!order) return;
-
-    const statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-    const currentIndex = statuses.indexOf(order.status);
-    const nextStatus = statuses[(currentIndex + 1) % statuses.length];
-
-    if (confirm(`Update order ${order.orderNumber} status to "${nextStatus}"?`)) {
-        order.status = nextStatus;
-        order.updatedAt = new Date().toISOString();
-        saveOrders();
-        renderOrders();
-        renderDashboard();
-    }
-}
-
-// ============================================
-// PRODUCTS RENDERING
-// ============================================
-function renderProducts(filteredProducts = products) {
-    const tbody = document.getElementById('productsTableBody');
-
-    if (filteredProducts.length === 0) {
-        tbody.innerHTML = `
-        <tr>
-            <td colspan="9">
-                <p class="empty-state">No products match the current filters.</p>
-            </td>
-        </tr>
-    `;
-        syncProductTableSelectionState(filteredProducts);
-        return;
-    }
-
-    tbody.innerHTML = filteredProducts.map(product => {
-        const inventoryState = getProductInventoryState(product);
-        const isOutOfStock = inventoryState.className === 'out-of-stock';
-
-        return `
-        <tr>
-            <td class="table-checkbox-cell">
-                <input type="checkbox" class="product-select-checkbox" value="${product.id}" aria-label="Select ${product.name}" ${selectedProductIds.has(product.id) ? 'checked' : ''}>
-            </td>
-            <td><img src="${product.image}" class="product-thumb" alt="${product.name}"></td>
-            <td>
-                <div class="product-name-cell">
-                    <strong>${product.name}</strong>
-                    <div class="product-meta-pills">
-                        ${product.isFeatured ? '<span class="table-pill featured">Featured</span>' : ''}
-                    </div>
-                </div>
-            </td>
-            <td>${product.sku}</td>
-            <td><strong>$${product.price.toFixed(2)}</strong></td>
-            <td>${product.stock}</td>
-            <td>${product.category}</td>
-            <td><span class="status-badge status-${inventoryState.className}">${inventoryState.label}</span></td>
-            <td>
-                <div class="table-actions">
-                    <button class="action-btn edit" onclick="editProduct(${product.id})">Edit</button>
-                    <button class="action-btn featured" onclick="toggleProductFeatured(${product.id})">${product.isFeatured ? 'Unfeature' : 'Feature'}</button>
-                    <button class="action-btn secondary" onclick="toggleProductVisibility(${product.id})">${product.isHidden ? 'Show' : 'Hide'}</button>
-                    <button class="action-btn warning" onclick="toggleOutOfStock(${product.id})">${isOutOfStock ? 'In Stock' : 'Out of Stock'}</button>
-                </div>
-            </td>
-        </tr>
-    `;
-    }).join('');
-
-    syncProductTableSelectionState(filteredProducts);
+    return { label: 'Live', className: 'active' };
 }
 
 function getFilteredProducts() {
-    const searchTerm = document.getElementById('productSearch').value.toLowerCase();
-    const categoryFilter = document.getElementById('productCategoryFilter').value;
-    const statusFilter = document.getElementById('productStatusFilter').value;
+    const searchTerm = document.getElementById('productSearch')?.value.trim().toLowerCase() || '';
+    const categoryFilter = document.getElementById('productCategoryFilter')?.value || 'all';
+    const statusFilter = document.getElementById('productStatusFilter')?.value || 'all';
 
     let filtered = [...products];
 
     if (searchTerm) {
-        filtered = filtered.filter(product =>
-            product.name.toLowerCase().includes(searchTerm) ||
-            product.sku.toLowerCase().includes(searchTerm) ||
-            product.brand.toLowerCase().includes(searchTerm) ||
+        filtered = filtered.filter((product) => (
+            product.name?.toLowerCase().includes(searchTerm) ||
+            product.sku?.toLowerCase().includes(searchTerm) ||
+            product.brand?.toLowerCase().includes(searchTerm) ||
             (product.colorway || '').toLowerCase().includes(searchTerm)
-        );
+        ));
     }
 
     if (categoryFilter !== 'all') {
-        filtered = filtered.filter(product => product.category === categoryFilter);
+        filtered = filtered.filter((product) => product.category === categoryFilter);
     }
 
     if (statusFilter !== 'all') {
-        filtered = filtered.filter(product => getProductInventoryState(product).className === statusFilter);
+        filtered = filtered.filter((product) => {
+            if (statusFilter === 'featured') return isProductFeatured(product);
+            if (statusFilter === 'hidden') return isProductHidden(product);
+            if (statusFilter === 'out-of-stock') return isProductOutOfStock(product);
+            return !isProductHidden(product) && !isProductOutOfStock(product);
+        });
     }
+
+    filtered.sort((left, right) => (
+        Number(isProductFeatured(right)) - Number(isProductFeatured(left)) ||
+        (right.createdAt?.seconds || 0) - (left.createdAt?.seconds || 0) ||
+        right.price - left.price
+    ));
 
     return filtered;
 }
 
-function syncProductTableSelectionState(filteredProducts = getFilteredProducts()) {
-    const selectAllProducts = document.getElementById('selectAllProducts');
-    const visibleIds = filteredProducts.map(product => product.id);
-    const selectedVisibleCount = visibleIds.filter(productId => selectedProductIds.has(productId)).length;
-
-    selectAllProducts.checked = visibleIds.length > 0 && selectedVisibleCount === visibleIds.length;
-    selectAllProducts.indeterminate = selectedVisibleCount > 0 && selectedVisibleCount < visibleIds.length;
-    renderBulkToolbar();
+function syncSelectedProductIds() {
+    const validIds = new Set(products.map((product) => product.id));
+    selectedProductIds = new Set([...selectedProductIds].filter((id) => validIds.has(id)));
 }
 
-function renderBulkToolbar() {
+function renderBulkToolbar(filteredProducts = getFilteredProducts()) {
     const selectionCount = document.getElementById('productSelectionCount');
     const bulkAction = document.getElementById('productBulkAction');
     const applyBulkActionBtn = document.getElementById('applyBulkActionBtn');
-    const selectedCount = selectedProductIds.size;
+    const selectAll = document.getElementById('selectAllProducts');
+    const visibleIds = filteredProducts.map((product) => product.id);
+    const selectedVisibleCount = visibleIds.filter((id) => selectedProductIds.has(id)).length;
 
-    selectionCount.textContent = `${selectedCount} selected`;
-    applyBulkActionBtn.disabled = selectedCount === 0 || !bulkAction.value;
+    if (selectionCount) selectionCount.textContent = `${selectedProductIds.size} selected`;
+    if (applyBulkActionBtn) applyBulkActionBtn.disabled = selectedProductIds.size === 0 || !bulkAction?.value;
+    if (selectAll) {
+        selectAll.checked = visibleIds.length > 0 && selectedVisibleCount === visibleIds.length;
+        selectAll.indeterminate = selectedVisibleCount > 0 && selectedVisibleCount < visibleIds.length;
+    }
 }
 
-function handleProductTableSelection(event) {
-    const checkbox = event.target.closest('.product-select-checkbox');
-    if (!checkbox) {
+function restoreInventorySizes(product) {
+    const sizes = getProductSizes(product).map((entry) => ({ ...entry }));
+    if (sizes.some((entry) => entry.stock > 0)) return sizes;
+    if (sizes.length === 0) {
+        return [{
+            size: 'US 9',
+            stock: 1,
+            price: Number(product?.price) || 0,
+            backorder: false,
+            backorderLeadTime: String(product?.backorderLeadTime || '').trim()
+        }];
+    }
+    sizes[0].stock = 1;
+    if (!sizes[0].price) sizes[0].price = Number(product?.price) || 0;
+    sizes[0].backorder = false;
+    return sizes;
+}
+
+function getVisibleProductCount() {
+    return products.filter((product) => !isProductHidden(product)).length;
+}
+
+function initFirebaseListeners() {
+    db.collection('products').onSnapshot((snapshot) => {
+        products = mergeAdminCatalogProducts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))).map(normalizeProduct);
+        syncSelectedProductIds();
+        renderProducts();
+        renderDashboard();
+    });
+
+    db.collection('offers').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+        offers = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        renderOffers();
+        renderDashboard();
+    });
+
+    db.collection('reviews').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+        reviews = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            rating: Math.min(5, Math.max(1, Number(doc.data().rating) || 5)),
+            isHidden: Boolean(doc.data().isHidden)
+        }));
+        renderReviews();
+    });
+
+    db.collection('orders').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+        orders = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        renderOrders();
+        renderDashboard();
+    });
+
+    db.collection('customers').onSnapshot((snapshot) => {
+        customers = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        renderCustomers();
+        renderDashboard();
+    });
+}
+
+function checkAuth() {
+    auth.onAuthStateChanged((user) => {
+        document.getElementById('loginScreen')?.classList.toggle('hidden', Boolean(user));
+        document.getElementById('adminDashboard')?.classList.toggle('hidden', !user);
+        if (user) renderDashboard();
+    });
+}
+
+function setupEventListeners() {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const button = event.target.querySelector('button');
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            button.disabled = true;
+            button.textContent = 'Verifying...';
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showToast('Welcome back, Admin');
+            } catch (error) {
+                console.error('Login Error:', error);
+                let message = error.message;
+                if (error.code === 'auth/unauthorized-domain') {
+                    message = 'Unauthorized domain. Add backdoordmv.netlify.app to Firebase authorized domains.';
+                }
+                showToast(`Login failed: ${message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Unlock Dashboard';
+            }
+        });
+    }
+
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        if (confirm('Logout?')) auth.signOut();
+    });
+
+    document.getElementById('productModalClose')?.addEventListener('click', closeModal);
+    document.getElementById('cancelProductBtn')?.addEventListener('click', closeModal);
+    document.getElementById('orderModalClose')?.addEventListener('click', closeOrderModal);
+    document.getElementById('reviewModalClose')?.addEventListener('click', closeReviewModal);
+    document.getElementById('cancelReviewBtn')?.addEventListener('click', closeReviewModal);
+    document.getElementById('addProductBtnTop')?.addEventListener('click', () => openProductModal());
+    document.getElementById('quickAddProduct')?.addEventListener('click', () => openProductModal());
+    document.getElementById('productForm')?.addEventListener('submit', handleProductSubmit);
+    document.getElementById('reviewForm')?.addEventListener('submit', handleReviewSubmit);
+    document.getElementById('addReviewBtn')?.addEventListener('click', () => openReviewModal());
+    document.getElementById('generateReviewsBtn')?.addEventListener('click', generateReviewProfiles);
+    document.getElementById('shuffleReviewNamesBtn')?.addEventListener('click', shuffleGeneratedReviewNames);
+    document.getElementById('copyReviewsJsonBtn')?.addEventListener('click', copyGeneratedReviewsJson);
+    document.getElementById('saveGeneratedReviewsBtn')?.addEventListener('click', saveGeneratedReviews);
+
+    const debouncedFilterProducts = debounce(filterProducts, 180);
+    document.getElementById('productSearch')?.addEventListener('input', debouncedFilterProducts);
+    document.getElementById('productCategoryFilter')?.addEventListener('change', filterProducts);
+    document.getElementById('productStatusFilter')?.addEventListener('change', filterProducts);
+    document.getElementById('productBulkAction')?.addEventListener('change', () => renderBulkToolbar());
+    document.getElementById('applyBulkActionBtn')?.addEventListener('click', applyBulkAction);
+    document.getElementById('selectAllProducts')?.addEventListener('change', handleSelectAllProducts);
+    document.getElementById('productsTableBody')?.addEventListener('change', handleProductTableSelection);
+    document.getElementById('productImage')?.addEventListener('input', () => {
+        activeProductPreviewIndex = 0;
+        updateProductImagePreview();
+    });
+    document.getElementById('productImageGallery')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productImageScale')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productImageOffsetX')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productImageOffsetY')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productName')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productSKU')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productBrand')?.addEventListener('change', updateProductImagePreview);
+    document.getElementById('productCategory')?.addEventListener('change', updateProductImagePreview);
+    document.getElementById('productName')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productSKU')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productBrand')?.addEventListener('change', updateProductImagePreview);
+    document.getElementById('productCategory')?.addEventListener('change', updateProductImagePreview);
+    document.querySelectorAll('#productImageFitButtons .segmented-option').forEach((button) => {
+        button.addEventListener('click', () => {
+            setProductImageFit(button.dataset.fit || 'cover');
+        });
+    });
+    document.getElementById('productImageResetBtn')?.addEventListener('click', resetProductImageEditor);
+    document.getElementById('productImageShoePresetBtn')?.addEventListener('click', applyProductImageShoePreset);
+    document.getElementById('applyBulkStockBtn')?.addEventListener('click', applyBulkInventoryStock);
+    document.getElementById('applyBulkPriceBtn')?.addEventListener('click', applyBulkInventoryPrice);
+    document.getElementById('applyBasePriceBtn')?.addEventListener('click', applyBasePriceToInventory);
+    document.getElementById('applyMarketPriceToInventoryBtn')?.addEventListener('click', () => {
+        const price = Math.max(0, parseFloat(document.getElementById('productPrice')?.value) || 0);
+        document.querySelectorAll('.size-price').forEach((input) => {
+            input.value = price ? price.toFixed(2) : '0.00';
+        });
+        showToast(`Applied current product price ${formatCurrency(price)} to all sizes.`);
+    });
+    document.getElementById('clearInventoryBtn')?.addEventListener('click', clearInventoryStock);
+    document.getElementById('refreshMarketPricingBtn')?.addEventListener('click', refreshMarketPricing);
+    document.getElementById('applyMarketMinus100Btn')?.addEventListener('click', () => applyMarketSuggestedPrice('minus100'));
+    document.getElementById('applyMarketMinus20Btn')?.addEventListener('click', () => applyMarketSuggestedPrice('minus20'));
+    document.getElementById('applyMarketSmartBtn')?.addEventListener('click', () => applyMarketSuggestedPrice('smart'));
+    document.getElementById('applyZeroStockBackorderBtn')?.addEventListener('click', applyBackorderToZeroStock);
+    document.getElementById('clearBackorderFlagsBtn')?.addEventListener('click', clearBackorderFlags);
+    document.getElementById('productAllowBackorder')?.addEventListener('change', updateMarketPricingPanel);
+    document.getElementById('marketStockxUrl')?.addEventListener('input', updateMarketPricingPanel);
+    document.getElementById('marketGoatUrl')?.addEventListener('input', updateMarketPricingPanel);
+    document.getElementById('marketEbayUrl')?.addEventListener('input', updateMarketPricingPanel);
+}
+
+function switchTab(tab, el) {
+    document.querySelectorAll('.nav-item').forEach((item) => item.classList.remove('active'));
+    if (el) el.classList.add('active');
+    else document.querySelector(`[data-page="${tab}"]`)?.classList.add('active');
+
+    const page = pageData[tab];
+    if (page) {
+        document.getElementById('sectionTitle').textContent = page.title;
+        document.getElementById('sectionSubtitle').textContent = page.subtitle;
+    }
+
+    document.querySelectorAll('.content-section').forEach((section) => section.classList.remove('active'));
+    document.getElementById(`${tab}Section`)?.classList.add('active');
+
+    if (tab === 'dashboard') renderDashboard();
+    if (tab === 'orders') renderOrders();
+    if (tab === 'offers') renderOffers();
+    if (tab === 'products') renderProducts();
+    if (tab === 'reviews') renderReviews();
+    if (tab === 'customers') renderCustomers();
+}
+
+function getPendingOfferCount() {
+    return offers.filter((offer) => String(offer.status || 'pending').toLowerCase() === 'pending').length;
+}
+
+function renderDashboard() {
+    const totalRevenue = orders.reduce((sum, order) => sum + getOrderTotal(order), 0);
+    const pendingCount = orders.filter((order) => order.status === 'pending').length;
+
+    animateCounter(document.getElementById('revenueVal'), totalRevenue, '$');
+    animateCounter(document.getElementById('ordersVal'), orders.length);
+    animateCounter(document.getElementById('pendingVal'), pendingCount);
+    animateCounter(document.getElementById('customersVal'), customers.length);
+
+    const orderBadge = document.getElementById('orderBadge');
+    const offerBadge = document.getElementById('offerBadge');
+    const productBadge = document.getElementById('productBadge');
+    if (orderBadge) orderBadge.textContent = String(pendingCount);
+    if (offerBadge) offerBadge.textContent = String(getPendingOfferCount());
+    if (productBadge) productBadge.textContent = String(getVisibleProductCount());
+
+    renderChart();
+    renderRecentOrders();
+    renderLowStock();
+}
+
+function renderRecentOrders() {
+    const list = document.getElementById('recentOrdersList');
+    if (!list) return;
+
+    list.innerHTML = orders.slice(0, 5).map((order) => `
+        <tr onclick="viewOrder('${escapeHtml(order.id)}')" style="cursor:pointer">
+            <td><span class="order-id">${escapeHtml(order.id)}</span></td>
+            <td>${escapeHtml(order.customer?.name || 'Unknown')}</td>
+            <td style="color:var(--text-primary);font-weight:600">$${getOrderTotal(order).toFixed(2)}</td>
+            <td><span class="status-pill ${escapeHtml(order.status || 'pending')}">${escapeHtml(order.status || 'pending')}</span></td>
+        </tr>
+    `).join('') || '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted)">No orders yet.</td></tr>';
+}
+
+function renderLowStock() {
+    const list = document.getElementById('lowStockList');
+    if (!list) return;
+
+    const lowStock = [];
+    products.forEach((product) => {
+        if (isProductHidden(product) || isProductOutOfStock(product)) return;
+        getProductSizes(product).forEach((size) => {
+            if (size.stock > 0 && size.stock < 5) {
+                lowStock.push({
+                    id: product.id,
+                    name: product.name,
+                    size: size.size,
+                stock: size.stock,
+                img: product.image,
+                imageFit: product.imageFit,
+                imagePosition: product.imagePosition,
+                brand: product.brand,
+                price: size.price || product.price
+            });
+            }
+        });
+    });
+
+    lowStock.sort((left, right) => left.stock - right.stock);
+
+    list.innerHTML = lowStock.slice(0, 4).map((entry) => `
+        <div class="inventory-item" onclick="openProductModal('${escapeHtml(entry.id)}')">
+            <div class="shoe-thumb"><img src="${escapeHtml(entry.img)}" alt="" style="${escapeHtml(getProductImageStyle(entry, 4))}"></div>
+            <div class="shoe-info">
+                <div class="shoe-name">${escapeHtml(entry.name)} (${escapeHtml(entry.size)})</div>
+                <div class="shoe-brand">${escapeHtml(entry.brand)}</div>
+                <div class="stock-indicator">
+                    <div class="stock-dot low"></div>
+                    <span style="color:var(--text-muted);font-size:11px">${entry.stock} in stock</span>
+                </div>
+            </div>
+            <div class="shoe-price">$${Number(entry.price || 0).toFixed(0)}</div>
+        </div>
+    `).join('') || '<p style="text-align:center; padding:20px; color:var(--text-muted)">Stock levels are healthy.</p>';
+}
+
+function renderProducts(filteredProducts = getFilteredProducts()) {
+    const tbody = document.getElementById('productsTableBody');
+    if (!tbody) return;
+
+    if (filteredProducts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state-row">No products match the current filters.</td></tr>';
+        renderBulkToolbar(filteredProducts);
         return;
     }
 
-    const productId = Number(checkbox.value);
-    if (checkbox.checked) {
-        selectedProductIds.add(productId);
-    } else {
-        selectedProductIds.delete(productId);
-    }
+    tbody.innerHTML = filteredProducts.map((product) => {
+        const totalStock = getTotalStock(product);
+        const status = getProductStatusMeta(product);
+        const stockLabel = hasBackorderEnabled(product) && totalStock <= 0
+            ? 'Backorder only'
+            : `${totalStock} items`;
+        return `
+            <tr class="${isProductOutOfStock(product) ? 'product-row-muted' : ''}">
+                <td class="checkbox-col">
+                    <input class="product-select-checkbox" type="checkbox" value="${escapeHtml(product.id)}" ${selectedProductIds.has(product.id) ? 'checked' : ''} aria-label="Select ${escapeHtml(product.name)}">
+                </td>
+                <td><div class="shoe-thumb"><img src="${escapeHtml(product.image)}" alt="" style="${escapeHtml(getProductImageStyle(product, 4))}"></div></td>
+                <td>
+                    <strong>${escapeHtml(product.name)}</strong>
+                    <div class="table-subtext">${escapeHtml(product.brand || '')}</div>
+                </td>
+                <td><code>${escapeHtml(product.sku || 'N/A')}</code></td>
+                <td>$${product.price.toFixed(2)}</td>
+                <td>${stockLabel}</td>
+                <td>${escapeHtml(product.category || 'Uncategorized')}</td>
+                <td>
+                    <div class="release-date-cell">
+                        <input
+                            type="date"
+                            class="table-date-input"
+                            value="${escapeHtml(normalizeReleaseDate(product.releaseDate))}"
+                            onchange="updateProductReleaseDate('${escapeHtml(product.id)}', this.value)"
+                            aria-label="Release date for ${escapeHtml(product.name)}">
+                        <div class="table-subtext">${escapeHtml(formatReleaseDateDisplay(product.releaseDate))}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="status-stack">
+                        <span class="status-pill ${status.className}">${status.label}</span>
+                        ${isProductFeatured(product) ? '<span class="status-pill shipped">Featured</span>' : ''}
+                    </div>
+                </td>
+                <td>
+                    <div class="row-action-group">
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="toggleProductFeatured('${escapeHtml(product.id)}')" title="${isProductFeatured(product) ? 'Remove featured' : 'Feature product'}">
+                            <i class="fa-solid ${isProductFeatured(product) ? 'fa-star' : 'fa-star-half-stroke'}"></i>
+                        </button>
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="toggleProductVisibility('${escapeHtml(product.id)}')" title="${isProductHidden(product) ? 'Show on storefront' : 'Hide from storefront'}">
+                            <i class="fa-solid ${isProductHidden(product) ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                        </button>
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="toggleOutOfStock('${escapeHtml(product.id)}')" title="${isProductOutOfStock(product) ? 'Mark in stock' : 'Mark out of stock'}">
+                            <i class="fa-solid ${isProductOutOfStock(product) ? 'fa-box-open' : 'fa-ban'}"></i>
+                        </button>
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="openProductModal('${escapeHtml(product.id)}')" title="Edit product">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 
-    syncProductTableSelectionState();
-}
-
-function handleSelectAllProducts(event) {
-    const filteredProducts = getFilteredProducts();
-
-    filteredProducts.forEach(product => {
-        if (event.target.checked) {
-            selectedProductIds.add(product.id);
-        } else {
-            selectedProductIds.delete(product.id);
-        }
-    });
-
-    renderProducts(filteredProducts);
-}
-
-function applyBulkAction() {
-    const bulkAction = document.getElementById('productBulkAction');
-    const action = bulkAction.value;
-
-    if (!action || selectedProductIds.size === 0) {
-        renderBulkToolbar();
-        return;
-    }
-
-    products.forEach(product => {
-        if (!selectedProductIds.has(product.id)) {
-            return;
-        }
-
-        switch (action) {
-            case 'show':
-                Object.assign(product, normalizeProduct({ ...product, isHidden: false }));
-                break;
-            case 'hide':
-                Object.assign(product, normalizeProduct({ ...product, isHidden: true }));
-                break;
-            case 'mark-in-stock':
-                Object.assign(product, normalizeProduct({
-                    ...product,
-                    stock: Math.max(1, Number(product.stock) || 0),
-                    isOutOfStock: false
-                }));
-                break;
-            case 'mark-out-of-stock':
-                Object.assign(product, normalizeProduct({
-                    ...product,
-                    isOutOfStock: true
-                }));
-                break;
-            case 'feature':
-                Object.assign(product, normalizeProduct({ ...product, isFeatured: true }));
-                break;
-            case 'unfeature':
-                Object.assign(product, normalizeProduct({ ...product, isFeatured: false }));
-                break;
-            default:
-                break;
-        }
-    });
-
-    saveProducts();
-    selectedProductIds.clear();
-    bulkAction.value = '';
-    filterProducts();
-    renderDashboard();
+    renderBulkToolbar(filteredProducts);
 }
 
 function filterProducts() {
     renderProducts(getFilteredProducts());
 }
 
-function openProductModal(product = null) {
-    currentProduct = product;
+function handleProductTableSelection(event) {
+    const checkbox = event.target.closest('.product-select-checkbox');
+    if (!checkbox) return;
+
+    if (checkbox.checked) selectedProductIds.add(checkbox.value);
+    else selectedProductIds.delete(checkbox.value);
+
+    renderBulkToolbar();
+}
+
+function handleSelectAllProducts(event) {
+    const filteredProducts = getFilteredProducts();
+    filteredProducts.forEach((product) => {
+        if (event.target.checked) selectedProductIds.add(product.id);
+        else selectedProductIds.delete(product.id);
+    });
+    renderProducts(filteredProducts);
+}
+
+async function applyBulkAction() {
+    const action = document.getElementById('productBulkAction')?.value;
+    if (!action || selectedProductIds.size === 0) {
+        renderBulkToolbar();
+        return;
+    }
+
+    try {
+        await Promise.all(products.filter((product) => selectedProductIds.has(product.id)).map((product) => {
+            const patch = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+            if (action === 'show') patch.isHidden = false;
+            if (action === 'hide') patch.isHidden = true;
+            if (action === 'mark-in-stock') {
+                patch.isOutOfStock = false;
+                patch.sizes = restoreInventorySizes(product);
+            }
+            if (action === 'mark-out-of-stock') patch.isOutOfStock = true;
+            if (action === 'feature') patch.isFeatured = true;
+            if (action === 'unfeature') patch.isFeatured = false;
+            return db.collection('products').doc(product.id).set(patch, { merge: true });
+        }));
+
+        selectedProductIds.clear();
+        document.getElementById('productBulkAction').value = '';
+        renderBulkToolbar();
+        showToast('Bulk action applied.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Bulk update failed: ${error.message}`, 'error');
+    }
+}
+
+function openProductModal(id = null) {
+    currentProduct = id ? products.find((product) => product.id === id) : null;
+
     const modal = document.getElementById('productModal');
     const title = document.getElementById('productModalTitle');
     const form = document.getElementById('productForm');
+    if (!modal || !title || !form) return;
 
-    title.textContent = product ? 'Edit Product' : 'Add Product';
+    title.textContent = currentProduct ? 'EDIT PRODUCT' : 'ADD PRODUCT';
+    form.reset();
+    activeProductPreviewIndex = 0;
+    currentMarketSnapshot = null;
 
-    if (product) {
-        document.getElementById('productName').value = product.name;
-        document.getElementById('productSKU').value = product.sku;
-        document.getElementById('productBrand').value = product.brand;
-        document.getElementById('productCategory').value = product.category;
-        document.getElementById('productPrice').value = product.price;
-        document.getElementById('productStock').value = product.stock;
-        document.getElementById('productHidden').checked = product.isHidden;
-        document.getElementById('productOutOfStock').checked = getEffectiveOutOfStock(product);
-        document.getElementById('productFeatured').checked = product.isFeatured;
-        document.getElementById('productColorway').value = product.colorway || '';
-        document.getElementById('productDescription').value = product.description || '';
-        document.getElementById('productImage').value = product.image;
+    document.getElementById('productHidden').checked = currentProduct ? isProductHidden(currentProduct) : false;
+    document.getElementById('productOutOfStock').checked = currentProduct ? Boolean(currentProduct.isOutOfStock) : false;
+    document.getElementById('productFeatured').checked = currentProduct ? isProductFeatured(currentProduct) : false;
+    document.getElementById('productAllowBackorder').checked = currentProduct ? Boolean(currentProduct.allowBackorder) : false;
+    document.getElementById('productBackorderLeadTime').value = currentProduct?.backorderLeadTime || 'Ships in 1.5-2 weeks';
+    applyMarketSourcesToInputs(currentProduct);
+
+    if (currentProduct) {
+        document.getElementById('productName').value = currentProduct.name || '';
+        document.getElementById('productBrand').value = currentProduct.brand || 'Nike';
+        document.getElementById('productSKU').value = currentProduct.sku || '';
+        document.getElementById('productCategory').value = currentProduct.category || 'Sneakers';
+        document.getElementById('productPrice').value = currentProduct.price || '';
+        document.getElementById('productReleaseDate').value = normalizeReleaseDate(currentProduct.releaseDate);
+        document.getElementById('productDescription').value = currentProduct.description || '';
+        document.getElementById('productImage').value = currentProduct.image || '';
+        document.getElementById('productImageGallery').value = Array.isArray(currentProduct.images)
+            ? currentProduct.images.join('\n')
+            : '';
+        document.getElementById('productImageFit').value = normalizeImageFit(currentProduct.imageFit, currentProduct);
+        const [offsetX, offsetY] = getImageOffsetsFromProduct(currentProduct);
+        document.getElementById('productImageOffsetX').value = String(offsetX);
+        document.getElementById('productImageOffsetY').value = String(offsetY);
+        document.getElementById('productImageScale').value = String(normalizeImageScale(currentProduct.imageScale, currentProduct));
+        renderSizeGrid(currentProduct.sizes, currentProduct);
+        setMarketSnapshot(currentProduct.marketSnapshot);
     } else {
-        form.reset();
-        document.getElementById('productHidden').checked = false;
-        document.getElementById('productOutOfStock').checked = false;
-        document.getElementById('productFeatured').checked = false;
+        document.getElementById('productImageGallery').value = '';
+        document.getElementById('productImageFit').value = 'cover';
+        document.getElementById('productImageOffsetX').value = '50';
+        document.getElementById('productImageOffsetY').value = '50';
+        document.getElementById('productImageScale').value = '1';
+        document.getElementById('productBackorderLeadTime').value = 'Ships in 1.5-2 weeks';
+        renderSizeGrid();
+        setMarketSnapshot(null);
     }
 
-    modal.classList.add('active');
+    syncProductImageFitButtons();
+    updateProductImagePreview();
+    updateMarketPricingPanel();
+    modal.classList.add('open');
 }
 
-function editProduct(productId) {
-    const product = products.find(p => p.id === productId);
-    if (product) {
-        openProductModal(product);
+function renderSizeGrid(existingSizes = [], contextProduct = currentProduct || {}) {
+    const grid = document.getElementById('sizeInventoryGrid');
+    if (!grid) return;
+
+    const leadTime = String(document.getElementById('productBackorderLeadTime')?.value || contextProduct?.backorderLeadTime || 'Ships in 1.5-2 weeks').trim();
+    const sizeMap = new Map(getProductSizes({
+        ...contextProduct,
+        sizes: existingSizes,
+        backorderLeadTime: leadTime
+    }).map((entry) => [entry.size, entry]));
+    grid.innerHTML = DEFAULT_SIZE_OPTIONS.map((size) => {
+        const entry = sizeMap.get(size);
+        return `
+            <div class="size-item">
+                <span>${size}</span>
+                <input type="number" placeholder="Stock" class="size-stock" data-size="${size}" min="0" value="${entry ? entry.stock : 0}">
+                <input type="number" placeholder="Price" class="size-price" data-size="${size}" min="0" step="0.01" value="${entry ? entry.price : ''}">
+                <label class="size-backorder-toggle">
+                    <input type="checkbox" class="size-backorder" data-size="${size}" ${entry?.backorder ? 'checked' : ''}>
+                    <span>Backorder</span>
+                </label>
+            </div>
+        `;
+    }).join('');
+}
+
+async function handleProductSubmit(event) {
+    event.preventDefault();
+
+    const button = event.target.querySelector('button[type="submit"]');
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Saving...';
+
+    const basePrice = parseFloat(document.getElementById('productPrice').value) || 0;
+    const allowBackorder = document.getElementById('productAllowBackorder').checked;
+    const backorderLeadTime = String(document.getElementById('productBackorderLeadTime').value || '').trim() || 'Ships in 1.5-2 weeks';
+    const sizeEntries = [...document.querySelectorAll('.size-item')].map((item) => ({
+        size: item.querySelector('span').textContent.trim(),
+        stock: Math.max(0, parseInt(item.querySelector('.size-stock').value, 10) || 0),
+        price: parseFloat(item.querySelector('.size-price').value) || basePrice,
+        backorder: item.querySelector('.size-backorder')?.checked || false,
+        backorderLeadTime
+    }));
+
+    const productId = currentProduct ? currentProduct.id : Date.now().toString();
+    const productName = document.getElementById('productName').value.trim();
+    const productSku = document.getElementById('productSKU').value.trim();
+    const imageDraft = collectProductImageDraft();
+    if (imageDraft.urls.length === 0) {
+        showToast('Add at least one valid image URL.', 'error');
+        button.disabled = false;
+        button.textContent = originalText;
+        return;
     }
-}
-
-function handleProductSubmit(e) {
-    e.preventDefault();
-
+    const imageOffsetX = clamp(Number(document.getElementById('productImageOffsetX').value || 50), 0, 100);
+    const imageOffsetY = clamp(Number(document.getElementById('productImageOffsetY').value || 50), 0, 100);
+    const imageFit = normalizeImageFit(document.getElementById('productImageFit').value, {
+        ...currentProduct,
+        name: productName,
+        sku: productSku
+    });
     const productData = {
-        name: document.getElementById('productName').value,
-        sku: document.getElementById('productSKU').value,
+        name: productName,
         brand: document.getElementById('productBrand').value,
+        sku: productSku,
         category: document.getElementById('productCategory').value,
-        price: parseFloat(document.getElementById('productPrice').value),
-        stock: parseInt(document.getElementById('productStock').value, 10),
+        price: basePrice,
+        releaseDate: normalizeReleaseDate(document.getElementById('productReleaseDate').value) || 'TBD',
+        description: document.getElementById('productDescription').value.trim(),
+        image: imageDraft.urls[0],
+        images: imageDraft.urls,
+        imageFit,
+        imagePosition: `${imageOffsetX}% ${imageOffsetY}%`,
+        imageOffsetX,
+        imageOffsetY,
+        imageScale: normalizeImageScale(document.getElementById('productImageScale').value, {
+            ...currentProduct,
+            name: productName,
+            sku: productSku,
+            category: document.getElementById('productCategory').value,
+            brand: document.getElementById('productBrand').value
+        }),
+        sizes: sizeEntries,
+        allowBackorder,
+        backorderLeadTime,
+        marketSources: readMarketSourceInputs(),
+        marketSnapshot: currentMarketSnapshot,
         isHidden: document.getElementById('productHidden').checked,
         isOutOfStock: document.getElementById('productOutOfStock').checked,
         isFeatured: document.getElementById('productFeatured').checked,
-        colorway: document.getElementById('productColorway').value,
-        description: document.getElementById('productDescription').value,
-        image: document.getElementById('productImage').value,
-        status: 'active'
+        status: 'active',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    if (currentProduct) {
-        // Update existing product
-        Object.assign(currentProduct, normalizeProduct({
-            ...currentProduct,
-            ...productData
-        }));
-        alert('Product updated successfully!');
-    } else {
-        // Add new product
-        productData.id = getNextProductId();
-        productData.releaseDate = new Date().toLocaleDateString();
-        products.push(normalizeProduct(productData));
-        alert('Product added successfully!');
+    if (!currentProduct) productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+
+    try {
+        await db.collection('products').doc(productId).set(productData, { merge: true });
+        showToast(currentProduct ? 'Product updated.' : 'Product added.');
+        closeModal();
+    } catch (error) {
+        console.error(error);
+        showToast(`Error saving product: ${error.message}`, 'error');
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
     }
-
-    saveProducts();
-    closeModal('productModal');
-    filterProducts();
-    renderDashboard();
 }
 
-function toggleProductVisibility(productId) {
-    const product = products.find(candidate => candidate.id === productId);
+function normalizeImageInputs(value) {
+    return String(value || '')
+        .split(/\r?\n|,/)
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+}
+
+function collectProductImageDraft() {
+    const rawUrls = [
+        document.getElementById('productImage')?.value.trim() || '',
+        ...normalizeImageInputs(document.getElementById('productImageGallery')?.value)
+    ].filter(Boolean);
+
+    const seen = new Set();
+    const urls = [];
+    const invalid = [];
+
+    rawUrls.forEach((rawUrl) => {
+        const resolved = resolveImgurUrl(rawUrl) || (/^https?:\/\//i.test(rawUrl) ? rawUrl : '');
+        if (!resolved) {
+            invalid.push(rawUrl);
+            return;
+        }
+
+        const key = resolved.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        urls.push(resolved);
+    });
+
+    return { urls, invalid };
+}
+
+function syncProductImageFitButtons() {
+    const currentFit = document.getElementById('productImageFit')?.value || 'cover';
+    document.querySelectorAll('#productImageFitButtons .segmented-option').forEach((button) => {
+        button.classList.toggle('active', button.dataset.fit === currentFit);
+    });
+}
+
+function setProductImageFit(value) {
+    const fitInput = document.getElementById('productImageFit');
+    if (!fitInput) return;
+    fitInput.value = normalizeImageFit(value, {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    });
+    syncProductImageFitButtons();
+    updateProductImagePreview();
+}
+
+function updateProductImagePreview() {
+    const image = document.getElementById('productImagePreview');
+    const rawUrl = document.getElementById('productImage')?.value.trim();
+    const url = resolveImgurUrl(rawUrl) || rawUrl;
+    const fit = normalizeImageFit(document.getElementById('productImageFit')?.value, {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    });
+    const scale = normalizeImageScale(document.getElementById('productImageScale')?.value, {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    });
+    const offsetX = clamp(Number(document.getElementById('productImageOffsetX')?.value || 50), 0, 100);
+    const offsetY = clamp(Number(document.getElementById('productImageOffsetY')?.value || 50), 0, 100);
+    const padding = getProductImagePadding({ imageFit: fit, category: document.getElementById('productCategory')?.value, brand: document.getElementById('productBrand')?.value, name: document.getElementById('productName')?.value, sku: document.getElementById('productSKU')?.value }, 6);
+
+    document.getElementById('productImagePosition').value = `${offsetX}% ${offsetY}%`;
+    document.getElementById('productImageScaleValue').textContent = `${Math.round(scale * 100)}%`;
+    document.getElementById('productImageOffsetXValue').textContent = `${Math.round(offsetX)}%`;
+    document.getElementById('productImageOffsetYValue').textContent = `${Math.round(offsetY)}%`;
+    document.getElementById('productImagePreviewSummary').textContent = `${fit === 'contain' ? 'Contain' : 'Cover'} · ${Math.round(scale * 100)}%`;
+
+    if (image) {
+        image.onerror = null;
+        image.src = url || 'https://via.placeholder.com/500x500/111111/c6ff4c?text=Preview';
+        image.onerror = () => {
+            image.onerror = null;
+            image.src = 'https://via.placeholder.com/500x500/111111/c6ff4c?text=Preview';
+        };
+        image.style.objectFit = fit;
+        image.style.objectPosition = `${offsetX}% ${offsetY}%`;
+        image.style.padding = padding;
+        image.style.transform = `scale(${scale})`;
+    }
+}
+
+function applyProductImageShoePreset() {
+    document.getElementById('productImageScale').value = '1.1';
+    document.getElementById('productImageOffsetX').value = '50';
+    document.getElementById('productImageOffsetY').value = '52';
+    setProductImageFit('contain');
+}
+
+function resetProductImageEditor() {
+    const contextProduct = {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    };
+    const fit = normalizeImageFit('', contextProduct);
+    document.getElementById('productImageScale').value = String(normalizeImageScale('', contextProduct));
+    document.getElementById('productImageOffsetX').value = '50';
+    document.getElementById('productImageOffsetY').value = '50';
+    setProductImageFit(fit);
+}
+
+function applyBulkInventoryStock() {
+    const value = Math.max(0, parseInt(document.getElementById('bulkStockValue')?.value, 10) || 0);
+    document.querySelectorAll('.size-stock').forEach((input) => {
+        input.value = value;
+    });
+    showToast(`Applied stock ${value} to all sizes.`);
+}
+
+function applyBulkInventoryPrice() {
+    const value = Math.max(0, parseFloat(document.getElementById('bulkPriceValue')?.value) || 0);
+    document.querySelectorAll('.size-price').forEach((input) => {
+        input.value = value ? value.toFixed(2) : '0.00';
+    });
+    showToast(`Applied price $${value.toFixed(2)} to all sizes.`);
+}
+
+function applyBasePriceToInventory() {
+    const basePrice = Math.max(0, parseFloat(document.getElementById('productPrice')?.value) || 0);
+    document.querySelectorAll('.size-price').forEach((input) => {
+        input.value = basePrice ? basePrice.toFixed(2) : '0.00';
+    });
+    showToast(`Applied base price $${basePrice.toFixed(2)} to all sizes.`);
+}
+
+function clearInventoryStock() {
+    document.querySelectorAll('.size-stock').forEach((input) => {
+        input.value = 0;
+    });
+    showToast('All size stock set to 0.', 'info');
+}
+
+function applyBackorderToZeroStock() {
+    document.querySelectorAll('.size-item').forEach((item) => {
+        const stock = Math.max(0, parseInt(item.querySelector('.size-stock')?.value, 10) || 0);
+        const checkbox = item.querySelector('.size-backorder');
+        if (checkbox) {
+            checkbox.checked = stock <= 0;
+        }
+    });
+    showToast('Backorder enabled for all zero-stock sizes.');
+}
+
+function clearBackorderFlags() {
+    document.querySelectorAll('.size-backorder').forEach((input) => {
+        input.checked = false;
+    });
+    document.getElementById('productAllowBackorder').checked = false;
+    showToast('Backorder flags cleared.', 'info');
+}
+
+async function updateProductReleaseDate(productId, value) {
+    const product = products.find((entry) => entry.id === productId);
     if (!product) return;
 
-    Object.assign(product, normalizeProduct({
-        ...product,
-        isHidden: !product.isHidden
-    }));
-    saveProducts();
-    filterProducts();
-    renderDashboard();
+    const normalized = normalizeReleaseDate(value) || 'TBD';
+    if ((product.releaseDate || 'TBD') === normalized) return;
+
+    try {
+        await db.collection('products').doc(productId).set({
+            releaseDate: normalized,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast(normalized === 'TBD' ? 'Release date cleared.' : `Release date updated to ${formatReleaseDateDisplay(normalized)}.`);
+    } catch (error) {
+        console.error(error);
+        showToast(`Release date update failed: ${error.message}`, 'error');
+    }
 }
 
-function toggleProductFeatured(productId) {
-    const product = products.find(candidate => candidate.id === productId);
+async function toggleProductVisibility(productId) {
+    const product = products.find((entry) => entry.id === productId);
     if (!product) return;
 
-    Object.assign(product, normalizeProduct({
-        ...product,
-        isFeatured: !product.isFeatured
-    }));
-    saveProducts();
-    filterProducts();
+    try {
+        await db.collection('products').doc(productId).set({
+            isHidden: !isProductHidden(product),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast(isProductHidden(product) ? 'Product is visible again.' : 'Product hidden from storefront.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Visibility update failed: ${error.message}`, 'error');
+    }
 }
 
-function toggleOutOfStock(productId) {
-    const product = products.find(candidate => candidate.id === productId);
+async function toggleProductFeatured(productId) {
+    const product = products.find((entry) => entry.id === productId);
     if (!product) return;
 
-    const nextOutOfStock = !getEffectiveOutOfStock(product);
-    Object.assign(product, normalizeProduct({
-        ...product,
-        stock: nextOutOfStock ? product.stock : Math.max(1, Number(product.stock) || 0),
-        isOutOfStock: nextOutOfStock
-    }));
-    saveProducts();
-    filterProducts();
-    renderDashboard();
+    try {
+        await db.collection('products').doc(productId).set({
+            isFeatured: !isProductFeatured(product),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast(isProductFeatured(product) ? 'Featured flag removed.' : 'Product featured.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Featured update failed: ${error.message}`, 'error');
+    }
 }
 
-// ============================================
-// CUSTOMERS RENDERING
-// ============================================
-function renderCustomers(filteredCustomers = customers) {
-    const tbody = document.getElementById('customersTableBody');
-    tbody.innerHTML = filteredCustomers.map(customer => `
+async function toggleOutOfStock(productId) {
+    const product = products.find((entry) => entry.id === productId);
+    if (!product) return;
+
+    const nextOutOfStock = !isProductOutOfStock(product);
+    const patch = {
+        isOutOfStock: nextOutOfStock,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (!nextOutOfStock) patch.sizes = restoreInventorySizes(product);
+
+    try {
+        await db.collection('products').doc(productId).set(patch, { merge: true });
+        showToast(nextOutOfStock ? 'Product marked out of stock.' : 'Product returned to stock.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Stock update failed: ${error.message}`, 'error');
+    }
+}
+
+function closeModal() {
+    document.getElementById('productModal')?.classList.remove('open');
+}
+
+function renderOrders() {
+    const tbody = document.getElementById('ordersTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = orders.map((order) => `
         <tr>
-            <td><strong>${customer.name}</strong></td>
-            <td>${customer.email}</td>
-            <td>${customer.totalOrders}</td>
-            <td><strong>$${customer.totalSpent}</strong></td>
-            <td>${new Date(customer.lastOrder).toLocaleDateString()}</td>
+            <td><strong>${escapeHtml(order.id)}</strong></td>
+            <td>${escapeHtml(order.customer?.name || 'Unknown')}</td>
+            <td>${getOrderItemCount(order)} items</td>
+            <td><strong>$${getOrderTotal(order).toFixed(2)}</strong></td>
+            <td><span class="status-pill ${escapeHtml(order.status || 'pending')}">${escapeHtml(order.status || 'pending')}</span></td>
+            <td>${new Date(order.createdAt || Date.now()).toLocaleDateString()}</td>
             <td>
-                <button class="action-btn view">View</button>
+                <button class="topbar-btn icon-btn-small" type="button" onclick="viewOrder('${escapeHtml(order.id)}')"><i class="fa-solid fa-eye"></i></button>
             </td>
         </tr>
     `).join('');
 }
 
-function filterCustomers() {
-    const searchTerm = document.getElementById('customerSearch').value.toLowerCase();
+function viewOrder(id) {
+    const order = orders.find((entry) => entry.id === id);
+    if (!order) return;
 
-    const filtered = customers.filter(customer =>
-        customer.name.toLowerCase().includes(searchTerm) ||
-        customer.email.toLowerCase().includes(searchTerm)
-    );
+    const body = document.getElementById('orderModalBody');
+    if (!body) return;
 
-    renderCustomers(filtered);
+    body.innerHTML = `
+        <div style="display:grid; gap:20px; color:var(--text-secondary)">
+            <div>
+                <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase">Customer</p>
+                <p style="color:var(--text-primary); font-weight:600">${escapeHtml(order.customer?.name || 'Unknown')} (${escapeHtml(order.customer?.email || 'No email')})</p>
+            </div>
+            <div>
+                <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase">Shipping</p>
+                <p>${escapeHtml(order.shippingAddress?.street || order.shippingAddress?.address1 || '')}, ${escapeHtml(order.shippingAddress?.city || '')}, ${escapeHtml(order.shippingAddress?.state || '')}</p>
+            </div>
+            <div>
+                <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase">Items</p>
+                ${(order.items || []).map((item) => `<p style="color:var(--text-primary)">- ${escapeHtml(item.name)} (Sz: ${escapeHtml(item.size)}) x${Number(item.quantity ?? item.qty ?? 1)} - $${item.price}</p>`).join('')}
+            </div>
+            <div style="padding-top:15px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
+                <span style="font-weight:700; color:var(--text-primary)">TOTAL</span>
+                <span style="font-family:'Bebas Neue'; font-size:24px; color:var(--accent)">$${getOrderTotal(order).toFixed(2)}</span>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('orderModal')?.classList.add('open');
 }
 
-// ============================================
-// ANALYTICS RENDERING
-// ============================================
-function renderAnalytics() {
-    const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
-    const avgOrderValue = totalRevenue / orders.length;
+function closeOrderModal() {
+    document.getElementById('orderModal')?.classList.remove('open');
+}
 
-    document.getElementById('avgOrderValue').textContent = `$${avgOrderValue.toFixed(2)}`;
-    document.getElementById('conversionRate').textContent = '3.2%';
-    document.getElementById('customerLTV').textContent = `$${(totalRevenue / customers.length).toFixed(2)}`;
+function renderOffers() {
+    const tbody = document.getElementById('offersTableBody');
+    if (!tbody) return;
 
-    // Top products
-    const productSales = {};
-    orders.forEach(order => {
-        order.items.forEach(item => {
-            if (!productSales[item.productId]) {
-                productSales[item.productId] = { name: item.name, quantity: 0, revenue: 0 };
-            }
-            productSales[item.productId].quantity += item.quantity;
-            productSales[item.productId].revenue += item.price * item.quantity;
-        });
-    });
+    if (offers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state-row">No offers yet.</td></tr>';
+        return;
+    }
 
-    const topProducts = Object.values(productSales)
-        .sort((a, b) => b.revenue - a.revenue)
-        .slice(0, 5);
+    tbody.innerHTML = offers.map((offer) => {
+        const status = String(offer.status || 'pending').toLowerCase();
+        const updatedAt = offer.updatedAt?.toDate ? offer.updatedAt.toDate().toLocaleDateString() : offer.createdAt?.toDate ? offer.createdAt.toDate().toLocaleDateString() : 'Just now';
+        const offerAmount = Number(offer.offerAmount || 0);
+        const askingPrice = Number(offer.askingPrice || 0);
+        const counterAmount = Number(offer.counterAmount || 0);
 
-    document.getElementById('topProductsList').innerHTML = topProducts.map(product => `
-        <div class="list-item">
-            <div class="list-item-info">
-                <div class="list-item-title">${product.name}</div>
-                <div class="list-item-subtitle">${product.quantity} sold</div>
-            </div>
-            <div class="list-item-value">$${product.revenue.toFixed(2)}</div>
-        </div>
+        return `
+            <tr>
+                <td>
+                    <strong>${escapeHtml(offer.customerName || 'Anonymous')}</strong>
+                    <div class="table-subtext">${escapeHtml(offer.customerEmail || 'No email provided')}</div>
+                    ${offer.customerPhone ? `<div class="table-subtext">${escapeHtml(offer.customerPhone)}</div>` : ''}
+                </td>
+                <td>
+                    <strong>${escapeHtml(offer.productName || 'Unknown product')}</strong>
+                    <div class="table-subtext">${escapeHtml(offer.size || 'No size selected')}</div>
+                    ${offer.message ? `<div class="table-subtext">${escapeHtml(offer.message)}</div>` : ''}
+                </td>
+                <td>
+                    <strong>${formatCurrency(offerAmount)}</strong>
+                    <div class="table-subtext">Ask ${formatCurrency(askingPrice)}</div>
+                    ${counterAmount > 0 ? `<div class="table-subtext">Counter ${formatCurrency(counterAmount)}</div>` : ''}
+                </td>
+                <td><span class="status-pill ${escapeHtml(status)}">${escapeHtml(status)}</span></td>
+                <td>${updatedAt}</td>
+                <td>
+                    <div class="row-action-group">
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="updateOfferStatus('${escapeHtml(offer.id)}', 'accepted')" title="Accept offer">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="counterOffer('${escapeHtml(offer.id)}')" title="Send counter offer">
+                            <i class="fa-solid fa-reply-dollar"></i>
+                        </button>
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="updateOfferStatus('${escapeHtml(offer.id)}', 'rejected')" title="Reject offer">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <button class="topbar-btn icon-btn-small" type="button" onclick="deleteOffer('${escapeHtml(offer.id)}')" title="Delete offer">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderCustomers() {
+    const tbody = document.getElementById('customersTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = customers.map((customer) => `
+        <tr>
+            <td><strong>${escapeHtml(customer.name)}</strong></td>
+            <td>${escapeHtml(customer.email)}</td>
+            <td>${customer.totalOrders || 0}</td>
+            <td>$${parseFloat(customer.totalSpent || 0).toFixed(2)}</td>
+            <td>${new Date(customer.lastOrder || Date.now()).toLocaleDateString()}</td>
+        </tr>
     `).join('');
 }
 
-// ============================================
-// UTILITIES
-// ============================================
-function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
-}
-
-function exportToCSV(data, filename) {
-    if (data.length === 0) {
-        alert('No data to export');
-        return;
-    }
-
-    const headers = Object.keys(data[0]);
-    const csv = [
-        headers.join(','),
-        ...data.map(row => headers.map(header => {
-            const value = row[header];
-            return typeof value === 'object' ? JSON.stringify(value) : value;
-        }).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-// ============================================
-// PRODUCT IMPORT
-// ============================================
-let importHistory = JSON.parse(localStorage.getItem(IMPORT_HISTORY_KEY) || '[]');
-
-function setupImportListeners() {
-    document.getElementById('fetchProductBtn').addEventListener('click', fetchProductDetails);
-    document.getElementById('cancelImportBtn').addEventListener('click', () => {
-        document.getElementById('importPreview').classList.add('hidden');
-        document.getElementById('productUrl').value = '';
-        document.getElementById('previewHidden').checked = false;
-        document.getElementById('previewOutOfStock').checked = false;
-        document.getElementById('previewFeatured').checked = false;
-    });
-    document.getElementById('confirmImportBtn').addEventListener('click', confirmImport);
-}
-
-async function fetchProductDetails() {
-    const url = document.getElementById('productUrl').value.trim();
-
-    if (!url) {
-        alert('Please enter a product URL');
-        return;
-    }
-
-    if (!url.includes('kickwho.info')) {
-        alert('Please enter a valid kickwho.info product URL');
-        return;
-    }
-
-    // Show loading state
-    const btn = document.getElementById('fetchProductBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<span>⏳</span> Fetching...';
-    btn.disabled = true;
+async function updateOfferStatus(offerId, status, extra = {}) {
+    const offer = offers.find((entry) => entry.id === offerId);
+    if (!offer) return;
 
     try {
-        // Parse product details from URL
-        const productData = await parseKickwhoProduct(url);
-
-        // Populate preview
-        document.getElementById('previewImage').src = productData.image || 'https://via.placeholder.com/300';
-        document.getElementById('previewName').value = productData.name;
-        document.getElementById('previewBrand').value = productData.brand;
-        document.getElementById('previewPrice').value = productData.price;
-        document.getElementById('previewSKU').value = productData.sku;
-        document.getElementById('previewStock').value = 10;
-        document.getElementById('previewCategory').value = productData.category;
-        document.getElementById('previewColorway').value = productData.colorway || '';
-        document.getElementById('previewHidden').checked = false;
-        document.getElementById('previewOutOfStock').checked = false;
-        document.getElementById('previewFeatured').checked = false;
-
-        // Show preview
-        document.getElementById('importPreview').classList.remove('hidden');
-
+        await db.collection('offers').doc(offerId).set({
+            status,
+            ...extra,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast(`Offer ${status}.`);
     } catch (error) {
-        alert('Could not fetch product details. Please fill in manually.');
         console.error(error);
-
-        // Show preview with empty fields
-        document.getElementById('previewImage').src = 'https://via.placeholder.com/300';
-        document.getElementById('previewName').value = '';
-        document.getElementById('previewBrand').value = 'Nike';
-        document.getElementById('previewPrice').value = '';
-        document.getElementById('previewSKU').value = '';
-        document.getElementById('previewStock').value = 10;
-        document.getElementById('previewCategory').value = 'Sneakers';
-        document.getElementById('previewColorway').value = '';
-        document.getElementById('previewHidden').checked = false;
-        document.getElementById('previewOutOfStock').checked = false;
-        document.getElementById('previewFeatured').checked = false;
-        document.getElementById('importPreview').classList.remove('hidden');
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        showToast(`Offer update failed: ${error.message}`, 'error');
     }
 }
 
-async function parseKickwhoProduct(url) {
-    // Extract product name from URL
-    const urlParts = url.split('/');
-    const productSlug = urlParts[urlParts.length - 1].replace('.html', '').replace(/-/g, ' ');
+async function counterOffer(offerId) {
+    const offer = offers.find((entry) => entry.id === offerId);
+    if (!offer) return;
 
-    // Determine brand from URL or product name
-    let brand = 'Nike';
-    if (url.includes('jordan') || productSlug.toLowerCase().includes('jordan')) {
-        brand = 'Jordan';
-    } else if (url.includes('adidas') || url.includes('yeezy') || productSlug.toLowerCase().includes('yeezy')) {
-        brand = 'Adidas';
-    }
+    const currentValue = Number(offer.counterAmount || offer.offerAmount || offer.askingPrice || 0);
+    const response = prompt('Enter the counter amount for this offer:', currentValue ? String(currentValue) : '');
+    if (response === null) return;
 
-    // Generate SKU from product name
-    const sku = productSlug.substring(0, 10).toUpperCase().replace(/\s/g, '');
-
-    return {
-        name: productSlug.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-        brand: brand,
-        price: 249.00, // Default price
-        sku: sku,
-        category: 'Sneakers',
-        colorway: '',
-        image: '' // User will need to add image manually
-    };
-}
-
-function confirmImport() {
-    const productData = {
-        id: getNextProductId(),
-        name: document.getElementById('previewName').value,
-        brand: document.getElementById('previewBrand').value,
-        price: parseFloat(document.getElementById('previewPrice').value),
-        sku: document.getElementById('previewSKU').value,
-        stock: parseInt(document.getElementById('previewStock').value, 10),
-        category: document.getElementById('previewCategory').value,
-        colorway: document.getElementById('previewColorway').value,
-        image: document.getElementById('previewImage').src,
-        status: 'active',
-        releaseDate: new Date().toLocaleDateString(),
-        isHidden: document.getElementById('previewHidden').checked,
-        isOutOfStock: document.getElementById('previewOutOfStock').checked,
-        isFeatured: document.getElementById('previewFeatured').checked
-    };
-
-    // Add to products array
-    products.push(normalizeProduct(productData));
-    saveProducts();
-
-    // Add to import history
-    importHistory.unshift({
-        ...productData,
-        importedAt: new Date().toISOString()
-    });
-
-    // Keep only last 10 imports
-    if (importHistory.length > 10) {
-        importHistory = importHistory.slice(0, 10);
-    }
-
-    localStorage.setItem(IMPORT_HISTORY_KEY, JSON.stringify(importHistory));
-
-    // Update UI
-    renderImportHistory();
-    document.getElementById('importPreview').classList.add('hidden');
-    document.getElementById('productUrl').value = '';
-    document.getElementById('previewHidden').checked = false;
-    document.getElementById('previewOutOfStock').checked = false;
-    document.getElementById('previewFeatured').checked = false;
-
-    alert(`✓ Product "${productData.name}" added to inventory!`);
-
-    // Refresh products table if on products section
-    if (currentSection === 'products') {
-        filterProducts();
-    }
-}
-
-function renderImportHistory() {
-    const historyList = document.getElementById('importHistory');
-
-    if (importHistory.length === 0) {
-        historyList.innerHTML = '<p class="empty-state">No products imported yet</p>';
+    const counterAmount = Math.max(0, Number.parseFloat(response) || 0);
+    if (!counterAmount) {
+        showToast('Enter a valid counter amount.', 'error');
         return;
     }
 
-    historyList.innerHTML = importHistory.map(item => `
-        <div class="history-item">
-            <img src="${item.image}" alt="${item.name}" class="history-item-image">
-            <div class="history-item-details">
-                <div class="history-item-name">${item.name}</div>
-                <div class="history-item-meta">
-                    ${item.brand} • $${item.price.toFixed(2)} • ${new Date(item.importedAt).toLocaleDateString()}
-                </div>
+    await updateOfferStatus(offerId, 'countered', { counterAmount });
+}
+
+async function deleteOffer(offerId) {
+    if (!confirm('Delete this offer?')) return;
+
+    try {
+        await db.collection('offers').doc(offerId).delete();
+        showToast('Offer deleted.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Delete failed: ${error.message}`, 'error');
+    }
+}
+
+function generateReviewProfiles() {
+    const comments = (document.getElementById('reviewCommentsInput')?.value || '')
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+    const images = (document.getElementById('reviewImagesInput')?.value || '')
+        .split(/\r?\n/)
+        .map((line) => line.trim());
+
+    if (comments.length === 0) {
+        showToast('Paste at least one review comment first.', 'error');
+        return;
+    }
+
+    generatedReviews = comments.map((comment, index) => {
+        const image = images[index] || '';
+        return {
+            name: generateReviewName(`${comment}|${image}|${index}`),
+            comment: polishReviewComment(comment),
+            originalComment: comment,
+            image,
+            rating: 5,
+            productName: '',
+            isHidden: false
+        };
+    });
+
+    renderGeneratedReviews();
+    showToast(`${generatedReviews.length} review profiles generated.`);
+}
+
+function shuffleGeneratedReviewNames() {
+    if (generatedReviews.length === 0) {
+        showToast('Generate reviews first.', 'info');
+        return;
+    }
+
+    generatedReviews = generatedReviews.map((review, index) => ({
+        ...review,
+        name: generateReviewName(`${review.originalComment}|${review.image}|shuffle`, index + 7)
+    }));
+
+    renderGeneratedReviews();
+    showToast('Generated names shuffled.');
+}
+
+function renderGeneratedReviews() {
+    const grid = document.getElementById('reviewsPreviewGrid');
+    const output = document.getElementById('reviewsJsonOutput');
+    const stats = document.getElementById('reviewsLabStats');
+
+    if (stats) stats.textContent = `${generatedReviews.length} review${generatedReviews.length === 1 ? '' : 's'} generated`;
+    if (output) output.value = generatedReviews.length ? JSON.stringify(generatedReviews, null, 2) : '';
+
+    if (!grid) return;
+    if (generatedReviews.length === 0) {
+        grid.innerHTML = '<div class="reviews-empty-state">Generate a batch to preview names, comments, and export-ready review objects.</div>';
+        return;
+    }
+
+    grid.innerHTML = generatedReviews.map((review) => `
+        <article class="review-preview-card">
+            <div class="review-preview-media">
+                ${review.image ? `<img src="${escapeHtml(review.image)}" alt="${escapeHtml(review.name)}" onerror="this.parentElement.innerHTML='<i class=&quot;fa-solid fa-camera&quot;></i>'">` : '<i class="fa-solid fa-camera"></i>'}
             </div>
+            <div class="review-preview-body">
+                <div class="review-preview-head">
+                    <div class="review-preview-name">${escapeHtml(review.name)}</div>
+                    <div class="review-preview-stars">${'&#9733;'.repeat(review.rating)}</div>
+                </div>
+                <div class="review-preview-comment">${escapeHtml(review.comment)}</div>
+                <div class="review-preview-raw">Raw: ${escapeHtml(review.originalComment)}</div>
+            </div>
+        </article>
+    `).join('');
+}
+
+async function copyGeneratedReviewsJson() {
+    if (generatedReviews.length === 0) {
+        showToast('Nothing to copy yet.', 'info');
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(JSON.stringify(generatedReviews, null, 2));
+        showToast('Review JSON copied.');
+    } catch (error) {
+        console.error(error);
+        showToast('Clipboard copy failed.', 'error');
+    }
+}
+
+async function saveGeneratedReviews() {
+    if (generatedReviews.length === 0) {
+        showToast('Generate reviews before saving.', 'error');
+        return;
+    }
+
+    try {
+        await Promise.all(generatedReviews.map((review) => db.collection('reviews').add({
+            name: review.name,
+            productName: review.productName || '',
+            comment: review.comment,
+            originalComment: review.originalComment,
+            images: review.image ? [review.image] : [],
+            image: review.image || '',
+            rating: review.rating,
+            isHidden: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        })));
+        showToast(`${generatedReviews.length} reviews saved.`);
+    } catch (error) {
+        console.error(error);
+        showToast(`Failed to save generated reviews: ${error.message}`, 'error');
+    }
+}
+
+function renderReviews() {
+    const tbody = document.getElementById('reviewsTableBody');
+    if (!tbody) return;
+
+    if (reviews.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state-row">No reviews yet.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = reviews.map((review) => `
+        <tr>
+            <td>
+                <strong>${escapeHtml(review.name || 'Anonymous')}</strong>
+                <div class="table-subtext">${escapeHtml(review.comment || '')}</div>
+            </td>
+            <td>${escapeHtml(review.productName || 'General store review')}</td>
+            <td>${'&#9733;'.repeat(Math.min(5, Math.max(1, Number(review.rating) || 5)))}</td>
+            <td><span class="status-pill ${review.isHidden ? 'inactive' : 'active'}">${review.isHidden ? 'Hidden' : 'Live'}</span></td>
+            <td>
+                ${review.updatedAt?.toDate ? review.updatedAt.toDate().toLocaleDateString() : 'Just now'}
+                <div class="table-subtext">${getReviewImages(review).length} photo${getReviewImages(review).length === 1 ? '' : 's'}</div>
+            </td>
+            <td>
+                <div class="row-action-group">
+                    <button class="topbar-btn icon-btn-small" type="button" onclick="openReviewModal('${escapeHtml(review.id)}')" title="Edit review">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="topbar-btn icon-btn-small" type="button" onclick="toggleReviewVisibility('${escapeHtml(review.id)}')" title="${review.isHidden ? 'Show review' : 'Hide review'}">
+                        <i class="fa-solid ${review.isHidden ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                    </button>
+                    <button class="topbar-btn icon-btn-small" type="button" onclick="deleteReview('${escapeHtml(review.id)}')" title="Delete review">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openReviewModal(id = null) {
+    currentReview = id ? reviews.find((review) => review.id === id) : null;
+
+    const modal = document.getElementById('reviewModal');
+    const title = document.getElementById('reviewModalTitle');
+    const form = document.getElementById('reviewForm');
+    if (!modal || !title || !form) return;
+
+    title.textContent = currentReview ? 'EDIT REVIEW' : 'CREATE REVIEW';
+    form.reset();
+
+    if (currentReview) {
+        document.getElementById('reviewName').value = currentReview.name || '';
+        document.getElementById('reviewProduct').value = currentReview.productName || '';
+        document.getElementById('reviewRating').value = String(Math.min(5, Math.max(1, Number(currentReview.rating) || 5)));
+        document.getElementById('reviewImages').value = getReviewImages(currentReview).join('\n');
+        document.getElementById('reviewOriginalComment').value = currentReview.originalComment || '';
+        document.getElementById('reviewComment').value = currentReview.comment || '';
+        document.getElementById('reviewHidden').checked = Boolean(currentReview.isHidden);
+    }
+
+    modal.classList.add('open');
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModal')?.classList.remove('open');
+    currentReview = null;
+}
+
+async function handleReviewSubmit(event) {
+    event.preventDefault();
+
+    const button = event.target.querySelector('button[type="submit"]');
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Saving...';
+
+    const reviewData = {
+        name: document.getElementById('reviewName').value.trim(),
+        productName: document.getElementById('reviewProduct').value.trim(),
+        rating: Math.min(5, Math.max(1, Number(document.getElementById('reviewRating').value) || 5)),
+        images: parseReviewImagesInput(document.getElementById('reviewImages').value),
+        originalComment: document.getElementById('reviewOriginalComment').value.trim(),
+        comment: polishReviewComment(document.getElementById('reviewComment').value.trim()),
+        isHidden: document.getElementById('reviewHidden').checked,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    reviewData.image = reviewData.images[0] || '';
+
+    if (!reviewData.originalComment) {
+        reviewData.originalComment = reviewData.comment;
+    }
+
+    try {
+        if (currentReview) {
+            await db.collection('reviews').doc(currentReview.id).set(reviewData, { merge: true });
+            showToast('Review updated.');
+        } else {
+            reviewData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            await db.collection('reviews').add(reviewData);
+            showToast('Review created.');
+        }
+        closeReviewModal();
+    } catch (error) {
+        console.error(error);
+        showToast(`Review save failed: ${error.message}`, 'error');
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}
+
+async function toggleReviewVisibility(reviewId) {
+    const review = reviews.find((entry) => entry.id === reviewId);
+    if (!review) return;
+
+    try {
+        await db.collection('reviews').doc(reviewId).set({
+            isHidden: !review.isHidden,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        showToast(review.isHidden ? 'Review is visible again.' : 'Review hidden.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Review visibility failed: ${error.message}`, 'error');
+    }
+}
+
+async function deleteReview(reviewId) {
+    if (!confirm('Delete this review?')) return;
+
+    try {
+        await db.collection('reviews').doc(reviewId).delete();
+        showToast('Review deleted.');
+    } catch (error) {
+        console.error(error);
+        showToast(`Delete failed: ${error.message}`, 'error');
+    }
+}
+
+function resolveImgurUrl(raw) {
+    let url = raw.trim();
+    if (!url) return null;
+    if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+
+    try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.toLowerCase();
+        if (host === 'i.imgur.com') {
+            if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(parsed.pathname)) return `${url}.jpg`;
+            return url;
+        }
+        if (host === 'imgur.com') {
+            const parts = parsed.pathname.split('/').filter(Boolean);
+            if (parts[0] === 'a' || parts[0] === 'gallery') return null;
+            if (parts[0] && parts[0].length >= 5) return `https://i.imgur.com/${parts[0]}.jpg`;
+        }
+        return url;
+    } catch {
+        return null;
+    }
+}
+
+function initImporter() {
+    buildImporterSizeChips();
+    addImporterUrlRow();
+}
+
+function handleImporterTabSwitch(tab) {
+    document.getElementById('individualTabImporter').style.display = tab === 'individual' ? 'block' : 'none';
+    document.getElementById('bulkTabImporter').classList.toggle('hidden', tab !== 'bulk');
+    document.getElementById('tabIndividual').classList.toggle('active', tab === 'individual');
+    document.getElementById('tabBulk').classList.toggle('active', tab === 'bulk');
+}
+
+function addImporterUrlRow() {
+    if (importerUrlRows.length >= 12) {
+        showToast('Max 12 images', 'error');
+        return;
+    }
+
+    importerRowCounter += 1;
+    importerUrlRows.push({ id: importerRowCounter, value: '', status: 'empty' });
+    renderImporterUrlRows();
+}
+
+function renderImporterUrlRows() {
+    const list = document.getElementById('urlInputList');
+    if (!list) return;
+
+    list.innerHTML = importerUrlRows.map((row, index) => `
+        <div class="url-row">
+            <div class="url-num">${index + 1}</div>
+            <input class="url-input ${row.status}" type="url" placeholder="Imgur URL" value="${escapeHtml(row.value)}" oninput="handleImporterUrlInput(${row.id}, this.value)">
+            <button class="url-remove" onclick="removeImporterUrlRow(${row.id})"><i class="fa-solid fa-xmark"></i></button>
         </div>
     `).join('');
 }
 
-// Make functions globally available
+function handleImporterUrlInput(id, value) {
+    const row = importerUrlRows.find((entry) => entry.id === id);
+    if (!row) return;
+    row.value = value.trim();
+    row.status = row.value ? (/imgur\.com/i.test(row.value) ? 'valid' : 'invalid') : 'empty';
+    renderImporterUrlRows();
+}
+
+function removeImporterUrlRow(id) {
+    importerUrlRows = importerUrlRows.filter((row) => row.id !== id);
+    if (importerUrlRows.length === 0) {
+        importerRowCounter = 0;
+        addImporterUrlRow();
+        return;
+    }
+    renderImporterUrlRows();
+}
+
+function clearImporterUrls() {
+    importerUrlRows = [];
+    importerRowCounter = 0;
+    importerSelectedImages = [];
+    importerPreviewItems = [];
+    document.getElementById('previewCard')?.classList.add('hidden');
+    addImporterUrlRow();
+}
+
+function processBulkImporterPaste() {
+    const text = document.getElementById('bulkPasteArea')?.value || '';
+    const validCount = text.split(/\n|\r/).map((line) => line.trim()).filter((line) => /imgur\.com/i.test(line)).length;
+    showToast(`${validCount} Imgur links detected`, 'info');
+}
+
+function confirmBulkImporterPaste() {
+    const text = document.getElementById('bulkPasteArea')?.value || '';
+    const imgurLines = text.split(/\n|\r/).map((line) => line.trim()).filter((line) => /imgur\.com/i.test(line)).slice(0, 12);
+    if (imgurLines.length === 0) {
+        showToast('No Imgur URLs found', 'error');
+        return;
+    }
+
+    importerUrlRows = imgurLines.map((line) => ({ id: ++importerRowCounter, value: line, status: 'valid' }));
+    handleImporterTabSwitch('individual');
+    renderImporterUrlRows();
+}
+
+async function loadImporterPreviews() {
+    const validRows = importerUrlRows.filter((row) => row.status === 'valid' && row.value);
+    if (validRows.length === 0) {
+        showToast('Add valid Imgur URLs', 'error');
+        return;
+    }
+
+    document.getElementById('importProgress')?.classList.add('show');
+    importerPreviewItems = validRows.map((row) => ({
+        original: row.value,
+        resolved: resolveImgurUrl(row.value),
+        status: 'loading'
+    }));
+    document.getElementById('previewCard')?.classList.remove('hidden');
+    renderImporterPreviewGrid();
+
+    for (let index = 0; index < importerPreviewItems.length; index += 1) {
+        const percent = Math.round(((index + 1) / importerPreviewItems.length) * 100);
+        document.getElementById('progressFill').style.width = `${percent}%`;
+        document.getElementById('progressPct').textContent = `${percent}%`;
+        document.getElementById('progressLabel').textContent = `Resolving image ${index + 1}...`;
+        await verifyImporterImage(importerPreviewItems[index]);
+        renderImporterPreviewItem(index);
+    }
+
+    setImporterStep(2);
+    window.setTimeout(() => document.getElementById('importProgress')?.classList.remove('show'), 2000);
+}
+
+function verifyImporterImage(item) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            item.status = 'loaded';
+            resolve();
+        };
+        img.onerror = () => {
+            item.status = 'error';
+            resolve();
+        };
+        img.src = item.resolved;
+    });
+}
+
+function renderImporterPreviewGrid() {
+    const grid = document.getElementById('previewGrid');
+    if (!grid) return;
+    grid.innerHTML = importerPreviewItems.map((_, index) => `<div class="preview-item-advanced" id="prevItem_${index}"></div>`).join('');
+}
+
+function renderImporterPreviewItem(index) {
+    const item = importerPreviewItems[index];
+    const element = document.getElementById(`prevItem_${index}`);
+    if (!element) return;
+
+    if (item.status === 'loaded') {
+        element.innerHTML = `<img src="${escapeHtml(item.resolved)}"><div class="preview-badge-advanced">${index + 1}</div>`;
+    } else {
+        element.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--accent-red)"><i class="fa-solid fa-circle-exclamation"></i></div>';
+    }
+}
+
+function resetImporterPreviews() {
+    importerPreviewItems = [];
+    importerSelectedImages = [];
+    document.getElementById('previewCard')?.classList.add('hidden');
+    setImporterStep(1);
+}
+
+function confirmImporterImages() {
+    importerSelectedImages = importerPreviewItems.filter((item) => item.status === 'loaded').map((item) => item.resolved);
+    if (importerSelectedImages.length === 0) {
+        showToast('No images confirmed', 'error');
+        return;
+    }
+
+    showToast(`${importerSelectedImages.length} images ready`);
+    document.getElementById('importerFormCard')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function buildImporterSizeChips() {
+    const container = document.getElementById('impSizeChips');
+    if (!container) return;
+    container.innerHTML = IMPORTER_SIZES.map((size) => `
+        <div class="size-chip ${importerSelectedSizes.includes(size) ? 'selected' : ''}" onclick="toggleImporterSize('${size}', this)">${size}</div>
+    `).join('');
+}
+
+function toggleImporterSize(size, el) {
+    if (importerSelectedSizes.includes(size)) {
+        importerSelectedSizes = importerSelectedSizes.filter((entry) => entry !== size);
+        el.classList.remove('selected');
+    } else {
+        importerSelectedSizes.push(size);
+        el.classList.add('selected');
+    }
+}
+
+async function publishImporterProduct() {
+    const name = document.getElementById('impName').value.trim();
+    const resell = parseFloat(document.getElementById('impResell').value);
+    if (!name || !resell || importerSelectedImages.length === 0 || importerSelectedSizes.length === 0) {
+        showToast('Please complete all required fields', 'error');
+        return;
+    }
+
+    const productData = {
+        name,
+        brand: document.getElementById('impBrand').value,
+        sku: document.getElementById('impSku').value.trim(),
+        price: resell,
+        image: importerSelectedImages[0],
+        images: importerSelectedImages,
+        imageFit: normalizeImageFit('', { name, sku: document.getElementById('impSku').value.trim() }),
+        imagePosition: '50% 52%',
+        imageOffsetX: 50,
+        imageOffsetY: 52,
+        imageScale: normalizeImageScale('', { name, brand: document.getElementById('impBrand').value, category: 'Sneakers' }),
+        sizes: importerSelectedSizes.map((size) => ({ size, stock: 10, price: resell })),
+        category: 'Sneakers',
+        releaseDate: normalizeReleaseDate(document.getElementById('impReleaseDate').value) || 'TBD',
+        description: document.getElementById('impDesc').value.trim(),
+        status: 'active',
+        isHidden: document.getElementById('impHidden').checked,
+        isOutOfStock: document.getElementById('impOutOfStock').checked,
+        isFeatured: document.getElementById('impFeatured').checked,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+        await db.collection('products').doc(Date.now().toString()).set(productData, { merge: true });
+        showToast(`Published: ${name}`);
+        setImporterStep(3);
+        document.getElementById('impName').value = '';
+        document.getElementById('impSku').value = '';
+        document.getElementById('impRetail').value = '';
+        document.getElementById('impResell').value = '';
+        document.getElementById('impDesc').value = '';
+        document.getElementById('impReleaseDate').value = '';
+        document.getElementById('impHidden').checked = false;
+        document.getElementById('impOutOfStock').checked = false;
+        document.getElementById('impFeatured').checked = false;
+        importerSelectedSizes = [];
+        buildImporterSizeChips();
+        clearImporterUrls();
+        resetImporterPreviews();
+    } catch (error) {
+        console.error(error);
+        showToast('Failed to publish to cloud', 'error');
+    }
+}
+
+function setImporterStep(step) {
+    for (let index = 1; index <= 3; index += 1) {
+        const number = document.getElementById(`step${index}num`);
+        const label = document.getElementById(`step${index}label`);
+        if (!number || !label) continue;
+        number.className = `step-num${index < step ? ' done' : index === step ? ' active' : ''}`;
+        label.className = index === step ? 'active' : '';
+        number.textContent = index;
+        if (index < step) number.innerHTML = '<i class="fa-solid fa-check"></i>';
+    }
+}
+
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icons = { success: '+', error: '!', info: 'i' };
+    toast.innerHTML = `<span>${icons[type] || '+'}</span><span>${escapeHtml(message)}</span>`;
+    container.appendChild(toast);
+    window.setTimeout(() => toast.remove(), 3000);
+}
+
+function animateCounter(el, target, prefix = '') {
+    if (!el) return;
+    const duration = 1000;
+    const start = performance.now();
+
+    function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        el.textContent = `${prefix}${Math.floor(progress * target).toLocaleString()}`;
+        if (progress < 1) requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+}
+
+function renderChart() {
+    const container = document.getElementById('chartBars');
+    if (!container) return;
+    const max = Math.max(...chartData.map((entry) => entry.val));
+    container.innerHTML = chartData.map((entry) => `
+        <div class="chart-bar-wrap">
+            <div class="chart-bar ${entry.active ? 'active' : ''}" style="height:${(entry.val / max) * 100}%" title="${entry.label}: $${entry.val * 100}"></div>
+            <span class="chart-label">${entry.label}</span>
+        </div>
+    `).join('');
+}
+
+function toggleNotifPanel() {
+    document.getElementById('notifPanel')?.classList.toggle('open');
+}
+
+function renderProductImagePreviewThumbs(urls) {
+    const container = document.getElementById('productImagePreviewThumbs');
+    if (!container) return;
+
+    if (!urls.length) {
+        container.innerHTML = '<div class="product-media-thumb-empty">No Images</div>';
+        return;
+    }
+
+    container.innerHTML = urls.map((url, index) => `
+        <button
+            type="button"
+            class="product-media-thumb ${index === activeProductPreviewIndex ? 'active' : ''}"
+            onclick="selectProductPreviewImage(${index})"
+            aria-label="Preview image ${index + 1}">
+            <img src="${escapeHtml(url)}" alt="Preview thumbnail ${index + 1}">
+        </button>
+    `).join('');
+}
+
+function updateProductImagePreview() {
+    const image = document.getElementById('productImagePreview');
+    const draft = collectProductImageDraft();
+    const previewUrls = draft.urls;
+    if (activeProductPreviewIndex >= previewUrls.length) {
+        activeProductPreviewIndex = 0;
+    }
+
+    const url = previewUrls[activeProductPreviewIndex] || '';
+    const fit = normalizeImageFit(document.getElementById('productImageFit')?.value, {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    });
+    const scale = normalizeImageScale(document.getElementById('productImageScale')?.value, {
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value
+    });
+    const offsetX = clamp(Number(document.getElementById('productImageOffsetX')?.value || 50), 0, 100);
+    const offsetY = clamp(Number(document.getElementById('productImageOffsetY')?.value || 50), 0, 100);
+    const padding = getProductImagePadding({
+        imageFit: fit,
+        category: document.getElementById('productCategory')?.value,
+        brand: document.getElementById('productBrand')?.value,
+        name: document.getElementById('productName')?.value,
+        sku: document.getElementById('productSKU')?.value
+    }, 6);
+
+    document.getElementById('productImagePosition').value = `${offsetX}% ${offsetY}%`;
+    document.getElementById('productImageScaleValue').textContent = `${Math.round(scale * 100)}%`;
+    document.getElementById('productImageOffsetXValue').textContent = `${Math.round(offsetX)}%`;
+    document.getElementById('productImageOffsetYValue').textContent = `${Math.round(offsetY)}%`;
+    document.getElementById('productImagePreviewSummary').textContent = `${fit === 'contain' ? 'Contain' : 'Cover'} · ${Math.round(scale * 100)}%`;
+
+    renderProductImagePreviewThumbs(previewUrls);
+
+    const previewStatus = document.getElementById('productImagePreviewStatus');
+    if (previewStatus) {
+        if (draft.invalid.length > 0) {
+            previewStatus.textContent = 'Some links could not be previewed. Use direct image links or single-image Imgur pages.';
+        } else if (previewUrls.length > 1) {
+            previewStatus.textContent = `Previewing image ${activeProductPreviewIndex + 1} of ${previewUrls.length}. Click a thumbnail to switch.`;
+        } else if (previewUrls.length === 1) {
+            previewStatus.textContent = 'Adjust zoom and framing until the storefront card looks right.';
+        } else {
+            previewStatus.textContent = 'Paste a valid image URL to preview it here.';
+        }
+    }
+
+    if (image) {
+        image.onerror = null;
+        image.src = url || 'https://via.placeholder.com/500x500/111111/c6ff4c?text=Preview';
+        image.onerror = () => {
+            image.onerror = null;
+            image.src = 'https://via.placeholder.com/500x500/111111/c6ff4c?text=Preview';
+        };
+        image.style.objectFit = fit;
+        image.style.objectPosition = `${offsetX}% ${offsetY}%`;
+        image.style.padding = padding;
+        image.style.transform = `scale(${scale})`;
+    }
+}
+
+window.selectProductPreviewImage = (index) => {
+    activeProductPreviewIndex = index;
+    updateProductImagePreview();
+};
+
+window.switchTab = switchTab;
 window.viewOrder = viewOrder;
-window.updateOrderStatus = updateOrderStatus;
-window.editProduct = editProduct;
-window.switchTab = switchSection;
-window.toggleProductFeatured = toggleProductFeatured;
+window.renderOffers = renderOffers;
+window.updateOfferStatus = updateOfferStatus;
+window.counterOffer = counterOffer;
+window.deleteOffer = deleteOffer;
+window.openProductModal = openProductModal;
+window.openReviewModal = openReviewModal;
+window.closeModal = closeModal;
+window.closeOrderModal = closeOrderModal;
+window.closeReviewModal = closeReviewModal;
+window.updateProductReleaseDate = updateProductReleaseDate;
 window.toggleProductVisibility = toggleProductVisibility;
+window.toggleProductFeatured = toggleProductFeatured;
 window.toggleOutOfStock = toggleOutOfStock;
+window.toggleReviewVisibility = toggleReviewVisibility;
+window.deleteReview = deleteReview;
+window.handleImporterTabSwitch = handleImporterTabSwitch;
+window.addImporterUrlRow = addImporterUrlRow;
+window.handleImporterUrlInput = handleImporterUrlInput;
+window.removeImporterUrlRow = removeImporterUrlRow;
+window.clearImporterUrls = clearImporterUrls;
+window.processBulkImporterPaste = processBulkImporterPaste;
+window.confirmBulkImporterPaste = confirmBulkImporterPaste;
+window.loadImporterPreviews = loadImporterPreviews;
+window.resetImporterPreviews = resetImporterPreviews;
+window.confirmImporterImages = confirmImporterImages;
+window.toggleImporterSize = toggleImporterSize;
+window.publishImporterProduct = publishImporterProduct;
+window.generateReviewProfiles = generateReviewProfiles;
+window.shuffleGeneratedReviewNames = shuffleGeneratedReviewNames;
+window.copyGeneratedReviewsJson = copyGeneratedReviewsJson;
+window.saveGeneratedReviews = saveGeneratedReviews;
+window.toggleNotifPanel = toggleNotifPanel;

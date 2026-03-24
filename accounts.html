@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backdoor — Account System</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="accounts.css" />
+</head>
+
+<body>
+
+    <!-- ══ NAVBAR ══ -->
+    <nav class="navbar">
+        <a class="nav-logo" href="index.html">BACK<span>DOOR</span></a>
+        <div class="nav-links">
+            <a href="index.html">Shop</a>
+            <a href="#">Brands</a>
+            <a href="#">New Drops</a>
+            <a href="#">About</a>
+        </div>
+        <div class="nav-right">
+            <button class="wishlist-nav-btn" onclick="openWishlistPanel()" id="wishlistNavBtn" title="Wishlist">
+                <i class="fa-regular fa-heart"></i>
+                <span class="badge hidden" id="wishlistBadge">0</span>
+            </button>
+            <div id="authButtons">
+                <button class="btn-login" onclick="openAuth('login')">Log In</button>
+                <button class="btn-signup" onclick="openAuth('register')">Sign Up</button>
+            </div>
+            <div class="user-menu-wrap hidden" id="userMenu">
+                <div class="user-avatar-btn" onclick="toggleUserDropdown()">
+                    <div class="user-avatar" id="navAvatar">?</div>
+                    <span id="navName">User</span>
+                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <p id="dropName">—</p>
+                        <span id="dropEmail">—</span>
+                    </div>
+                    <a class="dropdown-item" onclick="showAccountPage('overview')"><i class="fa-solid fa-chart-pie"></i>
+                        Dashboard</a>
+                    <a class="dropdown-item" onclick="showAccountPage('orders')"><i class="fa-solid fa-box"></i> My
+                        Orders</a>
+                    <a class="dropdown-item" onclick="showAccountPage('wishlist')"><i class="fa-regular fa-heart"></i>
+                        Wishlist</a>
+                    <a class="dropdown-item" onclick="showAccountPage('profile')"><i class="fa-solid fa-user"></i>
+                        Profile</a>
+                    <a class="dropdown-item" onclick="showAccountPage('notifications')"><i class="fa-solid fa-bell"></i>
+                        Alerts</a>
+                    <a class="dropdown-item danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i>
+                        Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══ AUTH MODAL ══ -->
+    <div class="modal-overlay" id="authModal" onclick="closeAuthOnOverlay(event)">
+        <div class="auth-modal">
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">LOGIN</button>
+                <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">SIGN UP</button>
+            </div>
+
+            <!-- LOGIN -->
+            <div class="auth-body" id="loginForm">
+                <h2 class="auth-title">WELCOME BACK</h2>
+                <p class="auth-sub">Sign in to your Backdoor account</p>
+                <div class="social-btns">
+                    <button class="social-btn" onclick="socialLogin('Google')"><i
+                            class="fa-brands fa-google icon-google"></i> Google</button>
+                    <button class="social-btn" onclick="socialLogin('Apple')"><i class="fa-brands fa-apple"></i>
+                        Apple</button>
+                </div>
+                <div class="divider">
+                    <div class="divider-line"></div><span>or continue with email</span>
+                    <div class="divider-line"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <div class="form-input-wrap">
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                        <input class="form-input" type="email" id="loginEmail" placeholder="your@email.com"
+                            oninput="clearError('loginEmailErr')" />
+                    </div>
+                    <div class="form-error" id="loginEmailErr">Please enter a valid email</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="form-input-wrap">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input class="form-input" type="password" id="loginPassword" placeholder="••••••••"
+                            onkeydown="if(event.key==='Enter') handleLogin()" oninput="clearError('loginPassErr')" />
+                        <button class="input-toggle" onclick="togglePass('loginPassword', this)" type="button"
+                            title="Toggle password visibility"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="form-error" id="loginPassErr">Incorrect password</div>
+                </div>
+                <div class="forgot-row"><a class="link-accent"
+                        onclick="showToast('Password reset coming soon', 'info')">Forgot password?</a></div>
+                <button class="auth-submit" id="loginSubmitBtn" onclick="handleLogin()">LOG IN</button>
+                <div class="auth-footer">Don't have an account? <a onclick="switchAuthTab('register')">Sign up free</a>
+                </div>
+            </div>
+
+            <!-- REGISTER -->
+            <div class="auth-body hidden" id="registerForm">
+                <h2 class="auth-title">JOIN BACKDOOR</h2>
+                <p class="auth-sub">Create your free account — it takes 30 seconds</p>
+                <div class="social-btns">
+                    <button class="social-btn" onclick="socialLogin('Google')"><i
+                            class="fa-brands fa-google icon-google"></i> Google</button>
+                    <button class="social-btn" onclick="socialLogin('Apple')"><i class="fa-brands fa-apple"></i>
+                        Apple</button>
+                </div>
+                <div class="divider">
+                    <div class="divider-line"></div><span>or sign up with email</span>
+                    <div class="divider-line"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <div class="form-input-wrap"><i class="fa-solid fa-user input-icon"></i><input
+                                class="form-input" type="text" id="regFirst" placeholder="Marcus" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <div class="form-input-wrap"><i class="fa-solid fa-user input-icon"></i><input
+                                class="form-input" type="text" id="regLast" placeholder="Johnson" /></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <div class="form-input-wrap"><i class="fa-solid fa-envelope input-icon"></i><input
+                            class="form-input" type="email" id="regEmail" placeholder="your@email.com"
+                            oninput="validateRegEmail()" /></div>
+                    <div class="form-error" id="regEmailErr">Please enter a valid email</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="form-input-wrap">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input class="form-input" type="password" id="regPassword"
+                            placeholder="Create a strong password" oninput="checkPasswordStrength(this.value)" />
+                        <button class="input-toggle" onclick="togglePass('regPassword', this)" type="button"
+                            title="Toggle password visibility"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="strength-bar" id="strengthBar">
+                        <div class="strength-seg" id="seg1"></div>
+                        <div class="strength-seg" id="seg2"></div>
+                        <div class="strength-seg" id="seg3"></div>
+                        <div class="strength-seg" id="seg4"></div>
+                    </div>
+                    <div class="strength-label" id="strengthLabel"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Shoe Size (US)</label>
+                    <div class="form-input-wrap">
+                        <i class="fa-solid fa-shoe-prints input-icon"></i>
+                        <select class="form-input form-input--select" id="regSize" title="Shoe Size">
+                            <option value="">Select your size...</option>
+                            <option>6</option>
+                            <option>6.5</option>
+                            <option>7</option>
+                            <option>7.5</option>
+                            <option>8</option>
+                            <option>8.5</option>
+                            <option>9</option>
+                            <option>9.5</option>
+                            <option>10</option>
+                            <option>10.5</option>
+                            <option>11</option>
+                            <option>11.5</option>
+                            <option>12</option>
+                            <option>13</option>
+                            <option>14</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="checkbox-wrap"><input type="checkbox" id="regTerms" /><label for="regTerms">I agree to the
+                        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I'm 18 or older.</label>
+                </div>
+                <div class="checkbox-wrap mb-0"><input type="checkbox" id="regAlerts" checked /><label
+                        for="regAlerts">Send me restock alerts and price drop notifications 🔔</label></div>
+                <button class="auth-submit mt-20" id="regSubmitBtn" onclick="handleRegister()">CREATE ACCOUNT</button>
+                <div class="auth-footer">Already have an account? <a onclick="switchAuthTab('login')">Log in</a></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ DEMO HOMEPAGE ══ -->
+    <div class="demo-home" id="homePage">
+        <div class="hero">
+            <div>
+                <h1>STEP INTO<br /><span>THE BACKDOOR</span></h1>
+                <p>Authenticated sneakers · Best prices · Fastest shipping</p>
+                <div class="hero-btns">
+                    <button class="btn-signup hero-btn" onclick="openAuth('register')">Create Account</button>
+                    <button class="btn-login hero-btn" onclick="openAuth('login')">Sign In</button>
+                </div>
+            </div>
+        </div>
+        <div class="product-section">
+            <div class="section-header">
+                <h2 class="section-title lg">FRESH <span>DROPS</span></h2>
+                <button class="section-action">View All →</button>
+            </div>
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+    </div>
+
+    <!-- ══ ACCOUNT DASHBOARD ══ -->
+    <div class="account-page hidden" id="accountPage">
+        <div class="account-hero">
+            <div class="account-hero-inner">
+                <div class="account-avatar-large" id="heroAvatar">?</div>
+                <div class="account-hero-info">
+                    <h2 id="heroName">—</h2>
+                    <p id="heroEmail">—</p>
+                    <p class="hero-member-date" id="heroMember"></p>
+                </div>
+                <div class="loyalty-badge">
+                    <div class="tier" id="loyaltyTier">BRONZE</div>
+                    <div class="points"><span id="loyaltyPoints">500</span> pts</div>
+                    <div class="loyalty-next">500 to Silver</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="account-nav">
+            <div class="acc-nav-item active" onclick="switchAccTab('overview', this)"><i
+                    class="fa-solid fa-chart-pie"></i> Overview</div>
+            <div class="acc-nav-item" onclick="switchAccTab('orders', this)"><i class="fa-solid fa-box"></i> Orders
+                <span class="nav-count-badge accent-bg" id="orderCountBadge">3</span>
+            </div>
+            <div class="acc-nav-item" onclick="switchAccTab('wishlist', this)"><i class="fa-regular fa-heart"></i>
+                Wishlist <span class="nav-count-badge red-bg" id="wishlistCountBadge">0</span></div>
+            <div class="acc-nav-item" onclick="switchAccTab('profile', this)"><i class="fa-solid fa-user"></i> Profile
+            </div>
+            <div class="acc-nav-item" onclick="switchAccTab('addresses', this)"><i class="fa-solid fa-location-dot"></i>
+                Addresses</div>
+            <div class="acc-nav-item" onclick="switchAccTab('notifications', this)"><i class="fa-solid fa-bell"></i>
+                Alerts</div>
+            <div class="acc-nav-item" onclick="switchAccTab('loyalty', this)"><i class="fa-solid fa-trophy"></i> Loyalty
+            </div>
+        </div>
+
+        <div class="account-content">
+            <!-- OVERVIEW -->
+            <div class="acc-tab-content active" id="tab-overview">
+                <div class="overview-grid">
+                    <div class="ov-card">
+                        <div class="ov-icon">📦</div>
+                        <div class="ov-value">3</div>
+                        <div class="ov-label">Total Orders</div>
+                    </div>
+                    <div class="ov-card">
+                        <div class="ov-icon">❤️</div>
+                        <div class="ov-value" id="ovWishlist">0</div>
+                        <div class="ov-label">Wishlist Items</div>
+                    </div>
+                    <div class="ov-card">
+                        <div class="ov-icon">⭐</div>
+                        <div class="ov-value">500</div>
+                        <div class="ov-label">Loyalty Points</div>
+                    </div>
+                    <div class="ov-card">
+                        <div class="ov-icon">💰</div>
+                        <div class="ov-value">$1,230</div>
+                        <div class="ov-label">Total Spent</div>
+                    </div>
+                </div>
+                <div class="section-header">
+                    <h3 class="section-title">RECENT <span>ORDERS</span></h3><button class="section-action"
+                        onclick="switchAccTab('orders', document.querySelector('[onclick*=orders]'))">View All
+                        →</button>
+                </div>
+                <div id="overviewOrders"></div>
+            </div>
+
+            <!-- ORDERS -->
+            <div class="acc-tab-content" id="tab-orders">
+                <div class="section-header">
+                    <h3 class="section-title">MY <span>ORDERS</span></h3>
+                    <select class="filter-select" title="Filter Orders">
+                        <option>All Orders</option>
+                        <option>Processing</option>
+                        <option>Shipped</option>
+                        <option>Delivered</option>
+                    </select>
+                </div>
+                <div id="ordersTab"></div>
+            </div>
+
+            <!-- WISHLIST -->
+            <div class="acc-tab-content" id="tab-wishlist">
+                <div class="section-header">
+                    <h3 class="section-title">MY <span>WISHLIST</span></h3><span class="wishlist-count-label"
+                        id="wishlistTabCount">0 items</span>
+                </div>
+                <div class="wishlist-grid" id="wishlistGrid"></div>
+                <div id="wishlistEmpty" class="hidden">
+                    <div class="empty-wishlist">
+                        <i class="fa-regular fa-heart"></i>
+                        <h3>YOUR WISHLIST IS EMPTY</h3>
+                        <p>Save shoes you love — get notified when prices drop or sizes restock</p>
+                        <button class="btn-signup" onclick="showPage('home')">Browse Shoes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROFILE -->
+            <div class="acc-tab-content" id="tab-profile">
+                <div class="section-header">
+                    <h3 class="section-title">PROFILE <span>SETTINGS</span></h3><button class="btn-signup save-btn"
+                        onclick="saveProfile()">Save Changes</button>
+                </div>
+                <div class="profile-card">
+                    <div class="profile-grid">
+                        <div class="form-group"><label class="form-label">First Name</label>
+                            <div class="form-input-wrap"><i class="fa-solid fa-user input-icon"></i><input
+                                    class="form-input" type="text" id="profileFirst" placeholder="First name" /></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Last Name</label>
+                            <div class="form-input-wrap"><i class="fa-solid fa-user input-icon"></i><input
+                                    class="form-input" type="text" id="profileLast" placeholder="Last name" /></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Email</label>
+                            <div class="form-input-wrap"><i class="fa-solid fa-envelope input-icon"></i><input
+                                    class="form-input" type="email" id="profileEmail" placeholder="Email address" />
+                            </div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Phone</label>
+                            <div class="form-input-wrap"><i class="fa-solid fa-phone input-icon"></i><input
+                                    class="form-input" type="tel" id="profilePhone" placeholder="+1 (555) 000-0000" />
+                            </div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Shoe Size (US)</label>
+                            <div class="form-input-wrap"><i class="fa-solid fa-shoe-prints input-icon"></i><input
+                                    class="form-input" type="text" id="profileSize" placeholder="e.g. 10" /></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Birthday</label>
+                            <div class="form-input-wrap"><i class="fa-solid fa-cake-candles input-icon"></i><input
+                                    class="form-input" type="date" id="profileBday" title="Birthday" /></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADDRESSES -->
+            <div class="acc-tab-content" id="tab-addresses">
+                <div class="section-header">
+                    <h3 class="section-title">SHIPPING <span>ADDRESSES</span></h3><button class="section-action"
+                        onclick="showToast('Add address form coming soon', 'info')"><i class="fa-solid fa-plus"></i> Add
+                        Address</button>
+                </div>
+                <div class="addresses-grid">
+                    <div class="address-card default">
+                        <span class="default-badge">DEFAULT</span>
+                        <h4>Home</h4>
+                        <p>123 Sneaker Lane<br />Brooklyn, NY 11201<br />United States</p>
+                    </div>
+                    <div class="address-card">
+                        <h4>Office</h4>
+                        <p>456 Hype Street, Apt 12B<br />Los Angeles, CA 90001<br />United States</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTIFICATIONS -->
+            <div class="acc-tab-content" id="tab-notifications">
+                <div class="section-header">
+                    <h3 class="section-title">ALERT <span>PREFERENCES</span></h3>
+                </div>
+                <div class="pref-list">
+                    <div class="pref-item">
+                        <div class="pref-info">
+                            <h4>Price Drop Alerts</h4>
+                            <p>Get notified when wishlist items drop in price</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="pref-item">
+                        <div class="pref-info">
+                            <h4>Restock Notifications</h4>
+                            <p>Know when sold-out sizes come back</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="pref-item">
+                        <div class="pref-info">
+                            <h4>New Releases</h4>
+                            <p>First to know about new drops</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="pref-item">
+                        <div class="pref-info">
+                            <h4>Order Updates</h4>
+                            <p>Shipping and delivery notifications</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="pref-item">
+                        <div class="pref-info">
+                            <h4>Marketing Emails</h4>
+                            <p>Exclusive deals and promotions</p>
+                        </div>
+                        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOYALTY -->
+            <div class="acc-tab-content" id="tab-loyalty">
+                <div class="section-header">
+                    <h3 class="section-title">LOYALTY <span>PROGRAM</span></h3>
+                </div>
+                <div class="loyalty-section">
+                    <div class="section-title">YOUR PROGRESS</div>
+                    <div class="points-bar-wrap">
+                        <div class="points-bar-track">
+                            <div class="points-bar-fill" id="loyaltyBar"></div>
+                        </div>
+                        <div class="points-bar-labels"><span>0</span><span>Bronze (500)</span><span>Silver
+                                (1000)</span><span>Gold (2500)</span><span>Platinum (5000)</span></div>
+                    </div>
+                    <div class="loyalty-tiers">
+                        <div class="tier-card current"><span class="tier-current-badge">YOU ARE HERE</span>
+                            <div class="tier-icon">🥉</div>
+                            <div class="tier-name">BRONZE</div>
+                            <div class="tier-req">0 – 999 pts</div>
+                        </div>
+                        <div class="tier-card">
+                            <div class="tier-icon">🥈</div>
+                            <div class="tier-name">SILVER</div>
+                            <div class="tier-req">1,000 – 2,499</div>
+                        </div>
+                        <div class="tier-card">
+                            <div class="tier-icon">🥇</div>
+                            <div class="tier-name">GOLD</div>
+                            <div class="tier-req">2,500 – 4,999</div>
+                        </div>
+                        <div class="tier-card">
+                            <div class="tier-icon">💎</div>
+                            <div class="tier-name">PLATINUM</div>
+                            <div class="tier-req">5,000+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        window.firebaseConfig = {
+            apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+            authDomain: "coalition-aec44.firebaseapp.com",
+            projectId: "coalition-aec44",
+            storageBucket: "coalition-aec44.firebasestorage.app",
+            messagingSenderId: "312196142925",
+            appId: "1:312196142925:web:ba090f602c8b5a31b20904",
+            measurementId: "G-SPJ2FDLSKZ"
+        };
+    </script>
+    <script src="accounts.js"></script>
+    <script src="analytics.js"></script>
+</body>
+
+</html>

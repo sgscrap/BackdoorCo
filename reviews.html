@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backdoor | Reviews</title>
+    <meta name="description" content="Customer-style review posts from the Backdoor community.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="store.css">
+</head>
+
+<body class="reviews-page-body">
+    <nav class="navbar" id="navbar">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-mark">B</div>
+            BACK<span>DOOR</span>
+        </a>
+        <div class="nav-center">
+            <a class="nav-link" href="shop-all.html">SHOP</a>
+            <a class="nav-link" href="men.html">Men</a>
+            <a class="nav-link" href="women.html">Women</a>
+            <a class="nav-link" href="kids.html">Kids</a>
+            <details class="nav-dropdown">
+                <summary class="nav-link nav-dropdown-toggle active">Browse <i class="fa-solid fa-chevron-down"></i></summary>
+                <div class="nav-dropdown-menu">
+                    <a class="nav-dropdown-link" href="shoes.html">Shoes</a>
+                    <a class="nav-dropdown-link" href="apparel.html">Apparel</a>
+                    <a class="nav-dropdown-link" href="accessories.html">Accessories</a>
+                    <a class="nav-dropdown-link" href="electronics.html">Electronics</a>
+                    <a class="nav-dropdown-link active" href="reviews.html">Reviews</a>
+                </div>
+            </details>
+        </div>
+        <div class="nav-right">
+            <a class="btn-hero-secondary" href="index.html">Back Home</a>
+        </div>
+    </nav>
+
+    <main class="reviews-page-shell">
+        <section class="reviews-hero">
+            <p class="product-review-eyebrow">Community Posts</p>
+            <h1>All Reviews</h1>
+            <p>Real-looking customer posts, fit pics, and quick reactions linked to the pairs people actually bought.</p>
+        </section>
+
+        <section class="reviews-page-grid" id="reviewsPageGrid">
+            <div class="reviews-empty-state">Loading reviews...</div>
+        </section>
+    </main>
+
+    <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out;">
+        <img id="lightboxImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none;" oncontextmenu="return false;" draggable="false">
+    </div>
+
+    <script type="module" src="reviews.js"></script>
+    <script>
+        window.openLightbox = (src) => {
+            const lb = document.getElementById('imageLightbox');
+            const img = document.getElementById('lightboxImage');
+            if (lb && img && src) {
+                img.src = src;
+                lb.style.display = 'flex';
+            }
+        };
+        window.closeLightbox = (e) => {
+            const lb = document.getElementById('imageLightbox');
+            if (lb) lb.style.display = 'none';
+        };
+    </script>
+
+  <!-- Firebase SDKs & Global Auth -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+      window.firebaseConfig = {
+          apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+          authDomain: "coalition-aec44.firebaseapp.com",
+          projectId: "coalition-aec44",
+          storageBucket: "coalition-aec44.firebasestorage.app",
+          messagingSenderId: "312196142925",
+          appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+      };
+  </script>
+  <script src="auth.js"></script>
+</body>
+
+
+</html>

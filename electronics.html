@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop All | Backdoor</title>
+    <!-- SEO Tags -->
+    <meta name="description"
+        content="Browse our full collection of premium authenticated sneakers and apparel at Backdoor.">
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Styles -->
+    <link rel="stylesheet" href="store.css">
+    <link rel="stylesheet" href="shop-all.css">
+</head>
+
+<body class="shop-all-page">
+
+    <!-- ══ ANNOUNCEMENT BAR ══ -->
+    <div class="announce-bar" id="announceBar">
+        <div class="announce-shell">
+            <div class="announce-copy">
+                <span class="announce-kicker">Just Dropped</span>
+                <span class="announce-headline">Jordan 4 Military Blue</span>
+            </div>
+            <div class="announce-pills" aria-label="Store highlights">
+                <span class="announce-pill">Free shipping $150+</span>
+                <span class="announce-pill">100% authenticated</span>
+            </div>
+        </div>
+        <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- ══ NAVBAR ══ -->
+    <nav class="navbar announce-offset" id="navbar">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-mark">B</div>
+            BACK<span>DOOR</span>
+        </a>
+        <div class="nav-center">
+            <a class="nav-link" href="shop-all.html">SHOP</a>
+            <a class="nav-link" href="men.html">Men</a>
+            <a class="nav-link" href="women.html">Women</a>
+            <a class="nav-link" href="kids.html">Kids</a>
+            <details class="nav-dropdown">
+                <summary class="nav-link nav-dropdown-toggle active">Browse <i class="fa-solid fa-chevron-down"></i></summary>
+                <div class="nav-dropdown-menu">
+                    <a class="nav-dropdown-link" href="shoes.html">Shoes</a>
+                    <a class="nav-dropdown-link" href="apparel.html">Apparel</a>
+                    <a class="nav-dropdown-link" href="accessories.html">Accessories</a>
+                    <a class="nav-dropdown-link active" href="electronics.html">Electronics</a>
+                    <a class="nav-dropdown-link" href="reviews.html">Reviews</a>
+                </div>
+            </details>
+        </div>
+        <div class="nav-right">
+            <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span class="cart-pill" id="cartCount">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ══ SHOP HERO ══ -->
+    <section class="shop-all-hero">
+        <div class="shop-hero-inner">
+            <div class="shop-hero-left">
+                <h1>ALL <span class="green-text">PRODUCTS</span></h1>
+                <p id="shopAllSubtitle">Browse the full collection.</p>
+            </div>
+            <div class="shop-hero-right">
+                <div class="shop-search-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" id="shopSearch" placeholder="Search brand, name, SKU...">
+                    <button class="clear-search d-none" id="clearSearch">✕</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ MAIN LAYOUT WRAPPER ══ -->
+    <div class="shop-layout-wrapper">
+
+        <!-- ══ SIDEBAR (FILTERS) ══ -->
+        <aside class="shop-sidebar">
+            <!-- CATEGORY ACCORDION -->
+            <div class="sidebar-accordion open">
+                <div class="accordion-header">
+                    <h3>CATEGORY</h3>
+                    <i class="fa-solid fa-chevron-up"></i>
+                </div>
+                <!-- Note: The existing filters are adapted here to match screenshot names 
+                     with fallback data-filters that match our Firebase structure -->
+                <div class="accordion-content shop-filter-tabs" id="filterTabs">
+                    <button class="shop-filter-tab active" data-filter="all">
+                        All <span class="tab-count" id="count-all">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Apparel">
+                        Apparel <span class="tab-count" id="count-Apparel">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Sneakers">
+                        Sneakers <span class="tab-count" id="count-Sneakers">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Accessories">
+                        Accessories <span class="tab-count" id="count-Accessories">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Shoes">
+                        Shoes <span class="tab-count" id="count-Shoes">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Electronics">
+                        Electronics <span class="tab-count" id="count-Electronics">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Collectibles">
+                        Collectibles <span class="tab-count" id="count-Collectibles">(0)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- BRANDS ACCORDION -->
+            <div class="sidebar-accordion">
+                <div class="accordion-header">
+                    <h3>BRANDS</h3>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content shop-filter-tabs">
+                    <button class="shop-filter-tab" data-filter="Jordan">
+                        Jordan <span class="tab-count" id="count-Jordan">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Nike">
+                        Nike <span class="tab-count" id="count-Nike">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Adidas">
+                        Adidas <span class="tab-count" id="count-Adidas">(0)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ACTIVITY ACCORDION -->
+            <div class="sidebar-accordion">
+                <div class="accordion-header">
+                    <h3>ACTIVITY</h3>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content">
+                    <!-- Placeholder content for visual scaling -->
+                </div>
+            </div>
+
+            <!-- COLOR ACCORDION -->
+            <div class="sidebar-accordion">
+                <div class="accordion-header">
+                    <h3>COLOR</h3>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content">
+                    <!-- Placeholder content -->
+                </div>
+            </div>
+
+            <!-- PRICE ACCORDION -->
+            <div class="sidebar-accordion">
+                <div class="accordion-header">
+                    <h3>PRICE</h3>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content">
+                    <!-- Placeholder content -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- ══ MAIN CONTENT (GRID + CONTROLS) ══ -->
+        <main class="shop-main-content">
+
+            <!-- Controls Top Bar (Results count + Sort) -->
+            <div class="shop-controls-top">
+                <div class="shop-results-inner">
+                    <span id="resultsCount">Loading products...</span>
+                </div>
+
+                <select id="shopSort" class="shop-sort-select" title="Sort products">
+                    <option value="price-high" selected>Price: High → Low</option>
+                    <option value="price-low">Price: Low → High</option>
+                    <option value="newest">Newest First</option>
+                    <option value="featured">Featured</option>
+                    <option value="name">A → Z</option>
+                </select>
+            </div>
+
+            <!-- ══ PRODUCT GRID ══ -->
+            <section class="shop-all-grid-section">
+                <!-- Skeleton Grid -->
+                <div class="shop-skeleton-grid" id="shopLoading">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+
+                <!-- Real Product Grid -->
+                <div class="shop-all-grid d-none" id="shopAllGrid"></div>
+
+                <!-- No Results -->
+                <div class="shop-no-results d-none" id="shopNoResults">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <h3>No products found</h3>
+                    <p id="noResultsMsg">Try a different filter or search term.</p>
+                    <button class="clear-filters-btn" id="clearFiltersBtn">Clear Filters</button>
+                </div>
+            </section>
+        </main>
+    </div> <!-- END LAYOUT WRAPPER -->
+
+    <!-- ══ BACK TO TOP ══ -->
+    <button class="back-top-btn" id="backTopBtn" title="Back to Top">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+    <!-- ══ TOAST ══ -->
+    <div class="shop-toast" id="shopToast">✓ Added to cart!</div>
+
+    <!-- ══ PRODUCT MODAL (from old layout) ══ -->
+    <div class="modal" id="productModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose" aria-label="Close Modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-body">
+                <div class="modal-badge-container">
+                    <span id="modalBadge" class="modal-badge"></span>
+                </div>
+                <img src="" alt="Product Image" class="modal-image" id="modalImage" />
+                <div class="modal-details">
+                    <div class="modal-category" id="modalCategory">Sneakers</div>
+                    <h2 class="modal-name" id="modalTitle"></h2>
+                    <div class="modal-sku" id="modalSku"></div>
+                    <div class="modal-colorway" id="modalColorway"></div>
+                    <div class="modal-price" id="modalPrice"></div>
+                    <div class="modal-lowest-ask">Lowest Ask</div>
+                    <div class="modal-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Release Date</span>
+                            <span id="modalReleaseDate" class="info-value"></span>
+                        </div>
+                    </div>
+                    <p id="modalDescription" class="modal-description"></p>
+                    <div class="size-selector">
+                        <h3>Select Size</h3>
+                        <div class="size-options" id="modalSizeOptions"></div>
+                    </div>
+                    <button class="add-to-cart-btn modal-add-to-cart" id="modalAddToCart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ CART SIDEBAR (from old layout) ══ -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="cart-close" id="cartClose" aria-label="Close Cart Sidebar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span class="cart-total-price" id="cartTotal">$0.00</span>
+            </div>
+            <button class="cart-checkout" id="cartCheckoutBtn" onclick="window.location.href='checkout.html'">Proceed to
+                Checkout</button>
+        </div>
+    </div>
+
+    <!-- ══ COMING SOON MODAL ══ -->
+    <div class="modal" id="comingSoonModal">
+        <div class="modal-overlay" id="comingSoonOverlay"></div>
+        <div class="modal-content small center">
+            <button class="modal-close" id="comingSoonClose">×</button>
+            <div class="coming-soon-body">
+                <div class="coming-soon-icon">✨</div>
+                <h2 id="comingSoonTitle">Coming Soon</h2>
+                <p id="comingSoonMessage">This feature is currently being refined for our archive collection. Stay
+                    tuned!</p>
+                <button class="add-to-cart-btn" id="comingSoonAck">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ TOAST CONTENT CONTAINER ══ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <!-- app.js is for global logic like cart/nav -->
+    <script type="module" src="app.js?v=2.2"></script>
+    <!-- shop-all.js is for this page's specific grid logic -->
+    <script>window.initialFilter = 'Electronics';</script>
+    <script type="module" src="shop-all.js?v=1.1"></script>
+
+    <script>
+        // Inline helpers for announcement and basic nav behavior
+        function closeAnnounce() {
+            const bar = document.getElementById('announceBar');
+            const nav = document.getElementById('navbar');
+            if (bar) bar.style.display = 'none';
+            if (nav) nav.classList.remove('announce-offset');
+        }
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+        });
+    </script>
+
+  <!-- Firebase SDKs & Global Auth -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+      window.firebaseConfig = {
+          apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+          authDomain: "coalition-aec44.firebaseapp.com",
+          projectId: "coalition-aec44",
+          storageBucket: "coalition-aec44.firebasestorage.app",
+          messagingSenderId: "312196142925",
+          appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+      };
+  </script>
+  <script src="auth.js"></script>
+</body>
+
+
+</html>

@@ -9,7 +9,7 @@
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="admin.css?v=2.2">
 </head>
 
 <body>
@@ -24,11 +24,11 @@
             <form class="login-form" id="loginForm">
                 <div class="form-group">
                     <label for="adminEmail">Email Address</label>
-                    <input type="email" id="adminEmail" placeholder="sgmpl99@gmail.com" value="sgmpl99@gmail.com" required>
+                    <input type="email" id="adminEmail" placeholder="admin@backdoordmv.com" required>
                 </div>
                 <div class="form-group">
                     <label for="adminPassword">Password</label>
-                    <input type="password" id="adminPassword" placeholder="Enter your admin password" required>
+                    <input type="password" id="adminPassword" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="login-btn">Unlock Dashboard</button>
             </form>
@@ -66,12 +66,6 @@
                 <span class="nav-badge" id="orderBadge">0</span>
             </a>
 
-            <a class="nav-item" data-page="offers" onclick="switchTab('offers', this)">
-                <i class="nav-icon fa-solid fa-hand-holding-dollar"></i>
-                Offers
-                <span class="nav-badge" id="offerBadge">0</span>
-            </a>
-
             <a class="nav-item" data-page="products" onclick="switchTab('products', this)">
                 <i class="nav-icon fa-solid fa-shoe-prints"></i>
                 Products
@@ -88,11 +82,6 @@
             <a class="nav-item" data-page="import" onclick="switchTab('import', this)">
                 <i class="nav-icon fa-solid fa-cloud-arrow-up"></i>
                 Import Products
-            </a>
-
-            <a class="nav-item" data-page="reviews" onclick="switchTab('reviews', this)">
-                <i class="nav-icon fa-solid fa-camera-retro"></i>
-                Reviews Lab
             </a>
 
             <a class="nav-item" href="pricing.html">
@@ -304,80 +293,13 @@
                     </div>
                 </section>
 
-                <section class="content-section" id="offersSection">
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">CUSTOMER OFFERS</span>
-                            <button class="btn-secondary btn-sm" type="button" onclick="renderOffers()">
-                                <i class="fa-solid fa-rotate"></i> Refresh
-                            </button>
-                        </div>
-                        <div class="data-table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Product</th>
-                                        <th>Offer</th>
-                                        <th>Status</th>
-                                        <th>Updated</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="offersTableBody">
-                                    <tr>
-                                        <td colspan="6" class="empty-state-row">No offers yet.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
                 <!-- PRODUCTS SECTION -->
                 <section class="content-section" id="productsSection">
                     <div class="card">
-                        <div class="products-toolbar">
-                            <div class="products-toolbar-main">
-                                <input type="search" id="productSearch" class="form-input product-search-input"
-                                    placeholder="Search products by name, SKU, brand, or colorway">
-                                <select id="productCategoryFilter" class="form-select" aria-label="Filter by category">
-                                    <option value="all">All Categories</option>
-                                    <option value="Sneakers">Sneakers</option>
-                                    <option value="Shoes">Shoes</option>
-                                    <option value="Apparel">Apparel</option>
-                                    <option value="Accessories">Accessories</option>
-                                    <option value="Electronics">Electronics</option>
-                                </select>
-                                <select id="productStatusFilter" class="form-select" aria-label="Filter by status">
-                                    <option value="all">All Statuses</option>
-                                    <option value="active">Live</option>
-                                    <option value="hidden">Hidden</option>
-                                    <option value="out-of-stock">Out of Stock</option>
-                                    <option value="featured">Featured</option>
-                                </select>
-                            </div>
-                            <div class="products-bulk-bar">
-                                <span class="selection-count" id="productSelectionCount">0 selected</span>
-                                <select id="productBulkAction" class="form-select" aria-label="Bulk action">
-                                    <option value="">Bulk actions</option>
-                                    <option value="show">Show on storefront</option>
-                                    <option value="hide">Hide from storefront</option>
-                                    <option value="mark-in-stock">Mark in stock</option>
-                                    <option value="mark-out-of-stock">Mark out of stock</option>
-                                    <option value="feature">Feature products</option>
-                                    <option value="unfeature">Remove featured</option>
-                                </select>
-                                <button class="btn-secondary" id="applyBulkActionBtn" type="button" disabled>Apply</button>
-                            </div>
-                        </div>
                         <div class="data-table-container">
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th class="checkbox-col">
-                                            <input type="checkbox" id="selectAllProducts" aria-label="Select all products">
-                                        </th>
                                         <th>Image</th>
                                         <th>Name</th>
                                         <th>SKU</th>
@@ -574,24 +496,6 @@
                                     <textarea id="impDesc" class="form-textarea"
                                         placeholder="Features, history, condition..."></textarea>
                                 </div>
-                                <div class="form-group">
-                                    <label for="impReleaseDate">Release Date</label>
-                                    <input type="date" id="impReleaseDate" class="form-input">
-                                </div>
-                                <div class="product-flags-grid">
-                                    <label class="toggle-card">
-                                        <input type="checkbox" id="impHidden">
-                                        <span>Hide product from storefront</span>
-                                    </label>
-                                    <label class="toggle-card">
-                                        <input type="checkbox" id="impOutOfStock">
-                                        <span>Publish as out of stock</span>
-                                    </label>
-                                    <label class="toggle-card">
-                                        <input type="checkbox" id="impFeatured">
-                                        <span>Feature on storefront</span>
-                                    </label>
-                                </div>
                                 <button class="btn-primary w-100 btn-load-preview" id="publishImporterBtn"
                                     onclick="publishImporterProduct()">
                                     <i class="fa-solid fa-rocket"></i> PUBLISH TO STORE
@@ -606,82 +510,6 @@
                     <div class="card">
                         <p class="text-muted text-center p-40">Advanced Analytics
                             coming soon...</p>
-                    </div>
-                </section>
-
-                <section class="content-section" id="reviewsSection">
-                    <div class="reviews-lab-layout">
-                        <div class="card reviews-lab-card">
-                            <div class="card-header">
-                                <span class="card-title">REVIEW NAME + COMMENT GENERATOR</span>
-                            </div>
-                            <p class="reviews-lab-copy">Paste one customer comment per line. Add one image URL per line if you want a matching post preview. The tool will generate privacy-safe names and lightly polish comments without making them sound fake.</p>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="reviewCommentsInput">Comments</label>
-                                    <textarea id="reviewCommentsInput" rows="12" placeholder="came in fast and they look crazy in hand&#10;quality is solid fr&#10;box was clean and shipping was quick"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="reviewImagesInput">Image URLs (Optional)</label>
-                                    <textarea id="reviewImagesInput" rows="12" placeholder="https://...&#10;https://...&#10;https://..."></textarea>
-                                </div>
-                            </div>
-                            <div class="reviews-lab-actions">
-                                <button class="btn-primary" type="button" id="generateReviewsBtn">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Review Profiles
-                                </button>
-                                <button class="btn-secondary" type="button" id="shuffleReviewNamesBtn">
-                                    <i class="fa-solid fa-shuffle"></i> Shuffle Names
-                                </button>
-                                <button class="btn-secondary" type="button" id="saveGeneratedReviewsBtn">
-                                    <i class="fa-solid fa-floppy-disk"></i> Save Batch To Reviews
-                                </button>
-                                <button class="btn-secondary" type="button" id="copyReviewsJsonBtn">
-                                    <i class="fa-solid fa-copy"></i> Copy JSON
-                                </button>
-                            </div>
-                            <div class="reviews-lab-stats" id="reviewsLabStats">0 reviews generated</div>
-                        </div>
-
-                        <div class="card reviews-output-card">
-                            <div class="card-header">
-                                <span class="card-title">REVIEW PREVIEW</span>
-                            </div>
-                            <div class="reviews-preview-grid" id="reviewsPreviewGrid">
-                                <div class="reviews-empty-state">Generate a batch to preview names, comments, and export-ready review objects.</div>
-                            </div>
-                            <div class="form-group reviews-json-wrap">
-                                <label for="reviewsJsonOutput">Export JSON</label>
-                                <textarea id="reviewsJsonOutput" rows="10" readonly placeholder="Generated review JSON will appear here."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card reviews-manager-card">
-                        <div class="card-header">
-                            <span class="card-title">MANAGE LIVE REVIEWS</span>
-                            <button class="btn-secondary btn-sm" type="button" id="addReviewBtn">
-                                <i class="fa-solid fa-plus"></i> New Review
-                            </button>
-                        </div>
-                        <div class="data-table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Reviewer</th>
-                                        <th>Product</th>
-                                        <th>Rating</th>
-                                        <th>Status</th>
-                                        <th>Updated</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="reviewsTableBody">
-                                    <tr>
-                                        <td colspan="6" class="empty-state-row">No reviews yet.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </section>
 
@@ -740,6 +568,10 @@
                         <select id="productCategory" required aria-label="Select Category">
                             <option value="Sneakers">Sneakers</option>
                             <option value="Apparel">Apparel</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Shoes">Shoes</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Collectibles">Collectibles</option>
                         </select>
                     </div>
                 </div>
@@ -747,119 +579,9 @@
                     <label for="productPrice">Base Price ($)</label>
                     <input type="number" id="productPrice" placeholder="0.00" required>
                 </div>
-                <div class="form-group">
-                    <label for="productReleaseDate">Release Date</label>
-                    <input type="date" id="productReleaseDate">
-                </div>
-                <div class="form-group">
-                    <label>Market Pricing Tracker</label>
-                    <div class="market-pricing-card">
-                        <p class="form-help-text market-pricing-copy">Paste live links from StockX, GOAT, and eBay, then refresh comps to benchmark the lowest market and apply a discounted list price fast.</p>
-                        <div class="form-row market-pricing-url-grid">
-                            <div class="form-group market-pricing-field">
-                                <label for="marketStockxUrl">StockX URL</label>
-                                <input type="url" id="marketStockxUrl" placeholder="https://stockx.com/...">
-                            </div>
-                            <div class="form-group market-pricing-field">
-                                <label for="marketGoatUrl">GOAT URL</label>
-                                <input type="url" id="marketGoatUrl" placeholder="https://www.goat.com/...">
-                            </div>
-                            <div class="form-group market-pricing-field">
-                                <label for="marketEbayUrl">eBay URL</label>
-                                <input type="url" id="marketEbayUrl" placeholder="https://www.ebay.com/...">
-                            </div>
-                        </div>
-                        <div class="market-pricing-actions">
-                            <button type="button" class="btn-ghost" id="refreshMarketPricingBtn">Refresh Market Comps</button>
-                            <button type="button" class="btn-ghost" id="applyMarketMinus100Btn">Apply -$100</button>
-                            <button type="button" class="btn-ghost" id="applyMarketMinus20Btn">Apply -20%</button>
-                            <button type="button" class="btn-ghost" id="applyMarketSmartBtn">Apply Smart</button>
-                        </div>
-                        <div class="market-pricing-metrics">
-                            <div class="market-pricing-metric">
-                                <span class="market-pricing-label">Benchmark</span>
-                                <strong id="marketBenchmarkValue">No data</strong>
-                                <small id="marketBenchmarkMeta">Refresh comps to calculate a market anchor.</small>
-                            </div>
-                            <div class="market-pricing-metric">
-                                <span class="market-pricing-label">-$100</span>
-                                <strong id="marketMinus100Value">--</strong>
-                                <small>Lowest market minus $100</small>
-                            </div>
-                            <div class="market-pricing-metric">
-                                <span class="market-pricing-label">-20%</span>
-                                <strong id="marketMinus20Value">--</strong>
-                                <small>Lowest market minus 20%</small>
-                            </div>
-                            <div class="market-pricing-metric">
-                                <span class="market-pricing-label">Smart Deal</span>
-                                <strong id="marketSmartValue">--</strong>
-                                <small>Larger discount between -$100 and -20%</small>
-                            </div>
-                        </div>
-                        <div class="market-pricing-source-grid">
-                            <div class="market-source-card" id="marketSourceCardStockx">
-                                <span class="market-source-title">StockX</span>
-                                <strong id="marketSourceValueStockx">No link</strong>
-                                <small id="marketSourceMetaStockx">Add a source URL.</small>
-                            </div>
-                            <div class="market-source-card" id="marketSourceCardGoat">
-                                <span class="market-source-title">GOAT</span>
-                                <strong id="marketSourceValueGoat">No link</strong>
-                                <small id="marketSourceMetaGoat">Add a source URL.</small>
-                            </div>
-                            <div class="market-source-card" id="marketSourceCardEbay">
-                                <span class="market-source-title">eBay</span>
-                                <strong id="marketSourceValueEbay">No link</strong>
-                                <small id="marketSourceMetaEbay">Add an authenticity-guaranteed listing URL.</small>
-                            </div>
-                        </div>
-                        <p class="form-help-text" id="marketPricingStatus">Benchmark uses the lowest valid tracked market price. Save the product to keep the snapshot.</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Backorder Setup</label>
-                    <div class="inventory-quickbar backorder-quickbar">
-                        <label class="toggle-card">
-                            <input type="checkbox" id="productAllowBackorder">
-                            <span>Auto-backorder any size that hits zero stock</span>
-                        </label>
-                        <div class="inventory-quickbar-group">
-                            <label for="productBackorderLeadTime">Lead Time</label>
-                            <div class="inventory-quickbar-row">
-                                <input type="text" id="productBackorderLeadTime" placeholder="Ships in 1.5-2 weeks">
-                            </div>
-                        </div>
-                        <div class="inventory-quickbar-actions">
-                            <button type="button" class="btn-ghost" id="applyZeroStockBackorderBtn">Backorder Zero Stock</button>
-                            <button type="button" class="btn-ghost danger" id="clearBackorderFlagsBtn">Clear Backorder</button>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="form-group">
-                    <label>Size Inventory (Stock, Price & Backorder)</label>
-                    <div class="inventory-quickbar">
-                        <div class="inventory-quickbar-group">
-                            <label for="bulkStockValue">Set All Stock</label>
-                            <div class="inventory-quickbar-row">
-                                <input type="number" id="bulkStockValue" min="0" placeholder="0">
-                                <button type="button" class="btn-ghost" id="applyBulkStockBtn">Apply</button>
-                            </div>
-                        </div>
-                        <div class="inventory-quickbar-group">
-                            <label for="bulkPriceValue">Set All Prices</label>
-                            <div class="inventory-quickbar-row">
-                                <input type="number" id="bulkPriceValue" min="0" step="0.01" placeholder="0.00">
-                                <button type="button" class="btn-ghost" id="applyBulkPriceBtn">Apply</button>
-                            </div>
-                        </div>
-                        <div class="inventory-quickbar-actions">
-                            <button type="button" class="btn-ghost" id="applyBasePriceBtn">Use Base Price</button>
-                            <button type="button" class="btn-ghost" id="applyMarketPriceToInventoryBtn">Use Market Price</button>
-                            <button type="button" class="btn-ghost danger" id="clearInventoryBtn">Zero Stock</button>
-                        </div>
-                    </div>
+                    <label>Size Inventory (Stock & Price per size)</label>
                     <div id="sizeInventoryGrid" class="size-inventory-grid"></div>
                 </div>
 
@@ -868,81 +590,8 @@
                     <textarea id="productDescription" rows="3" placeholder="Product details..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="productImage">Product Image URL</label>
-                    <input type="url" id="productImage" placeholder="https://..." required>
-                    <p class="form-help-text">Paste a direct image URL or a single-image Imgur page link.</p>
-                </div>
-                <div class="form-group">
-                    <label for="productImageGallery">Gallery Image URLs</label>
-                    <textarea id="productImageGallery" rows="4" placeholder="One image URL per line"></textarea>
-                    <p class="form-help-text">Optional. The first valid image becomes the cover image. Album links are not supported here.</p>
-                </div>
-                <div class="form-group">
-                    <label>Card Image Framing</label>
-                    <div class="product-media-workbench">
-                        <div class="product-media-preview-panel">
-                            <div class="product-media-preview-head">
-                                <span>Live Card Preview</span>
-                                <span id="productImagePreviewSummary">Contain · 108%</span>
-                            </div>
-                            <div class="product-media-preview-card">
-                                <span class="product-media-preview-badge">Preview</span>
-                                <img id="productImagePreview" alt="Product image preview">
-                            </div>
-                            <div id="productImagePreviewThumbs" class="product-media-thumb-row"></div>
-                            <p id="productImagePreviewStatus" class="product-media-preview-note">Adjust zoom and framing until the storefront card looks right.</p>
-                        </div>
-                        <div class="product-media-controls">
-                            <input type="hidden" id="productImageFit" value="cover">
-                            <input type="hidden" id="productImagePosition" value="50% 50%">
-                            <div class="product-media-control-group">
-                                <label>Fit Mode</label>
-                                <div class="segmented-control" id="productImageFitButtons">
-                                    <button type="button" class="segmented-option" data-fit="contain">Show Full Shoe</button>
-                                    <button type="button" class="segmented-option" data-fit="cover">Fill Card</button>
-                                </div>
-                            </div>
-                            <div class="product-media-control-group">
-                                <div class="product-media-control-label">
-                                    <label for="productImageScale">Zoom</label>
-                                    <span id="productImageScaleValue">108%</span>
-                                </div>
-                                <input type="range" id="productImageScale" min="0.85" max="1.4" step="0.01" value="1.08">
-                            </div>
-                            <div class="product-media-control-group">
-                                <div class="product-media-control-label">
-                                    <label for="productImageOffsetX">Horizontal Focus</label>
-                                    <span id="productImageOffsetXValue">50%</span>
-                                </div>
-                                <input type="range" id="productImageOffsetX" min="0" max="100" step="1" value="50">
-                            </div>
-                            <div class="product-media-control-group">
-                                <div class="product-media-control-label">
-                                    <label for="productImageOffsetY">Vertical Focus</label>
-                                    <span id="productImageOffsetYValue">50%</span>
-                                </div>
-                                <input type="range" id="productImageOffsetY" min="0" max="100" step="1" value="50">
-                            </div>
-                            <div class="product-media-preset-row">
-                                <button type="button" class="btn-ghost" id="productImageShoePresetBtn">Shoe Preset</button>
-                                <button type="button" class="btn-ghost" id="productImageResetBtn">Reset Framing</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="product-flags-grid">
-                    <label class="toggle-card">
-                        <input type="checkbox" id="productHidden">
-                        <span>Hide product from storefront</span>
-                    </label>
-                    <label class="toggle-card">
-                        <input type="checkbox" id="productOutOfStock">
-                        <span>Keep visible but mark out of stock</span>
-                    </label>
-                    <label class="toggle-card">
-                        <input type="checkbox" id="productFeatured">
-                        <span>Feature on storefront</span>
-                    </label>
+                    <label for="productImage">Product Image (Upload)</label>
+                    <input type="file" id="productImage" accept="image/*" required>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" id="cancelProductBtn">Cancel</button>
@@ -966,63 +615,6 @@
     </div>
 
     <!-- ══ TOAST CONTAINER ══ -->
-    <div class="modal-overlay" id="reviewModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title" id="reviewModalTitle">CREATE REVIEW</h2>
-                <button class="modal-close" id="reviewModalClose" aria-label="Close Review Modal">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <form id="reviewForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="reviewName">Reviewer Name</label>
-                        <input type="text" id="reviewName" placeholder="Mason T." required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reviewProduct">Product</label>
-                        <input type="text" id="reviewProduct" placeholder="Jordan 4 Retro 'Black Cat' 2020">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="reviewRating">Rating</label>
-                        <select id="reviewRating">
-                            <option value="5">5 Stars</option>
-                            <option value="4">4 Stars</option>
-                            <option value="3">3 Stars</option>
-                            <option value="2">2 Stars</option>
-                            <option value="1">1 Star</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="reviewImages">Image URLs</label>
-                        <textarea id="reviewImages" rows="4" placeholder="https://...&#10;https://...&#10;https://..."></textarea>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="reviewOriginalComment">Original Comment</label>
-                    <textarea id="reviewOriginalComment" rows="3" placeholder="raw customer wording..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="reviewComment">Published Comment</label>
-                    <textarea id="reviewComment" rows="4" placeholder="polished but authentic review comment..." required></textarea>
-                </div>
-                <div class="product-flags-grid">
-                    <label class="toggle-card">
-                        <input type="checkbox" id="reviewHidden">
-                        <span>Hide review from storefront</span>
-                    </label>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" id="cancelReviewBtn">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Review</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Firebase SDKs -->
@@ -1030,7 +622,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script>
-        window.firebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
             authDomain: "coalition-aec44.firebaseapp.com",
             projectId: "coalition-aec44",
@@ -1040,10 +632,9 @@
             measurementId: "G-SPJ2FDLSKZ"
         };
     </script>
-
-    <script src="admin.js"></script>
+    <script src="admin.js?v=2.7"></script>
     <!-- Backdoor Analytics Tracker -->
-    <script src="analytics.js"></script>
+    <script src="analytics.js?v=1.0"></script>
 </body>
 
 </html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seed Products | Backdoor Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0d0d0d;
+            color: #e8e8e8;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .seed-wrap {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+            color: #a3e635;
+            margin-bottom: 8px;
+        }
+
+        p {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 24px;
+        }
+
+        .warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.8rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+
+        #seedBtn {
+            padding: 12px 28px;
+            background: #a3e635;
+            border: none;
+            border-radius: 8px;
+            color: #0d0d0d;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 24px;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s ease;
+        }
+
+        #seedBtn:hover {
+            opacity: 0.9;
+        }
+
+        #seedBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #seedLog {
+            background: #111;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 16px;
+            height: 400px;
+            overflow-y: auto;
+            font-size: 0.75rem;
+            line-height: 1.8;
+        }
+
+        .log-success {
+            color: #a3e635;
+        }
+
+        .log-error {
+            color: #ef4444;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: #a3e635;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="seed-wrap">
+        <h1>⚡ SEED PRODUCTS TO FIREBASE</h1>
+        <p>This will add all 19 current Backdoor products to your Firestore database.</p>
+        <div class="warning">
+            ⚠️ Only run this ONCE. Running again will create duplicate products.
+            Delete existing products in Firestore first if re-seeding.
+        </div>
+        <button id="seedBtn" onclick="seedProducts()">Seed All 19 Products →</button>
+        <div id="seedLog">Waiting to start...</div>
+        <a href="index.html" class="back-link">← Back to Admin</a>
+    </div>
+
+    <!-- Firebase SDKs (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+            authDomain: "coalition-aec44.firebaseapp.com",
+            projectId: "coalition-aec44",
+            storageBucket: "coalition-aec44.firebasestorage.app",
+            messagingSenderId: "312196142925",
+            appId: "1:312196142925:web:ba090f602c8b5a31b20904",
+            measurementId: "G-SPJ2FDLSKZ"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    <script src="seed-products.js"></script>
+</body>
+
+</html>
