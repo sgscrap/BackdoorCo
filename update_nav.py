@@ -3,19 +3,10 @@ import re
 
 # Navigation template
 NAV_TEMPLATE = """<div class="nav-center">
-    <a class="nav-link {shop_active}" href="shop-all.html">SHOP</a>
-    <a class="nav-link {men_active}" href="men.html">Men</a>
-    <a class="nav-link {women_active}" href="women.html">Women</a>
-    <a class="nav-link {kids_active}" href="kids.html">Kids</a>
-    <div class="nav-dropdown">
-        <a class="nav-link nav-dropdown-toggle" href="#">Browse <i class="fa-solid fa-chevron-down"></i></a>
-        <div class="nav-dropdown-menu">
-            <a href="shoes.html" class="nav-dropdown-item">Shoes</a>
-            <a href="apparel.html" class="nav-dropdown-item">Apparel</a>
-            <a href="accessories.html" class="nav-dropdown-item" data-category="accessories">Accessories</a>
-            <a href="electronics.html" class="nav-dropdown-item">Electronics</a>
-        </div>
-    </div>
+    <a class="nav-link {shop_active}" href="shop-all.html">Shop</a>
+    <a class="nav-link {brands_active}" href="#">Brands</a>
+    <a class="nav-link {drops_active}" href="#">New Drops</a>
+    <a class="nav-link {about_active}" href="about.html">About</a>
 </div>"""
 
 def update_file(filepath):
@@ -23,16 +14,16 @@ def update_file(filepath):
     
     # Determine active states
     shop_active = "active" if filename == "shop-all.html" else ""
-    men_active = "active" if filename == "men.html" else ""
-    women_active = "active" if filename == "women.html" else ""
-    kids_active = "active" if filename == "kids.html" else ""
+    brands_active = ""
+    drops_active = ""
+    about_active = "active" if filename == "about.html" else ""
     
     # Format template
     new_nav = NAV_TEMPLATE.format(
         shop_active=shop_active,
-        men_active=men_active,
-        women_active=women_active,
-        kids_active=kids_active
+        brands_active=brands_active,
+        drops_active=drops_active,
+        about_active=about_active
     )
     
     with open(filepath, 'r', encoding='utf-8') as f:
