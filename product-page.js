@@ -89,6 +89,14 @@ function initShell() {
     document.getElementById('offerModalClose')?.addEventListener('click', closeOfferModal);
     document.getElementById('offerModalOverlay')?.addEventListener('click', closeOfferModal);
     document.getElementById('offerForm')?.addEventListener('submit', handleOfferSubmit);
+    
+    document.getElementById('productWishlistBtn')?.addEventListener('click', () => {
+        if (currentProduct) {
+            window.toggleWishlist(currentProduct.id);
+            updateWishlistBtnUI();
+        }
+    });
+
     window.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
             cartSidebar?.classList.remove('active');
@@ -97,6 +105,15 @@ function initShell() {
         if (event.key === 'ArrowLeft') changeProductImage(-1);
         if (event.key === 'ArrowRight') changeProductImage(1);
     });
+}
+
+function updateWishlistBtnUI() {
+    const btn = document.getElementById('productWishlistBtn');
+    if (!btn || !currentProduct) return;
+    const icon = btn.querySelector('i');
+    const isInWishlist = window.globalWishlist?.includes(currentProduct.id);
+    icon.className = isInWishlist ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+    icon.style.color = isInWishlist ? 'var(--accent)' : '';
 }
 
 function renderMissingProduct(message = 'Product not found.') {
@@ -181,6 +198,7 @@ function renderProduct(product) {
 
     document.querySelector('.product-back-link')?.setAttribute('href', buildBackHref(product));
     syncOfferForm(product);
+    updateWishlistBtnUI();
 }
 
 function initProductReviews(product) {

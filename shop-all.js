@@ -194,9 +194,14 @@ function renderProducts() {
                                 <p class="shop-card-price">$${product.price.toFixed(0)}</p>
                                 <a class="product-page-link" href="${buildProductHref(product)}" onclick="event.stopPropagation()">View product page</a>
                             </div>
-                            ${soldOut && !backorder
-                ? '<span class="shop-sold-label">Sold Out</span>'
-                : `<button class="shop-buy-btn" onclick="event.stopPropagation(); handleAddToCart('${product.id}')">Buy</button>`}
+                            <div class="actions-row" style="display:flex; gap:8px;">
+                                <button class="wishlist-btn" onclick="event.stopPropagation(); window.toggleWishlist('${product.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;margin-top:auto;">
+                                    <i class="${window.globalWishlist?.includes(product.id) ? 'fa-solid' : 'fa-regular'} fa-heart" id="wishlist-icon-${product.id}" style="${window.globalWishlist?.includes(product.id) ? 'color:var(--accent)' : ''}"></i>
+                                </button>
+                                ${soldOut && !backorder
+                                    ? '<span class="shop-sold-label" style="display:flex;align-items:center;">Sold Out</span>'
+                                    : `<button class="shop-buy-btn" onclick="event.stopPropagation(); handleAddToCart('${product.id}')">Buy</button>`}
+                            </div>
                         </div>
                     </div>
                 </div>

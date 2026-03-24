@@ -43,7 +43,36 @@ document.addEventListener('DOMContentLoaded', () => {
     initFirebaseSync();
     initGlobalListeners();
     updateCartUI();
+    
+    // Listen for auth changes to merge carts
+    if (window.firebaseConfig && firebase.apps.length) {
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                mergeCartsOnLogin(user.uid);
+            }
+        });
+    }
 });
+
+async function mergeCartsOnLogin(uid) {
+    try {
+        const snap = await firebase.firestore().collection('users').doc(uid).get();
+        if (snap.exists && snap.data().cart) {
+            const dbCart = snap.data().cart || [];
+            if (dbCart.length > 0) {
+                // Merge DB cart with local cart (local takes precedence if duplicates)
+                const merged = [...cart];
+                dbCart.forEach(dbItem => {
+                    const exists = merged.find(i => i.id === dbItem.id && i.size === dbItem.size);
+                    if (!exists) merged.push(dbItem);
+                });
+                cart = merged;
+                saveCart();
+                updateCartUI();
+            }
+        }
+    } catch(e) { console.warn("Cart merge error:", e); }
+}
 
 function getVisibleProducts() {
     return products.filter((product) => product.status === 'active' && !isHidden(product));
@@ -126,9 +155,14 @@ function renderMostWanted() {
                             <span class="mw-ask-label drop-price-label">${backorder ? getBackorderLeadTime(product) : soldOut ? 'Unavailable' : isFeatured(product) ? 'Featured Pick' : 'Lowest Ask'}</span>
                             <span class="mw-price drop-price">$${product.price.toFixed(0)}</span>
                         </div>
-                        ${soldOut && !backorder
-                ? '<span class="mw-sold drop-sold-text">Sold Out</span>'
-                : `<button class="mw-buy-btn drop-buy-btn" onclick="event.stopPropagation(); openProductModal('${product.id}')">Buy</button>`}
+                        <div class="actions-row" style="display:flex; gap:8px;">
+                            <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist('${product.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;">
+                                <i class="${window.globalWishlist?.includes(product.id) ? 'fa-solid' : 'fa-regular'} fa-heart" id="wishlist-icon-${product.id}" style="${window.globalWishlist?.includes(product.id) ? 'color:var(--accent)' : ''}"></i>
+                            </button>
+                            ${soldOut && !backorder
+                                ? '<span class="mw-sold drop-sold-text" style="display:flex;align-items:center;">Sold Out</span>'
+                                : `<button class="mw-buy-btn drop-buy-btn" onclick="event.stopPropagation(); openProductModal('${product.id}')">Buy</button>`}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -293,6 +327,11 @@ function addToCart(product, size) {
     saveCart();
     updateCartUI();
     toggleCart();
+    
+    // Show a toast that it was added (using existing showToast if present)
+    if(typeof showToast === 'function') {
+        showToast(`${product.name} added to cart!`, 'success');
+    }
 }
 
 function loadCartFromStorage() {
@@ -321,6 +360,15 @@ function normalizeCartItem(item) {
 function saveCart() {
     cart = cart.map(normalizeCartItem).filter((item) => item.name);
     localStorage.setItem('backdoor-cart', JSON.stringify(cart));
+    
+    // Sync to Firestore if logged in
+    if (window.globalUser && window.firebaseConfig) {
+        try {
+            firebase.firestore().collection('users').doc(window.globalUser.uid).set({
+                cart: cart
+            }, { merge: true });
+        } catch(e) { console.warn("Error syncing cart to DB:", e); }
+    }
 }
 
 function updateCartUI() {
@@ -405,3 +453,41 @@ window.toggleCart = () => {
 };
 
 window.addToCart = addToCart;
+
+window.toggleWishlist = async (productId) => {
+    if (!window.globalUser) {
+        if(typeof showToast === 'function') showToast('Please sign in to save items to your wishlist', 'info');
+        window.location.href = 'accounts.html';
+        return;
+    }
+
+    if (!window.globalWishlist) window.globalWishlist = [];
+    const idx = window.globalWishlist.indexOf(productId);
+    const added = idx === -1;
+
+    if (added) {
+        window.globalWishlist.push(productId);
+    } else {
+        window.globalWishlist.splice(idx, 1);
+    }
+
+    // Attempt to update icon immediately for fast feedback
+    const icons = document.querySelectorAll(`#wishlist-icon-${productId}`);
+    icons.forEach(icon => {
+        icon.className = added ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+        icon.style.color = added ? 'var(--accent)' : '';
+    });
+
+    if(typeof showToast === 'function') {
+        showToast(added ? 'Added to wishlist' : 'Removed from wishlist', 'success');
+    }
+
+    // Sync to DB
+    try {
+        await firebase.firestore().collection('users').doc(window.globalUser.uid).set({
+            wishlist: window.globalWishlist
+        }, { merge: true });
+    } catch(e) {
+        console.warn('Wishlist sync failed:', e);
+    }
+};
