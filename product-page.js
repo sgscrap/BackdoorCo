@@ -126,6 +126,27 @@ function formatHistoryAxisLabel(date) {
     return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
 }
 
+function normalizeProductLastSale(product) {
+    const sale = product?.lastSale;
+    if (!sale || typeof sale !== 'object') return null;
+
+    const price = Number(sale?.price);
+    const soldAt = toHistoryDate(sale?.soldAt || sale?.date || sale?.createdAt);
+    if (!price || !soldAt) return null;
+
+    return {
+        price,
+        soldAt,
+        marketplace: String(sale?.marketplace || sale?.source || 'Market').trim() || 'Market',
+        size: String(sale?.size || sale?.variant || '').trim() || '--',
+        note: String(sale?.note || '').trim()
+    };
+}
+
+function formatLastSaleDate(date) {
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+}
+
 function renderProductPriceHistory(product) {
     const section = document.getElementById('productPriceHistorySection');
     const chart = document.getElementById('productPriceHistoryChart');
@@ -211,6 +232,30 @@ function renderProductPriceHistory(product) {
     note.textContent = history.length > 1
         ? `Started at $${Math.round(first.price)} and is now $${Math.round(last.price)}. New price edits on Backdoor appear here automatically.`
         : 'This product just started live price tracking. Future price edits will plot on this chart automatically.';
+}
+
+function renderProductLastSale(product) {
+    const section = document.getElementById('productLastSaleSection');
+    const price = document.getElementById('productLastSalePrice');
+    const marketplace = document.getElementById('productLastSaleMarketplace');
+    const size = document.getElementById('productLastSaleSize');
+    const date = document.getElementById('productLastSaleDate');
+    const note = document.getElementById('productLastSaleNote');
+
+    if (!section || !price || !marketplace || !size || !date || !note) return;
+
+    const sale = normalizeProductLastSale(product);
+    if (!sale) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    price.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(sale.price);
+    marketplace.textContent = sale.marketplace;
+    size.textContent = sale.size;
+    date.textContent = formatLastSaleDate(sale.soldAt);
+    note.textContent = sale.note || `Most recent tracked sale recorded on ${sale.marketplace}.`;
 }
 
 const params = new URLSearchParams(window.location.search);
@@ -347,6 +392,7 @@ function renderProduct(product) {
         ? `${product.description || 'Premium authenticated product from Backdoor.'}\n\n${product.backorderLeadTime || 'Ships in 1.5-2 weeks'}.`
         : (product.description || 'Premium authenticated product from Backdoor.');
     renderProductPriceHistory(product);
+    renderProductLastSale(product);
     document.getElementById('productSku').textContent = product.sku || 'N/A';
     document.getElementById('productColorway').textContent = product.colorway || 'N/A';
     document.getElementById('productReleaseDate').textContent = product.releaseDate || 'TBD';

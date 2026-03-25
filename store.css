@@ -3903,6 +3903,72 @@ body {
     line-height: 1.6;
 }
 
+.product-last-sale {
+    margin-bottom: 24px;
+    padding: 18px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.product-last-sale-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.product-last-sale-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+    line-height: 0.95;
+}
+
+.product-last-sale-price {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+}
+
+.product-last-sale-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.product-last-sale-card {
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.product-last-sale-card span {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.product-last-sale-card strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+}
+
+.product-last-sale-note {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text3);
+    line-height: 1.6;
+}
+
 .product-page-meta {
     display: grid;
     gap: 12px;
@@ -4141,6 +4207,10 @@ body {
         grid-template-columns: 1fr;
     }
 
+    .product-last-sale-grid {
+        grid-template-columns: 1fr;
+    }
+
     .product-page-layout {
         grid-template-columns: 1fr;
     }
@@ -4170,6 +4240,11 @@ body {
     }
 
     .product-price-history-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .product-last-sale-head {
         flex-direction: column;
         align-items: flex-start;
     }
