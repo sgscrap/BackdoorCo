@@ -747,6 +747,112 @@ body {
     margin-right: 12px;
 }
 
+.info-page-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+}
+
+.info-hero {
+    max-width: 760px;
+    margin-bottom: 32px;
+}
+
+.info-hero h1 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(48px, 9vw, 88px);
+    line-height: 0.95;
+    letter-spacing: 1px;
+    margin: 10px 0 14px;
+}
+
+.info-hero p {
+    color: var(--text2);
+    font-size: 16px;
+    line-height: 1.7;
+    max-width: 680px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.info-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 22px;
+    padding: 26px;
+}
+
+.info-card--full {
+    grid-column: 1 / -1;
+}
+
+.info-card h2 {
+    color: var(--text);
+    margin-bottom: 14px;
+    font-family: 'Bebas Neue', cursive;
+    letter-spacing: 1px;
+    font-size: 28px;
+}
+
+.info-card p,
+.info-card li {
+    color: var(--text2);
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+.info-card ul {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 10px;
+}
+
+.info-link-list {
+    display: grid;
+    gap: 12px;
+}
+
+.info-link-list a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.info-link-list a:hover {
+    text-decoration: underline;
+}
+
+.info-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.info-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(200, 246, 93, 0.18);
+    background: rgba(200, 246, 93, 0.08);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.info-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 .nav-dropdown-link {
     display: block;
     padding: 10px 12px;
@@ -2637,6 +2743,19 @@ body {
     color: var(--accent);
 }
 
+.social-btn--wide {
+    width: auto;
+    padding: 0 14px;
+    gap: 8px;
+}
+
+.social-btn--wide span {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
 .footer-col h4 {
     font-family: 'Bebas Neue', cursive;
     font-size: 16px;
@@ -2673,6 +2792,26 @@ body {
 }
 
 .footer-bottom p span {
+    color: var(--accent);
+}
+
+.footer-legal-links {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.footer-legal-links a {
+    color: var(--text3);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.footer-legal-links a:hover {
     color: var(--accent);
 }
 
@@ -3618,6 +3757,152 @@ body {
     margin-bottom: 24px;
 }
 
+.product-trust-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.product-trust-card {
+    display: flex;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.product-trust-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(200, 246, 93, 0.12);
+    color: var(--accent);
+}
+
+.product-trust-card h3 {
+    font-family: 'Bebas Neue', cursive;
+    letter-spacing: 1px;
+    font-size: 21px;
+    margin-bottom: 6px;
+}
+
+.product-trust-card p {
+    color: var(--text2);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.product-trust-card a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.product-trust-card a:hover {
+    text-decoration: underline;
+}
+
+.product-price-history {
+    margin-bottom: 24px;
+    padding: 18px 18px 16px;
+    border-radius: 20px;
+    background:
+        radial-gradient(circle at top right, rgba(200, 246, 93, 0.08), transparent 42%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.product-price-history-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 16px;
+}
+
+.product-price-history-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 30px;
+    letter-spacing: 0.08em;
+    line-height: 0.95;
+}
+
+.product-price-history-summary {
+    display: grid;
+    justify-items: end;
+    gap: 4px;
+    text-align: right;
+}
+
+.product-price-history-summary span {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+}
+
+.product-price-history-summary strong {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    color: var(--text);
+}
+
+.product-price-history-summary strong.up {
+    color: var(--accent);
+}
+
+.product-price-history-summary strong.down {
+    color: #ff7c7c;
+}
+
+.product-price-history-chart-shell {
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    overflow: hidden;
+}
+
+.product-price-history-chart {
+    width: 100%;
+    height: 220px;
+    display: block;
+}
+
+.product-price-history-axis {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+}
+
+.product-price-history-axis span {
+    white-space: nowrap;
+}
+
+.product-price-history-note {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text3);
+    line-height: 1.6;
+}
+
 .product-page-meta {
     display: grid;
     gap: 12px;
@@ -3851,6 +4136,11 @@ body {
 }
 
 @media (max-width: 900px) {
+    .info-grid,
+    .product-trust-grid {
+        grid-template-columns: 1fr;
+    }
+
     .product-page-layout {
         grid-template-columns: 1fr;
     }
@@ -3879,8 +4169,22 @@ body {
         font-size: 48px;
     }
 
+    .product-price-history-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .product-price-history-summary {
+        justify-items: start;
+        text-align: left;
+    }
+
     .reviews-page-main-image img {
         min-height: 220px;
+    }
+
+    .footer-bottom {
+        align-items: flex-start;
     }
 }
 

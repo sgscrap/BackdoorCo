@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Support | Backdoor</title>
+    <meta name="description" content="Contact Backdoor support for order help, shipping questions, and product guidance.">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="store.css">
+</head>
+
+<body class="reviews-page-body">
+    <nav class="navbar" id="navbar">
+        <a class="nav-logo" href="index.html"><div class="nav-logo-mark">B</div>BACK<span>DOOR</span></a>
+        <div class="nav-center">
+            <a class="nav-link" href="shop-all.html">Shop</a>
+            <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+            <a class="nav-link" href="about.html">About</a>
+        </div>
+    </nav>
+
+    <main class="info-page-shell">
+        <section class="info-hero">
+            <p class="product-review-eyebrow">Support</p>
+            <h1>Contact Backdoor</h1>
+            <p>If you need help with an order, a sizing question, a backorder, or a return request, include the order number and the email used at checkout so support can review it faster.</p>
+            <div class="info-chip-row">
+                <a class="info-chip" href="mailto:support@backdoorco.xyz?subject=Backdoor%20Support"><i class="fa-solid fa-envelope"></i> support@backdoorco.xyz</a>
+                <a class="info-chip" href="tracking.html"><i class="fa-solid fa-location-dot"></i> Track Order</a>
+            </div>
+        </section>
+
+        <section class="info-grid">
+            <article class="info-card">
+                <h2>Common Help Requests</h2>
+                <ul>
+                    <li>Order status and tracking delays</li>
+                    <li>Backorder timing and shipping updates</li>
+                    <li>Product sizing or availability questions</li>
+                    <li>Return review requests for eligible orders</li>
+                </ul>
+            </article>
+            <article class="info-card">
+                <h2>Before You Reach Out</h2>
+                <ul>
+                    <li>Check the tracking page for the latest shipment status.</li>
+                    <li>Review the product page to confirm whether your item was listed as backorder.</li>
+                    <li>Keep your order number ready so support can review the order faster.</li>
+                </ul>
+            </article>
+        </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        window.firebaseConfig = {
+            apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+            authDomain: "backdoorco.xyz",
+            projectId: "coalition-aec44",
+            storageBucket: "coalition-aec44.firebasestorage.app",
+            messagingSenderId: "312196142925",
+            appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+        };
+    </script>
+    <script src="auth.js"></script>
+</body>
+
+</html>

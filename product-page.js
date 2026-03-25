@@ -2,7 +2,6 @@ import { db, auth } from './admin/firebase-config.js';
 import {
     collection,
     doc,
-    getDoc,
     onSnapshot
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
@@ -32,6 +31,7 @@ let cart = loadCartFromStorage();
 let productImages = [];
 let currentImageIndex = 0;
 let unsubscribeReviews = null;
+let unsubscribeProduct = null;
 
 function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -41,6 +41,176 @@ function escapeHtml(value) {
         '"': '&quot;',
         "'": '&#39;'
     }[char]));
+}
+
+function toHistoryDate(value) {
+    if (!value) return null;
+    if (typeof value?.toDate === 'function') return value.toDate();
+    if (typeof value?.seconds === 'number') return new Date(value.seconds * 1000);
+
+    const raw = String(value).trim();
+    if (!raw) return null;
+
+    const shortDate = raw.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
+    if (shortDate) {
+        const [, month, day, yearRaw] = shortDate;
+        const year = Number(yearRaw.length === 2 ? `20${yearRaw}` : yearRaw);
+        const parsed = new Date(year, Number(month) - 1, Number(day));
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    const parsed = new Date(raw);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function normalizeProductPriceHistory(product) {
+    const history = Array.isArray(product?.priceHistory) ? product.priceHistory : [];
+    const entries = history
+        .map((entry) => {
+            const price = Number(entry?.price);
+            const date = toHistoryDate(entry?.changedAt || entry?.date || entry?.createdAt);
+            if (!price || !date) return null;
+            return {
+                price,
+                date,
+                label: String(entry?.label || '').trim(),
+                source: String(entry?.source || '').trim()
+            };
+        })
+        .filter(Boolean)
+        .sort((left, right) => left.date - right.date);
+
+    const collapsed = [];
+    entries.forEach((entry) => {
+        const last = collapsed[collapsed.length - 1];
+        if (last && last.price === entry.price) {
+            if (entry.date > last.date) {
+                last.date = entry.date;
+                last.label = entry.label || last.label;
+                last.source = entry.source || last.source;
+            }
+            return;
+        }
+        collapsed.push({ ...entry });
+    });
+
+    const currentPrice = Number(product?.price) || 0;
+    const fallbackDate = toHistoryDate(product?.updatedAt || product?.createdAt || product?.releaseDate) || new Date();
+
+    if (!collapsed.length && currentPrice > 0) {
+        collapsed.push({
+            price: currentPrice,
+            date: fallbackDate,
+            label: 'Tracking started',
+            source: 'current'
+        });
+        return collapsed;
+    }
+
+    if (currentPrice > 0) {
+        const last = collapsed[collapsed.length - 1];
+        if (!last || last.price !== currentPrice) {
+            collapsed.push({
+                price: currentPrice,
+                date: fallbackDate > (last?.date || 0) ? fallbackDate : new Date(),
+                label: 'Current ask',
+                source: 'current'
+            });
+        }
+    }
+
+    return collapsed.slice(-24);
+}
+
+function formatHistoryAxisLabel(date) {
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+}
+
+function renderProductPriceHistory(product) {
+    const section = document.getElementById('productPriceHistorySection');
+    const chart = document.getElementById('productPriceHistoryChart');
+    const axis = document.getElementById('productPriceHistoryAxis');
+    const range = document.getElementById('productPriceHistoryRange');
+    const change = document.getElementById('productPriceHistoryChange');
+    const note = document.getElementById('productPriceHistoryNote');
+
+    if (!section || !chart || !axis || !range || !change || !note) return;
+
+    const history = normalizeProductPriceHistory(product);
+    if (!history.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+
+    const prices = history.map((entry) => entry.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const spread = Math.max(maxPrice - minPrice, Math.max(maxPrice * 0.08, 20));
+    const paddedMin = Math.max(0, minPrice - spread * 0.25);
+    const paddedMax = maxPrice + spread * 0.15;
+    const width = 560;
+    const height = 220;
+    const padX = 18;
+    const padTop = 18;
+    const padBottom = 28;
+    const plotWidth = width - padX * 2;
+    const plotHeight = height - padTop - padBottom;
+
+    const points = history.map((entry, index) => {
+        const x = history.length === 1 ? width / 2 : padX + (plotWidth * index) / (history.length - 1);
+        const ratio = (entry.price - paddedMin) / Math.max(paddedMax - paddedMin, 1);
+        const y = padTop + plotHeight - ratio * plotHeight;
+        return { ...entry, x, y };
+    });
+
+    const polyline = points.map((point) => `${point.x},${point.y}`).join(' ');
+    const areaPolyline = [`${points[0].x},${height - padBottom}`, ...points.map((point) => `${point.x},${point.y}`), `${points[points.length - 1].x},${height - padBottom}`].join(' ');
+    const gridLines = [0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+        const y = padTop + plotHeight * ratio;
+        const labelValue = Math.round(paddedMax - (paddedMax - paddedMin) * ratio);
+        return `
+            <g>
+                <line x1="${padX}" y1="${y}" x2="${width - padX}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4 8" />
+                <text x="${width - padX}" y="${Math.max(14, y - 6)}" text-anchor="end" fill="rgba(255,255,255,0.45)" font-size="10" letter-spacing="1">${'$' + labelValue}</text>
+            </g>
+        `;
+    }).join('');
+
+    chart.innerHTML = `
+        <defs>
+            <linearGradient id="productPriceHistoryGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+                <stop offset="0%" stop-color="rgba(200,246,93,0.28)"></stop>
+                <stop offset="100%" stop-color="rgba(200,246,93,0)"></stop>
+            </linearGradient>
+        </defs>
+        ${gridLines}
+        <polyline points="${areaPolyline}" fill="url(#productPriceHistoryGradient)" stroke="none"></polyline>
+        <polyline points="${polyline}" fill="none" stroke="rgba(200,246,93,0.92)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        ${points.map((point, index) => `
+            <g>
+                <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5.5 : 4}" fill="${index === points.length - 1 ? 'var(--accent)' : '#0f1115'}" stroke="rgba(200,246,93,0.92)" stroke-width="2"></circle>
+                <title>${formatHistoryAxisLabel(point.date)} · $${point.price}</title>
+            </g>
+        `).join('')}
+    `;
+
+    const axisIndexes = [...new Set([0, Math.floor((history.length - 1) / 2), history.length - 1])];
+    axis.innerHTML = axisIndexes.map((index) => `<span>${formatHistoryAxisLabel(history[index].date)}</span>`).join('');
+
+    const first = history[0];
+    const last = history[history.length - 1];
+    const delta = last.price - first.price;
+    const deltaPrefix = delta > 0 ? '+' : '';
+    change.textContent = `${deltaPrefix}$${Math.abs(Math.round(delta))}`;
+    change.className = delta > 0 ? 'up' : delta < 0 ? 'down' : '';
+    range.textContent = history.length > 1
+        ? `${history.length} tracked updates`
+        : 'Tracking started';
+    note.textContent = history.length > 1
+        ? `Started at $${Math.round(first.price)} and is now $${Math.round(last.price)}. New price edits on Backdoor appear here automatically.`
+        : 'This product just started live price tracking. Future price edits will plot on this chart automatically.';
 }
 
 const params = new URLSearchParams(window.location.search);
@@ -57,24 +227,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    const seededProduct = getSeededProducts().find((product) => product.id === productId);
+
     try {
-        const snapshot = await getDoc(doc(db, 'products', productId));
-        if (!snapshot.exists()) {
-            const seededProduct = getSeededProducts().find((product) => product.id === productId);
-            if (!seededProduct) {
+        unsubscribeProduct?.();
+        unsubscribeProduct = onSnapshot(doc(db, 'products', productId), (snapshot) => {
+            if (snapshot.exists()) {
+                currentProduct = applyProductOverrides({ id: snapshot.id, ...snapshot.data() });
+            } else if (seededProduct) {
+                currentProduct = seededProduct;
+            } else {
                 renderMissingProduct();
                 return;
             }
 
-            currentProduct = seededProduct;
             renderProduct(currentProduct);
             initProductReviews(currentProduct);
-            return;
-        }
-
-        currentProduct = applyProductOverrides({ id: snapshot.id, ...snapshot.data() });
-        renderProduct(currentProduct);
-        initProductReviews(currentProduct);
+        }, (error) => {
+            console.error(error);
+            if (seededProduct) {
+                currentProduct = seededProduct;
+                renderProduct(currentProduct);
+                initProductReviews(currentProduct);
+                return;
+            }
+            renderMissingProduct('Unable to load this product right now.');
+        });
     } catch (error) {
         console.error(error);
         renderMissingProduct('Unable to load this product right now.');
@@ -91,11 +269,13 @@ function initShell() {
     document.getElementById('offerModalOverlay')?.addEventListener('click', closeOfferModal);
     document.getElementById('offerForm')?.addEventListener('submit', handleOfferSubmit);
     
-    document.getElementById('productWishlistBtn')?.addEventListener('click', () => {
-        if (currentProduct) {
-            window.toggleWishlist(currentProduct.id);
-            updateWishlistBtnUI();
-        }
+    ['productWishlistBtn', 'productWishlistBtnSecondary'].forEach((id) => {
+        document.getElementById(id)?.addEventListener('click', () => {
+            if (currentProduct) {
+                window.toggleWishlist(currentProduct.id);
+                updateWishlistBtnUI();
+            }
+        });
     });
 
     window.addEventListener('keydown', (event) => {
@@ -109,12 +289,17 @@ function initShell() {
 }
 
 window.updateWishlistBtnUI = function() {
-    const btn = document.getElementById('productWishlistBtn');
-    if (!btn || !currentProduct) return;
-    const icon = btn.querySelector('i');
+    const buttons = ['productWishlistBtn', 'productWishlistBtnSecondary']
+        .map((id) => document.getElementById(id))
+        .filter(Boolean);
+    if (!buttons.length || !currentProduct) return;
     const isInWishlist = window.globalWishlist?.includes(currentProduct.id);
-    icon.className = isInWishlist ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-    icon.style.color = isInWishlist ? 'var(--accent)' : '';
+    buttons.forEach((btn) => {
+        const icon = btn.querySelector('i');
+        if (!icon) return;
+        icon.className = isInWishlist ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+        icon.style.color = isInWishlist ? 'var(--accent)' : '';
+    });
 }
 
 function renderMissingProduct(message = 'Product not found.') {
@@ -122,9 +307,25 @@ function renderMissingProduct(message = 'Product not found.') {
         <div class="product-page-empty">
             <h1>Product unavailable</h1>
             <p>${message}</p>
-            <a class="btn-hero-primary" href="men.html">Back to Men</a>
+            <a class="btn-hero-primary" href="shop-all.html">Back to Shop</a>
         </div>
     `;
+}
+
+function getProductShippingPromise(product) {
+    if (isBackorderOnly(product)) {
+        return `${getBackorderLeadTime(product)} for this pair.`;
+    }
+
+    if (hasInStockSizes(product) && hasBackorderSizes(product)) {
+        return `In-stock sizes ship fast. Other sizes ${getBackorderLeadTime(product).toLowerCase()}.`;
+    }
+
+    if (hasInStockSizes(product)) {
+        return 'In-stock sizes ship fast with tracking after fulfillment.';
+    }
+
+    return getBackorderLeadTime(product);
 }
 
 function renderProduct(product) {
@@ -139,9 +340,14 @@ function renderProduct(product) {
     document.getElementById('productDescription').textContent = backorder
         ? `${product.description || 'Premium authenticated product from Backdoor.'}\n\n${product.backorderLeadTime || 'Ships in 1.5-2 weeks'}.`
         : (product.description || 'Premium authenticated product from Backdoor.');
+    renderProductPriceHistory(product);
     document.getElementById('productSku').textContent = product.sku || 'N/A';
     document.getElementById('productColorway').textContent = product.colorway || 'N/A';
     document.getElementById('productReleaseDate').textContent = product.releaseDate || 'TBD';
+    const shippingPromise = document.getElementById('productShippingPromise');
+    if (shippingPromise) {
+        shippingPromise.textContent = getProductShippingPromise(product);
+    }
     document.getElementById('productStockLabel').textContent = soldOut
         ? 'Out of stock'
         : backorder

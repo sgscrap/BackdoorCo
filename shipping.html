@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipping Policy | Backdoor</title>
+    <meta name="description" content="Backdoor shipping policy for in-stock pairs, backorders, tracking, and delivery timing.">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="store.css">
+</head>
+
+<body class="reviews-page-body">
+    <nav class="navbar" id="navbar">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-mark">B</div>
+            BACK<span>DOOR</span>
+        </a>
+        <div class="nav-center">
+            <a class="nav-link" href="shop-all.html">Shop</a>
+            <div class="nav-dropdown">
+                <a class="nav-link nav-dropdown-toggle" href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+                <div class="nav-dropdown-menu">
+                    <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
+                    <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+                    <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
+                    <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
+                    <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
+                </div>
+            </div>
+            <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+            <a class="nav-link" href="about.html">About</a>
+        </div>
+        <div class="nav-right">
+            <div class="nav-search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="navSearch" placeholder="Search sneakers..." />
+            </div>
+            <div class="nav-icons-group">
+                <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
+                    <i class="fa-regular fa-heart"></i>
+                    <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
+                </a>
+                <button class="btn-cart" id="cartButton" onclick="window.location.href='checkout.html'">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Cart</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="info-page-shell">
+        <section class="info-hero">
+            <p class="product-review-eyebrow">Support</p>
+            <h1>Shipping Policy</h1>
+            <p>Backdoor ships both in-stock pairs and backorder products. Timing depends on the product status shown on the product page at the time you place the order.</p>
+            <div class="info-chip-row">
+                <a class="info-chip" href="tracking.html"><i class="fa-solid fa-truck-fast"></i> Track Order</a>
+                <a class="info-chip" href="contact.html"><i class="fa-solid fa-envelope"></i> Contact Support</a>
+            </div>
+        </section>
+
+        <section class="info-grid">
+            <article class="info-card">
+                <h2>In-Stock Orders</h2>
+                <ul>
+                    <li>Pairs marked in stock are prepared first and ship with tracking after fulfillment.</li>
+                    <li>Shipping speed at checkout depends on the method you choose and your delivery region.</li>
+                    <li>Orders over the free-shipping threshold qualify for free standard shipping.</li>
+                </ul>
+            </article>
+            <article class="info-card">
+                <h2>Backorder Items</h2>
+                <ul>
+                    <li>Products marked as backorder include an estimated lead time on the product page.</li>
+                    <li>Mixed orders can ship on the longer backorder timeline if all items are sent together.</li>
+                    <li>If a backorder timing changes materially, support can help review the order status.</li>
+                </ul>
+            </article>
+            <article class="info-card">
+                <h2>Tracking</h2>
+                <ul>
+                    <li>Tracking is sent after the order is fulfilled and handed to the carrier.</li>
+                    <li>Carrier scans can lag behind shipment pickup, especially during weekends or volume spikes.</li>
+                    <li>Use the tracking page if you need a live status update after checkout.</li>
+                </ul>
+            </article>
+            <article class="info-card">
+                <h2>International Delivery</h2>
+                <ul>
+                    <li>Transit windows can vary by customs processing and local carrier handoff.</li>
+                    <li>Customers are responsible for local import duties or taxes where applicable.</li>
+                    <li>Delivery estimates are not guarantees once the carrier controls the shipment.</li>
+                </ul>
+            </article>
+        </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        window.firebaseConfig = {
+            apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+            authDomain: "backdoorco.xyz",
+            projectId: "coalition-aec44",
+            storageBucket: "coalition-aec44.firebasestorage.app",
+            messagingSenderId: "312196142925",
+            appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+        };
+    </script>
+    <script src="auth.js"></script>
+</body>
+
+</html>

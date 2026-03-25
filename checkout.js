@@ -103,16 +103,41 @@ function getCartItemCount() {
 }
 
 function getDiscountAmount() {
-    return 0;
+    const codeInfo = promoState && PROMO_CODES[promoState.code?.toUpperCase()];
+    if (!codeInfo) return 0;
+    return Math.round(getCartSubtotal() * Number(codeInfo.discount || 0) * 100) / 100;
 }
 
 function getShippingCost() {
     const subtotal = getCartSubtotal();
+    if (cart.length === 0 || subtotal <= 0) {
+        return 0;
+    }
     if (subtotal >= FREE_SHIP_THRESHOLD && selectedShipping === 'standard') {
         return 0;
     }
 
     return SHIPPING_OPTIONS.find((option) => option.id === selectedShipping)?.price || SHIPPING_OPTIONS[0].price;
+}
+
+function updateCheckoutActionsState() {
+    const hasItems = cart.length > 0;
+    const continueBtn = document.getElementById('continueBtn');
+    const placeBtn = document.getElementById('placeOrderBtn');
+
+    if (continueBtn) {
+        continueBtn.disabled = !hasItems;
+        continueBtn.title = hasItems ? '' : 'Add a product to your cart to continue checkout.';
+    }
+
+    if (placeBtn) {
+        placeBtn.disabled = !hasItems;
+        if (!hasItems) {
+            placeBtn.innerHTML = '<i class="fa-solid fa-bag-shopping"></i> ADD ITEMS TO CHECKOUT';
+        } else if (!placeBtn.dataset.loading) {
+            placeBtn.innerHTML = '<i class="fa-solid fa-lock"></i> CONTINUE TO SECURE PAYMENT';
+        }
+    }
 }
 
 function updateFreeShippingBar(subtotal) {
@@ -306,6 +331,7 @@ function setStep(step) {
     if (placeBtn) placeBtn.style.display = step === 3 ? 'flex' : 'none';
 
     if (step === 2) renderShippingOptions();
+    updateCheckoutActionsState();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -409,6 +435,31 @@ function updateCheckoutSummary() {
     const summaryItems = document.getElementById('summaryItems');
     if (!summaryItems) return;
 
+    if (cart.length === 0) {
+        summaryItems.innerHTML = `
+            <div class="summary-empty-state">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <strong>Your cart is empty.</strong>
+                <span>Add a product to unlock shipping rates and secure checkout.</span>
+            </div>
+        `;
+
+        const discountLine = document.getElementById('discountLine');
+        if (discountLine) discountLine.classList.add('hidden');
+
+        const setText = (id, value) => {
+            const node = document.getElementById(id);
+            if (node) node.textContent = value;
+        };
+
+        setText('summarySubtotal', fmt(0));
+        setText('summaryShipping', '--');
+        setText('summaryTax', 'Calculated in Stripe');
+        setText('summaryTotal', fmt(0));
+        updateCheckoutActionsState();
+        return;
+    }
+
     summaryItems.innerHTML = cart.map((item) => `
         <div class="summary-item">
             <div class="summary-img">
@@ -454,6 +505,8 @@ function updateCheckoutSummary() {
             discountLine.classList.add('hidden');
         }
     }
+
+    updateCheckoutActionsState();
 }
 
 function getShippingSelection() {
@@ -491,10 +544,15 @@ function setCheckoutButtonLoading(isLoading) {
     const button = document.getElementById('placeOrderBtn');
     if (!button) return;
 
+    button.dataset.loading = isLoading ? 'true' : '';
     button.disabled = isLoading;
     button.innerHTML = isLoading
         ? '<div class="spinner"></div> OPENING SECURE CHECKOUT...'
         : '<i class="fa-solid fa-lock"></i> CONTINUE TO SECURE PAYMENT';
+
+    if (!isLoading) {
+        updateCheckoutActionsState();
+    }
 }
 
 function formatMoneyDisplay(amount, currency = 'USD') {

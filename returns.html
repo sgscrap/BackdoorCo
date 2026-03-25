@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Returns Policy | Backdoor</title>
+    <meta name="description" content="Backdoor returns policy for eligible orders, condition requirements, and support review.">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="store.css">
+</head>
+
+<body class="reviews-page-body">
+    <nav class="navbar" id="navbar">
+        <a class="nav-logo" href="index.html"><div class="nav-logo-mark">B</div>BACK<span>DOOR</span></a>
+        <div class="nav-center">
+            <a class="nav-link" href="shop-all.html">Shop</a>
+            <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+            <a class="nav-link" href="about.html">About</a>
+        </div>
+        <div class="nav-right">
+            <button class="btn-cart" id="cartButton" onclick="window.location.href='checkout.html'"><i class="fa-solid fa-bag-shopping"></i><span>Cart</span></button>
+        </div>
+    </nav>
+
+    <main class="info-page-shell">
+        <section class="info-hero">
+            <p class="product-review-eyebrow">Support</p>
+            <h1>Returns Policy</h1>
+            <p>Backdoor reviews return requests for eligible unworn items. Product condition, category, and order status all matter when a return request is submitted.</p>
+        </section>
+
+        <section class="info-grid">
+            <article class="info-card">
+                <h2>Eligible Returns</h2>
+                <ul>
+                    <li>Items must be unworn, unaltered, and returned in the condition they were delivered.</li>
+                    <li>Original box, accessories, tags, and packaging should be included when applicable.</li>
+                    <li>Return approval is reviewed before a refund or store-credit outcome is issued.</li>
+                </ul>
+            </article>
+            <article class="info-card">
+                <h2>Non-Returnable Cases</h2>
+                <ul>
+                    <li>Used items, damaged items, or products missing original packaging can be declined.</li>
+                    <li>Approved offers, special-order items, and some backorder pairs may be final sale.</li>
+                    <li>Fraud screening or chargeback disputes can pause return handling until resolved.</li>
+                </ul>
+            </article>
+            <article class="info-card info-card--full">
+                <h2>How To Request A Return</h2>
+                <div class="info-link-list">
+                    <a href="tracking.html">Track the order and confirm delivery status</a>
+                    <a href="accounts.html">Open your account dashboard and locate the order</a>
+                    <a href="contact.html">Contact support with the order number and reason for return</a>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        window.firebaseConfig = {
+            apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+            authDomain: "backdoorco.xyz",
+            projectId: "coalition-aec44",
+            storageBucket: "coalition-aec44.firebasestorage.app",
+            messagingSenderId: "312196142925",
+            appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+        };
+    </script>
+    <script src="auth.js"></script>
+</body>
+
+</html>

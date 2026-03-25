@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Backdoor</title>
+    <meta name="description" content="Backdoor privacy policy covering account, order, and checkout data handling.">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="store.css">
+</head>
+
+<body class="reviews-page-body">
+    <nav class="navbar" id="navbar">
+        <a class="nav-logo" href="index.html"><div class="nav-logo-mark">B</div>BACK<span>DOOR</span></a>
+        <div class="nav-center">
+            <a class="nav-link" href="shop-all.html">Shop</a>
+            <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+            <a class="nav-link" href="about.html">About</a>
+        </div>
+    </nav>
+
+    <main class="info-page-shell">
+        <section class="info-hero">
+            <p class="product-review-eyebrow">Legal</p>
+            <h1>Privacy Policy</h1>
+            <p>Backdoor uses customer information to process orders, provide support, and improve the storefront experience.</p>
+        </section>
+
+        <section class="info-grid">
+            <article class="info-card">
+                <h2>Information We Collect</h2>
+                <ul>
+                    <li>Account details such as name, email, and saved preferences.</li>
+                    <li>Order details including products, sizes, shipping address, and fulfillment history.</li>
+                    <li>Checkout metadata from Stripe needed to confirm payment status and order completion.</li>
+                </ul>
+            </article>
+            <article class="info-card">
+                <h2>How We Use It</h2>
+                <ul>
+                    <li>To process orders, fulfill shipments, and provide tracking updates.</li>
+                    <li>To respond to support questions, offers, and return requests.</li>
+                    <li>To protect the storefront against abuse, fraud, and payment risk.</li>
+                </ul>
+            </article>
+            <article class="info-card info-card--full">
+                <h2>Your Choices</h2>
+                <p>You can contact support if you need help reviewing account information, order history, or storefront data tied to your purchases. Payment details are handled by Stripe and are not stored directly as raw card data by Backdoor.</p>
+            </article>
+        </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        window.firebaseConfig = {
+            apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+            authDomain: "backdoorco.xyz",
+            projectId: "coalition-aec44",
+            storageBucket: "coalition-aec44.firebasestorage.app",
+            messagingSenderId: "312196142925",
+            appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+        };
+    </script>
+    <script src="auth.js"></script>
+</body>
+
+</html>

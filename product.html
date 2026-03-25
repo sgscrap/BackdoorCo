@@ -124,7 +124,7 @@
                         <a class="btn-hero-secondary product-review-link" href="reviews.html">All Reviews</a>
                     </div>
                     <div class="product-review-list" id="productReviewList">
-                        <div class="reviews-empty-state">Loading review posts...</div>
+                        <div class="reviews-empty-state">Loading verified buyer posts...</div>
                     </div>
                 </section>
             </div>
@@ -134,11 +134,11 @@
                     <span id="productStatusBadge" class="modal-badge hidden-badge"></span>
                     <span id="productCategoryLabel" class="product-page-category">Sneakers</span>
                 </div>
-                <h1 id="productName">Loading product...</h1>
+                <h1 id="productName">Loading product details...</h1>
                 <p id="productBrandLine" class="product-page-brand"></p>
                 <div class="product-page-price-row">
-                    <div class="product-page-price" id="productPrice">$0</div>
-                    <div class="product-page-stock" id="productStockLabel"></div>
+                    <div class="product-page-price" id="productPrice">--</div>
+                    <div class="product-page-stock" id="productStockLabel">Checking live inventory...</div>
                 </div>
 
                 <div class="product-page-offer-wrap">
@@ -153,18 +153,71 @@
 
                 <p id="productDescription" class="product-page-description"></p>
 
+                <section class="product-trust-grid" aria-label="Product purchase info">
+                    <article class="product-trust-card">
+                        <div class="product-trust-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                        <div>
+                            <h3>Shipping</h3>
+                            <p id="productShippingPromise">Checking shipping speed for this pair...</p>
+                            <a href="shipping.html">Shipping policy</a>
+                        </div>
+                    </article>
+                    <article class="product-trust-card">
+                        <div class="product-trust-icon"><i class="fa-solid fa-rotate-left"></i></div>
+                        <div>
+                            <h3>Returns</h3>
+                            <p>Eligible unworn items can be reviewed for return approval.</p>
+                            <a href="returns.html">Returns policy</a>
+                        </div>
+                    </article>
+                    <article class="product-trust-card">
+                        <div class="product-trust-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div>
+                            <h3>Authenticity</h3>
+                            <p>Every pair is checked before delivery and backed by Backdoor authentication.</p>
+                            <a href="about.html">About authentication</a>
+                        </div>
+                    </article>
+                    <article class="product-trust-card">
+                        <div class="product-trust-icon"><i class="fa-solid fa-ruler-combined"></i></div>
+                        <div>
+                            <h3>Sizing & Help</h3>
+                            <p>Need sizing help or product guidance before ordering?</p>
+                            <a href="faq.html#sizing">Size guide & FAQ</a>
+                        </div>
+                    </article>
+                </section>
+
+                <section class="product-price-history" id="productPriceHistorySection" style="display:none;">
+                    <div class="product-price-history-head">
+                        <div>
+                            <p class="product-review-eyebrow">Price History</p>
+                            <h2 class="product-price-history-title">Backdoor market chart</h2>
+                        </div>
+                        <div class="product-price-history-summary">
+                            <span id="productPriceHistoryRange">Tracking started</span>
+                            <strong id="productPriceHistoryChange">$0</strong>
+                        </div>
+                    </div>
+                    <div class="product-price-history-chart-shell">
+                        <svg class="product-price-history-chart" id="productPriceHistoryChart" viewBox="0 0 560 220" preserveAspectRatio="none" aria-label="Product price history chart"></svg>
+                    </div>
+                    <div class="product-price-history-axis" id="productPriceHistoryAxis"></div>
+                    <p class="product-price-history-note" id="productPriceHistoryNote">Live Backdoor price tracking starts with the current ask and updates as the price changes.</p>
+                </section>
+
                 <div class="product-page-meta">
                     <div class="product-meta-item">
                         <span>SKU</span>
-                        <strong id="productSku">N/A</strong>
+                        <strong id="productSku">Loading</strong>
                     </div>
                     <div class="product-meta-item">
                         <span>Colorway</span>
-                        <strong id="productColorway">N/A</strong>
+                        <strong id="productColorway">Loading</strong>
                     </div>
                     <div class="product-meta-item">
                         <span>Release Date</span>
-                        <strong id="productReleaseDate">TBD</strong>
+                        <strong id="productReleaseDate">Loading</strong>
                     </div>
                 </div>
 
@@ -175,7 +228,7 @@
 
                 <div class="product-page-actions">
                     <button class="add-to-cart-btn" id="productAddToCart">Add to Cart</button>
-                    <button class="btn-hero-secondary product-wishlist-fixed" id="productWishlistBtn" type="button" title="Add to Wishlist" aria-label="Add to Wishlist">
+                    <button class="btn-hero-secondary product-wishlist-fixed" id="productWishlistBtnSecondary" type="button" title="Add to Wishlist" aria-label="Add to Wishlist">
                         <i class="fa-regular fa-heart"></i>
                     </button>
                     <a class="btn-hero-secondary product-back-link" href="men.html">Back to Men</a>
