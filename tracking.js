@@ -190,8 +190,10 @@ function showPage(page) {
     document.getElementById('trackingPage').classList.toggle('show', page === 'tracking');
     document.getElementById('adminPage').classList.toggle('show', page === 'admin');
 
-    document.getElementById('navLookup').classList.toggle('active', page === 'lookup' || page === 'tracking');
-    document.getElementById('navAdmin').classList.toggle('active', page === 'admin');
+    const navLookup = document.getElementById('navLookup');
+    const navAdmin = document.getElementById('navAdmin');
+    navLookup?.classList.toggle('active', page === 'lookup' || page === 'tracking');
+    navAdmin?.classList.toggle('active', page === 'admin');
 
     if (page === 'admin') renderAdminPanel();
     window.scrollTo(0, 0);
