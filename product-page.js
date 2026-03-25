@@ -229,6 +229,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const seededProduct = getSeededProducts().find((product) => product.id === productId);
 
+    if (seededProduct) {
+        currentProduct = seededProduct;
+        renderProduct(seededProduct);
+        initProductReviews(seededProduct);
+    }
+
     try {
         unsubscribeProduct?.();
         unsubscribeProduct = onSnapshot(doc(db, 'products', productId), (snapshot) => {
@@ -410,6 +416,9 @@ function renderProduct(product) {
 
 function initProductReviews(product) {
     if (unsubscribeReviews) unsubscribeReviews();
+
+    const seededReviews = mergeVisibleReviews([]).filter((review) => reviewMatchesProduct(review, product));
+    renderProductReviews(seededReviews);
 
     unsubscribeReviews = onSnapshot(collection(db, 'reviews'), (snapshot) => {
         const dynamicReviews = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
