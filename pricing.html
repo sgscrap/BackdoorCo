@@ -23,7 +23,7 @@
         <div class="header-actions">
             <div class="live-badge">
                 <div class="live-dot"></div>
-                MARKET LIVE
+                MARKET WATCH
             </div>
             <button class="auto-price-btn" onclick="runAutoPrice()">
                 <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Price All
@@ -42,7 +42,7 @@
         <div class="stat-card stat-card--blue">
             <div class="stat-label">Avg Market Price</div>
             <div class="stat-value" id="statAvgMarket">$—</div>
-            <div class="stat-sub">GOAT + StockX avg</div>
+            <div class="stat-sub">tracked benchmark price</div>
         </div>
         <div class="stat-card stat-card--green">
             <div class="stat-label">Underpriced</div>
@@ -58,6 +58,48 @@
             <div class="stat-label">Est. Revenue Gain</div>
             <div class="stat-value accent" id="statGain">$—</div>
             <div class="stat-sub">if optimized now</div>
+        </div>
+    </div>
+
+    <div class="opportunity-section card mb-20">
+        <div class="opportunity-header">
+            <div>
+                <div class="card-title">
+                    <i class="fa-solid fa-tags"></i>
+                    PRICE WATCH
+                </div>
+                <p class="opportunity-meta" id="pricingBoardMeta">Checking tracked shoe benchmarks...</p>
+            </div>
+            <div class="opportunity-legend">
+                <span class="opportunity-pill opportunity-pill--under">Raise price</span>
+                <span class="opportunity-pill opportunity-pill--over">Lower price</span>
+            </div>
+        </div>
+        <div class="opportunity-shell">
+            <div class="opportunity-panel">
+                <div class="opportunity-panel-head">
+                    <h2>Underpriced Shoes</h2>
+                    <span id="underpricedCount">0 tracked</span>
+                </div>
+                <div class="opportunity-grid" id="underpricedGrid">
+                    <div class="empty-state small">
+                        <i class="fa-solid fa-arrow-trend-up empty-icon small"></i>
+                        No underpriced tracked shoes yet.
+                    </div>
+                </div>
+            </div>
+            <div class="opportunity-panel">
+                <div class="opportunity-panel-head">
+                    <h2>Overpriced Shoes</h2>
+                    <span id="overpricedCount">0 tracked</span>
+                </div>
+                <div class="opportunity-grid" id="overpricedGrid">
+                    <div class="empty-state small">
+                        <i class="fa-solid fa-arrow-trend-down empty-icon small"></i>
+                        No overpriced tracked shoes yet.
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -293,7 +335,7 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="pricing.js"></script>
+    <script type="module" src="pricing.js"></script>
     <!-- Backdoor Analytics Tracker -->
     <script src="analytics.js"></script>
 

@@ -277,6 +277,274 @@ body {
     margin-bottom: 20px;
 }
 
+.opportunity-section {
+    padding-top: 22px;
+}
+
+.opportunity-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.opportunity-meta {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: -8px;
+}
+
+.opportunity-legend {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.opportunity-pill {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border2);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.opportunity-pill--under {
+    color: var(--green);
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.opportunity-pill--over {
+    color: var(--red);
+    background: rgba(255, 77, 77, 0.1);
+    border-color: rgba(255, 77, 77, 0.2);
+}
+
+.opportunity-shell {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.opportunity-panel {
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.opportunity-panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.opportunity-panel-head h2 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    letter-spacing: 2px;
+}
+
+.opportunity-panel-head span {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.opportunity-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.opportunity-card {
+    display: grid;
+    grid-template-columns: 116px 1fr;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+}
+
+.opportunity-card--under {
+    box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.08);
+}
+
+.opportunity-card--over {
+    box-shadow: inset 0 0 0 1px rgba(255, 77, 77, 0.08);
+}
+
+.opportunity-image {
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.opportunity-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 6px;
+}
+
+.opportunity-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.opportunity-kicker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.opportunity-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.opportunity-status--under {
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--green);
+}
+
+.opportunity-status--over {
+    background: rgba(255, 77, 77, 0.12);
+    color: var(--red);
+}
+
+.opportunity-gap {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.opportunity-gap--under {
+    color: var(--green);
+}
+
+.opportunity-gap--over {
+    color: var(--red);
+}
+
+.opportunity-brand {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.opportunity-name {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text);
+}
+
+.opportunity-prices {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.opportunity-price-cell {
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+}
+
+.opportunity-price-label {
+    display: block;
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+}
+
+.opportunity-price-value {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 28px;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.opportunity-price-value--current {
+    color: var(--text);
+}
+
+.opportunity-price-value--market {
+    color: var(--blue);
+}
+
+.opportunity-price-value--suggested {
+    color: var(--accent);
+}
+
+.opportunity-source {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--text2);
+}
+
+.opportunity-source a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.opportunity-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.opportunity-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.opportunity-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 /* ── SEARCH BAR ── */
 .search-bar {
     display: flex;
@@ -1134,6 +1402,10 @@ input[type=range]::-webkit-slider-thumb:hover {
     .two-col {
         grid-template-columns: 1fr;
     }
+
+    .opportunity-shell {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 700px) {
@@ -1151,5 +1423,13 @@ input[type=range]::-webkit-slider-thumb:hover {
 
     body {
         padding: 16px;
+    }
+
+    .opportunity-card {
+        grid-template-columns: 1fr;
+    }
+
+    .opportunity-prices {
+        grid-template-columns: 1fr;
     }
 }

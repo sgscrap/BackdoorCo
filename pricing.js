@@ -3,9 +3,21 @@
 ══════════════════════════════════════════ */
 
 /* ── STATE ── */
+import {
+    BLACK_CAT_IMAGES,
+    buildProductHref,
+    getProductCardImage,
+    getProductSizes,
+    getSeededProducts,
+    mergeCatalogProducts
+} from './product-data.js';
+
 let currentStrategy = 'competitive';
 let currentMargin = 20;
 let currentProduct = null;
+let catalogProducts = [];
+let trackedPricingRows = [];
+let productsUnsubscribe = null;
 
 let autoRules = [
     { id: 1, name: 'Beat Lowest Ask', condition: 'Market drops > 5%', action: 'Lower price to match', active: true },
@@ -105,8 +117,7 @@ const MARKET_DB = {
     },
 };
 
-/* Sample inventory for bulk table */
-const INVENTORY = [
+const DEMO_INVENTORY = [
     { name: 'Jordan 1 Retro High OG Chicago', sku: '555088-101', yours: 760, market: 737, emoji: '👟' },
     { name: 'Yeezy 350 V2 Zebra', sku: 'CP9654', yours: 320, market: 310, emoji: '🦓' },
     { name: 'Nike Dunk Low Panda', sku: 'DD1391-100', yours: 168, market: 159, emoji: '🐼' },
@@ -114,6 +125,109 @@ const INVENTORY = [
     { name: 'New Balance 550 White', sku: 'BB550WT1', yours: 150, market: 148, emoji: '💚' },
     { name: 'Jordan 4 Retro Military Blue', sku: '408452-105', yours: 310, market: 340, emoji: '👟' },
     { name: 'Nike Air Max 1 "86 OG Big Bubble"', sku: 'DO9844-101', yours: 185, market: 180, emoji: '💨' },
+];
+
+const MARKET_BENCHMARK_DATE = 'March 24, 2026';
+const PRICE_VARIANCE_THRESHOLD = 15;
+const TRACKED_MARKET_WATCH = [
+    {
+        key: 'black-cat',
+        benchmarkPrice: 750,
+        benchmarkSourceLabel: 'StockX Buy Now',
+        benchmarkSourceUrl: 'https://stockx.com/air-jordan-4-retro-black-cat-2020',
+        match(product) {
+            const name = String(product?.name || '').toLowerCase();
+            const sku = String(product?.sku || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            return (name.includes('black cat') && name.includes('jordan 4')) || sku === 'cu1110010' || sku === 'fv5029010';
+        },
+        fallbackProduct: {
+            id: '3BnEYfFRQGN1zhIrqQgv',
+            name: "Jordan 4 Retro 'Black Cat' 2020",
+            brand: 'Jordan',
+            category: 'Sneakers',
+            price: 290,
+            image: BLACK_CAT_IMAGES[0]
+        }
+    },
+    {
+        key: 'adult-black-phantom',
+        benchmarkPrice: 841,
+        benchmarkSourceLabel: 'StockX Buy Now',
+        benchmarkSourceUrl: 'https://stockx.com/air-jordan-1-retro-low-og-sp-travis-scott-black-phantom',
+        match(product) {
+            const id = String(product?.id || '').toLowerCase();
+            const name = String(product?.name || '').toLowerCase();
+            const sku = String(product?.sku || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            return id === 'seed-men-travis-black-phantom' || sku === 'dm7866001' || (name.includes('black phantom') && !name.includes(' ps ') && !name.includes('td'));
+        }
+    },
+    {
+        key: 'velvet-brown',
+        benchmarkPrice: 400,
+        benchmarkSourceLabel: 'StockX Buy Now',
+        benchmarkSourceUrl: 'https://stockx.com/es-es/air-jordan-1-retro-low-og-sp-travis-scott-velvet-brown',
+        match(product) {
+            const id = String(product?.id || '').toLowerCase();
+            const name = String(product?.name || '').toLowerCase();
+            const sku = String(product?.sku || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            return id === 'seed-men-travis-velvet-brown' || sku === 'dm7866202' || name.includes('velvet brown');
+        }
+    },
+    {
+        key: 'yeezy-slide-onyx',
+        benchmarkPrice: 134,
+        benchmarkSourceLabel: 'StockX Buy Now',
+        benchmarkSourceUrl: 'https://stockx.com/en-gb/adidas-yeezy-slide-black-onyx?size=10',
+        match(product) {
+            const id = String(product?.id || '').toLowerCase();
+            const name = String(product?.name || '').toLowerCase();
+            const sku = String(product?.sku || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            return id === 'seed-yeezy-slide-onyx' || sku === 'hq6448' || (name.includes('yeezy slide') && name.includes('onyx'));
+        }
+    },
+    {
+        key: 'kobe-bruce-lee',
+        benchmarkPrice: 400,
+        benchmarkSourceLabel: 'GOAT Buy New',
+        benchmarkSourceUrl: 'https://www.goat.com/sneakers/nike-zoom-kobe-5-protro-bruce-lee-alt-cd4991-101',
+        match(product) {
+            const id = String(product?.id || '').toLowerCase();
+            const name = String(product?.name || '').toLowerCase();
+            const sku = String(product?.sku || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            return id === 'seed-kobe-5-alternate-bruce-lee' || sku === 'cd4991101' || name.includes('alternate bruce lee');
+        }
+    },
+    {
+        key: 'new-balance-sea-salt',
+        benchmarkPrice: 87,
+        benchmarkSourceLabel: 'StockX Buy Now',
+        benchmarkSourceUrl: 'https://stockx.com/en-gb/new-balance-m2002-protection-pack-sea-salt',
+        match(product) {
+            const id = String(product?.id || '').toLowerCase();
+            const name = String(product?.name || '').toLowerCase();
+            return id === 'seed-nb-2002r-protection-pack-sea-salt' || name.includes('protection pack sea salt');
+        }
+    },
+    {
+        key: 'off-white-the-ten',
+        benchmarkPrice: 1350,
+        benchmarkSourceLabel: 'StockX Lowest Ask',
+        benchmarkSourceUrl: 'https://stockx.com/nike-air-force-1-low-off-white',
+        match(product) {
+            const id = String(product?.id || '').toLowerCase();
+            const name = String(product?.name || '').toLowerCase();
+            const sku = String(product?.sku || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            return id === 'seed-off-white-nike-air-force-1-low-the-ten' || sku === 'ao4606100' || (name.includes('air force 1') && name.includes('the ten'));
+        },
+        fallbackProduct: {
+            id: 'seed-off-white-nike-air-force-1-low-the-ten',
+            name: "Off-White x Nike Air Force 1 Low 'The Ten'",
+            brand: 'Nike x Off-White',
+            category: 'Sneakers',
+            price: 1300,
+            image: 'https://mysportsshoe.com/wp-content/uploads/2018/06/802491_01.jpg'
+        }
+    }
 ];
 
 /* ══════════════════════════════════════════
@@ -129,6 +243,259 @@ function showToast(msg, type = 'success') {
     toast.innerHTML = `<i class="fa-solid ${type === 'error' ? 'fa-circle-xmark' : type === 'warn' ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i> ${msg}`;
     container.appendChild(toast);
     setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(110%)'; setTimeout(() => toast.remove(), 300); }, 3000);
+}
+
+function formatMoney(value) {
+    const amount = Number(value) || 0;
+    return `$${Math.round(amount)}`;
+}
+
+function roundToNearestFive(value) {
+    return Math.round((Number(value) || 0) / 5) * 5;
+}
+
+function isFootwearProduct(product) {
+    const category = String(product?.category || '').toLowerCase();
+    const name = String(product?.name || '').toLowerCase();
+    return ['sneakers', 'shoes', 'kids'].includes(category)
+        || name.includes('jordan')
+        || name.includes('nike')
+        || name.includes('yeezy')
+        || name.includes('kobe')
+        || name.includes('new balance')
+        || name.includes('off-white');
+}
+
+function getCurrentProductPrice(product) {
+    const directPrice = Number(product?.price);
+    if (directPrice > 0) return directPrice;
+
+    const sizes = getProductSizes(product);
+    if (!sizes.length) return 0;
+
+    return avg(sizes.map((entry) => Number(entry.price) || 0).filter(Boolean));
+}
+
+function buildSuggestedBenchmarkPrice(benchmarkPrice) {
+    const benchmark = Number(benchmarkPrice) || 0;
+    if (!benchmark) return 0;
+    const discount = Math.min(100, benchmark * 0.2);
+    return Math.max(0, roundToNearestFive(benchmark - discount));
+}
+
+function createFallbackHref(product) {
+    if (!product?.id || !product?.name) return '#';
+    return buildProductHref(product);
+}
+
+function buildTrackedPricingRow(product, config) {
+    const benchmarkPrice = Number(config?.benchmarkPrice) || 0;
+    const currentPrice = getCurrentProductPrice(product);
+    if (!benchmarkPrice || !currentPrice) return null;
+
+    const suggestedPrice = buildSuggestedBenchmarkPrice(benchmarkPrice);
+    const delta = roundToNearestFive(suggestedPrice - currentPrice);
+    const status = delta >= 0 ? 'under' : 'over';
+    const absDelta = Math.abs(delta);
+
+    if (absDelta < PRICE_VARIANCE_THRESHOLD) {
+        return null;
+    }
+
+    const href = product?.href || createFallbackHref(product);
+    const image = String(product?.cardImage || product?.image || '').trim() || BLACK_CAT_IMAGES[0];
+    return {
+        key: config.key,
+        id: product?.id || config.key,
+        brand: String(product?.brand || '').trim() || 'Tracked',
+        name: String(product?.name || '').trim() || 'Tracked product',
+        sku: String(product?.sku || '').trim(),
+        href,
+        image,
+        currentPrice,
+        benchmarkPrice,
+        suggestedPrice,
+        delta,
+        absDelta,
+        status,
+        benchmarkSourceLabel: config.benchmarkSourceLabel,
+        benchmarkSourceUrl: config.benchmarkSourceUrl
+    };
+}
+
+function getTrackedCatalogProducts(products) {
+    const baseProducts = [...products];
+    const rows = [];
+
+    TRACKED_MARKET_WATCH.forEach((config) => {
+        const matchedProduct = baseProducts.find((product) => config.match(product));
+        const product = matchedProduct || config.fallbackProduct;
+        if (!product) return;
+
+        const normalizedProduct = {
+            ...product,
+            image: product.image || getProductCardImage(product),
+            cardImage: getProductCardImage(product)
+        };
+        const row = buildTrackedPricingRow(normalizedProduct, config);
+        if (row) {
+            rows.push(row);
+        }
+    });
+
+    return rows.sort((left, right) => right.absDelta - left.absDelta);
+}
+
+function renderOpportunityCards(targetId, items, status) {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    if (!items.length) {
+        target.innerHTML = `
+            <div class="empty-state small">
+                <i class="fa-solid ${status === 'under' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'} empty-icon small"></i>
+                No ${status === 'under' ? 'underpriced' : 'overpriced'} tracked shoes right now.
+            </div>
+        `;
+        return;
+    }
+
+    target.innerHTML = items.map((item) => `
+        <article class="opportunity-card opportunity-card--${status}">
+            <div class="opportunity-image">
+                <img src="${item.image}" alt="${item.name}">
+            </div>
+            <div class="opportunity-body">
+                <div class="opportunity-kicker">
+                    <span class="opportunity-status opportunity-status--${status}">
+                        ${status === 'under' ? 'Underpriced' : 'Overpriced'}
+                    </span>
+                    <span class="opportunity-gap opportunity-gap--${status}">
+                        ${status === 'under' ? '+' : '-'}${formatMoney(item.absDelta)}
+                    </span>
+                </div>
+                <div>
+                    <div class="opportunity-brand">${item.brand}</div>
+                    <div class="opportunity-name">${item.name}</div>
+                </div>
+                <div class="opportunity-prices">
+                    <div class="opportunity-price-cell">
+                        <span class="opportunity-price-label">Current</span>
+                        <div class="opportunity-price-value opportunity-price-value--current">${formatMoney(item.currentPrice)}</div>
+                    </div>
+                    <div class="opportunity-price-cell">
+                        <span class="opportunity-price-label">Market</span>
+                        <div class="opportunity-price-value opportunity-price-value--market">${formatMoney(item.benchmarkPrice)}</div>
+                    </div>
+                    <div class="opportunity-price-cell">
+                        <span class="opportunity-price-label">Suggested</span>
+                        <div class="opportunity-price-value opportunity-price-value--suggested">${formatMoney(item.suggestedPrice)}</div>
+                    </div>
+                </div>
+                <div class="opportunity-source">
+                    <span>${item.benchmarkSourceLabel} benchmark on ${MARKET_BENCHMARK_DATE}</span>
+                    <a href="${item.benchmarkSourceUrl}" target="_blank" rel="noreferrer">View source</a>
+                </div>
+                <div class="opportunity-actions">
+                    <a class="opportunity-link" href="${item.href}">View product</a>
+                </div>
+            </div>
+        </article>
+    `).join('');
+}
+
+function renderTrackedPricingBoard() {
+    const rows = [...trackedPricingRows];
+    const underpriced = rows.filter((item) => item.status === 'under');
+    const overpriced = rows.filter((item) => item.status === 'over');
+
+    document.getElementById('underpricedCount').textContent = `${underpriced.length} tracked`;
+    document.getElementById('overpricedCount').textContent = `${overpriced.length} tracked`;
+
+    const meta = document.getElementById('pricingBoardMeta');
+    if (meta) {
+        meta.textContent = rows.length
+            ? `Benchmarks observed on ${MARKET_BENCHMARK_DATE}. Suggested prices target about 20% off market, capped at $100.`
+            : `Add tracked shoe comps to compare live catalog pricing against market benchmarks.`;
+    }
+
+    renderOpportunityCards('underpricedGrid', underpriced, 'under');
+    renderOpportunityCards('overpricedGrid', overpriced, 'over');
+}
+
+function buildBulkRows() {
+    if (trackedPricingRows.length) {
+        return trackedPricingRows.map((item) => ({
+            name: item.name,
+            sku: item.sku || item.key.toUpperCase(),
+            yours: item.currentPrice,
+            market: item.benchmarkPrice,
+            suggested: item.suggestedPrice,
+            href: item.href,
+            image: item.image,
+            status: item.status
+        }));
+    }
+
+    return DEMO_INVENTORY.map((item) => ({
+        ...item,
+        suggested: calcSuggestedPrice(item.market * 1.04, item.market * 0.96, currentStrategy, item.market * 0.6, currentMargin)
+    }));
+}
+
+function updateTrackedStats() {
+    const rows = buildBulkRows();
+    if (!rows.length) {
+        animateCounter('statAvgYours', '$0');
+        animateCounter('statAvgMarket', '$0');
+        animateCounter('statUnder', '0');
+        animateCounter('statOver', '0');
+        animateCounter('statGain', '$0');
+        return;
+    }
+
+    const avgYours = avg(rows.map((row) => row.yours));
+    const avgMarket = avg(rows.map((row) => row.market));
+    const under = rows.filter((row) => row.yours < row.suggested - PRICE_VARIANCE_THRESHOLD).length;
+    const over = rows.filter((row) => row.yours > row.suggested + PRICE_VARIANCE_THRESHOLD).length;
+    const totalGain = rows.reduce((sum, row) => sum + (row.suggested - row.yours), 0);
+
+    animateCounter('statAvgYours', formatMoney(avgYours));
+    animateCounter('statAvgMarket', formatMoney(avgMarket));
+    animateCounter('statUnder', String(under));
+    animateCounter('statOver', String(over));
+    animateCounter('statGain', `${totalGain >= 0 ? '+' : '-'}${formatMoney(Math.abs(totalGain))}`);
+}
+
+function refreshTrackedPricingFromCatalog(nextProducts) {
+    catalogProducts = nextProducts;
+    trackedPricingRows = getTrackedCatalogProducts(catalogProducts);
+    renderTrackedPricingBoard();
+    renderBulkTable();
+    updateTrackedStats();
+}
+
+function subscribeToProducts() {
+    const seededProducts = mergeCatalogProducts(getSeededProducts());
+    refreshTrackedPricingFromCatalog(seededProducts);
+
+    if (!window.firebase?.firestore) {
+        return;
+    }
+
+    try {
+        const db = window.firebase.firestore();
+        productsUnsubscribe?.();
+        productsUnsubscribe = db.collection('products').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+            const liveProducts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            refreshTrackedPricingFromCatalog(mergeCatalogProducts(liveProducts));
+        }, (error) => {
+            console.error('Pricing products sync failed', error);
+            showToast('Live pricing sync unavailable. Using tracked catalog defaults.', 'warn');
+        });
+    } catch (error) {
+        console.error('Unable to start pricing product sync', error);
+    }
 }
 
 /* ══════════════════════════════════════════
@@ -547,11 +914,11 @@ function addRule() {
    BULK TABLE
 ══════════════════════════════════════════ */
 function renderBulkTable() {
-    document.getElementById('bulkTableBody').innerHTML = INVENTORY.map(item => {
+    document.getElementById('bulkTableBody').innerHTML = buildBulkRows().map(item => {
         const diff = item.yours - item.market;
         const diffPct = ((diff / item.market) * 100).toFixed(1);
         const pos = getPositionLabel(item.yours, item.market);
-        const suggested = calcSuggestedPrice(
+        const suggested = Number(item.suggested) || calcSuggestedPrice(
             item.market * 1.04, item.market * 0.96,
             currentStrategy, item.market * 0.6, currentMargin
         );
@@ -560,7 +927,9 @@ function renderBulkTable() {
       <tr>
         <td>
           <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:20px">${item.emoji}</span>
+            ${item.image
+                ? `<img src="${item.image}" alt="${item.name}" style="width:44px;height:44px;border-radius:10px;background:#fff;object-fit:contain;padding:3px;flex-shrink:0;">`
+                : `<span style="font-size:20px">${item.emoji || '👟'}</span>`}
             <div>
               <div style="font-weight:700;color:var(--text)">${item.name}</div>
               <div style="font-size:11px;color:var(--text3);font-family:monospace">${item.sku}</div>
@@ -576,7 +945,9 @@ function renderBulkTable() {
         </td>
         <td><span class="price-vs-market ${pos.class}">${pos.icon} ${pos.label}</span></td>
         <td><div class="price-cell green" style="font-size:20px">$${suggested}</div></td>
-        <td><button class="apply-size-btn" onclick="applyPrice(${item.yours}, ${suggested}, '${item.name}')">Apply</button></td>
+        <td>${item.href
+                ? `<a class="apply-size-btn" href="${item.href}" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none">Open</a>`
+                : `<button class="apply-size-btn" onclick="applyPrice(${item.yours}, ${suggested}, '${item.name}')">Apply</button>`}</td>
       </tr>
     `;
     }).join('');
@@ -586,26 +957,7 @@ function renderBulkTable() {
    TOP STATS
 ══════════════════════════════════════════ */
 function updateTopStats() {
-    const avgYours = avg(INVENTORY.map(i => i.yours));
-    const avgMarket = avg(INVENTORY.map(i => i.market));
-
-    const under = INVENTORY.filter(i => i.yours < i.market * 0.95).length;
-    const over = INVENTORY.filter(i => i.yours > i.market * 1.05).length;
-
-    let totalGain = 0;
-    INVENTORY.forEach(i => {
-        const suggested = calcSuggestedPrice(
-            i.market * 1.04, i.market * 0.96,
-            currentStrategy, i.market * 0.6, currentMargin
-        );
-        totalGain += suggested - i.yours;
-    });
-
-    animateCounter('statAvgYours', '$' + Math.round(avgYours));
-    animateCounter('statAvgMarket', '$' + Math.round(avgMarket));
-    animateCounter('statUnder', under.toString());
-    animateCounter('statOver', over.toString());
-    animateCounter('statGain', (totalGain >= 0 ? '+$' : '-$') + Math.abs(Math.round(totalGain)));
+    updateTrackedStats();
 }
 
 function animateCounter(id, target) {
@@ -622,4 +974,18 @@ document.addEventListener('DOMContentLoaded', () => {
     renderRulesTable();
     renderBulkTable();
     updateTopStats();
+    renderTrackedPricingBoard();
+    subscribeToProducts();
+});
+
+Object.assign(window, {
+    addRule,
+    applyAllPrices,
+    applyPrice,
+    fetchMarketData,
+    quickSearch,
+    runAutoPrice,
+    setStrategy,
+    toggleRule,
+    updateMargin
 });
