@@ -18,6 +18,7 @@ let currentProduct = null;
 let catalogProducts = [];
 let trackedPricingRows = [];
 let productsUnsubscribe = null;
+const applyingProductIds = new Set();
 
 let autoRules = [
     { id: 1, name: 'Beat Lowest Ask', condition: 'Market drops > 5%', action: 'Lower price to match', active: true },
@@ -288,6 +289,104 @@ function createFallbackHref(product) {
     return buildProductHref(product);
 }
 
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function getTrackedRowById(productId) {
+    return trackedPricingRows.find((row) => row.id === productId) || null;
+}
+
+function buildPriceUpdatePayload(product, newPrice) {
+    const normalizedPrice = Number(newPrice) || 0;
+    const payload = {
+        ...product,
+        price: normalizedPrice,
+        updatedAt: window.firebase?.firestore?.FieldValue?.serverTimestamp?.() || new Date().toISOString(),
+        lastSuggestedPrice: normalizedPrice,
+        lastPricedFrom: 'pricing-watch'
+    };
+
+    if (Array.isArray(product?.sizes) && product.sizes.length > 0) {
+        payload.sizes = product.sizes.map((entry) => ({
+            ...entry,
+            price: normalizedPrice
+        }));
+    }
+
+    if (!product?.createdAt && window.firebase?.firestore?.FieldValue?.serverTimestamp) {
+        payload.createdAt = window.firebase.firestore.FieldValue.serverTimestamp();
+    }
+
+    return payload;
+}
+
+async function applyTrackedPriceById(productId) {
+    const row = getTrackedRowById(productId);
+    if (!row) {
+        showToast('Tracked product not found.', 'error');
+        return;
+    }
+
+    if (applyingProductIds.has(productId)) {
+        return;
+    }
+
+    if (!window.firebase?.firestore) {
+        showToast('Live pricing write unavailable on this page.', 'error');
+        return;
+    }
+
+    const sourceProduct = row.sourceProduct || catalogProducts.find((product) => product.id === productId);
+    if (!sourceProduct) {
+        showToast('Unable to resolve the product record for pricing.', 'error');
+        return;
+    }
+
+    applyingProductIds.add(productId);
+    renderTrackedPricingBoard();
+    renderBulkTable();
+
+    try {
+        const db = window.firebase.firestore();
+        const payload = buildPriceUpdatePayload(sourceProduct, row.suggestedPrice);
+        await db.collection('products').doc(productId).set(payload, { merge: true });
+
+        const existingIndex = catalogProducts.findIndex((product) => product.id === productId);
+        if (existingIndex >= 0) {
+            catalogProducts = catalogProducts.map((product) => {
+                if (product.id !== productId) return product;
+                return {
+                    ...product,
+                    ...payload
+                };
+            });
+        } else {
+            catalogProducts = [...catalogProducts, { ...sourceProduct, ...payload }];
+        }
+        refreshTrackedPricingFromCatalog(catalogProducts);
+        showToast(`${row.name}: price updated to ${formatMoney(row.suggestedPrice)}`);
+    } catch (error) {
+        console.error('Tracked pricing update failed', error);
+        const isPermissionError = String(error?.code || '').includes('permission');
+        showToast(
+            isPermissionError
+                ? 'Pricing write blocked. Sign in with the admin account first.'
+                : 'Unable to update the product price right now.',
+            'error'
+        );
+    } finally {
+        applyingProductIds.delete(productId);
+        renderTrackedPricingBoard();
+        renderBulkTable();
+    }
+}
+
 function buildTrackedPricingRow(product, config) {
     const benchmarkPrice = Number(config?.benchmarkPrice) || 0;
     const currentPrice = getCurrentProductPrice(product);
@@ -318,6 +417,7 @@ function buildTrackedPricingRow(product, config) {
         delta,
         absDelta,
         status,
+        sourceProduct: product,
         benchmarkSourceLabel: config.benchmarkSourceLabel,
         benchmarkSourceUrl: config.benchmarkSourceUrl
     };
@@ -397,6 +497,13 @@ function renderOpportunityCards(targetId, items, status) {
                     <a href="${item.benchmarkSourceUrl}" target="_blank" rel="noreferrer">View source</a>
                 </div>
                 <div class="opportunity-actions">
+                    <button
+                        class="opportunity-link opportunity-link--primary"
+                        onclick='applyTrackedPriceById(${JSON.stringify(item.id)})'
+                        ${applyingProductIds.has(item.id) ? 'disabled' : ''}
+                    >
+                        ${applyingProductIds.has(item.id) ? 'Applying...' : `Set ${formatMoney(item.suggestedPrice)}`}
+                    </button>
                     <a class="opportunity-link" href="${item.href}">View product</a>
                 </div>
             </div>
@@ -426,6 +533,7 @@ function renderTrackedPricingBoard() {
 function buildBulkRows() {
     if (trackedPricingRows.length) {
         return trackedPricingRows.map((item) => ({
+            id: item.id,
             name: item.name,
             sku: item.sku || item.key.toUpperCase(),
             yours: item.currentPrice,
@@ -922,6 +1030,7 @@ function renderBulkTable() {
             item.market * 1.04, item.market * 0.96,
             currentStrategy, item.market * 0.6, currentMargin
         );
+        const isApplying = item.id ? applyingProductIds.has(item.id) : false;
 
         return `
       <tr>
@@ -945,9 +1054,16 @@ function renderBulkTable() {
         </td>
         <td><span class="price-vs-market ${pos.class}">${pos.icon} ${pos.label}</span></td>
         <td><div class="price-cell green" style="font-size:20px">$${suggested}</div></td>
-        <td>${item.href
-                ? `<a class="apply-size-btn" href="${item.href}" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none">Open</a>`
-                : `<button class="apply-size-btn" onclick="applyPrice(${item.yours}, ${suggested}, '${item.name}')">Apply</button>`}</td>
+        <td>
+          <div class="pricing-action-stack">
+            ${item.id
+                ? `<button class="apply-size-btn apply-size-btn--primary" onclick='applyTrackedPriceById(${JSON.stringify(item.id)})' ${isApplying ? 'disabled' : ''}>${isApplying ? 'Applying...' : `Set $${suggested}`}</button>`
+                : `<button class="apply-size-btn apply-size-btn--primary" onclick="applyPrice(${item.yours}, ${suggested}, '${escapeHtml(item.name)}')">Set $${suggested}</button>`}
+            ${item.href
+                ? `<a class="apply-size-btn apply-size-btn--ghost" href="${item.href}" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none">View</a>`
+                : ''}
+          </div>
+        </td>
       </tr>
     `;
     }).join('');
@@ -982,6 +1098,7 @@ Object.assign(window, {
     addRule,
     applyAllPrices,
     applyPrice,
+    applyTrackedPriceById,
     fetchMarketData,
     quickSearch,
     runAutoPrice,

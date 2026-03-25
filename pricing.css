@@ -540,6 +540,22 @@ body {
     transition: all 0.2s;
 }
 
+.opportunity-link--primary {
+    background: rgba(200, 246, 93, .12);
+    color: var(--accent);
+    border-color: rgba(200, 246, 93, .35);
+}
+
+.opportunity-link--primary:hover {
+    background: rgba(200, 246, 93, .2);
+    color: #000;
+}
+
+.opportunity-link:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
 .opportunity-link:hover {
     border-color: var(--accent);
     color: var(--accent);
@@ -1305,8 +1321,37 @@ input[type=range]::-webkit-slider-thumb:hover {
     transition: all 0.2s;
 }
 
+.pricing-action-stack {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.apply-size-btn--primary {
+    background: rgba(200, 246, 93, .12);
+    border-color: rgba(200, 246, 93, .35);
+}
+
+.apply-size-btn--ghost {
+    background: transparent;
+    color: var(--text2);
+    border-color: var(--border2);
+}
+
 .apply-size-btn:hover {
     background: rgba(200, 246, 93, .2);
+}
+
+.apply-size-btn--ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.apply-size-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
 }
 
 /* ── TOAST ── */
