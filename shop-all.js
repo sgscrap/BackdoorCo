@@ -26,6 +26,8 @@ import {
 
 let allProducts = [];
 let currentFilter = window.initialFilter || 'all';
+let currentColor = 'all';
+let currentPrice = 'all';
 let currentSort = 'featured';
 let searchTerm = '';
 
@@ -114,6 +116,20 @@ function getFilteredProducts() {
             product.sku?.toLowerCase().includes(searchTerm) ||
             (product.colorway || '').toLowerCase().includes(searchTerm)
         ));
+    }
+
+    if (currentColor !== 'all') {
+        filtered = filtered.filter((product) => (product.colorway || '').toLowerCase().includes(currentColor.toLowerCase()));
+    }
+
+    if (currentPrice !== 'all') {
+        filtered = filtered.filter((p) => {
+            if (currentPrice === 'under-100') return p.price < 100;
+            if (currentPrice === '100-200') return p.price >= 100 && p.price <= 200;
+            if (currentPrice === '200-300') return p.price > 200 && p.price <= 300;
+            if (currentPrice === 'over-300') return p.price > 300;
+            return true;
+        });
     }
 
     switch (currentSort) {
@@ -317,6 +333,8 @@ if (clearSearchBtn) {
 if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener('click', () => {
         currentFilter = 'all';
+        currentColor = 'all';
+        currentPrice = 'all';
         currentSort = 'featured';
         searchTerm = '';
         if (searchInput) searchInput.value = '';
@@ -384,4 +402,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadAllProducts();
     updateCartDisplay();
+});
+
+document.querySelectorAll('.color-filter').forEach((tab) => {
+    tab.addEventListener('click', () => {
+        const isActive = tab.classList.contains('active');
+        document.querySelectorAll('.color-filter').forEach((item) => item.classList.remove('active'));
+        
+        if (isActive) {
+            currentColor = 'all';
+        } else {
+            tab.classList.add('active');
+            currentColor = tab.dataset.color;
+        }
+        renderProducts();
+    });
+});
+
+document.querySelectorAll('.price-filter').forEach((tab) => {
+    tab.addEventListener('click', () => {
+        const isActive = tab.classList.contains('active');
+        document.querySelectorAll('.price-filter').forEach((item) => item.classList.remove('active'));
+        
+        if (isActive) {
+            currentPrice = 'all';
+        } else {
+            tab.classList.add('active');
+            currentPrice = tab.dataset.price;
+        }
+        renderProducts();
+    });
 });
