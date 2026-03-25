@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backdoor | Reviews</title>
-    <meta name="description" content="Customer-style review posts from the Backdoor community.">
+    <title>About | Backdoor</title>
+    <meta name="description" content="Learn more about Backdoor, the premier destination for authenticated sneakers and apparel.">
     <link
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
         rel="stylesheet" />
@@ -32,7 +32,7 @@
             </div>
         </div>
         <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
-        <a class="nav-link " href="about.html">About</a>
+        <a class="nav-link active" href="about.html">About</a>
     </div>
     <div class="nav-right">
         <div class="nav-search-wrap">
@@ -70,35 +70,25 @@
 
     <main class="reviews-page-shell">
         <section class="reviews-hero">
-            <p class="product-review-eyebrow">Community Posts</p>
-            <h1>All Reviews</h1>
-            <p>Real-looking customer posts, fit pics, and quick reactions linked to the pairs people actually bought.</p>
+            <p class="product-review-eyebrow">The Collective</p>
+            <h1>About Backdoor</h1>
+            <p>Backdoor is more than just a marketplace. We are a community of enthusiasts dedicated to the culture of authenticated sneakers and premium apparel.</p>
         </section>
 
-        <section class="reviews-page-grid" id="reviewsPageGrid">
-            <div class="reviews-empty-state">Loading reviews...</div>
+        <section class="about-content-shell">
+            <div class="about-card">
+                <h2>Our Mission</h2>
+                <p>Founded on the principles of trust and transparency, Backdoor ensures that every item passing through our platform is 100% authenticated. We bridge the gap between collectors and the most sought-after drops in the world.</p>
+                
+                <h2>Why Shop With Us?</h2>
+                <ul class="about-list">
+                    <li><i class="fa-solid fa-check"></i> Verified Authentication Process</li>
+                    <li><i class="fa-solid fa-check"></i> Curated Collection of 1/1s & Grails</li>
+                    <li><i class="fa-solid fa-check"></i> Secure Payment & Worldwide Shipping</li>
+                </ul>
+            </div>
         </section>
     </main>
-
-    <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out;">
-        <img id="lightboxImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none;" oncontextmenu="return false;" draggable="false">
-    </div>
-
-    <script type="module" src="reviews.js"></script>
-    <script>
-        window.openLightbox = (src) => {
-            const lb = document.getElementById('imageLightbox');
-            const img = document.getElementById('lightboxImage');
-            if (lb && img && src) {
-                img.src = src;
-                lb.style.display = 'flex';
-            }
-        };
-        window.closeLightbox = (e) => {
-            const lb = document.getElementById('imageLightbox');
-            if (lb) lb.style.display = 'none';
-        };
-    </script>
 
   <!-- Firebase SDKs & Global Auth -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -116,6 +106,5 @@
   </script>
   <script src="auth.js"></script>
 </body>
-
 
 </html>

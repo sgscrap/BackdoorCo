@@ -23,6 +23,35 @@ let cart = [];
 let currentStep = 1;
 let selectedShipping = 'standard';
 
+// ── Promo Code State ──
+const PROMO_CODES = {
+    'SGSCRAP': { discount: 0.30, label: '30% off — SGSCRAP' }
+};
+let promoState = JSON.parse(localStorage.getItem('backdoor-promo') || 'null');
+
+function applyPromoCode(raw) {
+    const code = (raw || '').trim().toUpperCase();
+    const match = PROMO_CODES[code];
+    if (!match) {
+        showToast('Invalid promo code.', 'error');
+        return false;
+    }
+    promoState = { code };
+    localStorage.setItem('backdoor-promo', JSON.stringify(promoState));
+    showToast(`✓ Code applied — ${match.label}!`, 'success');
+    renderCartDrawer();
+    updateCheckoutSummary();
+    return true;
+}
+
+function removePromo() {
+    promoState = null;
+    localStorage.removeItem('backdoor-promo');
+    renderCartDrawer();
+    updateCheckoutSummary();
+    showToast('Promo code removed.', 'info');
+}
+
 function normalizeCartItem(item) {
     return {
         id: item?.id || item?.productId || '',
@@ -397,8 +426,10 @@ function updateCheckoutSummary() {
     `).join('');
 
     const subtotal = getCartSubtotal();
+    const discount = getDiscountAmount();
+    const discountedSubtotal = subtotal - discount;
     const shipping = getShippingCost();
-    const total = subtotal + shipping - getDiscountAmount();
+    const total = discountedSubtotal + shipping;
 
     const setText = (id, value) => {
         const node = document.getElementById(id);
@@ -411,7 +442,18 @@ function updateCheckoutSummary() {
     setText('summaryTotal', fmt(total));
 
     const discountLine = document.getElementById('discountLine');
-    if (discountLine) discountLine.classList.add('hidden');
+    const discountAmt = document.getElementById('discountAmount');
+    const discountLabel = document.getElementById('discountLabel');
+    if (discountLine) {
+        if (discount > 0) {
+            discountLine.classList.remove('hidden');
+            if (discountAmt) discountAmt.textContent = `-${fmt(discount)}`;
+            const codeInfo = promoState && PROMO_CODES[promoState.code?.toUpperCase()];
+            if (discountLabel) discountLabel.textContent = codeInfo ? codeInfo.label : 'Discount';
+        } else {
+            discountLine.classList.add('hidden');
+        }
+    }
 }
 
 function getShippingSelection() {
@@ -439,7 +481,9 @@ function buildCheckoutRequestPayload() {
             country: normalizeCountryCode(document.getElementById('country')?.value || 'US')
         },
         shippingMethod: getShippingSelection().id,
-        cart: cart.map(normalizeCartItem)
+        cart: cart.map(normalizeCartItem),
+        promoCode: promoState?.code || null,
+        discountAmount: Math.round(getDiscountAmount() * 100) // cents
     };
 }
 
@@ -536,9 +580,14 @@ async function placeOrder() {
 function applyPromo() {
     const cartInput = document.getElementById('promoCode');
     const checkoutInput = document.getElementById('checkoutPromo');
+    const raw = (cartInput?.value || checkoutInput?.value || '').trim();
+    if (!raw) {
+        showToast('Please enter a promo code.', 'error');
+        return;
+    }
+    applyPromoCode(raw);
     if (cartInput) cartInput.value = '';
     if (checkoutInput) checkoutInput.value = '';
-    showToast('Promo codes and pay-later offers are handled in Stripe checkout.', 'info');
 }
 
 async function handleCheckoutReturn() {
@@ -644,6 +693,7 @@ window.closeCart = closeCart;
 window.goToCheckout = goToCheckout;
 window.showPage = showPage;
 window.applyPromo = applyPromo;
+window.removePromo = removePromo;
 window.removeFromCart = removeFromCart;
 window.updateQty = updateQty;
 window.formatPhone = formatPhone;

@@ -15,21 +15,59 @@
 <body>
 
     <!-- ══ NAVBAR ══ -->
-    <nav class="navbar">
-        <div class="nav-logo">BACK<span>DOOR</span></div>
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showPage('flows',    this)">Flows</button>
-            <button class="nav-tab" onclick="showPage('builder',  this)">Builder</button>
-            <button class="nav-tab" onclick="showPage('analytics',this)">Analytics</button>
-            <button class="nav-tab" onclick="showPage('subs',     this)">Subscribers</button>
-            <button class="nav-tab" onclick="showPage('settings', this)">Settings</button>
+    <nav class="navbar" id="navbar">
+    <a class="nav-logo" href="index.html">
+        <div class="nav-logo-mark">B</div>
+        BACK<span>DOOR</span>
+    </a>
+    <div class="nav-center">
+        <a class="nav-link " href="shop-all.html">Shop</a>
+        <div class="nav-dropdown">
+            <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+            <div class="nav-dropdown-menu">
+                <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
+                <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+                <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
+                <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
+                <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
+            </div>
         </div>
-        <div class="nav-right">
-            <button onclick="openNewFlowModal()" class="btn-new-flow">
-                <i class="fa-solid fa-plus"></i> New Flow
+        <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
+        <a class="nav-link " href="about.html">About</a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="navSearch" placeholder="Search sneakers..." />
+        </div>
+        <div class="nav-icons-group">
+            <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
+                <i class="fa-regular fa-heart"></i>
+                <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
+            </a>
+            <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span>Cart</span>
+                <span class="cart-badge" id="cartCount" style="display: none;">0</span>
             </button>
         </div>
-    </nav>
+        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+<div class="nav-mobile-menu" id="navMobileMenu">
+    <a class="nav-link" href="shop-all.html">Shop All</a>
+    <p class="nav-mobile-section">Brands</p>
+    <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
+    <a class="nav-link" href="shop-all.html?filter=Nike">Nike</a>
+    <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
+    <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
+    <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
+    <p class="nav-mobile-section">Explore</p>
+    <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+    <a class="nav-link" href="about.html">About</a>
+</div>
 
     <!-- ══════════════════════════════════════
      FLOWS PAGE
@@ -429,6 +467,23 @@
 
     <script src="email.js"></script>
     <script src="analytics.js"></script>
+
+  <!-- Firebase SDKs & Global Auth -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+      window.firebaseConfig = {
+          apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+          authDomain: "backdoorco.xyz",
+          projectId: "coalition-aec44",
+          storageBucket: "coalition-aec44.firebasestorage.app",
+          messagingSenderId: "312196142925",
+          appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+      };
+  </script>
+  <script src="auth.js"></script>
+
 </body>
 
 </html>

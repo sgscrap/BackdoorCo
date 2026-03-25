@@ -2,5 +2,15 @@
   publish = "."
   ignore = "git diff --quiet \"$CACHED_COMMIT_REF\" \"$COMMIT_REF\" -- . ':(exclude).github/**' ':(exclude)diff.txt' ':(exclude)deploy.ps1' ':(exclude)check-homepage.js' ':(exclude)check-shop-page.js' ':(exclude)test-browser.js' ':(exclude)server.js'"
 
+[[redirects]]
+  from = "/__/auth/*"
+  to = "https://coalition-aec44.firebaseapp.com/__/auth/:splat"
+  status = 200
+
 [functions]
   directory = "netlify/functions"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"

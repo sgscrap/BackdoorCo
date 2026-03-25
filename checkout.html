@@ -207,13 +207,15 @@
                 <div class="order-summary">
                     <div class="summary-title">ORDER SUMMARY</div>
                     <div class="summary-items" id="summaryItems"></div>
-                    <div class="promo-row mb-16"><input class="promo-input" type="text" id="checkoutPromo"
-                            placeholder="Promo codes are entered in Stripe checkout" /><button class="promo-btn" onclick="applyPromo()">Info</button>
+                    <div class="promo-row mb-16">
+                        <input class="promo-input" type="text" id="checkoutPromo" placeholder="Promo code (e.g. SGSCRAP)" />
+                        <button class="promo-btn" onclick="applyPromo()">Apply</button>
                     </div>
                     <div class="summary-line"><span>Subtotal</span><span id="summarySubtotal">$0.00</span></div>
-                    <div class="summary-line hidden" id="discountLine"><span
-                            class="summary-discount">Discount</span><span class="summary-discount"
-                            id="discountAmt">-$0.00</span></div>
+                    <div class="summary-line hidden" id="discountLine">
+                        <span class="summary-discount" id="discountLabel">Discount</span>
+                        <span class="summary-discount" id="discountAmount">-$0.00</span>
+                    </div>
                     <div class="summary-line"><span>Shipping</span><span id="summaryShipping">—</span></div>
                     <div class="summary-line"><span>Tax</span><span id="summaryTax">Calculated in Stripe</span></div>
                     <div class="summary-line total"><span>Total</span><strong id="summaryTotal">$0.00</strong></div>
@@ -294,8 +296,10 @@
         </div>
         <div class="cart-items" id="cartItems"></div>
         <div class="cart-footer" id="cartFooter">
-            <div class="promo-row"><input class="promo-input" type="text" id="promoCode"
-                    placeholder="Promo codes are entered in Stripe checkout" /><button class="promo-btn" onclick="applyPromo()">Info</button></div>
+            <div class="promo-row">
+                <input class="promo-input" type="text" id="promoCode" placeholder="Promo code (e.g. SGSCRAP)" />
+                <button class="promo-btn" onclick="applyPromo()">Apply</button>
+            </div>
             <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
             <div class="cart-savings hidden" id="cartSavings"></div>
             <button class="checkout-btn" onclick="goToCheckout()"><i class="fa-solid fa-lock"></i> CHECKOUT</button>

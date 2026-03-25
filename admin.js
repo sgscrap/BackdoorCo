@@ -45,7 +45,6 @@ let importerSelectedSizes = [];
 let generatedReviews = [];
 let activeProductPreviewIndex = 0;
 let currentMarketSnapshot = null;
-let seededCatalogProducts = [...SEEDED_ADMIN_PRODUCTS];
 
 const REVIEW_FIRST_NAMES = ['Mason', 'Jada', 'Chris', 'Avery', 'Jordan', 'Cam', 'Tiana', 'Malik', 'Ari', 'Noah', 'Nia', 'Jay', 'Kayla', 'Andre', 'Zoe', 'Micah', 'Savannah', 'Bryson', 'Laila', 'Darius', 'Jasmine', 'Ethan', 'Sofia', 'Tyrese', 'Mila', 'Zay', 'Kendall', 'Isaiah', 'Amaya', 'Luca', 'Brielle', 'Kobe', 'Nyla', 'Tristan', 'Aaliyah', 'Devin', 'Maya', 'Roman', 'Leah', 'Jalen'];
 const REVIEW_LAST_INITIALS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -128,6 +127,8 @@ const SEEDED_ADMIN_PRODUCTS = [
         createdAt: { seconds: 0 }
     }
 ];
+
+let seededCatalogProducts = [...SEEDED_ADMIN_PRODUCTS];
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadSeededCatalogProducts();

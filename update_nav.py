@@ -1,28 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+import os
+import re
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backdoor | Reviews</title>
-    <meta name="description" content="Customer-style review posts from the Backdoor community.">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="stylesheet" href="store.css">
-</head>
-
-<body class="reviews-page-body">
-    <nav class="navbar" id="navbar">
+# Comprehensive Navigation Template
+NAV_TEMPLATE = """<nav class="navbar" id="navbar">
     <a class="nav-logo" href="index.html">
         <div class="nav-logo-mark">B</div>
         BACK<span>DOOR</span>
     </a>
     <div class="nav-center">
-        <a class="nav-link " href="shop-all.html">Shop</a>
+        <a class="nav-link {shop_active}" href="shop-all.html">Shop</a>
         <div class="nav-dropdown">
-            <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+            <a class="nav-link nav-dropdown-toggle {brands_active}" href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
             <div class="nav-dropdown-menu">
                 <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
                 <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
@@ -31,8 +19,8 @@
                 <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
             </div>
         </div>
-        <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
-        <a class="nav-link " href="about.html">About</a>
+        <a class="nav-link {drops_active}" href="shop-all.html?sort=newest">New Drops</a>
+        <a class="nav-link {about_active}" href="about.html">About</a>
     </div>
     <div class="nav-right">
         <div class="nav-search-wrap">
@@ -50,7 +38,7 @@
                 <span class="cart-badge" id="cartCount" style="display: none;">0</span>
             </button>
         </div>
-        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
+        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){{var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){{m.classList.toggle('open');h.classList.toggle('open');}}}})()">
             <span></span><span></span><span></span>
         </button>
     </div>
@@ -66,40 +54,9 @@
     <p class="nav-mobile-section">Explore</p>
     <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
     <a class="nav-link" href="about.html">About</a>
-</div>
+</div>"""
 
-    <main class="reviews-page-shell">
-        <section class="reviews-hero">
-            <p class="product-review-eyebrow">Community Posts</p>
-            <h1>All Reviews</h1>
-            <p>Real-looking customer posts, fit pics, and quick reactions linked to the pairs people actually bought.</p>
-        </section>
-
-        <section class="reviews-page-grid" id="reviewsPageGrid">
-            <div class="reviews-empty-state">Loading reviews...</div>
-        </section>
-    </main>
-
-    <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out;">
-        <img id="lightboxImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none;" oncontextmenu="return false;" draggable="false">
-    </div>
-
-    <script type="module" src="reviews.js"></script>
-    <script>
-        window.openLightbox = (src) => {
-            const lb = document.getElementById('imageLightbox');
-            const img = document.getElementById('lightboxImage');
-            if (lb && img && src) {
-                img.src = src;
-                lb.style.display = 'flex';
-            }
-        };
-        window.closeLightbox = (e) => {
-            const lb = document.getElementById('imageLightbox');
-            if (lb) lb.style.display = 'none';
-        };
-    </script>
-
+DEPENDENCIES = """
   <!-- Firebase SDKs & Global Auth -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -115,7 +72,55 @@
       };
   </script>
   <script src="auth.js"></script>
-</body>
+"""
 
+def update_file(filepath):
+    filename = os.path.basename(filepath)
+    if filename in ["admin.html", "checkout.html"]: # Skip non-storefront
+        return
 
-</html>
+    # Determine active states
+    shop_active = "active" if filename == "shop-all.html" else ""
+    brands_active = ""
+    drops_active = ""
+    about_active = "active" if filename == "about.html" else ""
+    
+    # Format template
+    new_nav = NAV_TEMPLATE.format(
+        shop_active=shop_active,
+        brands_active=brands_active,
+        drops_active=drops_active,
+        about_active=about_active
+    )
+    
+    with open(filepath, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Replace entire <nav class="navbar"> block with any attributes
+    nav_pattern = r'<nav\b[^>]*?class="[^"]*?navbar[^"]*?"[^>]*?>.*?</nav>'
+    if re.search(nav_pattern, content, re.DOTALL):
+        content = re.sub(nav_pattern, new_nav, content, flags=re.DOTALL)
+        
+        # Ensure dependencies are present before </body>
+        if 'auth.js' not in content:
+            content = content.replace('</body>', DEPENDENCIES + '\n</body>')
+            
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print(f"Updated: {filename}")
+    else:
+        print(f"Skipped (navbar not found): {filename}")
+
+def main():
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    html_files = []
+    
+    for file in os.listdir(root_dir):
+        if file.endswith(".html"):
+            html_files.append(os.path.join(root_dir, file))
+    
+    for html_file in html_files:
+        update_file(html_file)
+
+if __name__ == "__main__":
+    main()

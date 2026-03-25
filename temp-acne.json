@@ -1,0 +1,46 @@
+{
+  "name": "projects/coalition-aec44/databases/(default)/documents/products/HFSGZ0pgRmDo1EWHgtUJ",
+  "fields": {
+    "stock": {
+      "integerValue": "45"
+    },
+    "brand": {
+      "stringValue": "Acne Studios"
+    },
+    "image": {
+      "stringValue": "products/acne-1996-logo-tshirt.png"
+    },
+    "name": {
+      "stringValue": "Acne Studios 1996 Logo T-Shirt - Relaxed Fit Deep Blue"
+    },
+    "description": {
+      "stringValue": "Acne Studios 1996 Logo T-Shirt Relaxed Fit in Deep Blue."
+    },
+    "status": {
+      "stringValue": "active"
+    },
+    "colorway": {
+      "stringValue": "Deep Blue"
+    },
+    "sizes": {
+      "stringValue": "S, M, L, XL"
+    },
+    "category": {
+      "stringValue": "Apparel"
+    },
+    "sku": {
+      "stringValue": "FN-UX-TSHI000013"
+    },
+    "price": {
+      "integerValue": "260"
+    },
+    "createdAt": {
+      "timestampValue": "2026-03-05T08:00:45.810Z"
+    },
+    "featured": {
+      "booleanValue": true
+    }
+  },
+  "createTime": "2026-03-05T08:00:45.917981Z",
+  "updateTime": "2026-03-23T06:16:29.831588Z"
+}

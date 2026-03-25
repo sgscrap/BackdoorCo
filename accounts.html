@@ -15,50 +15,59 @@
 <body>
 
     <!-- ══ NAVBAR ══ -->
-    <nav class="navbar">
-        <a class="nav-logo" href="index.html">BACK<span>DOOR</span></a>
-        <div class="nav-links">
-            <a href="index.html">Shop</a>
-            <a href="#">Brands</a>
-            <a href="#">New Drops</a>
-            <a href="#">About</a>
+    <nav class="navbar" id="navbar">
+    <a class="nav-logo" href="index.html">
+        <div class="nav-logo-mark">B</div>
+        BACK<span>DOOR</span>
+    </a>
+    <div class="nav-center">
+        <a class="nav-link " href="shop-all.html">Shop</a>
+        <div class="nav-dropdown">
+            <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+            <div class="nav-dropdown-menu">
+                <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
+                <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+                <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
+                <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
+                <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
+            </div>
         </div>
-        <div class="nav-right">
-            <button class="wishlist-nav-btn" onclick="openWishlistPanel()" id="wishlistNavBtn" title="Wishlist">
+        <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
+        <a class="nav-link " href="about.html">About</a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="navSearch" placeholder="Search sneakers..." />
+        </div>
+        <div class="nav-icons-group">
+            <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
                 <i class="fa-regular fa-heart"></i>
-                <span class="badge hidden" id="wishlistBadge">0</span>
+                <span class="nav-badge" id="wishlistCountBadge">0</span>
+            </a>
+            <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span>Cart</span>
+                <span class="cart-badge" id="cartCount">0</span>
             </button>
-            <div id="authButtons">
-                <button class="btn-login" onclick="openAuth('login')">Log In</button>
-                <button class="btn-signup" onclick="openAuth('register')">Sign Up</button>
-            </div>
-            <div class="user-menu-wrap hidden" id="userMenu">
-                <div class="user-avatar-btn" onclick="toggleUserDropdown()">
-                    <div class="user-avatar" id="navAvatar">?</div>
-                    <span id="navName">User</span>
-                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
-                </div>
-                <div class="user-dropdown" id="userDropdown">
-                    <div class="dropdown-header">
-                        <p id="dropName">—</p>
-                        <span id="dropEmail">—</span>
-                    </div>
-                    <a class="dropdown-item" onclick="showAccountPage('overview')"><i class="fa-solid fa-chart-pie"></i>
-                        Dashboard</a>
-                    <a class="dropdown-item" onclick="showAccountPage('orders')"><i class="fa-solid fa-box"></i> My
-                        Orders</a>
-                    <a class="dropdown-item" onclick="showAccountPage('wishlist')"><i class="fa-regular fa-heart"></i>
-                        Wishlist</a>
-                    <a class="dropdown-item" onclick="showAccountPage('profile')"><i class="fa-solid fa-user"></i>
-                        Profile</a>
-                    <a class="dropdown-item" onclick="showAccountPage('notifications')"><i class="fa-solid fa-bell"></i>
-                        Alerts</a>
-                    <a class="dropdown-item danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i>
-                        Logout</a>
-                </div>
-            </div>
         </div>
-    </nav>
+        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+<div class="nav-mobile-menu" id="navMobileMenu">
+    <a class="nav-link" href="shop-all.html">Shop All</a>
+    <p class="nav-mobile-section">Brands</p>
+    <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
+    <a class="nav-link" href="shop-all.html?filter=Nike">Nike</a>
+    <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
+    <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
+    <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
+    <p class="nav-mobile-section">Explore</p>
+    <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+    <a class="nav-link" href="about.html">About</a>
+</div>
 
     <!-- ══ AUTH MODAL ══ -->
     <div class="modal-overlay" id="authModal" onclick="closeAuthOnOverlay(event)">
@@ -466,7 +475,7 @@
     <script>
         window.firebaseConfig = {
             apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
-            authDomain: "coalition-aec44.firebaseapp.com",
+            authDomain: "backdoorco.xyz",
             projectId: "coalition-aec44",
             storageBucket: "coalition-aec44.firebasestorage.app",
             messagingSenderId: "312196142925",
@@ -476,6 +485,12 @@
     </script>
     <script src="accounts.js"></script>
     <script src="analytics.js"></script>
+
+
+  <!-- Global Auth -->
+  <script src="auth.js"></script>
+
+
 </body>
 
 </html>

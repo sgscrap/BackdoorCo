@@ -9,7 +9,14 @@ let userProfile = null;     // Firestore profile data
 let wishlist = [];          // array of product IDs
 
 /* ── FIREBASE REFS ── */
-let auth, db;
+// Always initialize before returning a reference.
+function ensureFirebase() {
+    if (window.firebaseConfig && !firebase.apps.length) {
+        firebase.initializeApp(window.firebaseConfig);
+    }
+}
+function getAuth() { ensureFirebase(); return firebase.auth(); }
+function getDb()   { ensureFirebase(); return firebase.firestore(); }
 
 /* ══════════════════════════════════════════
    HELPERS
@@ -41,21 +48,22 @@ function fmt(ts) {
 ══════════════════════════════════════════ */
 function initFirebase() {
     if (!window.firebaseConfig) return;
-    if (!firebase.apps.length) {
-        firebase.initializeApp(window.firebaseConfig);
-    }
-    auth = firebase.auth();
-    db   = firebase.firestore();
-
-    auth.onAuthStateChanged(async (user) => {
+    
+    // Listen for the master auth event from auth.js
+    window.addEventListener('backdoor-auth-changed', async (event) => {
+        const { user, profile } = event.detail;
+        
         if (user) {
             currentUser = user;
-            await loadUserProfile(user.uid);
-            await loadWishlist(user.uid);
+            userProfile = profile;
+            wishlist = profile?.wishlist || [];
+            
             updateNavUI();
             renderProductsGrid();
+            
             // If already on account page, refresh
-            if (!document.getElementById('accountPage').classList.contains('hidden')) {
+            const accountPage = document.getElementById('accountPage');
+            if (accountPage && !accountPage.classList.contains('hidden')) {
                 populateAccountPage();
             }
         } else {
@@ -67,6 +75,15 @@ function initFirebase() {
             showPage('home');
         }
     });
+
+    // Initial check if auth.js already finished
+    if (window.globalUser || window.globalProfile) {
+        currentUser = window.globalUser;
+        userProfile = window.globalProfile;
+        wishlist = window.globalWishlist || [];
+        updateNavUI();
+        renderProductsGrid();
+    }
 }
 
 /* ══════════════════════════════════════════
@@ -144,10 +161,10 @@ async function socialLogin(provider) {
     if (provider !== 'Google') { showToast(`${provider} login coming soon`, 'info'); return; }
     try {
         const prov = new firebase.auth.GoogleAuthProvider();
-        const result = await auth.signInWithPopup(prov);
+        const result = await getAuth().signInWithPopup(prov);
         const user   = result.user;
         // Create profile if new user
-        const ref = db.collection('users').doc(user.uid);
+        const ref = getDb().collection('users').doc(user.uid);
         const snap = await ref.get();
         if (!snap.exists) {
             const names = (user.displayName || '').split(' ');
@@ -189,7 +206,7 @@ async function handleLogin() {
     btn.innerHTML = '<div class="spinner"></div>';
 
     try {
-        await auth.signInWithEmailAndPassword(email, pw);
+        await getAuth().signInWithEmailAndPassword(email, pw);
         closeAuth();
         showToast('Welcome back! 👟');
     } catch (err) {
@@ -224,8 +241,8 @@ async function handleRegister() {
     btn.innerHTML = '<div class="spinner"></div>';
 
     try {
-        const cred = await auth.createUserWithEmailAndPassword(email, pw);
-        await db.collection('users').doc(cred.user.uid).set({
+        const cred = await getAuth().createUserWithEmailAndPassword(email, pw);
+        await getDb().collection('users').doc(cred.user.uid).set({
             first, last, email, size,
             phone: '', bday: '',
             joined: firebase.firestore.FieldValue.serverTimestamp(),
@@ -245,7 +262,7 @@ async function handleRegister() {
 
 /* ── LOGOUT ── */
 async function logout() {
-    await auth.signOut();
+    await getAuth().signOut();
     showToast('Logged out successfully', 'info');
 }
 
@@ -254,7 +271,7 @@ async function logout() {
 ══════════════════════════════════════════ */
 async function loadUserProfile(uid) {
     try {
-        const snap = await db.collection('users').doc(uid).get();
+        const snap = await getDb().collection('users').doc(uid).get();
         userProfile = snap.exists ? snap.data() : {};
     } catch (e) {
         userProfile = {};
@@ -374,7 +391,7 @@ async function saveProfile() {
     };
 
     try {
-        await db.collection('users').doc(currentUser.uid).update(updates);
+        await getDb().collection('users').doc(currentUser.uid).update(updates);
         Object.assign(userProfile, updates);
         updateNavUI();
         showToast('Profile saved! ✓');
@@ -390,7 +407,7 @@ async function loadAndRenderOrders() {
     if (!currentUser) return;
 
     try {
-        const snap = await db.collection('orders')
+        const snap = await getDb().collection('orders')
             .where('customerEmail', '==', currentUser.email)
             .orderBy('createdAt', 'desc')
             .limit(20)
@@ -400,7 +417,7 @@ async function loadAndRenderOrders() {
 
         if (orders.length === 0) {
             // Fallback: try userId field
-            const snap2 = await db.collection('orders')
+            const snap2 = await getDb().collection('orders')
                 .where('userId', '==', currentUser.uid)
                 .orderBy('createdAt', 'desc')
                 .limit(20)
@@ -485,7 +502,7 @@ function renderOrders(containerId, orders) {
 ══════════════════════════════════════════ */
 async function loadWishlist(uid) {
     try {
-        const snap = await db.collection('users').doc(uid).get();
+        const snap = await getDb().collection('users').doc(uid).get();
         wishlist = snap.exists ? (snap.data().wishlist || []) : [];
     } catch { wishlist = []; }
     updateWishlistBadge();
@@ -508,7 +525,7 @@ async function toggleWishlist(productId) {
     }
 
     try {
-        await db.collection('users').doc(currentUser.uid).update({
+        await getDb().collection('users').doc(currentUser.uid).update({
             wishlist: firebase.firestore.FieldValue.arrayUnion
                 ? (idx >= 0
                     ? firebase.firestore.FieldValue.arrayRemove(productId)
@@ -559,7 +576,7 @@ async function renderWishlistGrid() {
         const chunks = [];
         for (let i = 0; i < wishlist.length; i += 10) chunks.push(wishlist.slice(i, i + 10));
         for (const chunk of chunks) {
-            const snap = await db.collection('products').where(firebase.firestore.FieldPath.documentId(), 'in', chunk).get();
+            const snap = await getDb().collection('products').where(firebase.firestore.FieldPath.documentId(), 'in', chunk).get();
             snap.docs.forEach(d => items.push({ id: d.id, ...d.data() }));
         }
     } catch (e) {
