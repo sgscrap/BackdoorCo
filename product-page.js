@@ -126,6 +126,10 @@ function formatHistoryAxisLabel(date) {
     return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
 }
 
+function formatHistoryFullDate(date) {
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+}
+
 function normalizeProductLastSale(product) {
     const sale = product?.lastSale;
     if (!sale || typeof sale !== 'object') return null;
@@ -223,15 +227,20 @@ function renderProductPriceHistory(product) {
     const first = history[0];
     const last = history[history.length - 1];
     const delta = last.price - first.price;
+
+    if (history.length === 1) {
+        range.textContent = 'Current ask';
+        change.textContent = `$${Math.round(last.price)}`;
+        change.className = '';
+        note.textContent = `Current Backdoor ask recorded on ${formatHistoryFullDate(last.date)}. Future price edits and market adjustments will appear here automatically.`;
+        return;
+    }
+
     const deltaPrefix = delta > 0 ? '+' : '';
     change.textContent = `${deltaPrefix}$${Math.abs(Math.round(delta))}`;
     change.className = delta > 0 ? 'up' : delta < 0 ? 'down' : '';
-    range.textContent = history.length > 1
-        ? `${history.length} tracked updates`
-        : 'Tracking started';
-    note.textContent = history.length > 1
-        ? `Started at $${Math.round(first.price)} and is now $${Math.round(last.price)}. New price edits on Backdoor appear here automatically.`
-        : 'This product just started live price tracking. Future price edits will plot on this chart automatically.';
+    range.textContent = `${history.length} tracked updates`;
+    note.textContent = `Started at $${Math.round(first.price)} and is now $${Math.round(last.price)}. New price edits on Backdoor appear here automatically.`;
 }
 
 function renderProductLastSale(product) {
