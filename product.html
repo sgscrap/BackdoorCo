@@ -2,262 +2,290 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product | Backdoor</title>
-    <meta name="description" content="Authenticated sneakers at Backdoor — verified every pair." />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backdoor | Product</title>
+    <meta name="description" content="Premium authenticated product details at Backdoor.">
     <link
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="stylesheet" href="store.css" />
-    <link rel="stylesheet" href="product.css" />
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <!-- Open Graph -->
-  <meta property="og:title" content="Product — Backdoor" />
-  <meta property="og:description" content="View detailed info, sizing, and pricing for this authenticated sneaker on Backdoor." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://backdoorco.xyz/product.html" />
-  <meta property="og:image" content="https://backdoorco.xyz/og-image.jpg" />
-  <meta property="og:site_name" content="Backdoor" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Product — Backdoor" />
-  <meta name="twitter:description" content="View detailed info, sizing, and pricing for this authenticated sneaker on Backdoor." />
+    <link rel="stylesheet" href="store.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="Backdoor | Product" />
+    <meta property="og:description" content="Authenticated sneakers at Backdoor — every pair verified." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://backdoorco.xyz/product.html" />
+    <meta property="og:image" content="https://backdoorco.xyz/og-image.jpg" />
+    <meta property="og:site_name" content="Backdoor" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Backdoor | Product" />
+    <meta name="twitter:description" content="Authenticated sneakers at Backdoor — every pair verified." />
+    <style>
+        .product-img-preview { pointer-events: none; }
+        .product-wishlist-fixed { width: 50px; flex-shrink: 0; }
+        .lightbox-fixed { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out; }
+        .lightbox-img-fixed { max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none; }
+        .hidden-badge { display: none; }
+    </style>
 </head>
 
-<body class="product-page">
-
-    <!-- ══ ANNOUNCEMENT BAR ══ -->
+<body class="product-detail-page">
     <div class="announce-bar" id="announceBar">
-        <span>🔥 New Jordan 4 Military Blue just dropped</span>
-        <span class="sep">|</span>
-        <span>🚚 Free shipping on orders over $150</span>
-        <span class="sep">|</span>
-        <span>✅ All shoes 100% authenticated</span>
+        <div class="announce-shell">
+            <div class="announce-copy">
+                <span class="announce-kicker">Just Dropped</span>
+                <span class="announce-headline">Jordan 4 Military Blue</span>
+            </div>
+            <div class="announce-pills" aria-label="Store highlights">
+                <span class="announce-pill">Free shipping $150+</span>
+                <span class="announce-pill">100% authenticated</span>
+            </div>
+        </div>
         <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
 
-    <!-- ══ NAVBAR ══ -->
-    <nav class="navbar announce-offset" id="navbar">
-        <a class="nav-logo" href="index.html">
-            <div class="nav-logo-mark">B</div>
-            BACK<span>DOOR</span>
-        </a>
-        <div class="nav-center">
-            <a class="nav-link" href="shop-all.html">SHOP</a>
-            <a class="nav-link" href="men.html">Men</a>
-            <a class="nav-link" href="women.html">Women</a>
-            <a class="nav-link" href="kids.html">Kids</a>
-            <a class="nav-link" href="shoes.html">Shoes</a>
-            <a class="nav-link" href="apparel.html">Apparel</a>
-            <a class="nav-link" href="accessories.html">Accessories</a>
-            <a class="nav-link" href="electronics.html">Electronics</a>
+    <nav class="navbar" id="navbar">
+    <a class="nav-logo" href="index.html">
+        <div class="nav-logo-mark">B</div>
+        BACK<span>DOOR</span>
+    </a>
+    <div class="nav-center">
+        <a class="nav-link " href="shop-all.html">Shop</a>
+        <div class="nav-dropdown">
+            <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+            <div class="nav-dropdown-menu">
+                <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
+                <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+                <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
+                <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
+                <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
+            </div>
         </div>
-        <div class="nav-right">
-            <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
-                <i class="fa-solid fa-bag-shopping"></i> Cart
-                <span class="cart-pill" id="cartCount">0</span>
+        <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
+        <a class="nav-link " href="about.html">About</a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="navSearch" placeholder="Search sneakers..." />
+        </div>
+        <div class="nav-icons-group">
+            <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
+                <i class="fa-regular fa-heart"></i>
+                <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
+            </a>
+            <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span>Cart</span>
+                <span class="cart-badge" id="cartCount" style="display: none;">0</span>
             </button>
-            <button class="btn-signup-nav" onclick="window.location.href='accounts.html'">Sign In</button>
         </div>
-    </nav>
+        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+<div class="nav-mobile-menu" id="navMobileMenu">
+    <a class="nav-link" href="shop-all.html">Shop All</a>
+    <p class="nav-mobile-section">Brands</p>
+    <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
+    <a class="nav-link" href="shop-all.html?filter=Nike">Nike</a>
+    <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
+    <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
+    <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
+    <p class="nav-mobile-section">Explore</p>
+    <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+    <a class="nav-link" href="about.html">About</a>
+</div>
 
-    <!-- ══ MAIN PRODUCT LAYOUT ══ -->
-    <main class="product-main">
-
-        <!-- Breadcrumb -->
-        <nav class="product-breadcrumb" id="productBreadcrumb" aria-label="breadcrumb">
-            <a href="shop-all.html">SHOP</a>
-            <span class="breadcrumb-sep">/</span>
-            <span id="breadcrumbCategory">SNEAKERS</span>
-            <span class="breadcrumb-sep">/</span>
-            <span id="breadcrumbName">Loading...</span>
-        </nav>
-
-        <!-- Loading State -->
-        <div class="product-skeleton" id="productSkeleton">
-            <div class="skeleton-gallery">
-                <div class="skeleton-main-img shimmer"></div>
-                <div class="skeleton-thumbs">
-                    <div class="shimmer"></div>
-                    <div class="shimmer"></div>
-                    <div class="shimmer"></div>
-                </div>
-            </div>
-            <div class="skeleton-info">
-                <div class="shimmer" style="height:18px;width:60%;border-radius:4px;margin-bottom:16px;"></div>
-                <div class="shimmer" style="height:52px;width:90%;border-radius:4px;margin-bottom:24px;"></div>
-                <div class="shimmer" style="height:24px;width:40%;border-radius:4px;margin-bottom:32px;"></div>
-                <div class="shimmer" style="height:56px;border-radius:10px;margin-bottom:12px;"></div>
-                <div class="shimmer" style="height:56px;border-radius:10px;"></div>
-            </div>
+    <main class="product-page-shell">
+        <div class="product-page-breadcrumb">
+            <a href="men.html">Men</a>
+            <span>/</span>
+            <span id="productBreadcrumbLabel">Product</span>
         </div>
 
-        <!-- Product Content (hidden until loaded) -->
-        <div class="product-content d-none" id="productContent">
-
-            <!-- LEFT — Image Gallery -->
-            <div class="product-gallery">
-
-                <!-- Main Square Image -->
-                <div class="gallery-main" id="galleryMain">
-                    <div class="gallery-badges" id="galleryBadges"></div>
-                    <img
-                        src=""
-                        alt="Product"
-                        id="mainProductImg"
-                        class="gallery-main-img"
-                        onerror="this.style.display='none'"
-                    />
-                    <div class="gallery-zoom-hint">
-                        <i class="fa-solid fa-magnifying-glass-plus"></i> Click to zoom
-                    </div>
-                </div>
-
-                <!-- Thumbnail Strip -->
-                <div class="gallery-thumbs" id="galleryThumbs"></div>
-
-                <!-- Preview Label -->
-                <p class="gallery-label">SINGLE PRODUCT PREVIEW</p>
-            </div>
-
-            <!-- RIGHT — Product Details -->
-            <div class="product-details">
-
-                <!-- Status + Category row -->
-                <div class="pd-top-row">
-                    <span class="pd-stock-badge" id="pdStockBadge">IN STOCK</span>
-                    <span class="pd-category" id="pdCategory">SNEAKERS</span>
-                </div>
-
-                <!-- Title -->
-                <h1 class="pd-title" id="pdTitle">Loading...</h1>
-
-                <!-- Brand -->
-                <p class="pd-brand" id="pdBrand">—</p>
-
-                <!-- Price -->
-                <div class="pd-price-row">
-                    <span class="pd-price" id="pdPrice">$—</span>
-                    <span class="pd-retail" id="pdRetail"></span>
-                </div>
-                <p class="pd-price-label" id="pdPriceLabel">Lowest Ask</p>
-
-                <!-- Size Selector -->
-                <div class="pd-size-section" id="pdSizeSection">
-                    <div class="pd-size-header">
-                        <span class="pd-size-label">SELECT SIZE</span>
-                        <button class="pd-size-guide">Size Guide</button>
-                    </div>
-                    <div class="pd-sizes" id="pdSizes"></div>
-                </div>
-
-                <!-- CTA Buttons -->
-                <div class="pd-actions" id="pdActions">
-                    <button class="pd-buy-btn" id="pdBuyBtn">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        <span>ADD TO CART</span>
-                    </button>
-                    <button class="pd-offer-btn" id="pdOfferBtn">
-                        <i class="fa-solid fa-tag"></i>
-                        MAKE AN OFFER
-                    </button>
-                </div>
-
-                <!-- Wishlist -->
-                <div class="pd-wishlist-row">
-                    <button class="pd-wishlist-btn" id="pdWishlistBtn" onclick="showToast('Sign in to save to wishlist', 'info')">
-                        <i class="fa-regular fa-heart"></i>
-                    </button>
-                    <span class="pd-wishlist-hint">Don't like the price? Send us your best number.</span>
-                </div>
-
-                <!-- Trust Bar -->
-                <div class="pd-trust-bar">
-                    <div class="pd-trust-item">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        <span>100% Authenticated</span>
-                    </div>
-                    <div class="pd-trust-item">
-                        <i class="fa-solid fa-truck"></i>
-                        <span>2–4 Day Shipping</span>
-                    </div>
-                    <div class="pd-trust-item">
-                        <i class="fa-solid fa-rotate-left"></i>
-                        <span>Easy Returns</span>
-                    </div>
-                </div>
-
-                <!-- Backdoor Read / Analysis Card -->
-                <div class="pd-read-card">
-                    <div class="pd-read-header">
-                        <span class="pd-read-eyebrow">BACKDOOR READ</span>
-                        <button class="pd-watch-btn" id="pdWatchBtn">
-                            <i class="fa-solid fa-bell"></i> WATCH TIMING
+        <section class="product-page-layout" id="productPageLayout">
+            <div class="product-page-gallery-column">
+                <div class="product-page-gallery">
+                    <div class="product-page-main-media">
+                        <button class="product-gallery-nav product-gallery-nav--prev" id="productPrevImage" type="button" aria-label="Previous image">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <img id="productMainImage" src="" alt="Product preview" oncontextmenu="return false;" draggable="false" class="product-img-preview">
+                        <button class="product-gallery-nav product-gallery-nav--next" id="productNextImage" type="button" aria-label="Next image">
+                            <i class="fa-solid fa-chevron-right"></i>
                         </button>
                     </div>
-                    <h3 class="pd-read-title" id="pdReadTitle">Loading market analysis...</h3>
-                    <p class="pd-read-body" id="pdReadBody"></p>
-                    <div class="pd-read-tabs">
-                        <button class="pd-read-tab active" data-tab="current">CURRENT</button>
-                        <button class="pd-read-tab" data-tab="market">MARKET</button>
-                        <button class="pd-read-tab" data-tab="inventory">INVENTORY</button>
-                        <button class="pd-read-tab" data-tab="best">BEST MOVE</button>
-                    </div>
-                    <div class="pd-read-content" id="pdReadContent"></div>
-                </div>
-
-                <!-- SKU + Details -->
-                <div class="pd-meta">
-                    <div class="pd-meta-row">
-                        <span class="pd-meta-label">SKU</span>
-                        <span class="pd-meta-value" id="pdSku">—</span>
-                    </div>
-                    <div class="pd-meta-row">
-                        <span class="pd-meta-label">Colorway</span>
-                        <span class="pd-meta-value" id="pdColorway">—</span>
-                    </div>
-                    <div class="pd-meta-row">
-                        <span class="pd-meta-label">Release Date</span>
-                        <span class="pd-meta-value" id="pdReleaseDate">—</span>
-                    </div>
-                    <div class="pd-meta-row">
-                        <span class="pd-meta-label">Condition</span>
-                        <span class="pd-meta-value">Deadstock</span>
+                    <div class="product-gallery-meta">
+                        <span class="product-gallery-hint" id="productGalleryHint">Image 1 / 1 | Click image for next</span>
+                        <div class="product-gallery-dots" id="productGalleryDots"></div>
                     </div>
                 </div>
-
+                <section class="product-review-section" id="productReviewSection">
+                    <div class="product-review-section-head">
+                        <div>
+                            <p class="product-review-eyebrow">Customer Review</p>
+                            <h2 class="product-review-title">What buyers are saying</h2>
+                        </div>
+                        <a class="btn-hero-secondary product-review-link" href="reviews.html">All Reviews</a>
+                    </div>
+                    <div class="product-review-list" id="productReviewList">
+                        <div class="reviews-empty-state">Loading verified buyer posts...</div>
+                    </div>
+                </section>
             </div>
-        </div>
 
-        <!-- Not Found State -->
-        <div class="product-not-found d-none" id="productNotFound">
-            <i class="fa-solid fa-shoe-prints"></i>
-            <h2>Product Not Found</h2>
-            <p>This drop may have sold out or been removed.</p>
-            <a href="shop-all.html" class="pd-buy-btn" style="display:inline-flex;text-decoration:none;">
-                Back to Shop
-            </a>
-        </div>
+            <div class="product-page-info">
+                <div class="product-page-eyebrow">
+                    <span id="productStatusBadge" class="modal-badge hidden-badge"></span>
+                    <span id="productCategoryLabel" class="product-page-category">Sneakers</span>
+                </div>
+                <h1 id="productName">Loading product details...</h1>
+                <p id="productBrandLine" class="product-page-brand"></p>
+                <div class="product-page-price-row">
+                    <div class="product-page-price" id="productPrice">--</div>
+                    <div class="product-page-stock" id="productStockLabel">Checking live inventory...</div>
+                </div>
 
+                <div class="product-page-offer-wrap">
+                    <button class="btn-hero-secondary product-offer-trigger prominent-trigger" id="productOfferBtn" type="button">
+                        <i class="fa-solid fa-tag"></i> MAKE AN OFFER
+                    </button>
+                    <button class="product-heart-btn" id="productWishlistBtn" type="button" title="Add to Wishlist">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                    <p class="offer-hint">Don't like the price? Send us your best number.</p>
+                </div>
+
+                <p id="productDescription" class="product-page-description"></p>
+
+                <section class="product-trust-grid" aria-label="Product purchase info">
+                    <article class="product-trust-card">
+                        <div class="product-trust-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                        <div>
+                            <h3>Shipping</h3>
+                            <p id="productShippingPromise">Checking shipping speed for this pair...</p>
+                            <a href="shipping.html">Shipping policy</a>
+                        </div>
+                    </article>
+                    <article class="product-trust-card">
+                        <div class="product-trust-icon"><i class="fa-solid fa-rotate-left"></i></div>
+                        <div>
+                            <h3>Returns</h3>
+                            <p>Eligible unworn items can be reviewed for return approval.</p>
+                            <a href="returns.html">Returns policy</a>
+                        </div>
+                    </article>
+                    <article class="product-trust-card">
+                        <div class="product-trust-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div>
+                            <h3>Authenticity</h3>
+                            <p>Every pair is checked before delivery and backed by Backdoor authentication.</p>
+                            <a href="about.html">About authentication</a>
+                        </div>
+                    </article>
+                    <article class="product-trust-card">
+                        <div class="product-trust-icon"><i class="fa-solid fa-ruler-combined"></i></div>
+                        <div>
+                            <h3>Sizing & Help</h3>
+                            <p>Need sizing help or product guidance before ordering?</p>
+                            <a href="faq.html#sizing">Size guide & FAQ</a>
+                        </div>
+                    </article>
+                </section>
+
+                <section class="product-price-history" id="productPriceHistorySection" style="display:none;">
+                    <div class="product-price-history-head">
+                        <div>
+                            <p class="product-review-eyebrow">Price History</p>
+                            <h2 class="product-price-history-title">Backdoor market chart</h2>
+                        </div>
+                        <div class="product-price-history-summary">
+                            <span id="productPriceHistoryRange">Current ask</span>
+                            <strong id="productPriceHistoryChange">--</strong>
+                        </div>
+                    </div>
+                    <div class="product-price-history-chart-shell">
+                        <svg class="product-price-history-chart" id="productPriceHistoryChart" viewBox="0 0 560 220" preserveAspectRatio="none" aria-label="Product price history chart"></svg>
+                    </div>
+                    <div class="product-price-history-axis" id="productPriceHistoryAxis"></div>
+                    <p class="product-price-history-note" id="productPriceHistoryNote">Loading tracked pricing for this pair.</p>
+                </section>
+
+                <section class="product-last-sale" id="productLastSaleSection" style="display:none;">
+                    <div class="product-last-sale-head">
+                        <div>
+                            <p class="product-review-eyebrow">Latest Sale</p>
+                            <h2 class="product-last-sale-title">Recent market sale</h2>
+                        </div>
+                        <strong class="product-last-sale-price" id="productLastSalePrice">$0.00</strong>
+                    </div>
+                    <div class="product-last-sale-grid">
+                        <div class="product-last-sale-card">
+                            <span>Marketplace</span>
+                            <strong id="productLastSaleMarketplace">--</strong>
+                        </div>
+                        <div class="product-last-sale-card">
+                            <span>Size</span>
+                            <strong id="productLastSaleSize">--</strong>
+                        </div>
+                        <div class="product-last-sale-card">
+                            <span>Sold</span>
+                            <strong id="productLastSaleDate">--</strong>
+                        </div>
+                    </div>
+                    <p class="product-last-sale-note" id="productLastSaleNote">Recent authenticated or observed market sale activity appears here.</p>
+                </section>
+
+                <div class="product-page-meta">
+                    <div class="product-meta-item">
+                        <span>SKU</span>
+                        <strong id="productSku">Loading</strong>
+                    </div>
+                    <div class="product-meta-item">
+                        <span>Colorway</span>
+                        <strong id="productColorway">Loading</strong>
+                    </div>
+                    <div class="product-meta-item">
+                        <span>Release Date</span>
+                        <strong id="productReleaseDate">Loading</strong>
+                    </div>
+                </div>
+
+                <div class="product-page-size-block">
+                    <h3>Select Size</h3>
+                    <div class="size-options" id="productSizeOptions"></div>
+                </div>
+
+                <div class="product-page-actions">
+                    <button class="add-to-cart-btn" id="productAddToCart">Add to Cart</button>
+                    <button class="btn-hero-secondary product-wishlist-fixed" id="productWishlistBtnSecondary" type="button" title="Add to Wishlist" aria-label="Add to Wishlist">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                    <a class="btn-hero-secondary product-back-link" href="men.html">Back to Men</a>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- ══ RECENTLY VIEWED ══ -->
     <section class="recently-viewed-section" id="recentlyViewedSection" style="display:none;">
         <div class="recently-viewed-inner">
             <div class="rv-header">
-                <div class="rv-eyebrow"><i class="fa-solid fa-clock-rotate-left"></i> Recently Viewed</div>
-                <a href="shop-all.html" class="rv-see-all">See All <i class="fa-solid fa-arrow-right"></i></a>
+                <span class="rv-eyebrow"><i class="fa-solid fa-clock-rotate-left"></i> Recently Viewed</span>
+                <a class="rv-see-all" href="shop-all.html">Shop All <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="rv-track" id="recentlyViewedTrack"></div>
         </div>
     </section>
 
-    <!-- ══ CART SIDEBAR ══ -->
     <div class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
             <h3>Shopping Cart</h3>
@@ -271,86 +299,91 @@
                 <span>Total</span>
                 <span class="cart-total-price" id="cartTotal">$0.00</span>
             </div>
-            <button class="cart-checkout" onclick="window.location.href='checkout.html'">
-                Proceed to Checkout
-            </button>
+            <button class="cart-checkout" onclick="window.location.href='checkout.html'">Proceed to Checkout</button>
         </div>
     </div>
 
-    <!-- ══ IMAGE ZOOM MODAL ══ -->
-    <div class="zoom-modal" id="zoomModal" onclick="closeZoom()">
-        <button class="zoom-close" onclick="closeZoom()"><i class="fa-solid fa-xmark"></i></button>
-        <img src="" id="zoomImg" alt="Product zoom" />
-    </div>
-
-    <!-- ══ OFFER MODAL ══ -->
     <div class="modal" id="offerModal">
-        <div class="modal-overlay" id="offerOverlay"></div>
-        <div class="modal-content small center">
-            <button class="modal-close" onclick="closeOfferModal()">
+        <div class="modal-overlay" id="offerModalOverlay"></div>
+        <div class="modal-content small product-offer-modal">
+            <button class="modal-close" id="offerModalClose" aria-label="Close offer modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <div class="coming-soon-body">
-                <div class="coming-soon-icon">💬</div>
-                <h2>Make an Offer</h2>
-                <p>Enter your best offer and we'll get back to you within 24 hours.</p>
-                <input
-                    type="number"
-                    id="offerInput"
-                    placeholder="Your offer (USD)"
-                    class="offer-input"
-                    min="1"
-                />
-                <button class="add-to-cart-btn" onclick="submitOffer()">Send Offer</button>
+            <div class="product-offer-shell">
+                <p class="product-review-eyebrow">OFFER SYSTEM</p>
+                <h2 class="product-offer-title">SEND YOUR BEST OFFER</h2>
+                <p class="product-offer-copy">Submit a competitive price for this pair. Our team reviews every offer for approval.</p>
+                <div class="product-offer-price-row">
+                    <span>CURRENT ASK</span>
+                    <strong id="offerAskPrice">$0</strong>
+                </div>
+                <form id="offerForm" class="product-offer-form">
+                    <div class="product-offer-grid">
+                        <label class="product-offer-field">
+                            <span>Name</span>
+                            <input type="text" id="offerCustomerName" placeholder="Your name" required>
+                        </label>
+                        <label class="product-offer-field">
+                            <span>Email</span>
+                            <input type="email" id="offerCustomerEmail" placeholder="you@example.com" required>
+                        </label>
+                    </div>
+                    <div class="product-offer-grid">
+                        <label class="product-offer-field">
+                            <span>PHONE (OPTIONAL)</span>
+                            <input type="tel" id="offerCustomerPhone" placeholder="(555) 555-5555">
+                        </label>
+                        <label class="product-offer-field">
+                            <span>SIZE</span>
+                            <select id="offerSize" required></select>
+                        </label>
+                    </div>
+                    <label class="product-offer-field">
+                        <span>OFFER AMOUNT</span>
+                        <input type="number" id="offerAmount" min="1" step="1" placeholder="Enter your offer" required>
+                    </label>
+                    <label class="product-offer-field">
+                        <span>MESSAGE (OPTIONAL)</span>
+                        <textarea id="offerMessage" rows="3" placeholder="Any note for this offer..."></textarea>
+                    </label>
+                    <button class="add-to-cart-btn" id="offerSubmitBtn" type="submit">SUBMIT OFFER</button>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- ══ TOAST ══ -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Scripts -->
-    <script type="module" src="app.js?v=2.2"></script>
-    <script type="module" src="product.js?v=1.0"></script>
+    <div id="imageLightbox" class="lightbox-overlay lightbox-fixed" onclick="closeLightbox(event)">
+        <img id="lightboxImage" src="" class="lightbox-img-fixed" oncontextmenu="return false;" draggable="false" alt="Lightbox image view">
+    </div>
 
+    <script type="module" src="product-page.js"></script>
     <script>
+        window.openLightbox = (src) => {
+            const lb = document.getElementById('imageLightbox');
+            const img = document.getElementById('lightboxImage');
+            if (lb && img && src) {
+                img.src = src;
+                lb.style.display = 'flex';
+            }
+        };
+        window.closeLightbox = (e) => {
+            const lb = document.getElementById('imageLightbox');
+            if (lb) lb.style.display = 'none';
+        };
+
         function closeAnnounce() {
             const bar = document.getElementById('announceBar');
             const nav = document.getElementById('navbar');
             if (bar) bar.style.display = 'none';
             if (nav) nav.classList.remove('announce-offset');
         }
+
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('navbar');
             if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
         });
-        function showToast(msg, type) {
-            type = type || 'info';
-            const c = document.getElementById('toastContainer');
-            const t = document.createElement('div');
-            t.className = 'toast ' + type;
-            const icon = type === 'error' ? 'circle-exclamation' : type === 'warn' ? 'triangle-exclamation' : 'circle-info';
-            t.innerHTML = '<i class="fa-solid fa-' + icon + '"></i> ' + msg;
-            c.appendChild(t);
-            setTimeout(() => t.remove(), 3500);
-        }
-        function closeZoom() {
-            document.getElementById('zoomModal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        function closeOfferModal() {
-            document.getElementById('offerModal').classList.remove('active');
-            document.getElementById('offerOverlay').classList.remove('active');
-        }
-        function submitOffer() {
-            const val = document.getElementById('offerInput').value;
-            if (!val || parseInt(val) < 1) {
-                showToast('Please enter a valid offer amount.', 'warn');
-                return;
-            }
-            closeOfferModal();
-            showToast(`Offer of $${parseInt(val)} submitted! We'll be in touch.`, 'info');
-        }
 
         /* ── RECENTLY VIEWED ── */
         const RV_KEY = 'bdoor_recently_viewed';
@@ -382,7 +415,7 @@
 
         function renderRecentlyViewed(currentId) {
             const list = getRVList().filter(p => p.id !== currentId);
-            if (list.length < 2) return; // need at least 2 to show the section
+            if (list.length < 2) return;
             const section = document.getElementById('recentlyViewedSection');
             const track = document.getElementById('recentlyViewedTrack');
             if (!section || !track) return;
@@ -405,29 +438,12 @@
             section.style.display = 'block';
         }
 
-        // Hook into product-page.js: run after product loads
-        // product-page.js fires a custom event when product data is ready
         document.addEventListener('productLoaded', function(e) {
             if (e.detail) {
                 trackProductView(e.detail);
                 renderRecentlyViewed(e.detail.id);
             }
         });
-
-        // Fallback: poll for the product data from product-page.js global
-        (function waitForProduct() {
-            let attempts = 0;
-            const poll = setInterval(function() {
-                attempts++;
-                if (window.__currentProduct) {
-                    clearInterval(poll);
-                    trackProductView(window.__currentProduct);
-                    renderRecentlyViewed(window.__currentProduct.id);
-                } else if (attempts > 40) {
-                    clearInterval(poll);
-                }
-            }, 250);
-        })();
     </script>
 
     <style>
@@ -536,6 +552,23 @@
         .rv-track { grid-template-columns: repeat(2, 1fr); }
     }
     </style>
+
+  <!-- Firebase SDKs & Global Auth -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+      window.firebaseConfig = {
+          apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
+          authDomain: "backdoorco.xyz",
+          projectId: "coalition-aec44",
+          storageBucket: "coalition-aec44.firebasestorage.app",
+          messagingSenderId: "312196142925",
+          appId: "1:312196142925:web:ba090f602c8b5a31b20904"
+      };
+  </script>
+  <script src="auth.js"></script>
 </body>
+
 
 </html>
