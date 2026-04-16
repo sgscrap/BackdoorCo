@@ -2,60 +2,528 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About | Backdoor</title>
-    <meta name="description" content="Learn more about Backdoor, the premier destination for authenticated sneakers and apparel.">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="stylesheet" href="store.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Backdoor New York</title>
+  <meta name="description" content="Backdoor is a New York-based streetwear and sneaker marketplace built on exclusive access, strict authentication, and a deep respect for the culture." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="About Backdoor — New York's Exclusive Sneaker Marketplace" />
+  <meta property="og:description" content="In New York, the best stuff was never on the shelf. Backdoor was built on that truth. 100% authenticated. 100% New York." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://backdoorco.xyz/about.html" />
+  <meta property="og:image" content="https://backdoorco.xyz/og-image.jpg" />
+  <meta property="og:site_name" content="Backdoor" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About Backdoor — New York's Exclusive Sneaker Marketplace" />
+  <meta name="twitter:description" content="100% authenticated. 100% New York. Welcome to the back." />
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="store.css" />
+
+  <style>
+    /* ── ABOUT PAGE STYLES ── */
+
+    .about-hero {
+      position: relative;
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: var(--bg);
+      padding: 100px 24px 80px;
+    }
+
+    .about-hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 80% 50%, rgba(200, 246, 93, 0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 60%, rgba(200, 246, 93, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .about-hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    .about-hero-inner {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .about-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(200, 246, 93, 0.08);
+      border: 1px solid rgba(200, 246, 93, 0.2);
+      border-radius: 999px;
+      padding: 6px 16px;
+      margin-bottom: 28px;
+    }
+
+    .about-hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 12vw, 120px);
+      line-height: 0.92;
+      letter-spacing: 0.02em;
+      color: var(--text1);
+      margin: 0 0 28px;
+    }
+
+    .about-hero-title span {
+      color: var(--accent);
+    }
+
+    .about-hero-sub {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--text2);
+      line-height: 1.65;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── DIVIDER ── */
+    .about-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      margin: 0;
+    }
+
+    /* ── STORY SECTION ── */
+    .about-story {
+      background: var(--bg);
+      padding: 100px 24px;
+    }
+
+    .about-story-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .about-story-left {
+      position: sticky;
+      top: 100px;
+    }
+
+    .about-section-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .about-story-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 72px);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      color: var(--text1);
+      margin: 0 0 24px;
+    }
+
+    .about-story-title span {
+      color: var(--accent);
+    }
+
+    .about-story-lead {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text2);
+      line-height: 1.7;
+    }
+
+    .about-story-right {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .about-story-block p {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      color: var(--text3);
+      line-height: 1.8;
+      margin: 0;
+    }
+
+    .about-story-block p + p {
+      margin-top: 16px;
+    }
+
+    .about-story-block strong {
+      color: var(--text2);
+      font-weight: 600;
+    }
+
+    .about-story-quote {
+      border-left: 3px solid var(--accent);
+      padding: 20px 24px;
+      background: rgba(200, 246, 93, 0.04);
+      border-radius: 0 12px 12px 0;
+    }
+
+    .about-story-quote p {
+      font-family: 'Bebas Neue', sans-serif !important;
+      font-size: 26px !important;
+      line-height: 1.25 !important;
+      color: var(--text1) !important;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── VALUES SECTION ── */
+    .about-values {
+      background: var(--bg2);
+      padding: 100px 24px;
+    }
+
+    .about-values-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .about-values-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .about-values-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 72px);
+      letter-spacing: 0.02em;
+      color: var(--text1);
+      margin: 8px 0 0;
+    }
+
+    .about-values-title span { color: var(--accent); }
+
+    .about-values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .about-value-card {
+      background: var(--bg3);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 36px 28px;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .about-value-card:hover {
+      border-color: rgba(200, 246, 93, 0.2);
+      transform: translateY(-4px);
+    }
+
+    .about-value-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(200, 246, 93, 0.1);
+      border: 1px solid rgba(200, 246, 93, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .about-value-card h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 0.05em;
+      color: var(--text1);
+      margin: 0 0 10px;
+    }
+
+    .about-value-card p {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: var(--text3);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* ── NYC SECTION ── */
+    .about-nyc {
+      background: var(--bg);
+      padding: 100px 24px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .about-nyc-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(200, 246, 93, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .about-nyc-inner {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .about-nyc-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 14vw, 160px);
+      line-height: 0.88;
+      letter-spacing: 0.02em;
+      color: rgba(255,255,255,0.04);
+      margin: 0;
+      user-select: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      white-space: nowrap;
+    }
+
+    .about-nyc-content {
+      position: relative;
+      padding: 60px 0;
+    }
+
+    .about-nyc-content h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 6vw, 64px);
+      letter-spacing: 0.03em;
+      color: var(--text1);
+      margin: 0 0 20px;
+    }
+
+    .about-nyc-content h2 span { color: var(--accent); }
+
+    .about-nyc-content p {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      color: var(--text3);
+      line-height: 1.75;
+      max-width: 600px;
+      margin: 0 auto 36px;
+    }
+
+    .about-nyc-stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .about-nyc-stat {
+      text-align: center;
+    }
+
+    .about-nyc-stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      line-height: 1;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+
+    .about-nyc-stat-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-top: 6px;
+    }
+
+    /* ── CTA ── */
+    .about-cta {
+      background: var(--bg2);
+      padding: 100px 24px;
+      text-align: center;
+    }
+
+    .about-cta-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .about-cta h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 8vw, 88px);
+      letter-spacing: 0.02em;
+      color: var(--text1);
+      line-height: 0.92;
+      margin: 0 0 20px;
+    }
+
+    .about-cta h2 span { color: var(--accent); }
+
+    .about-cta p {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      color: var(--text3);
+      line-height: 1.7;
+      margin: 0 0 36px;
+    }
+
+    .about-cta-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .about-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #0a0a0a;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .about-btn-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+
+    .about-btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text2);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+    }
+
+    .about-btn-secondary:hover {
+      border-color: rgba(255,255,255,0.3);
+      color: var(--text1);
+      transform: translateY(-2px);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .about-story-inner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .about-story-left { position: static; }
+      .about-values-grid { grid-template-columns: 1fr; }
+      .about-nyc-stats { gap: 28px; }
+    }
+  </style>
 </head>
 
-<body class="reviews-page-body">
-    <nav class="navbar" id="navbar">
+<body>
+
+  <!-- ══ ANNOUNCEMENT BAR ══ -->
+  <div class="announce-bar" id="announceBar">
+    <div class="announce-shell">
+      <div class="announce-copy">
+        <span class="announce-kicker">Just Dropped</span>
+        <span class="announce-headline">Jordan 4 Military Blue</span>
+      </div>
+      <div class="announce-pills" aria-label="Store highlights">
+        <span class="announce-pill">Free shipping $150+</span>
+        <span class="announce-pill">100% authenticated</span>
+      </div>
+    </div>
+    <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar" id="navbar">
     <a class="nav-logo" href="index.html">
-        <div class="nav-logo-mark">B</div>
-        BACK<span>DOOR</span>
+      <div class="nav-logo-mark">B</div>
+      BACK<span>DOOR</span>
     </a>
     <div class="nav-center">
-        <a class="nav-link " href="shop-all.html">Shop</a>
-        <div class="nav-dropdown">
-            <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
-            <div class="nav-dropdown-menu">
-                <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
-                <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
-                <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
-                <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
-                <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
-            </div>
+      <a class="nav-link" href="shop-all.html">Shop</a>
+      <div class="nav-dropdown">
+        <a class="nav-link nav-dropdown-toggle" href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+        <div class="nav-dropdown-menu">
+          <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
+          <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+          <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
+          <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
+          <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
         </div>
-        <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
-        <a class="nav-link active" href="about.html">About</a>
+      </div>
+      <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+      <a class="nav-link active" href="about.html">About</a>
     </div>
     <div class="nav-right">
-        <div class="nav-search-wrap">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="navSearch" placeholder="Search sneakers..." />
-        </div>
-        <div class="nav-icons-group">
-            <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
-                <i class="fa-regular fa-heart"></i>
-                <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
-            </a>
-            <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
-                <i class="fa-solid fa-bag-shopping"></i>
-                <span>Cart</span>
-                <span class="cart-badge" id="cartCount" style="display: none;">0</span>
-            </button>
-        </div>
-        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
-            <span></span><span></span><span></span>
+      <div class="nav-search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="navSearch" placeholder="Search sneakers..." />
+      </div>
+      <div class="nav-icons-group">
+        <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
+          <i class="fa-regular fa-heart"></i>
+          <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
+        </a>
+        <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span>Cart</span>
+          <span class="cart-badge" id="cartCount" style="display: none;">0</span>
         </button>
+      </div>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Menu"
+        onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-</nav>
-<div class="nav-mobile-menu" id="navMobileMenu">
+  </nav>
+
+  <div class="nav-mobile-menu" id="navMobileMenu">
     <a class="nav-link" href="shop-all.html">Shop All</a>
     <p class="nav-mobile-section">Brands</p>
     <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
@@ -65,46 +533,277 @@
     <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
     <p class="nav-mobile-section">Explore</p>
     <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
-    <a class="nav-link" href="about.html">About</a>
-</div>
+    <a class="nav-link active" href="about.html">About</a>
+  </div>
 
-    <main class="reviews-page-shell">
-        <section class="reviews-hero">
-            <p class="product-review-eyebrow">The Collective</p>
-            <h1>About Backdoor</h1>
-            <p>Backdoor is more than just a marketplace. We are a community of enthusiasts dedicated to the culture of authenticated sneakers and premium apparel.</p>
-        </section>
+  <!-- ══ HERO ══ -->
+  <section class="about-hero announce-offset-section">
+    <div class="about-hero-bg"></div>
+    <div class="about-hero-grid"></div>
+    <div class="about-hero-inner">
+      <div class="about-eyebrow">
+        <i class="fa-solid fa-location-dot"></i> New York City
+      </div>
+      <h1 class="about-hero-title">
+        WELCOME<br>TO THE <span>BACK.</span>
+      </h1>
+      <p class="about-hero-sub">
+        In New York, the best stuff was never on the shelf. If you knew where to go — the right corner, the right connect, the right door — you could get what nobody else could. That's been the city's way forever.
+      </p>
+    </div>
+  </section>
 
-        <section class="about-content-shell">
-            <div class="about-card">
-                <h2>Our Mission</h2>
-                <p>Founded on the principles of trust and transparency, Backdoor ensures that every item passing through our platform is 100% authenticated. We bridge the gap between collectors and the most sought-after drops in the world.</p>
-                
-                <h2>Why Shop With Us?</h2>
-                <ul class="about-list">
-                    <li><i class="fa-solid fa-check"></i> Verified Authentication Process</li>
-                    <li><i class="fa-solid fa-check"></i> Curated Collection of 1/1s & Grails</li>
-                    <li><i class="fa-solid fa-check"></i> Secure Payment & Worldwide Shipping</li>
-                </ul>
-            </div>
-        </section>
-    </main>
+  <div class="about-divider"></div>
 
-  <!-- Firebase SDKs & Global Auth -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- ══ STORY ══ -->
+  <section class="about-story">
+    <div class="about-story-inner">
+      <div class="about-story-left">
+        <p class="about-section-label">Our Story</p>
+        <h2 class="about-story-title">NOT THE<br>FRONT<br><span>WINDOW.</span></h2>
+        <p class="about-story-lead">
+          Backdoor wasn't built for everyone. It was built for people who know the difference between a shoe and a statement.
+        </p>
+      </div>
+
+      <div class="about-story-right">
+        <div class="about-story-block">
+          <p>
+            <strong>Backdoor started with a simple obsession:</strong> getting the right pairs to the right people. Not the restocks. Not the samples. The ones that actually matter — the grails, the collabs, the limited runs that define a generation.
+          </p>
+          <p>
+            We grew up in New York, which means we grew up understanding that access is everything. Who you know. Where you go. Which door you walk through. The city taught us that the best connections happen quietly, away from the hype and the noise — through the back.
+          </p>
+        </div>
+
+        <div class="about-story-quote">
+          <p>"WE DON'T LIST EVERYTHING. WE LIST THE RIGHT THINGS."</p>
+        </div>
+
+        <div class="about-story-block">
+          <p>
+            Every sneaker on Backdoor is <strong>hand-sourced, professionally authenticated,</strong> and held to a standard most platforms don't bother with. We partner with verified authenticators who have trained eyes on every pair — checking stitching, tags, colorways, and construction before a single listing goes live.
+          </p>
+          <p>
+            We built Backdoor for the streetwear crowd that doesn't need a tutorial — the buyers who read the tongue label before they check the price, who know the difference between a DS and a VNDS, who wear their collection as hard as they built it. If that's you, you're in the right place.
+          </p>
+        </div>
+
+        <div class="about-story-block">
+          <p>
+            <strong>Based in New York. Built for everywhere.</strong> Our roots are in the five boroughs — the block parties, the boutiques, the Supreme lines and the Harlem spot that had the Dunks six months before the rest of the country. That culture runs through everything we do.
+          </p>
+          <p>
+            We're not a marketplace that happens to sell sneakers. We're a sneaker operation that built a marketplace — and there's a difference you'll feel the moment your order arrives.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="about-divider"></div>
+
+  <!-- ══ VALUES ══ -->
+  <section class="about-values">
+    <div class="about-values-inner">
+      <div class="about-values-header">
+        <p class="about-section-label">What We Stand For</p>
+        <h2 class="about-values-title">THE <span>CODE</span></h2>
+      </div>
+      <div class="about-values-grid">
+        <div class="about-value-card">
+          <div class="about-value-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <h3>AUTHENTICATION FIRST</h3>
+          <p>Every pair is inspected by trained authenticators before it reaches your door. No exceptions. No grey area. If it can't be verified, it doesn't get listed.</p>
+        </div>
+        <div class="about-value-card">
+          <div class="about-value-icon"><i class="fa-solid fa-gem"></i></div>
+          <h3>CURATED, NOT CROWDED</h3>
+          <p>We don't chase volume. We chase quality. Our catalog is tight on purpose — built around the pairs that actually move culture, not just fill a shelf.</p>
+        </div>
+        <div class="about-value-card">
+          <div class="about-value-icon"><i class="fa-solid fa-bolt"></i></div>
+          <h3>FAST, EVERY TIME</h3>
+          <p>New York doesn't wait and neither do we. Orders ship within 24–48 hours, tracked from our warehouse to your door with full visibility the whole way.</p>
+        </div>
+        <div class="about-value-card">
+          <div class="about-value-icon"><i class="fa-solid fa-handshake"></i></div>
+          <h3>STRAIGHT BUSINESS</h3>
+          <p>No inflated "market value" games. Our prices reflect real resell data — transparent, fair, and honest whether you're buying a beater or a grail.</p>
+        </div>
+        <div class="about-value-card">
+          <div class="about-value-icon"><i class="fa-solid fa-city"></i></div>
+          <h3>NYC ROOTS</h3>
+          <p>We're not a Silicon Valley startup that discovered sneaker culture. We're from it. The boroughs built our taste and the city keeps us accountable.</p>
+        </div>
+        <div class="about-value-card">
+          <div class="about-value-icon"><i class="fa-solid fa-rotate-left"></i></div>
+          <h3>HASSLE-FREE RETURNS</h3>
+          <p>If something's wrong, we make it right. Easy returns, real customer support, and a team that actually answers — because your trust is our only product.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="about-divider"></div>
+
+  <!-- ══ NYC SECTION ══ -->
+  <section class="about-nyc">
+    <div class="about-nyc-bg"></div>
+    <div class="about-nyc-inner">
+      <div class="about-nyc-title" aria-hidden="true">NEW YORK</div>
+      <div class="about-nyc-content">
+        <p class="about-section-label">Based In</p>
+        <h2>THE CITY <span>NEVER SLEEPS.</span><br>NEITHER DO WE.</h2>
+        <p>
+          New York is where street culture and high fashion collide every single day. It's where a kid from the Bronx and a buyer from SoHo want the same pair and only one of them gets it. Backdoor was built to tip that balance — giving everyone with taste the access they deserve.
+        </p>
+        <div class="about-nyc-stats">
+          <div class="about-nyc-stat">
+            <div class="about-nyc-stat-num">500+</div>
+            <div class="about-nyc-stat-label">Verified Styles</div>
+          </div>
+          <div class="about-nyc-stat">
+            <div class="about-nyc-stat-num">100%</div>
+            <div class="about-nyc-stat-label">Authenticated</div>
+          </div>
+          <div class="about-nyc-stat">
+            <div class="about-nyc-stat-num">24H</div>
+            <div class="about-nyc-stat-label">Order Processing</div>
+          </div>
+          <div class="about-nyc-stat">
+            <div class="about-nyc-stat-num">NYC</div>
+            <div class="about-nyc-stat-label">Based &amp; Built</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="about-divider"></div>
+
+  <!-- ══ CTA ══ -->
+  <section class="about-cta">
+    <div class="about-cta-inner">
+      <p class="about-section-label">You're In</p>
+      <h2>STEP<br>THROUGH <span>THE<br>BACK.</span></h2>
+      <p>Browse the full catalog — every pair authenticated, every drop curated, every order shipped direct from New York.</p>
+      <div class="about-cta-btns">
+        <a href="shop-all.html" class="about-btn-primary">
+          <i class="fa-solid fa-shoe-prints"></i> Shop All Drops
+        </a>
+        <a href="shop-all.html?sort=newest" class="about-btn-secondary">
+          <i class="fa-solid fa-fire"></i> New Arrivals
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="footer-inner">
+
+      <!-- Email signup -->
+      <div class="footer-signup">
+        <div class="footer-signup-text">
+          <h4>BE FIRST IN LINE</h4>
+          <p>Get early access to drops, restocks, and exclusive NYC events. No spam — just the right pairs.</p>
+        </div>
+        <form class="footer-signup-form" onsubmit="handleFooterSignup(event)">
+          <input type="email" id="footerEmailInput" placeholder="your@email.com" required autocomplete="email" />
+          <button type="submit">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+
+      <div class="footer-signup-divider"></div>
+
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="footer-logo">BACK<span>DOOR</span></span>
+          <p>New York's premium marketplace for authenticated sneakers and streetwear. Every pair verified. Every drop delivered.</p>
+          <div class="social-links">
+            <a class="social-btn" href="https://instagram.com/backdoorco" target="_blank" rel="noopener" title="Instagram" aria-label="Backdoor on Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+            <a class="social-btn" href="https://tiktok.com/@backdoorco" target="_blank" rel="noopener" title="TikTok" aria-label="Backdoor on TikTok">
+              <i class="fa-brands fa-tiktok"></i>
+            </a>
+            <a class="social-btn" href="https://twitter.com/backdoorco" target="_blank" rel="noopener" title="Twitter / X" aria-label="Backdoor on X">
+              <i class="fa-brands fa-x-twitter"></i>
+            </a>
+            <a class="social-btn social-btn--wide" href="tracking.html" title="Track Your Order">
+              <i class="fa-solid fa-truck-fast"></i><span>Track</span>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>SHOP</h4>
+          <a href="shop-all.html">All Products</a>
+          <a href="shop-all.html?sort=newest">New Drops</a>
+          <a href="shop-all.html?filter=Jordan">Jordan</a>
+          <a href="shop-all.html?filter=Nike">Nike</a>
+          <a href="checkout.html">Checkout</a>
+        </div>
+        <div class="footer-col">
+          <h4>HELP</h4>
+          <a href="tracking.html">Track Order</a>
+          <a href="accounts.html">My Account</a>
+          <a href="about.html">About Us</a>
+        </div>
+        <div class="footer-col">
+          <h4>POLICIES</h4>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="contact.html">Contact Support</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 <span>Backdoor</span>. All rights reserved. New York, NY. Authentic sneakers guaranteed.</p>
+        <div class="footer-legal-links">
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="returns.html">Returns</a>
+        </div>
+        <div class="payment-logos">
+          <i class="fa-brands fa-cc-visa"></i>
+          <i class="fa-brands fa-cc-mastercard"></i>
+          <i class="fa-brands fa-cc-amex"></i>
+          <i class="fa-brands fa-cc-apple-pay"></i>
+          <i class="fa-brands fa-google-pay"></i>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="app.js"></script>
   <script>
-      window.firebaseConfig = {
-          apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
-          authDomain: "backdoorco.xyz",
-          projectId: "coalition-aec44",
-          storageBucket: "coalition-aec44.firebasestorage.app",
-          messagingSenderId: "312196142925",
-          appId: "1:312196142925:web:ba090f602c8b5a31b20904"
-      };
-  </script>
-  <script src="auth.js"></script>
-</body>
+    function closeAnnounce() {
+      var bar = document.getElementById('announceBar');
+      if (bar) bar.style.display = 'none';
+    }
 
+    function handleFooterSignup(e) {
+      e.preventDefault();
+      var input = document.getElementById('footerEmailInput');
+      if (input && input.value) {
+        input.value = '';
+        input.placeholder = 'You\'re in. Welcome to the back.';
+        input.disabled = true;
+      }
+    }
+
+    // Nav search redirect
+    var navSearch = document.getElementById('navSearch');
+    if (navSearch) {
+      navSearch.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && this.value.trim()) {
+          window.location.href = 'shop-all.html?search=' + encodeURIComponent(this.value.trim());
+        }
+      });
+    }
+  </script>
+
+</body>
 </html>

@@ -12,81 +12,67 @@
     rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="store.css" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Backdoor — Authenticated Sneakers & Streetwear | New York" />
+  <meta property="og:description" content="New York's premium marketplace for authenticated sneakers and streetwear. Every pair verified. Every drop delivered fast. No fakes. No games." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://backdoorco.xyz/" />
+  <meta property="og:image" content="https://backdoorco.xyz/og-image.jpg" />
+  <meta property="og:site_name" content="Backdoor" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Backdoor — Authenticated Sneakers & Streetwear | New York" />
+  <meta name="twitter:description" content="New York's premium marketplace for authenticated sneakers and streetwear. Every pair verified. Every drop delivered fast. No fakes. No games." />
 </head>
 
 <body>
 
   <!-- ══ ANNOUNCEMENT BAR ══ -->
-    <div class="announce-bar" id="announceBar">
-        <div class="announce-shell">
-            <div class="announce-copy">
-                <span class="announce-kicker">Just Dropped</span>
-                <span class="announce-headline">Jordan 4 Military Blue</span>
-            </div>
-            <div class="announce-pills" aria-label="Store highlights">
-                <span class="announce-pill">Free shipping $150+</span>
-                <span class="announce-pill">100% authenticated</span>
-            </div>
-        </div>
-        <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-    </div>
+  <div class="announce-bar" id="announceBar">
+    <span>🔥 New Jordan 4 Military Blue just dropped</span>
+    <span class="sep">|</span>
+    <span>🚚 Free shipping on orders over $150</span>
+    <span class="sep">|</span>
+    <span>✅ All shoes 100% authenticated</span>
+    <button class="announce-close" title="Close announcement" onclick="closeAnnounce()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
 
   <!-- ══ NAVBAR ══ -->
-  <nav class="navbar" id="navbar">
-    <a class="nav-logo" href="index.html">
-        <div class="nav-logo-mark">B</div>
-        BACK<span>DOOR</span>
+  <nav class="navbar announce-offset" id="navbar">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-mark">B</div>
+      BACK<span>DOOR</span>
     </a>
     <div class="nav-center">
-        <a class="nav-link " href="shop-all.html">Shop</a>
-        <div class="nav-dropdown">
-            <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
-            <div class="nav-dropdown-menu">
-                <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
-                <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
-                <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
-                <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
-                <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
-            </div>
-        </div>
-        <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
-        <a class="nav-link " href="about.html">About</a>
+      <a class="nav-link" href="shop-all.html">SHOP</a>
+      <a class="nav-link" href="men.html">Men</a>
+      <a class="nav-link" href="women.html">Women</a>
+      <a class="nav-link" href="kids.html">Kids</a>
+      <a class="nav-link" href="shoes.html">Shoes</a>
+      <a class="nav-link" href="apparel.html">Apparel</a>
+      <a class="nav-link" href="accessories.html">Accessories</a>
+      <a class="nav-link" href="electronics.html">Electronics</a>
     </div>
     <div class="nav-right">
-        <div class="nav-search-wrap">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="navSearch" placeholder="Search sneakers..." />
-        </div>
-        <div class="nav-icons-group">
-            <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
-                <i class="fa-regular fa-heart"></i>
-                <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
-            </a>
-            <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
-                <i class="fa-solid fa-bag-shopping"></i>
-                <span>Cart</span>
-                <span class="cart-badge" id="cartCount" style="display: none;">0</span>
-            </button>
-        </div>
-        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
-            <span></span><span></span><span></span>
-        </button>
+      <div class="nav-search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="navSearch" class="nav-search" placeholder="Search brand, name..."
+          title="Search products" />
+      </div>
+      <button class="nav-icon-btn" title="Wishlist" onclick="showToast('Sign in to view wishlist','info')">
+        <i class="fa-regular fa-heart"></i>
+      </button>
+      <button class="nav-cart-btn" id="cartButton" onclick="toggleCart()">
+        <i class="fa-solid fa-bag-shopping"></i> Cart
+        <span class="cart-pill" id="cartCount">0</span>
+      </button>
+      <button class="btn-signup-nav" onclick="window.location.href='accounts.html'">Sign In</button>
     </div>
-</nav>
-<div class="nav-mobile-menu" id="navMobileMenu">
-    <a class="nav-link" href="shop-all.html">Shop All</a>
-    <p class="nav-mobile-section">Brands</p>
-    <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
-    <a class="nav-link" href="shop-all.html?filter=Nike">Nike</a>
-    <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
-    <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
-    <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
-    <p class="nav-mobile-section">Explore</p>
-    <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
-    <a class="nav-link" href="about.html">About</a>
-</div>
+  </nav>
 
   <!-- ══ HERO ══ -->
   <section class="hero announce-offset-section">
@@ -157,7 +143,26 @@
     </div>
   </section>
 
-
+  <!-- ══ TRUST BAR ══ -->
+  <div class="trust-bar">
+    <div class="trust-bar-inner">
+      <div class="trust-bar-item">
+        <i class="fa-solid fa-shield-halved"></i> 100% Authenticated
+      </div>
+      <div class="trust-bar-item">
+        <i class="fa-solid fa-truck-fast"></i> Ships in 24–48 Hours
+      </div>
+      <div class="trust-bar-item">
+        <i class="fa-solid fa-rotate-left"></i> Free Returns
+      </div>
+      <div class="trust-bar-item">
+        <i class="fa-solid fa-lock"></i> Secure Checkout
+      </div>
+      <div class="trust-bar-item">
+        <i class="fa-solid fa-city"></i> Based in New York, NY
+      </div>
+    </div>
+  </div>
 
   <!-- ══ MOST WANTED ══ -->
   <section class="most-wanted-section" id="mostWanted">
@@ -253,45 +258,33 @@
     </div>
     <div class="brands-grid">
       <div class="brand-card" onclick="filterByBrandClick('Jordan')">
-        <div class="brand-card-visual brand-card-visual--light">
-          <img src="https://th.bing.com/th/id/R.0139937c2f641ab61fd020844ccfd459?rik=Jeg6%2bRaQwcqadA&pid=ImgRaw&r=0"
-            alt="Jordan" class="brand-card-img brand-card-img--jordan" loading="lazy" decoding="async"
-            referrerpolicy="no-referrer" />
-        </div>
+        <img src="products/jordan-4-black-cat.jpg" alt="Jordan" class="brand-card-img" />
         <div class="brand-name">Jordan</div>
         <div class="brand-count">8 items</div>
       </div>
       <div class="brand-card" onclick="filterByBrandClick('Nike')">
-        <div class="brand-card-visual brand-card-visual--light">
-          <img src="brand-logos/nike.svg" alt="Nike" class="brand-card-img brand-card-img--nike" loading="lazy"
-            decoding="async" />
-        </div>
+        <img src="products/kobe-6-reverse-grinch.jpg" alt="Nike" class="brand-card-img" />
         <div class="brand-name">Nike</div>
         <div class="brand-count">5 items</div>
       </div>
       <div class="brand-card" onclick="filterByBrandClick('Adidas')">
-        <div class="brand-card-visual brand-card-visual--light">
-          <img src="https://www.freepnglogos.com/uploads/adidas-logo-png-transparent-24.png" alt="Adidas"
-            class="brand-card-img brand-card-img--adidas" loading="lazy" decoding="async"
-            referrerpolicy="no-referrer" />
-        </div>
+        <img src="products/pharrell-jellyfish-blue.jpg" alt="Adidas" class="brand-card-img" />
         <div class="brand-name">Adidas</div>
         <div class="brand-count">2 items</div>
       </div>
-      <div class="brand-card" onclick="filterByBrandClick('Travis Scott')">
-        <div class="brand-card-visual brand-card-visual--dark">
-          <img src="brand-logos/travis-scott.svg" alt="Travis Scott" class="brand-card-img brand-card-img--travis"
-            loading="lazy" decoding="async" />
-        </div>
-        <div class="brand-name">Travis Scott</div>
+      <div class="brand-card" onclick="filterByBrandClick('Godspeed')">
+        <img src="products/godspeed-surf-day.png" alt="Godspeed" class="brand-card-img" />
+        <div class="brand-name">Godspeed</div>
         <div class="brand-count">1 item</div>
       </div>
-      <div class="brand-card" onclick="filterByBrandClick('Godspeed')">
-        <div class="brand-card-visual brand-card-visual--dark">
-          <img src="https://i.imgur.com/sSlKm7R.png" alt="Godspeed" class="brand-card-img brand-card-img--godspeed"
-            loading="lazy" decoding="async" referrerpolicy="no-referrer" />
-        </div>
-        <div class="brand-name">Godspeed</div>
+      <div class="brand-card" onclick="filterByBrandClick('Nike')">
+        <img src="products/nocta-sunset-jacket.jpg" alt="NOCTA" class="brand-card-img" />
+        <div class="brand-name">NOCTA</div>
+        <div class="brand-count">1 item</div>
+      </div>
+      <div class="brand-card" onclick="filterByBrandClick('Jordan')">
+        <img src="products/jordan-1-fragment-travis.jpg" alt="Travis Scott" class="brand-card-img" />
+        <div class="brand-name">Travis Scott</div>
         <div class="brand-count">1 item</div>
       </div>
     </div>
@@ -375,30 +368,43 @@
   <!-- ══ FOOTER ══ -->
   <footer class="footer">
     <div class="footer-inner">
+
+      <!-- Email signup strip -->
+      <div class="footer-signup">
+        <div class="footer-signup-text">
+          <h4>BE FIRST IN LINE</h4>
+          <p>Early access to drops, restocks, and exclusive NYC events. No spam — just the right pairs.</p>
+        </div>
+        <form class="footer-signup-form" onsubmit="handleFooterSignup(event)">
+          <input type="email" id="footerEmailInput" placeholder="your@email.com" required autocomplete="email" />
+          <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
+        </form>
+      </div>
+      <div class="footer-signup-divider"></div>
+
       <div class="footer-top">
         <div class="footer-brand">
           <span class="footer-logo">BACK<span>DOOR</span></span>
-          <p>The premium marketplace for authenticated sneakers. Every pair verified. Every drop delivered fast.</p>
+          <p>New York's premium marketplace for authenticated sneakers and streetwear. Every pair verified. Every drop delivered.</p>
           <div class="social-links">
-            <a class="social-btn social-btn--wide" href="contact.html" title="Contact Support"><i class="fa-solid fa-envelope"></i><span>Support</span></a>
-            <a class="social-btn social-btn--wide" href="tracking.html" title="Track Your Order"><i class="fa-solid fa-truck-fast"></i><span>Track</span></a>
-            <a class="social-btn social-btn--wide" href="faq.html" title="Frequently Asked Questions"><i class="fa-solid fa-circle-question"></i><span>FAQ</span></a>
+            <a class="social-btn" href="https://instagram.com/backdoorco" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a class="social-btn" href="https://tiktok.com/@backdoorco" target="_blank" rel="noopener" title="TikTok" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            <a class="social-btn" href="https://twitter.com/backdoorco" target="_blank" rel="noopener" title="X / Twitter" aria-label="X Twitter"><i class="fa-brands fa-x-twitter"></i></a>
           </div>
         </div>
         <div class="footer-col">
           <h4>SHOP</h4>
-          <a href="#shopSection">All Products</a>
-          <a href="#brandsSection">Brands</a>
-          <a href="#dropSection">New Drops</a>
+          <a href="shop-all.html">All Products</a>
+          <a href="shop-all.html?sort=newest">New Drops</a>
+          <a href="shop-all.html?filter=Jordan">Jordan</a>
+          <a href="shop-all.html?filter=Nike">Nike</a>
           <a href="checkout.html">Checkout</a>
         </div>
         <div class="footer-col">
-          <h4>HELP</h4>
+          <h4>COMPANY</h4>
+          <a href="about.html">About Us</a>
           <a href="tracking.html">Track Order</a>
           <a href="accounts.html">My Account</a>
-          <a href="shipping.html">Shipping Info</a>
-          <a href="returns.html">Returns</a>
-          <a href="faq.html">FAQ</a>
         </div>
         <div class="footer-col">
           <h4>POLICIES</h4>
@@ -408,11 +414,10 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2026 <span>Backdoor</span>. All rights reserved. Authentic sneakers guaranteed.</p>
+        <p>&copy; 2026 <span>Backdoor</span>. All rights reserved. New York, NY. Authentic sneakers guaranteed.</p>
         <div class="footer-legal-links">
           <a href="privacy.html">Privacy</a>
           <a href="terms.html">Terms</a>
-          <a href="returns.html">Returns</a>
         </div>
         <div class="payment-logos">
           <i class="fa-brands fa-cc-visa"></i>
@@ -501,6 +506,20 @@
   <script type="module" src="app.js?v=2.2"></script>
   <script src="analytics.js" defer></script>
   <script>
+    // Brand card click — redirects to shop-all with brand pre-filtered
+    function filterByBrandClick(brand) {
+      window.location.href = 'shop-all.html?filter=' + encodeURIComponent(brand);
+    }
+    // Footer email signup
+    function handleFooterSignup(e) {
+      e.preventDefault();
+      var input = document.getElementById('footerEmailInput');
+      if (input && input.value) {
+        input.value = '';
+        input.placeholder = "You're in. Welcome to the back.";
+        input.disabled = true;
+      }
+    }
     // Announcement bar
     function closeAnnounce() {
       document.getElementById('announceBar').style.display = 'none';
@@ -510,9 +529,6 @@
     // Scroll to shop
     function scrollToShop() {
       window.location.href = 'shop-all.html?sort=price-high';
-    }
-    function filterByBrandClick(brand) {
-      window.location.href = 'shop-all.html?search=' + encodeURIComponent(brand);
     }
     // Navbar scroll effect
     window.addEventListener('scroll', () => {
@@ -542,23 +558,6 @@
       }, 1000);
     })();
   </script>
-
-  <!-- Firebase SDKs & Global Auth -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script>
-      window.firebaseConfig = {
-          apiKey: "AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw",
-          authDomain: "backdoorco.xyz",
-          projectId: "coalition-aec44",
-          storageBucket: "coalition-aec44.firebasestorage.app",
-          messagingSenderId: "312196142925",
-          appId: "1:312196142925:web:ba090f602c8b5a31b20904"
-      };
-  </script>
-  <script src="auth.js"></script>
 </body>
-
 
 </html>

@@ -389,6 +389,10 @@ function getProductShippingPromise(product) {
 }
 
 function renderProduct(product) {
+    // Expose product globally for recently-viewed tracker
+    window.__currentProduct = product;
+    document.dispatchEvent(new CustomEvent('productLoaded', { detail: product }));
+
     document.title = `${product.name} | Backdoor`;
     const soldOut = isOutOfStock(product);
     const backorder = isBackorderOnly(product);
@@ -555,8 +559,10 @@ function renderGalleryControls() {
     if (nextButton) nextButton.style.display = hasMultiple ? 'inline-flex' : 'none';
 
     if (dots) {
-        dots.innerHTML = productImages.map((_, index) => `
-            <button class="product-gallery-dot ${index === currentImageIndex ? 'active' : ''}" type="button" data-index="${index}" onclick="selectProductImage(this)" aria-label="View image ${index + 1}"></button>
+        dots.innerHTML = productImages.map((src, index) => `
+            <button class="product-gallery-dot ${index === currentImageIndex ? 'active' : ''}" type="button" data-index="${index}" onclick="selectProductImage(this)" aria-label="View image ${index + 1}">
+                <img src="${src}" alt="View ${index + 1}" loading="lazy" onerror="this.style.display='none'">
+            </button>
         `).join('');
         dots.style.display = hasMultiple ? 'flex' : 'none';
     }
