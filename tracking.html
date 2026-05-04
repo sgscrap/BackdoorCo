@@ -53,14 +53,13 @@
                     <button class="lookup-btn" id="lookupBtn" onclick="lookupOrder()"><i
                             class="fa-solid fa-magnifying-glass"></i> TRACK</button>
                 </div>
-                <p class="lookup-hint">Can't find your order? <a
-                        onclick="showToast('Support chat coming soon!', 'info')">Contact support</a></p>
+                <p class="lookup-hint">Can't find your order? <button type="button" class="link-accent" onclick="showToast('Support chat coming soon!', 'info')">Contact support</button></p>
             </div>
             <div class="demo-orders">
                 <div class="demo-label">Try these demo orders:</div>
                 <div class="demo-chips">
-                    <div class="demo-chip" onclick="quickLookup('#BD-1042')">#BD-1042 <span
-                            class="chip-hint">Shipped</span></div>
+                        <button type="button" class="demo-chip" onclick="quickLookup('#BD-1042')">#BD-1042 <span
+                            class="chip-hint">Shipped</span></button>
                     <button type="button" class="demo-chip" onclick="quickLookup('#BD-1042')">#BD-1042 <span
                     class="chip-hint">Delivered</span></button>
                     <button type="button" class="demo-chip" onclick="quickLookup('#BD-1041')">#BD-1041 <span
