@@ -263,7 +263,7 @@
     </div>
 
     <!-- ══ STATUS UPDATE MODAL ══ -->
-    <div class="modal-overlay" id="statusModal" onclick="closeModalOnOverlay(event,'statusModal')">
+    <div class="modal-overlay" id="statusModal" onclick="closeModalOnOverlay(event,'statusModal')" tabindex="0" role="button" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); closeModalOnOverlay(event,'statusModal'); }" aria-label="Close status dialog">
         <div class="modal">
             <div class="modal-header">
                 <h2 class="modal-title">UPDATE STATUS</h2><button class="modal-close"
@@ -320,7 +320,7 @@
     </div>
 
     <!-- ══ NOTIFY MODAL ══ -->
-    <div class="modal-overlay" id="notifyModal" onclick="closeModalOnOverlay(event,'notifyModal')">
+    <div class="modal-overlay" id="notifyModal" onclick="closeModalOnOverlay(event,'notifyModal')" tabindex="0" role="button" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); closeModalOnOverlay(event,'notifyModal'); }" aria-label="Close notify dialog">
         <div class="modal">
             <div class="modal-header">
                 <h2 class="modal-title">SEND NOTIFICATION</h2><button class="modal-close"

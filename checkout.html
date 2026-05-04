@@ -315,7 +315,7 @@
     </div>
 
     <!-- ══ CART DRAWER ══ -->
-    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()" tabindex="0" role="button" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); closeCart(); }" aria-label="Close cart overlay"></div>
     <div class="cart-drawer" id="cartDrawer">
         <div class="cart-header">
             <div class="cart-header-left">

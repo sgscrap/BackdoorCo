@@ -74,7 +74,7 @@
     </nav>
 
     <!-- ══ AUTH MODAL ══ -->
-    <div class="modal-overlay" id="authModal" onclick="closeAuthOnOverlay(event)">
+    <div class="modal-overlay" id="authModal" onclick="closeAuthOnOverlay(event)" tabindex="0" role="button" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); closeAuthOnOverlay(event); }" aria-label="Close authentication dialog">
         <div class="auth-modal">
             <div class="auth-tabs">
                 <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">LOGIN</button>
