@@ -330,25 +330,8 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <div id="imageLightbox" class="lightbox-overlay lightbox-fixed" onclick="closeLightbox(event)">
-        <img id="lightboxImage" src="" class="lightbox-img-fixed" oncontextmenu="return false;" draggable="false" alt="Lightbox image view">
-    </div>
-
     <script type="module" src="product-page.js"></script>
     <script>
-        window.openLightbox = (src) => {
-            const lb = document.getElementById('imageLightbox');
-            const img = document.getElementById('lightboxImage');
-            if (lb && img && src) {
-                img.src = src;
-                lb.style.display = 'flex';
-            }
-        };
-        window.closeLightbox = (e) => {
-            const lb = document.getElementById('imageLightbox');
-            if (lb) lb.style.display = 'none';
-        };
-
         function closeAnnounce() {
             const bar = document.getElementById('announceBar');
             const nav = document.getElementById('navbar');

@@ -564,9 +564,9 @@ function renderProductReviews(reviews) {
             <p class="product-review-comment">${escapeHtml(review.comment)}</p>
             <div class="product-review-gallery">
                 ${review.images.map((image, index) => `
-                    <button class="product-review-thumb" type="button" onclick="openLightbox('${escapeHtml(image)}')">
-                        <img src="${escapeHtml(image)}" alt="${escapeHtml(review.name)} review image ${index + 1}" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
-                    </button>
+                    <div class="product-review-thumb" style="cursor: default;">
+                        <img src="${escapeHtml(image)}" alt="${escapeHtml(review.name)} review image ${index + 1}" onerror="this.closest('.product-review-thumb').style.display='none';" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
+                    </div>
                 `).join('')}
             </div>
         </article>
