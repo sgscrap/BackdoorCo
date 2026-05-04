@@ -204,6 +204,7 @@ function renderPriceMonitor() {
                                 <div style="display:flex;gap:6px;align-items:center">
                                     <input type="number" step="0.01" id="${compInputId}" placeholder="paste min price" value="${p._lastCompetitorPrice || ''}" onchange="onCompetitorPriceChange('${p.id}')">
                                     <button class="btn-secondary" onclick="fetchEbayForProduct('${p.id}')" title="Fetch eBay">eBay</button>
+                                    <button class="btn-secondary" onclick="fetchPradaForProduct('${p.id}')" title="Fetch Prada">Prada</button>
                                 </div>
                             </td>
                             <td id="sugg_${p.id}">$${(suggested || 0).toFixed(2)}</td>
@@ -235,6 +236,27 @@ async function fetchEbayForProduct(productId) {
     } catch (err) {
         console.error('eBay fetch failed', err);
         showToast('eBay fetch failed: ' + err.message, 'error');
+    }
+}
+
+async function fetchPradaForProduct(productId) {
+    const p = products.find(pr => pr.id === productId);
+    if (!p) return showToast('Product not found', 'error');
+    const q = encodeURIComponent(p.sku || p.name || p.id);
+    const url = `/.netlify/functions/price-monitor-prada?q=${q}`;
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data.minPrice) {
+            p._lastCompetitorPrice = data.minPrice;
+            showToast(`Prada min: $${data.minPrice.toFixed(2)} (found ${data.found})`, 'success');
+            onCompetitorPriceChange(productId);
+        } else {
+            showToast('No prices found on Prada', 'warning');
+        }
+    } catch (err) {
+        console.error('Prada fetch failed', err);
+        showToast('Prada fetch failed: ' + err.message, 'error');
     }
 }
 
