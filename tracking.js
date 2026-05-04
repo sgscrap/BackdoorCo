@@ -575,7 +575,7 @@ function renderOrdersTable() {
         return `
       <tr>
         <td><input type="checkbox" class="accent-checkbox" ${isSelected ? 'checked' : ''} onchange="toggleRow('${o.id}', this.checked)"/></td>
-        <td><span class="order-id-cell" onclick="viewOrderFromAdmin('${o.id}')">${o.id}</span></td>
+        <td><button type="button" class="order-id-cell" onclick="viewOrderFromAdmin('${o.id}')">${o.id}</button></td>
         <td><div class="customer-cell"><div class="cust-avatar">${o.customer.initials}</div><span>${o.customer.name}</span></div></td>
         <td>${formatDate(o.date)}</td>
         <td>${formatCurrency(o.total)}</td>
