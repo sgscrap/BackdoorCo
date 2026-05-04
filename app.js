@@ -49,8 +49,38 @@ const cartCount = document.getElementById('cartCount');
 document.addEventListener('DOMContentLoaded', () => {
     initFirebaseSync();
     initGlobalListeners();
+    disableSiteLightbox();
     updateCartUI();
 });
+
+// Disable any image lightbox/pop-out behavior on public pages.
+function disableSiteLightbox() {
+    try {
+        // Don't interfere with admin editing pages
+        if (location.pathname.includes('/admin')) return;
+
+        // Make showProductModal a no-op to prevent modal popouts
+        window.showProductModal = function () { return; };
+
+        // Remove inline onclick handlers that reference modal/lightbox functions
+        document.querySelectorAll('[onclick]').forEach((el) => {
+            const v = el.getAttribute('onclick') || '';
+            if (/showProductModal|openProductModal|openLightbox|openImage|openModal/i.test(v)) {
+                el.removeAttribute('onclick');
+            }
+        });
+
+        // Remove any common data attributes used by lightbox libraries
+        document.querySelectorAll('[data-lightbox],[data-fancybox],[data-zoom]').forEach((el) => {
+            el.removeAttribute('data-lightbox');
+            el.removeAttribute('data-fancybox');
+            el.removeAttribute('data-zoom');
+        });
+    } catch (e) {
+        // Non-fatal — surface errors to console for debugging
+        console.warn('disableSiteLightbox error', e);
+    }
+}
 
 // ============================================
 // FIREBASE SYNC
