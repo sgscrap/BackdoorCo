@@ -222,6 +222,17 @@
               </div>
               <input type="file" id="imageInput" accept="image/*" class="hidden" aria-label="Upload product image" />
             </div>
+            <div class="image-crop-controls" style="margin-top:12px;display:flex;gap:8px;align-items:center">
+              <label style="font-size:13px;color:var(--muted)">Aspect</label>
+              <select id="imageAspectSelect" aria-label="Image aspect ratio">
+                <option value="original">Original</option>
+                <option value="1">1:1 (Square)</option>
+                <option value="4/3">4:3</option>
+                <option value="16/9">16:9</option>
+              </select>
+              <button type="button" class="btn-small" id="applyCropBtn">Apply Crop</button>
+              <span id="cropStatus" style="font-size:13px;color:var(--muted);margin-left:8px"></span>
+            </div>
           </div>
 
           <!-- URL Tab -->

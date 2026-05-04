@@ -378,6 +378,13 @@ function initImageUI() {
   const urlPreview = document.getElementById("urlPreviewWrap");
   const urlPreviewImg = document.getElementById("urlPreviewImg");
   const clearUrl = document.getElementById("clearUrl");
+  const aspectSelect = document.getElementById('imageAspectSelect');
+  const applyCropBtn = document.getElementById('applyCropBtn');
+  const cropStatus = document.getElementById('cropStatus');
+
+  // internal state for cropping
+  let currentPreviewDataUrl = null;
+  let croppedBlob = null;
 
   // Tab switcher
   document.querySelectorAll(".img-tab").forEach((tab) => {
@@ -420,6 +427,31 @@ function initImageUI() {
     if (file) handleFilePreview(file);
   });
 
+  // Apply crop button
+  applyCropBtn?.addEventListener('click', async () => {
+    const sel = aspectSelect?.value || 'original';
+    if (!currentPreviewDataUrl) return;
+    if (sel === 'original') {
+      cropStatus.textContent = 'No crop applied';
+      croppedBlob = null;
+      return;
+    }
+    cropStatus.textContent = 'Cropping...';
+    try {
+      const ratio = parseAspect(sel);
+      const blob = await cropDataUrlToRatio(currentPreviewDataUrl, ratio, 1200);
+      croppedBlob = blob;
+      // update preview to show cropped result
+      const url = URL.createObjectURL(blob);
+      const preview = document.getElementById('imagePreview');
+      preview.innerHTML = `<img src="${url}" style="width:100%;height:200px;object-fit:cover;" alt="Preview">`;
+      cropStatus.textContent = 'Cropped';
+    } catch (err) {
+      console.error('Crop error', err);
+      cropStatus.textContent = 'Crop failed';
+    }
+  });
+
   // URL input preview (debounced)
   let urlDebounce;
   urlInput?.addEventListener("input", (e) => {
@@ -451,8 +483,81 @@ function handleFilePreview(file) {
     const preview = document.getElementById("imagePreview");
     preview.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:200px;object-fit:cover;" alt="Preview">`;
     preview.style.padding = "0";
+    currentPreviewDataUrl = ev.target.result;
+    croppedBlob = null;
+    cropStatus.textContent = '';
   };
   reader.readAsDataURL(file);
+}
+
+function parseAspect(value) {
+  if (typeof value === 'number') return Number(value);
+  if (value === '1') return 1;
+  const parts = String(value).split('/').map(Number).filter(Boolean);
+  if (parts.length === 2 && parts[1] !== 0) return parts[0] / parts[1];
+  return null;
+}
+
+function dataURLToBlob(dataURL) {
+  const parts = dataURL.split(',');
+  const meta = parts[0];
+  const base64 = parts[1];
+  const mime = meta.match(/:(.*?);/)[1];
+  const binary = atob(base64);
+  const arr = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+function cropDataUrlToRatio(dataUrl, ratio, maxSide = 1200) {
+  return new Promise((resolve, reject) => {
+    try {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const iw = img.naturalWidth;
+        const ih = img.naturalHeight;
+
+        // determine crop area centered
+        const srcRatio = iw / ih;
+        let sx = 0, sy = 0, sw = iw, sh = ih;
+        if (srcRatio > ratio) {
+          // image is wider -> crop width
+          sh = ih;
+          sw = Math.round(ih * ratio);
+          sx = Math.round((iw - sw) / 2);
+        } else {
+          // image is taller -> crop height
+          sw = iw;
+          sh = Math.round(iw / ratio);
+          sy = Math.round((ih - sh) / 2);
+        }
+
+        // scale output to max side
+        let outW = sw;
+        let outH = sh;
+        if (Math.max(sw, sh) > maxSide) {
+          const scale = maxSide / Math.max(sw, sh);
+          outW = Math.round(sw * scale);
+          outH = Math.round(sh * scale);
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = outW;
+        canvas.height = outH;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Canvas toBlob failed'));
+        }, 'image/jpeg', 0.92);
+      };
+      img.onerror = reject;
+      img.src = dataUrl;
+    } catch (e) {
+      reject(e);
+    }
+  });
 }
 
 // Init on load
