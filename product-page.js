@@ -503,12 +503,25 @@ function renderProduct(product) {
 
     const sizes = getProductSizes(product);
     const sizeOptions = document.getElementById('productSizeOptions');
-    sizeOptions.innerHTML = sizes.map((entry) => {
+    sizeOptions.innerHTML = sizes.map((entry, idx) => {
         const sizeBackorder = isBackorder(product, entry) && entry.stock <= 0;
         const sizeSoldOut = entry.stock <= 0 && !sizeBackorder;
+        const disabledAttr = sizeSoldOut ? 'disabled' : '';
         return `
-            <button type="button" class="size-option ${sizeSoldOut ? 'out-of-stock' : ''} ${sizeBackorder ? 'backorder' : ''}" ${sizeSoldOut ? 'disabled' : ''} data-size="${entry.size}" data-backorder="${sizeBackorder}" onclick="selectProductSize(this)">
-                ${entry.size}${sizeBackorder ? '<span class="size-option-tag">BO</span>' : ''}
+            <button
+                type="button"
+                role="radio"
+                aria-checked="false"
+                tabindex="0"
+                class="size-option ${sizeSoldOut ? 'out-of-stock' : ''} ${sizeBackorder ? 'backorder' : ''}"
+                ${disabledAttr}
+                data-size="${escapeHtml(entry.size)}"
+                data-backorder="${sizeBackorder}"
+                data-index="${idx}"
+                onclick="selectProductSize(this)"
+                onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); selectProductSize(this); }"
+            >
+                ${escapeHtml(entry.size)}${sizeBackorder ? '<span class="size-option-tag">BO</span>' : ''}
             </button>
         `;
     }).join('');
@@ -647,8 +660,13 @@ function changeProductImage(direction) {
 
 window.selectProductSize = (button) => {
     if (button.disabled) return;
-    document.querySelectorAll('#productSizeOptions .size-option').forEach((option) => option.classList.remove('selected'));
+    const options = document.querySelectorAll('#productSizeOptions .size-option');
+    options.forEach((option) => {
+        option.classList.remove('selected');
+        option.setAttribute('aria-checked', 'false');
+    });
     button.classList.add('selected');
+    button.setAttribute('aria-checked', 'true');
     selectedSize = button.dataset.size || '';
     selectedSizeBackorder = button.dataset.backorder === 'true';
     const addBtn = document.getElementById('productAddToCart');
