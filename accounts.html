@@ -247,21 +247,21 @@
         </div>
 
         <div class="account-nav">
-            <div class="acc-nav-item active" onclick="switchAccTab('overview', this)"><i
-                    class="fa-solid fa-chart-pie"></i> Overview</div>
-            <div class="acc-nav-item" onclick="switchAccTab('orders', this)"><i class="fa-solid fa-box"></i> Orders
+            <button type="button" class="acc-nav-item active" onclick="switchAccTab('overview', this)" aria-pressed="true"><i
+                    class="fa-solid fa-chart-pie"></i> Overview</button>
+            <button type="button" class="acc-nav-item" onclick="switchAccTab('orders', this)" aria-pressed="false"><i class="fa-solid fa-box"></i> Orders
                 <span class="nav-count-badge accent-bg" id="orderCountBadge">3</span>
-            </div>
-            <div class="acc-nav-item" onclick="switchAccTab('wishlist', this)"><i class="fa-regular fa-heart"></i>
-                Wishlist <span class="nav-count-badge red-bg" id="wishlistCountBadge">0</span></div>
-            <div class="acc-nav-item" onclick="switchAccTab('profile', this)"><i class="fa-solid fa-user"></i> Profile
-            </div>
-            <div class="acc-nav-item" onclick="switchAccTab('addresses', this)"><i class="fa-solid fa-location-dot"></i>
-                Addresses</div>
-            <div class="acc-nav-item" onclick="switchAccTab('notifications', this)"><i class="fa-solid fa-bell"></i>
-                Alerts</div>
-            <div class="acc-nav-item" onclick="switchAccTab('loyalty', this)"><i class="fa-solid fa-trophy"></i> Loyalty
-            </div>
+            </button>
+            <button type="button" class="acc-nav-item" onclick="switchAccTab('wishlist', this)" aria-pressed="false"><i class="fa-regular fa-heart"></i>
+                Wishlist <span class="nav-count-badge red-bg" id="wishlistCountBadge">0</span></button>
+            <button type="button" class="acc-nav-item" onclick="switchAccTab('profile', this)" aria-pressed="false"><i class="fa-solid fa-user"></i> Profile
+            </button>
+            <button type="button" class="acc-nav-item" onclick="switchAccTab('addresses', this)" aria-pressed="false"><i class="fa-solid fa-location-dot"></i>
+                Addresses</button>
+            <button type="button" class="acc-nav-item" onclick="switchAccTab('notifications', this)" aria-pressed="false"><i class="fa-solid fa-bell"></i>
+                Alerts</button>
+            <button type="button" class="acc-nav-item" onclick="switchAccTab('loyalty', this)" aria-pressed="false"><i class="fa-solid fa-trophy"></i> Loyalty
+            </button>
         </div>
 
         <div class="account-content">
