@@ -268,10 +268,9 @@
                             <div class="setting-group">
                                 <label class="setting-label">Accent Color</label>
                                 <div class="color-row">
-                                    <div class="color-swatch selected bg-c8f65d" onclick="setColor('#c8f65d',this)">
-                                    </div>
-                                    <div class="color-swatch bg-4d9fff" onclick="setColor('#4d9fff',this)"></div>
-                                    <div class="color-swatch bg-ff4d4d" onclick="setColor('#ff4d4d',this)"></div>
+                                    <button type="button" class="color-swatch selected bg-c8f65d" onclick="setColor('#c8f65d',this)" aria-pressed="true"></button>
+                                    <button type="button" class="color-swatch bg-4d9fff" onclick="setColor('#4d9fff',this)" aria-pressed="false"></button>
+                                    <button type="button" class="color-swatch bg-ff4d4d" onclick="setColor('#ff4d4d',this)" aria-pressed="false"></button>
                                 </div>
                             </div>
                             <div class="setting-group">
@@ -408,14 +407,14 @@
             <div class="card mb-20">
                 <div class="card-title"><i class="fa-solid fa-server"></i> EMAIL PROVIDER</div>
                 <div class="provider-grid">
-                    <div class="provider-card selected-provider" onclick="selectProvider('resend',this)">
+                    <button type="button" class="provider-card selected-provider" onclick="selectProvider('resend',this)">
                         <div class="provider-title">Resend</div>
                         <div class="provider-sub">Recommended</div>
-                    </div>
-                    <div class="provider-card" onclick="selectProvider('sendgrid',this)">
+                    </button>
+                    <button type="button" class="provider-card" onclick="selectProvider('sendgrid',this)">
                         <div class="provider-title">SendGrid</div>
                         <div class="provider-sub">Industry Standard</div>
-                    </div>
+                    </button>
                 </div>
                 <div class="flex-column-gap-14">
                     <div>
