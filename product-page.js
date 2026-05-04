@@ -631,8 +631,20 @@ function renderGalleryControls() {
     if (nextButton) nextButton.style.display = hasMultiple ? 'inline-flex' : 'none';
 
     if (dots) {
+        dots.setAttribute('role', 'radiogroup');
+        dots.setAttribute('aria-label', 'Product image selector');
         dots.innerHTML = productImages.map((src, index) => `
-            <button class="product-gallery-dot ${index === currentImageIndex ? 'active' : ''}" type="button" data-index="${index}" onclick="selectProductImage(this)" aria-label="View image ${index + 1}">
+            <button
+                class="product-gallery-dot ${index === currentImageIndex ? 'active' : ''}"
+                type="button"
+                role="radio"
+                aria-checked="${index === currentImageIndex}"
+                tabindex="${index === currentImageIndex ? 0 : -1}"
+                data-index="${index}"
+                onclick="selectProductImage(this)"
+                onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); selectProductImage(this); }"
+                aria-label="View image ${index + 1}"
+            >
                 <img src="${src}" alt="View ${index + 1}" loading="lazy" onerror="this.style.display='none'">
             </button>
         `).join('');
@@ -649,6 +661,15 @@ function setProductImage(index) {
         mainImage.src = productImages[currentImageIndex];
         mainImage.alt = `${currentProduct?.name || 'Product'} image ${currentImageIndex + 1}`;
     }
+    // Update gallery controls and hint for better UX
+    const hint = document.getElementById('productGalleryHint');
+    if (hint) hint.textContent = productImages.length > 1
+        ? `Image ${currentImageIndex + 1} / ${productImages.length} | Use arrows or thumbnails to navigate`
+        : 'Single product preview';
+
+    // Move keyboard focus to the active dot for accessibility
+    const activeDot = document.querySelector(`#productGalleryDots .product-gallery-dot[data-index="${currentImageIndex}"]`);
+    if (activeDot) activeDot.focus();
 
     renderGalleryControls();
 }
