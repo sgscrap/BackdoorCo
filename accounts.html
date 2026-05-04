@@ -46,28 +46,28 @@
                 <button class="btn-signup" onclick="openAuth('register')">Sign Up</button>
             </div>
             <div class="user-menu-wrap hidden" id="userMenu">
-                <div class="user-avatar-btn" onclick="toggleUserDropdown()">
+                <button type="button" class="user-avatar-btn" onclick="toggleUserDropdown()" aria-haspopup="true" aria-expanded="false">
                     <div class="user-avatar" id="navAvatar">?</div>
                     <span id="navName">User</span>
                     <i class="fa-solid fa-chevron-down chevron-icon"></i>
-                </div>
+                </button>
                 <div class="user-dropdown" id="userDropdown">
                     <div class="dropdown-header">
                         <p id="dropName">—</p>
                         <span id="dropEmail">—</span>
                     </div>
-                    <a class="dropdown-item" onclick="showAccountPage('overview')"><i class="fa-solid fa-chart-pie"></i>
-                        Dashboard</a>
-                    <a class="dropdown-item" onclick="showAccountPage('orders')"><i class="fa-solid fa-box"></i> My
-                        Orders</a>
-                    <a class="dropdown-item" onclick="showAccountPage('wishlist')"><i class="fa-regular fa-heart"></i>
-                        Wishlist</a>
-                    <a class="dropdown-item" onclick="showAccountPage('profile')"><i class="fa-solid fa-user"></i>
-                        Profile</a>
-                    <a class="dropdown-item" onclick="showAccountPage('notifications')"><i class="fa-solid fa-bell"></i>
-                        Alerts</a>
-                    <a class="dropdown-item danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i>
-                        Logout</a>
+                    <button type="button" class="dropdown-item" onclick="showAccountPage('overview')"><i class="fa-solid fa-chart-pie"></i>
+                        Dashboard</button>
+                    <button type="button" class="dropdown-item" onclick="showAccountPage('orders')"><i class="fa-solid fa-box"></i> My
+                        Orders</button>
+                    <button type="button" class="dropdown-item" onclick="showAccountPage('wishlist')"><i class="fa-regular fa-heart"></i>
+                        Wishlist</button>
+                    <button type="button" class="dropdown-item" onclick="showAccountPage('profile')"><i class="fa-solid fa-user"></i>
+                        Profile</button>
+                    <button type="button" class="dropdown-item" onclick="showAccountPage('notifications')"><i class="fa-solid fa-bell"></i>
+                        Alerts</button>
+                    <button type="button" class="dropdown-item danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i>
+                        Logout</button>
                 </div>
             </div>
         </div>
@@ -115,10 +115,10 @@
                     </div>
                     <div class="form-error" id="loginPassErr">Incorrect password</div>
                 </div>
-                <div class="forgot-row"><a class="link-accent"
-                        onclick="showToast('Password reset coming soon', 'info')">Forgot password?</a></div>
+                <div class="forgot-row"><button type="button" class="link-accent"
+                    onclick="showToast('Password reset coming soon', 'info')">Forgot password?</button></div>
                 <button class="auth-submit" id="loginSubmitBtn" onclick="handleLogin()">LOG IN</button>
-                <div class="auth-footer">Don't have an account? <a onclick="switchAuthTab('register')">Sign up free</a>
+                <div class="auth-footer">Don't have an account? <button type="button" class="link-accent" onclick="switchAuthTab('register')">Sign up free</button>
                 </div>
             </div>
 
@@ -202,7 +202,7 @@
                 <div class="checkbox-wrap mb-0"><input type="checkbox" id="regAlerts" checked /><label
                         for="regAlerts">Send me restock alerts and price drop notifications 🔔</label></div>
                 <button class="auth-submit mt-20" id="regSubmitBtn" onclick="handleRegister()">CREATE ACCOUNT</button>
-                <div class="auth-footer">Already have an account? <a onclick="switchAuthTab('login')">Log in</a></div>
+                <div class="auth-footer">Already have an account? <button type="button" class="link-accent" onclick="switchAuthTab('login')">Log in</button></div>
             </div>
         </div>
     </div>
