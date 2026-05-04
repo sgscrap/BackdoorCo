@@ -71,7 +71,7 @@ function renderFlows() {
                 <div class="flow-rate rate-${parseFloat(f.rate) > 30 ? 'good' : 'mid'}">${f.rate} Open</div>
             </div>
             <div class="flow-toggle-wrap">
-                <div class="toggle ${f.active ? 'on' : ''}" onclick="toggleFlow(${f.id}, event)"></div>
+                <button type="button" class="toggle ${f.active ? 'on' : ''}" onclick="toggleFlow(${f.id}, event)" aria-pressed="${f.active ? 'true' : 'false'}"></button>
                 <div class="toggle-label">${f.active ? 'Active' : 'Paused'}</div>
             </div>
         </div>
@@ -105,10 +105,10 @@ function initBuilder() {
     if (!tList) return;
 
     tList.innerHTML = TEMPLATES.map((t, i) => `
-        <div class="template-item ${i === currentTemplateIndex ? 'active' : ''}" onclick="loadTemplate(${i})">
+        <button type="button" class="template-item ${i === currentTemplateIndex ? 'active' : ''}" onclick="loadTemplate(${i})">
             <div class="template-name">${t.name}</div>
             <div class="template-type">${t.type}</div>
-        </div>
+        </button>
     `).join('');
 
     loadTemplate(currentTemplateIndex);

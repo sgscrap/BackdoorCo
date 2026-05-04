@@ -420,14 +420,14 @@ function renderShippingOptions() {
         const priceLabel = isFree ? '<span class="free-badge">FREE</span>' : fmt(option.price);
 
         return `
-            <div class="shipping-option ${isSelected ? 'selected' : ''}" onclick="selectShipping('${option.id}')">
+            <button type="button" class="shipping-option ${isSelected ? 'selected' : ''}" onclick="selectShipping('${option.id}')" aria-pressed="${isSelected ? 'true' : 'false'}">
                 <div class="shipping-radio${isSelected ? ' checked' : ''}"></div>
                 <div class="shipping-info">
                     <div class="shipping-name">${option.name}</div>
                     <div class="shipping-time">${option.time}</div>
                 </div>
                 <div class="shipping-price">${priceLabel}</div>
-            </div>
+            </button>
         `;
     }).join('');
 }

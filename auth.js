@@ -79,21 +79,21 @@ function updateGlobalNavUI() {
         wrapper.id = 'globalUserMenu';
         
         wrapper.innerHTML = `
-            <div class="user-avatar-btn" onclick="document.getElementById('globalUserDropdown').classList.toggle('open')" id="globalUserAvatarBtn">
+            <button type="button" class="user-avatar-btn" onclick="document.getElementById('globalUserDropdown').classList.toggle('open')" id="globalUserAvatarBtn" aria-haspopup="true" aria-expanded="false">
                 <div class="user-avatar" id="navAvatar">${initials}</div>
                 <span id="navName">${first}</span>
                 <i class="fa-solid fa-chevron-down chevron-icon"></i>
-            </div>
+            </button>
             <div class="user-dropdown" id="globalUserDropdown">
                 <div class="dropdown-header">
                     <p id="dropName">${first}</p>
                     <span id="dropEmail">${email}</span>
                 </div>
-                <a class="dropdown-item" href="accounts.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                <a class="dropdown-item" href="accounts.html#orders"><i class="fa-solid fa-box"></i> My Orders</a>
-                <a class="dropdown-item" href="accounts.html#wishlist"><i class="fa-regular fa-heart"></i> Wishlist</a>
-                <a class="dropdown-item" href="accounts.html#profile"><i class="fa-solid fa-user"></i> Profile</a>
-                <a class="dropdown-item danger" href="#" onclick="firebase.auth().signOut(); window.location.reload(); return false;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                <button type="button" class="dropdown-item" onclick="window.location.href='accounts.html'"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+                <button type="button" class="dropdown-item" onclick="window.location.href='accounts.html#orders'"><i class="fa-solid fa-box"></i> My Orders</button>
+                <button type="button" class="dropdown-item" onclick="window.location.href='accounts.html#wishlist'"><i class="fa-regular fa-heart"></i> Wishlist</button>
+                <button type="button" class="dropdown-item" onclick="window.location.href='accounts.html#profile'"><i class="fa-solid fa-user"></i> Profile</button>
+                <button type="button" class="dropdown-item danger" onclick="firebase.auth().signOut(); window.location.reload(); return false;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
             </div>
         `;
         
