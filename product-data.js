@@ -237,6 +237,7 @@ const SEEDED_PRODUCTS = [
         slug: 'gucci-cotton-jersey-tshirt-forest-green',
         cardImage: buildImgurImageUrl('bMJpkUt'),
         price: 550,
+        retailPrice: 690,
         brand: 'Gucci',
         category: 'Apparel',
         colorway: 'Forest green',

@@ -159,7 +159,10 @@
                 <h1 id="productName">Loading product details...</h1>
                 <p id="productBrandLine" class="product-page-brand"></p>
                 <div class="product-page-price-row">
-                    <div class="product-page-price" id="productPrice">--</div>
+                    <div class="product-page-price-wrap" style="display: flex; align-items: baseline; gap: 12px;">
+                        <span class="product-page-price" id="productPrice">--</span>
+                        <span class="product-page-retail-price" id="productRetailPrice" style="display:none; text-decoration: line-through; color: var(--text-secondary); font-family: 'Bebas Neue', cursive; font-size: 24px; letter-spacing: 1px;"></span>
+                    </div>
                     <div class="product-page-stock" id="productStockLabel">Checking live inventory...</div>
                 </div>
 

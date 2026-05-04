@@ -453,7 +453,20 @@ function renderProduct(product) {
     document.getElementById('productName').textContent = product.name;
     document.getElementById('productCategoryLabel').textContent = product.category || 'Product';
     document.getElementById('productBrandLine').textContent = formatBrandLine(product);
-    document.getElementById('productPrice').textContent = `$${(Number(product.price) || 0).toFixed(0)}`;
+    
+    const currentPrice = Number(product.price) || 0;
+    const retailPrice = Number(product.retailPrice) || 0;
+    document.getElementById('productPrice').textContent = `$${currentPrice.toFixed(0)}`;
+    const retailEl = document.getElementById('productRetailPrice');
+    if (retailEl) {
+        if (retailPrice > currentPrice) {
+            retailEl.textContent = `$${retailPrice.toFixed(0)}`;
+            retailEl.style.display = 'inline';
+        } else {
+            retailEl.style.display = 'none';
+        }
+    }
+    
     document.getElementById('productDescription').textContent = backorder
         ? `${product.description || 'Premium authenticated product from Backdoor.'}\n\n${product.backorderLeadTime || 'Ships in 1.5-2 weeks'}.`
         : (product.description || 'Premium authenticated product from Backdoor.');
