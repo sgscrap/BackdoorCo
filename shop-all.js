@@ -8,6 +8,11 @@ import {
     where,
     onSnapshot
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import {
+    buildProductHref,
+    getProductCardImage,
+    mergeCatalogProducts
+} from './product-data.js';
 
 // ================================
 // STATE
@@ -92,13 +97,14 @@ function loadAllProducts() {
         );
 
         onSnapshot(q, (snapshot) => {
-            allProducts = [];
+            const liveProducts = [];
             snapshot.forEach(doc => {
-                allProducts.push({
+                liveProducts.push({
                     id: doc.id,
                     ...doc.data()
                 });
             });
+            allProducts = mergeCatalogProducts(liveProducts);
 
             updateFilterCounts();
             renderProducts();
@@ -200,10 +206,11 @@ function renderProducts() {
     // Build HTML
     if (grid) {
         grid.innerHTML = filtered.map((p, i) => `
-            <div class="shop-card"
+            <a class="shop-card"
                  data-id="${p.id}"
+                 href="${buildProductHref(p)}"
                  style="animation-delay:${Math.min(i * 0.04, 0.3)}s"
-                 onclick="handleProductClick('${p.id}')">
+                 aria-label="View ${p.name}">
 
                 <div class="shop-card-img">
                     ${p.featured
@@ -222,8 +229,8 @@ function renderProducts() {
                            </div>`
                 : ''
             }
-                    ${p.image
-                ? `<img src="${p.image}"
+                    ${getProductCardImage(p)
+                ? `<img src="${getProductCardImage(p)}"
                                 alt="${p.name}"
                                 loading="${i < 4
                     ? 'eager'
@@ -254,18 +261,19 @@ function renderProducts() {
                             </p>
                         </div>
                         ${p.stock > 0
-                ? `<button class="shop-buy-btn"
+                ? `<span class="shop-buy-btn"
                                    onclick="event.stopPropagation();
+                                   event.preventDefault();
                                    handleAddToCart('${p.id}')">
                                    Buy
-                               </button>`
+                               </span>`
                 : `<span class="shop-sold-label">
                                    Sold Out
                                </span>`
             }
                     </div>
                 </div>
-            </div>
+            </a>
         `).join('');
     }
 
@@ -317,56 +325,16 @@ function updateSubtitle() {
 // PRODUCT CLICK
 // ================================
 window.handleProductClick = (id) => {
-    const product = allProducts.find(p => p.id === id);
-    // Try to open globally accessible modal function in app.js
-    if (product && typeof window.showProductModal === 'function') {
-        window.showProductModal(product);
-    } else {
-        // Fallback
-        window.location.href = `product.html?id=${id}`;
-    }
+    const product = allProducts.find((entry) => entry.id === id);
+    window.location.href = product ? buildProductHref(product) : `product.html?id=${encodeURIComponent(id)}`;
 };
 
 // ================================
 // ADD TO CART
 // ================================
 window.handleAddToCart = (id) => {
-    const product = allProducts.find(p => p.id === id);
-    if (!product) return;
-
-    let cart = JSON.parse(
-        localStorage.getItem('backdoor-cart')
-    ) || [];
-
-    const existing = cart.find(item => item.id === id);
-    if (existing) {
-        existing.qty += 1;
-    } else {
-        cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image || '',
-            size: 'One Size',
-            qty: 1
-        });
-    }
-
-    localStorage.setItem(
-        'backdoor-cart',
-        JSON.stringify(cart)
-    );
-
-    // Update cart count
-    updateCartDisplay();
-
-    // Show toast
-    const toast = document.getElementById('shopToast');
-    if (toast) {
-        toast.textContent = `✓ ${product.name} added!`;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
-    }
+    const product = allProducts.find((entry) => entry.id === id);
+    window.location.href = product ? buildProductHref(product) : `product.html?id=${encodeURIComponent(id)}`;
 };
 
 function updateCartDisplay() {

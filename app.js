@@ -3,6 +3,11 @@ import {
     collection, query,
     orderBy, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import {
+    buildProductHref,
+    getProductCardImage,
+    mergeCatalogProducts
+} from './product-data.js';
 
 // ============================================
 // GLOBAL STATE
@@ -57,13 +62,14 @@ function initFirebaseSync() {
     );
 
     onSnapshot(q, (snapshot) => {
-        products = [];
+        const liveProducts = [];
         snapshot.forEach(doc => {
             const data = doc.data();
             if (data.status === 'active') {
-                products.push({ id: doc.id, ...data });
+                liveProducts.push({ id: doc.id, ...data });
             }
         });
+        products = mergeCatalogProducts(liveProducts);
 
         if (isHomePage) {
             renderMostWanted();
@@ -90,7 +96,7 @@ function renderMostWanted() {
         <div class="mw-card drop-card"
              data-id="${p.id}"
              style="animation-delay:${i * 0.1}s"
-             onclick="openProductModal('${p.id}')">
+             onclick="openProductPage('${p.id}')">
 
             <!-- Image -->
             <div class="mw-card-img drop-card-img-wrap">
@@ -114,7 +120,7 @@ function renderMostWanted() {
             : ''
         }
 
-                <img src="${p.image || ''}"
+                <img src="${getProductCardImage(p) || ''}"
                      alt="${p.name}"
                      loading="${i < 2 ? 'eager' : 'lazy'}"
                      onerror="this.style.display='none'">
@@ -141,7 +147,7 @@ function renderMostWanted() {
                     ${p.stock > 0
             ? `<button class="mw-buy-btn drop-buy-btn"
                                onclick="event.stopPropagation();
-                               openProductModal('${p.id}')">
+                               openProductPage('${p.id}')">
                                Buy
                            </button>`
             : `<span class="mw-sold drop-sold-text">Sold Out</span>`
@@ -242,10 +248,23 @@ window.showProductModal = function (product) {
 }; // End of showProductModal
 
 export async function openProductModal(id) {
-    const product = products.find(p => p.id === id);
-    if (product) window.showProductModal(product);
+    window.openProductPage(id);
 }
 window.openProductModal = openProductModal;
+
+function findProductForPage(value) {
+    const target = String(value || '').trim().toLowerCase();
+    return products.find((product) => (
+        String(product.id || '').toLowerCase() === target ||
+        String(product.sku || '').toLowerCase() === target ||
+        String(product.name || '').toLowerCase() === target
+    ));
+}
+
+window.openProductPage = (value) => {
+    const product = findProductForPage(value);
+    window.location.href = product ? buildProductHref(product) : `product.html?id=${encodeURIComponent(value)}`;
+};
 
 function closeProductModal() {
     const modal = document.getElementById('productModal');
@@ -308,19 +327,42 @@ function updateCartUI() {
 
     cartItemsContainer.innerHTML = cart.map((item, index) => `
         <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}">
+            <div class="cart-item-thumb">
+                ${item.image
+                    ? `<img src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                    : ''}
+                <span class="cart-item-fallback" ${item.image ? 'style="display:none"' : ''}><i class="fa-solid fa-shoe-prints"></i></span>
+            </div>
             <div class="cart-item-info">
                 <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-size">Size: ${item.size}</div>
-                <div class="cart-item-price">$${item.price.toFixed(0)}</div>
-                <div class="cart-item-qty">
-                    <span>Qty: ${item.qty}</span>
+                <div class="cart-item-meta">
+                    <span>Size ${item.size}</span>
+                    ${item.brand ? `<span>${item.brand}</span>` : ''}
+                    ${item.backorder ? `<span>Backorder${item.backorderLeadTime ? ` | ${item.backorderLeadTime}` : ''}</span>` : ''}
                 </div>
+                <div class="cart-item-bottom">
+                    <div class="qty-control">
+                        <button class="qty-btn" type="button" onclick="updateCartQty(${index}, -1)" aria-label="Decrease quantity">−</button>
+                        <div class="qty-val">${item.qty}</div>
+                        <button class="qty-btn" type="button" onclick="updateCartQty(${index}, 1)" aria-label="Increase quantity">+</button>
+                    </div>
+                    <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+                </div>
+                <button class="cart-item-remove" type="button" onclick="removeFromCart(${index})">
+                    <i class="fa-solid fa-trash-can"></i> Remove
+                </button>
             </div>
-            <button class="cart-remove" onclick="removeFromCart(${index})">&times;</button>
         </div>
     `).join('');
 }
+
+window.updateCartQty = (index, delta) => {
+    const item = cart[index];
+    if (!item) return;
+    item.qty = Math.max(1, item.qty + delta);
+    saveCart();
+    updateCartUI();
+};
 
 window.removeFromCart = (index) => {
     cart.splice(index, 1);

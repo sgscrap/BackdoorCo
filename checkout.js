@@ -22,6 +22,7 @@ const COUNTRY_CODES = {
 let cart = [];
 let currentStep = 1;
 let selectedShipping = 'standard';
+let selectedPaymentMethod = 'stripe';
 
 // ── Promo Code State ──
 const PROMO_CODES = {
@@ -135,9 +136,15 @@ function updateCheckoutActionsState() {
         if (!hasItems) {
             placeBtn.innerHTML = '<i class="fa-solid fa-bag-shopping"></i> ADD ITEMS TO CHECKOUT';
         } else if (!placeBtn.dataset.loading) {
-            placeBtn.innerHTML = '<i class="fa-solid fa-lock"></i> CONTINUE TO SECURE PAYMENT';
+            placeBtn.innerHTML = getCheckoutButtonIdleLabel();
         }
     }
+}
+
+function getCheckoutButtonIdleLabel() {
+    return selectedPaymentMethod === 'paypal'
+        ? '<i class="fa-brands fa-paypal"></i> CONTINUE TO PAYPAL'
+        : '<i class="fa-solid fa-lock"></i> CONTINUE TO SECURE PAYMENT';
 }
 
 function updateFreeShippingBar(subtotal) {
@@ -454,7 +461,7 @@ function updateCheckoutSummary() {
 
         setText('summarySubtotal', fmt(0));
         setText('summaryShipping', '--');
-        setText('summaryTax', 'Calculated in Stripe');
+        setText('summaryTax', 'Calculated at payment');
         setText('summaryTotal', fmt(0));
         updateCheckoutActionsState();
         return;
@@ -489,7 +496,7 @@ function updateCheckoutSummary() {
 
     setText('summarySubtotal', fmt(subtotal));
     setText('summaryShipping', shipping === 0 ? 'FREE' : fmt(shipping));
-    setText('summaryTax', 'Calculated in Stripe');
+    setText('summaryTax', selectedPaymentMethod === 'paypal' ? fmt(0) : 'Calculated at payment');
     setText('summaryTotal', fmt(total));
 
     const discountLine = document.getElementById('discountLine');
@@ -547,12 +554,54 @@ function setCheckoutButtonLoading(isLoading) {
     button.dataset.loading = isLoading ? 'true' : '';
     button.disabled = isLoading;
     button.innerHTML = isLoading
-        ? '<div class="spinner"></div> OPENING SECURE CHECKOUT...'
-        : '<i class="fa-solid fa-lock"></i> CONTINUE TO SECURE PAYMENT';
+        ? `<div class="spinner"></div> OPENING ${selectedPaymentMethod === 'paypal' ? 'PAYPAL' : 'SECURE CHECKOUT'}...`
+        : getCheckoutButtonIdleLabel();
 
     if (!isLoading) {
         updateCheckoutActionsState();
     }
+}
+
+function selectPaymentMethod(method) {
+    selectedPaymentMethod = method === 'paypal' ? 'paypal' : 'stripe';
+
+    document.getElementById('payTabStripe')?.classList.toggle('active', selectedPaymentMethod === 'stripe');
+    document.getElementById('payTabPaypal')?.classList.toggle('active', selectedPaymentMethod === 'paypal');
+
+    const setHtml = (id, value) => {
+        const node = document.getElementById(id);
+        if (node) node.innerHTML = value;
+    };
+
+    if (selectedPaymentMethod === 'paypal') {
+        setHtml('paymentKicker', 'SECURE PAYPAL CHECKOUT');
+        setHtml('paymentTitle', 'Pay with PayPal, Venmo, or eligible cards');
+        setHtml('paymentCopy', 'After you confirm the order, PayPal opens a secure hosted checkout page. Backdoor sends the cart, shipping choice, and customer details so the final approval matches your order summary.');
+        setHtml('paymentPills', `
+            <span><i class="fa-brands fa-paypal"></i> PayPal</span>
+            <span>Venmo</span>
+            <span><i class="fa-regular fa-credit-card"></i> Cards</span>
+            <span><i class="fa-solid fa-shield-halved"></i> Buyer protection</span>
+        `);
+        setHtml('paymentNote', 'You will return to Backdoor after PayPal approval so the order can be confirmed.');
+    } else {
+        setHtml('paymentKicker', 'SECURE STRIPE CHECKOUT');
+        setHtml('paymentTitle', "Pay on Backdoor's encrypted Stripe checkout page");
+        setHtml('paymentCopy', 'After you confirm the order, Stripe handles payment on a secure hosted checkout page. Card, Apple Pay, Google Pay, and pay-later options show there automatically when the order and customer country are eligible.');
+        setHtml('paymentPills', `
+            <span><i class="fa-regular fa-credit-card"></i> Cards</span>
+            <span><i class="fa-brands fa-apple"></i> Apple Pay</span>
+            <span><i class="fa-brands fa-google-pay"></i> Google Pay</span>
+            <span>Klarna</span>
+            <span>Afterpay</span>
+            <span>Affirm</span>
+            <span><i class="fa-solid fa-building-columns"></i> Direct payouts to your bank</span>
+        `);
+        setHtml('paymentNote', 'Final payment, promo codes, wallets, and pay-later options are completed inside Stripe checkout.');
+    }
+
+    updateCheckoutSummary();
+    updateCheckoutActionsState();
 }
 
 function formatMoneyDisplay(amount, currency = 'USD') {
@@ -603,6 +652,47 @@ async function hydrateSuccessPage(sessionId) {
     showPage('success');
 }
 
+async function startStripeCheckout(payload) {
+    const response = await fetch(`${CHECKOUT_FUNCTIONS_BASE}/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.url) {
+        throw new Error(result.error || 'Unable to start secure checkout.');
+    }
+
+    window.location.href = result.url;
+}
+
+async function startPayPalCheckout(payload) {
+    const response = await fetch(`${CHECKOUT_FUNCTIONS_BASE}/create-paypal-order`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.url || !result.orderId) {
+        throw new Error(result.error || 'Unable to start PayPal checkout.');
+    }
+
+    localStorage.setItem('backdoor-paypal-pending-order', JSON.stringify({
+        ...payload,
+        orderId: result.orderId,
+        orderNumber: result.orderNumber || ''
+    }));
+    window.location.href = result.url;
+}
+
 async function placeOrder() {
     if (!validateStep3()) return;
     if (cart.length === 0) {
@@ -613,26 +703,61 @@ async function placeOrder() {
     setCheckoutButtonLoading(true);
 
     try {
-        const response = await fetch(`${CHECKOUT_FUNCTIONS_BASE}/create-checkout-session`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-            },
-            body: JSON.stringify(buildCheckoutRequestPayload())
-        });
+        const payload = buildCheckoutRequestPayload();
 
-        const payload = await response.json();
-        if (!response.ok || !payload.url) {
-            throw new Error(payload.error || 'Unable to start secure checkout.');
+        if (selectedPaymentMethod === 'paypal') {
+            await startPayPalCheckout(payload);
+        } else {
+            await startStripeCheckout(payload);
         }
-
-        window.location.href = payload.url;
     } catch (error) {
-        console.error('Stripe checkout start failed:', error);
+        console.error('Checkout start failed:', error);
         showToast(error.message || 'Unable to start secure checkout.', 'error');
         setCheckoutButtonLoading(false);
     }
+}
+
+async function capturePayPalReturn(orderId) {
+    const pending = JSON.parse(localStorage.getItem('backdoor-paypal-pending-order') || 'null');
+    const response = await fetch(`${CHECKOUT_FUNCTIONS_BASE}/capture-paypal-order`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        },
+        body: JSON.stringify({
+            orderId,
+            pendingOrder: pending
+        })
+    });
+
+    const payload = await response.json();
+    if (!response.ok) {
+        throw new Error(payload.error || 'Unable to confirm PayPal checkout.');
+    }
+
+    return payload;
+}
+
+async function hydratePayPalSuccessPage(orderId) {
+    const summary = await capturePayPalReturn(orderId);
+    const setText = (id, value) => {
+        const node = document.getElementById(id);
+        if (node) node.textContent = value;
+    };
+
+    setText('successEmail', summary.customerEmail || '');
+    setText('successOrderNum', summary.orderNumber ? `#${summary.orderNumber}` : '#BACKDOOR');
+    setText('successDate', new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+    setText('successPayment', summary.paymentLabel || 'PayPal Checkout');
+    setText('successTotal', formatMoneyDisplay(summary.total, summary.currency || 'USD'));
+    setText('successDelivery', formatDeliveryEstimate(summary.shippingMethod));
+
+    localStorage.removeItem('backdoor-paypal-pending-order');
+    clearCart();
+    updateCheckoutSummary();
+    renderCartDrawer();
+    showPage('success');
 }
 
 function applyPromo() {
@@ -652,11 +777,12 @@ async function handleCheckoutReturn() {
     const params = new URLSearchParams(window.location.search);
     const state = params.get(SUCCESS_QUERY_KEY);
     const sessionId = params.get('session_id');
+    const paypalOrderId = params.get('token') || params.get('orderId') || params.get('order_id');
 
     if (state === 'cancelled') {
         showPage('checkout');
         setStep(Number(params.get('step')) || 3);
-        showToast('Stripe checkout was canceled.', 'info');
+        showToast('Checkout was canceled.', 'info');
         window.history.replaceState({}, document.title, window.location.pathname);
         return true;
     }
@@ -667,6 +793,20 @@ async function handleCheckoutReturn() {
             showToast('Payment confirmed.', 'success');
         } catch (error) {
             console.error('Stripe checkout confirmation failed:', error);
+            showToast(error.message || 'Payment confirmation is still processing.', 'info');
+            showPage('success');
+        } finally {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        return true;
+    }
+
+    if (state === 'success' && paypalOrderId) {
+        try {
+            await hydratePayPalSuccessPage(paypalOrderId);
+            showToast('Payment confirmed.', 'success');
+        } catch (error) {
+            console.error('PayPal checkout confirmation failed:', error);
             showToast(error.message || 'Payment confirmation is still processing.', 'info');
             showPage('success');
         } finally {
@@ -756,6 +896,7 @@ window.removeFromCart = removeFromCart;
 window.updateQty = updateQty;
 window.formatPhone = formatPhone;
 window.selectShipping = selectShipping;
+window.selectPaymentMethod = selectPaymentMethod;
 window.placeOrder = placeOrder;
 window.continueStep = continueStep;
 window.prevStep = prevStep;

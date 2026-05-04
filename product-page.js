@@ -2,7 +2,10 @@ import { db, auth } from './admin/firebase-config.js';
 import {
     collection,
     doc,
-    onSnapshot
+    limit,
+    onSnapshot,
+    query,
+    where
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import {
@@ -269,46 +272,96 @@ function renderProductLastSale(product) {
 
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('id');
+const productSlug = params.get('slug');
 const cartSidebar = document.getElementById('cartSidebar');
 const cartCount = document.getElementById('cartCount');
+
+function slugifyProductName(value) {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+}
+
+function findSeededProductByRequest() {
+    const decodedSlug = String(productSlug || '').trim();
+    return getSeededProducts().find((product) => (
+        product.id === productId ||
+        (decodedSlug && (
+            product.slug === decodedSlug ||
+            slugifyProductName(product.name) === decodedSlug
+        ))
+    ));
+}
+
+function renderResolvedProduct(product) {
+    currentProduct = applyProductOverrides(product);
+    renderProduct(currentProduct);
+    initProductReviews(currentProduct);
+}
+
+function subscribeToProductQuery(productQuery, fallbackProduct, missingMessage = 'Product not found.') {
+    unsubscribeProduct?.();
+    unsubscribeProduct = onSnapshot(productQuery, (snapshot) => {
+        const productDoc = snapshot.docs?.[0];
+        if (productDoc) {
+            renderResolvedProduct({ id: productDoc.id, ...productDoc.data() });
+            return;
+        }
+
+        if (fallbackProduct) {
+            renderResolvedProduct(fallbackProduct);
+            return;
+        }
+
+        renderMissingProduct(missingMessage);
+    }, (error) => {
+        console.error(error);
+        if (fallbackProduct) {
+            renderResolvedProduct(fallbackProduct);
+            return;
+        }
+        renderMissingProduct('Unable to load this product right now.');
+    });
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     initShell();
     updateCartUI();
 
-    if (!productId) {
+    if (!productId && !productSlug) {
         renderMissingProduct();
         return;
     }
 
-    const seededProduct = getSeededProducts().find((product) => product.id === productId);
+    const seededProduct = findSeededProductByRequest();
 
     if (seededProduct) {
-        currentProduct = seededProduct;
-        renderProduct(seededProduct);
-        initProductReviews(seededProduct);
+        renderResolvedProduct(seededProduct);
+    }
+
+    if (!productId) {
+        if (!seededProduct && productSlug) {
+            const slugQuery = query(collection(db, 'products'), where('slug', '==', productSlug), limit(1));
+            subscribeToProductQuery(slugQuery, null);
+        }
+        return;
     }
 
     try {
         unsubscribeProduct?.();
         unsubscribeProduct = onSnapshot(doc(db, 'products', productId), (snapshot) => {
             if (snapshot.exists()) {
-                currentProduct = applyProductOverrides({ id: snapshot.id, ...snapshot.data() });
-            } else if (seededProduct) {
-                currentProduct = seededProduct;
-            } else {
-                renderMissingProduct();
+                renderResolvedProduct({ id: snapshot.id, ...snapshot.data() });
                 return;
             }
 
-            renderProduct(currentProduct);
-            initProductReviews(currentProduct);
+            const skuQuery = query(collection(db, 'products'), where('sku', '==', productId), limit(1));
+            subscribeToProductQuery(skuQuery, seededProduct);
         }, (error) => {
             console.error(error);
             if (seededProduct) {
-                currentProduct = seededProduct;
-                renderProduct(currentProduct);
-                initProductReviews(currentProduct);
+                renderResolvedProduct(seededProduct);
                 return;
             }
             renderMissingProduct('Unable to load this product right now.');
@@ -632,6 +685,10 @@ document.getElementById('productAddToCart')?.addEventListener('click', () => {
     localStorage.setItem('backdoor-cart', JSON.stringify(cart.map(normalizeCartItem).filter((item) => item.name)));
     updateCartUI();
     showToast(`${currentProduct.name} added to cart.`);
+    
+    // Automatically open the cart sidebar
+    const sidebar = document.getElementById('cartSidebar');
+    if (sidebar) sidebar.classList.add('active');
 });
 
 function loadCartFromStorage() {
@@ -687,7 +744,7 @@ function updateCartUI() {
 
     cartItems.innerHTML = cart.map((item, index) => `
         <div class="cart-item">
-            <div class="cart-item-img">
+            <div class="cart-item-thumb">
                 ${item.image
                     ? `<img src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
                     : ''}
