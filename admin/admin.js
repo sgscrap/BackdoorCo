@@ -211,20 +211,20 @@ function renderLowStock() {
         });
     });
 
-    list.innerHTML = lowStock.slice(0, 4).map(s => `
-    <div class="inventory-item" onclick="openProductModal(${products.find(p => p.name === s.name).id})">
-      <div class="shoe-thumb"><img src="../${s.img}" alt=""></div>
-      <div class="shoe-info">
-        <div class="shoe-name">${s.name} (${s.size})</div>
-        <div class="shoe-brand">${s.brand}</div>
-        <div class="stock-indicator">
-          <div class="stock-dot ${s.stock === 0 ? 'out' : 'low'}"></div>
-          <span style="color:var(--text-muted);font-size:11px">${s.stock} in stock</span>
-        </div>
-      </div>
-      <div class="shoe-price">$${s.price.toFixed(0)}</div>
-    </div>
-  `).join('') || '<p style="text-align:center; padding:20px; color:var(--text-muted)">Stock levels are healthy.</p>';
+        list.innerHTML = lowStock.slice(0, 4).map(s => `
+        <button type="button" class="inventory-item" onclick="openProductModal(${products.find(p => p.name === s.name).id})">
+            <div class="shoe-thumb"><img src="../${s.img}" alt=""></div>
+            <div class="shoe-info">
+                <div class="shoe-name">${s.name} (${s.size})</div>
+                <div class="shoe-brand">${s.brand}</div>
+                <div class="stock-indicator">
+                    <div class="stock-dot ${s.stock === 0 ? 'out' : 'low'}"></div>
+                    <span style="color:var(--text-muted);font-size:11px">${s.stock} in stock</span>
+                </div>
+            </div>
+            <div class="shoe-price">$${s.price.toFixed(0)}</div>
+        </button>
+    `).join('') || '<p style="text-align:center; padding:20px; color:var(--text-muted)">Stock levels are healthy.</p>';
 }
 
 // ============================================

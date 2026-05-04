@@ -2137,7 +2137,7 @@ function buildImporterSizeChips() {
     const container = document.getElementById('impSizeChips');
     if (!container) return;
     container.innerHTML = IMPORTER_SIZES.map((size) => `
-        <div class="size-chip ${importerSelectedSizes.includes(size) ? 'selected' : ''}" onclick="toggleImporterSize('${size}', this)">${size}</div>
+        <button type="button" class="size-chip ${importerSelectedSizes.includes(size) ? 'selected' : ''}" onclick="toggleImporterSize('${size}', this)">${size}</button>
     `).join('');
 }
 
