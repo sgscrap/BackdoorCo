@@ -64,6 +64,37 @@ const SEEDED_PRODUCTS = [
         createdAt: { seconds: 0 }
     },
     {
+        id: 'seed-prada-americas-cup-burgundy-silver',
+        name: "Prada America's Cup 'Burgundy/Silver'",
+        sku: 'PRDA-AMC-001',
+        price: 950,
+        brand: 'Prada',
+        category: 'Sneakers',
+        colorway: 'Burgundy/Silver',
+        description: "Patent leather and technical fabric Prada America's Cup sneakers in burgundy and silver. Premium materials on a performance-inspired silhouette.",
+        image: buildImgurImageUrl('sRovUH4'),
+        images: [
+            buildImgurImageUrl('sRovUH4'),
+            buildImgurImageUrl('ohctVER'),
+            buildImgurImageUrl('fdIQWEt'),
+            buildImgurImageUrl('Grq1Nuu'),
+            buildImgurImageUrl('9aa0zDH')
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 50%',
+        imageScale: 1.0,
+        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 950 })),
+        releaseDate: 'TBD',
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
         id: 'seed-yeezy-slide-onyx',
         name: "adidas Yeezy Slide 'Onyx'",
         sku: 'HQ6448',
