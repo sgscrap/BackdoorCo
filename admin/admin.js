@@ -376,7 +376,22 @@ function openProductModal(id = null) {
         document.getElementById('productCategory').value = currentProduct.category;
         document.getElementById('productPrice').value = currentProduct.price;
         document.getElementById('productDescription').value = currentProduct.description || '';
-        document.getElementById('productImage').value = currentProduct.image || '';
+        // Populate image URL and preview (file input cannot be prefilled)
+        const imgUrlInput = document.getElementById('productImageUrl');
+        const imgPreview = document.getElementById('productImagePreview');
+        const imgPreviewMeta = document.getElementById('productImagePreviewMeta');
+        if (imgUrlInput) imgUrlInput.value = currentProduct.image || '';
+        if (imgPreview) {
+            if (currentProduct.image) {
+                imgPreview.src = currentProduct.image;
+                imgPreview.style.display = 'block';
+                imgPreviewMeta.textContent = currentProduct.image;
+            } else {
+                imgPreview.src = '';
+                imgPreview.style.display = 'none';
+                imgPreviewMeta.textContent = '';
+            }
+        }
         renderSizeGrid(currentProduct.sizes);
     } else {
         document.getElementById('productForm').reset();
@@ -431,33 +446,64 @@ async function handleProductSubmit(e) {
     };
 
     try {
-        // 1. Sync to Firestore
+        // Handle image source: prefer uploaded file (via local API) else URL input
+        const fileInput = document.getElementById('productImage');
+        const imageUrlInput = document.getElementById('productImageUrl');
+        let finalImageUrl = imageUrlInput?.value || null;
+
+        if (fileInput && fileInput.files.length > 0) {
+            // Post to local API to store image and return a hosted URL
+            const formData = new FormData();
+            formData.append('id', productId);
+            Object.keys(productData).forEach(key => {
+                if (key === 'sizes') formData.append(key, JSON.stringify(productData[key]));
+                else formData.append(key, productData[key]);
+            });
+            formData.append('imageFile', fileInput.files[0]);
+
+            try {
+                const apiRes = await fetch('http://localhost:5001/api/products', {
+                    method: 'POST',
+                    body: formData
+                });
+                const apiData = await apiRes.json();
+                if (apiData && apiData.success && apiData.imageUrl) {
+                    finalImageUrl = apiData.imageUrl;
+                    showToast('Image uploaded to local API', 'success');
+                } else {
+                    showToast('Image upload returned no URL; saving without image.', 'warning');
+                }
+            } catch (err) {
+                console.error('Local API upload failed', err);
+                showToast('Image upload failed; saving without uploaded image.', 'warning');
+            }
+        }
+
+        if (finalImageUrl) productData.image = finalImageUrl;
+
+        // 1. Sync to Firestore (now that productData includes image if available)
         await db.collection('products').doc(productId).set(productData, { merge: true });
 
-        // 2. Also call local API if available (for Git push functionality)
-        const formData = new FormData();
-        formData.append('id', productId);
-        Object.keys(productData).forEach(key => {
-            if (key === 'sizes') formData.append(key, JSON.stringify(productData[key]));
-            else formData.append(key, productData[key]);
-        });
-
-        const fileInput = document.getElementById('productImage');
-        if (fileInput.files.length > 0) {
-            formData.append('imageFile', fileInput.files[0]);
+        // If we didn't already notify the user about a successful Git push, still attempt a push
+        // by calling local API without the file - this keeps previous behavior for syncing to Git.
+        try {
+            const formData2 = new FormData();
+            formData2.append('id', productId);
+            Object.keys(productData).forEach(key => {
+                if (key === 'sizes') formData2.append(key, JSON.stringify(productData[key]));
+                else formData2.append(key, productData[key]);
+            });
+            const apiRes2 = await fetch('http://localhost:5001/api/products', {
+                method: 'POST',
+                body: formData2
+            });
+            const apiData2 = await apiRes2.json();
+            if (apiData2 && apiData2.success) showToast('✓ Product saved and pushed to Git!', 'success');
+            else showToast('Firestore synced, but Git push may have failed.', 'warning');
+        } catch (err) {
+            // Non-fatal
         }
 
-        const apiRes = await fetch('http://localhost:5001/api/products', {
-            method: 'POST',
-            body: formData
-        });
-        const apiData = await apiRes.json();
-
-        if (apiData.success) {
-            showToast('✓ Product saved and pushed to Git!', 'success');
-        } else {
-            showToast('Firestore synced, but Git push failed.', 'warning');
-        }
         closeModal();
     } catch (err) {
         console.error(err);
@@ -578,6 +624,33 @@ function resolveImgurUrl(raw) {
 function initImporter() {
     buildImporterSizeChips();
     addImporterUrlRow();
+    // Product image preview change listener
+    const imgUrlInput = document.getElementById('productImageUrl');
+    const imgFileInput = document.getElementById('productImage');
+    const imgPreview = document.getElementById('productImagePreview');
+    const imgPreviewMeta = document.getElementById('productImagePreviewMeta');
+    if (imgUrlInput) imgUrlInput.addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        if (v) {
+            imgPreview.src = v;
+            imgPreview.style.display = 'block';
+            imgPreviewMeta.textContent = v;
+        } else {
+            imgPreview.src = '';
+            imgPreview.style.display = 'none';
+            imgPreviewMeta.textContent = '';
+        }
+    });
+    if (imgFileInput) imgFileInput.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const url = URL.createObjectURL(f);
+        if (imgPreview) {
+            imgPreview.src = url;
+            imgPreview.style.display = 'block';
+            imgPreviewMeta.textContent = f.name + ' (' + Math.round(f.size/1024) + ' KB)';
+        }
+    });
 }
 
 function handleImporterTabSwitch(tab) {
