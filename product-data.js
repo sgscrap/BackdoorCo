@@ -569,6 +569,13 @@ export function applyProductOverrides(product) {
         price: Number(product.price) || 0
     };
 
+    // Auto-correct brand for any Prada product mislabeled as another brand
+    const productId = String(nextProduct.id || '').toLowerCase();
+    const productName = String(nextProduct.name || '').toLowerCase();
+    if ((productId.includes('prada') || productName.includes("prada")) && nextProduct.brand !== 'Prada') {
+        nextProduct.brand = 'Prada';
+    }
+
     // Default shoes to backorder flow when out of stock
     if (isFootwearProduct(nextProduct) && nextProduct.allowBackorder !== false) {
         nextProduct.allowBackorder = true;

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Violet Prada Brand | Backdoor Admin</title>
+    <link rel="stylesheet" href="admin.css?v=2.2">
+    <style>
+        .fix-wrap {
+            max-width: 480px;
+            margin: 100px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+        }
+        .fix-title {
+            font-family: "Bebas Neue", cursive;
+            font-size: 28px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .fix-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+        .fix-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-family: "Bebas Neue", cursive;
+            font-size: 18px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .fix-btn:hover:not(:disabled) { background: var(--accent-dark); transform: translateY(-2px); }
+        .fix-btn:disabled { opacity: 0.5; cursor: default; }
+        .fix-status {
+            margin-top: 20px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            min-height: 24px;
+        }
+        .fix-status.success { color: var(--accent); }
+        .fix-status.error { color: var(--accent-red); }
+    </style>
+</head>
+<body class="admin-body" style="display:flex;align-items:flex-start;justify-content:center;padding:40px 20px">
+    <div class="fix-wrap">
+        <div class="fix-title">Fix Violet Prada Brand</div>
+        <div class="fix-sub">
+            Updates <code>brand</code> from <strong>"Nike"</strong> → <strong>"Prada"</strong> on<br>
+            <code>seed-prada-americas-cup-violet-silver</code>
+        </div>
+        <button class="fix-btn" id="fixBtn" onclick="fixBrand()">Fix Brand Now</button>
+        <div class="fix-status" id="fixStatus">Requires admin login.</div>
+    </div>
+
+    <script type="module">
+        import { db, auth } from './firebase-config.js';
+        import { doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+
+        const btn = document.getElementById('fixBtn');
+        const status = document.getElementById('fixStatus');
+        let authed = false;
+
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                status.textContent = 'Not logged in — redirecting…';
+                setTimeout(() => window.location.href = 'index.html', 1500);
+            } else {
+                authed = true;
+                status.textContent = `Logged in as ${user.email}. Ready.`;
+            }
+        });
+
+        window.fixBrand = async () => {
+            if (!authed) return;
+            btn.disabled = true;
+            btn.textContent = 'Fixing…';
+            status.className = 'fix-status';
+            status.textContent = 'Updating Firestore…';
+
+            try {
+                const docId = 'seed-prada-americas-cup-violet-silver';
+                const ref = doc(db, 'products', docId);
+                const snap = await getDoc(ref);
+
+                if (!snap.exists()) {
+                    status.className = 'fix-status error';
+                    status.textContent = `Error: Document "${docId}" not found in Firestore.`;
+                    btn.disabled = false;
+                    btn.textContent = 'Fix Brand Now';
+                    return;
+                }
+
+                const current = snap.data();
+                console.log('Current brand:', current.brand);
+
+                await updateDoc(ref, { brand: 'Prada' });
+
+                status.className = 'fix-status success';
+                status.textContent = `✓ Done! Brand changed from "${current.brand}" → "Prada"`;
+                btn.textContent = 'Fixed ✓';
+            } catch (err) {
+                status.className = 'fix-status error';
+                status.textContent = `Error: ${err.message}`;
+                btn.disabled = false;
+                btn.textContent = 'Fix Brand Now';
+            }
+        };
+    </script>
+</body>
+</html>
