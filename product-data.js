@@ -67,6 +67,8 @@ const SEEDED_PRODUCTS = [
         id: 'seed-prada-americas-cup-burgundy-silver',
         name: "Prada America's Cup 'Burgundy/Silver'",
         sku: 'PRDA-AMC-001',
+        slug: 'prada-americas-cup-burgundy-silver',
+        cardImage: buildImgurImageUrl('sRovUH4'),
         price: 950,
         brand: 'Prada',
         category: 'Sneakers',
