@@ -286,15 +286,15 @@
         </div>
     </div>
 
-    <div class="modal" id="offerModal">
+    <div class="modal" id="offerModal" aria-hidden="true">
         <div class="modal-overlay" id="offerModalOverlay"></div>
-        <div class="modal-content small product-offer-modal">
+        <div class="modal-content small product-offer-modal" role="dialog" aria-modal="true" aria-labelledby="offerModalTitle">
             <button class="modal-close" id="offerModalClose" aria-label="Close offer modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div class="product-offer-shell">
                 <p class="product-review-eyebrow">OFFER SYSTEM</p>
-                <h2 class="product-offer-title">SEND YOUR BEST OFFER</h2>
+                <h2 class="product-offer-title" id="offerModalTitle">SEND YOUR BEST OFFER</h2>
                 <p class="product-offer-copy">Submit a competitive price for this pair. Our team reviews every offer for approval.</p>
                 <div class="product-offer-price-row">
                     <span>CURRENT ASK</span>
@@ -335,7 +335,7 @@
         </div>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
 
     <script type="module" src="product-page.js"></script>
     <script>
