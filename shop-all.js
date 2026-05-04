@@ -290,6 +290,9 @@ function updateFilterCounts() {
         Jordan: allProducts.filter(
             p => p.brand === 'Jordan'
         ).length,
+        Prada: allProducts.filter(
+            p => p.brand === 'Prada'
+        ).length,
         Nike: allProducts.filter(
             p => p.brand === 'Nike'
         ).length,
