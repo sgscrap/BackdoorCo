@@ -43,6 +43,13 @@ body {
   overflow-x: hidden;
 }
 
+.admin-body-centered {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar {
   width: 4px;

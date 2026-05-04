@@ -21,7 +21,22 @@
     --text2: #888888;
     --text3: #444444;
     --border: #222222;
-    --border2: #2a2a2a;
+.hide-initial {
+    display: none;
+}
+
+.price-wrap-inline {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.product-page-retail-price {
+    text-decoration: line-through;
+    color: var(--text2);
+    font-family: 'Bebas Neue', cursive;
+    font-size: 24px;
+    letter-spacing: 1px;
 }
 
 html {

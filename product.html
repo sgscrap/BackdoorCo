@@ -62,12 +62,12 @@
         <div class="nav-icons-group">
             <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
                 <i class="fa-regular fa-heart"></i>
-                <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
+                <span class="nav-badge hide-initial" id="wishlistCountBadge">0</span>
             </a>
             <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
                 <i class="fa-solid fa-bag-shopping"></i>
                 <span>Cart</span>
-                <span class="cart-badge" id="cartCount" style="display: none;">0</span>
+                <span class="cart-badge hide-initial" id="cartCount">0</span>
             </button>
         </div>
         <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
@@ -159,9 +159,9 @@
                 <h1 id="productName">Loading product details...</h1>
                 <p id="productBrandLine" class="product-page-brand"></p>
                 <div class="product-page-price-row">
-                    <div class="product-page-price-wrap" style="display: flex; align-items: baseline; gap: 12px;">
+                    <div class="product-page-price-wrap price-wrap-inline">
                         <span class="product-page-price" id="productPrice">--</span>
-                        <span class="product-page-retail-price" id="productRetailPrice" style="display:none; text-decoration: line-through; color: var(--text-secondary); font-family: 'Bebas Neue', cursive; font-size: 24px; letter-spacing: 1px;"></span>
+                        <span class="product-page-retail-price hide-initial" id="productRetailPrice"></span>
                     </div>
                     <div class="product-page-stock" id="productStockLabel">Checking live inventory...</div>
                 </div>
@@ -213,7 +213,7 @@
                     </article>
                 </section>
 
-                <section class="product-price-history" id="productPriceHistorySection" style="display:none;">
+                <section class="product-price-history hide-initial" id="productPriceHistorySection">
                     <div class="product-price-history-head">
                         <div>
                             <p class="product-review-eyebrow">Price History</p>
@@ -231,7 +231,7 @@
                     <p class="product-price-history-note" id="productPriceHistoryNote">Loading tracked pricing for this pair.</p>
                 </section>
 
-                <section class="product-last-sale" id="productLastSaleSection" style="display:none;">
+                <section class="product-last-sale hide-initial" id="productLastSaleSection">
                     <div class="product-last-sale-head">
                         <div>
                             <p class="product-review-eyebrow">Latest Sale</p>
@@ -288,7 +288,7 @@
     </main>
 
     <!-- ══ RECENTLY VIEWED ══ -->
-    <section class="recently-viewed-section" id="recentlyViewedSection" style="display:none;">
+    <section class="recently-viewed-section hide-initial" id="recentlyViewedSection">
         <div class="recently-viewed-inner">
             <div class="rv-header">
                 <span class="rv-eyebrow"><i class="fa-solid fa-clock-rotate-left"></i> Recently Viewed</span>
