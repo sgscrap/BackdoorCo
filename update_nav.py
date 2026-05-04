@@ -14,6 +14,7 @@ NAV_TEMPLATE = """<nav class="navbar" id="navbar">
             <div class="nav-dropdown-menu">
                 <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
                 <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+                <a href="shop-all.html?filter=Prada" class="current-cat-link">Prada</a>
                 <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
                 <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
                 <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
@@ -48,6 +49,7 @@ NAV_TEMPLATE = """<nav class="navbar" id="navbar">
     <p class="nav-mobile-section">Brands</p>
     <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
     <a class="nav-link" href="shop-all.html?filter=Nike">Nike</a>
+    <a class="nav-link" href="shop-all.html?filter=Prada">Prada</a>
     <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
     <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
     <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
