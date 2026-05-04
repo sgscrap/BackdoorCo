@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initFirebaseSync();
     initGlobalListeners();
     disableSiteLightbox();
-    enhanceClickableNonButtonElements();
     updateCartUI();
 });
 
@@ -153,65 +152,66 @@ function renderMostWanted() {
     productGrid.innerHTML = topPriced.map((p, i) => `
         <div class="mw-card drop-card"
              data-id="${p.id}"
-             style="animation-delay:${i * 0.1}s"
-             onclick="openProductPage('${p.id}')">
+             style="animation-delay:${i * 0.1}s">
 
-            <!-- Image -->
-            <div class="mw-card-img drop-card-img-wrap">
+            <a class="mw-card-link" href="${buildProductHref(p)}" aria-label="${p.name}">
+                <!-- Image -->
+                <div class="mw-card-img drop-card-img-wrap">
 
-                <!-- Rank Badge -->
-                <div class="mw-rank new-badge">#${i + 1}</div>
+                    <!-- Rank Badge -->
+                    <div class="mw-rank new-badge">#${i + 1}</div>
 
-                <!-- Exclusive badge for top item -->
-                ${i === 0
+                    <!-- Exclusive badge for top item -->
+                    ${i === 0
             ? `<div class="mw-exclusive-badge low-stock-badge" style="background:var(--accent); color:#000;">
                            ⚡ EXCLUSIVE DROP
                        </div>`
             : ''
         }
 
-                <!-- Sold out -->
-                ${p.stock === 0
+                    <!-- Sold out -->
+                    ${p.stock === 0
             ? `<div class="mw-sold-overlay sold-out-overlay">
                            <span>SOLD OUT</span>
                        </div>`
             : ''
         }
 
-                <img src="${getProductCardImage(p) || ''}"
-                     alt="${p.name}"
-                     loading="${i < 2 ? 'eager' : 'lazy'}"
-                     onerror="this.style.display='none'">
-            
-            </div>
+                    <img src="${getProductCardImage(p) || ''}"
+                         alt="${p.name}"
+                         loading="${i < 2 ? 'eager' : 'lazy'}"
+                         onerror="this.style.display='none'">
+                
+                </div>
 
-            <!-- Info -->
-            <div class="mw-card-info drop-card-info">
-                <p class="mw-card-brand drop-brand">
-                    ${p.brand || p.category} · 
-                    ${p.category || 'Deadstock'}
-                </p>
-                <h3 class="mw-card-name drop-name">${p.name}</h3>
+                <!-- Info -->
+                <div class="mw-card-info drop-card-info">
+                    <p class="mw-card-brand drop-brand">
+                        ${p.brand || p.category} · 
+                        ${p.category || 'Deadstock'}
+                    </p>
+                    <h3 class="mw-card-name drop-name">${p.name}</h3>
 
-                <div class="mw-price-row drop-bottom">
-                    <div class="mw-price-block drop-price-wrap">
-                        <span class="mw-ask-label drop-price-label">
-                            Lowest Ask
-                        </span>
-                        <span class="mw-price drop-price">
-                            $${parseFloat(p.price).toFixed(0)}
-                        </span>
+                    <div class="mw-price-row drop-bottom">
+                        <div class="mw-price-block drop-price-wrap">
+                            <span class="mw-ask-label drop-price-label">
+                                Lowest Ask
+                            </span>
+                            <span class="mw-price drop-price">
+                                $${parseFloat(p.price).toFixed(0)}
+                            </span>
+                        </div>
                     </div>
-                    ${p.stock > 0
+                </div>
+            </a>
+
+            ${p.stock > 0
             ? `<button class="mw-buy-btn drop-buy-btn"
-                               onclick="event.stopPropagation();
-                               openProductPage('${p.id}')">
+                               onclick="event.stopPropagation(); window.location.href='${buildProductHref(p)}'">
                                Buy
                            </button>`
             : `<span class="mw-sold drop-sold-text">Sold Out</span>`
         }
-                </div>
-            </div>
         </div>
     `).join('');
 
@@ -286,7 +286,7 @@ window.showProductModal = function (product) {
     if (sizesContainer) {
         const sizes = product.sizes ? product.sizes.split(',').map(s => s.trim()) : ['8', '8.5', '9', '9.5', '10', '10.5', '11', '12'];
         sizesContainer.innerHTML = sizes.map(size => `
-            <div class="size-option" onclick="selectModalSize(this)">${size}</div>
+            <button class="size-option" type="button" onclick="selectModalSize(this)">${size}</button>
         `).join('');
     }
 
