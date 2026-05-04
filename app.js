@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initFirebaseSync();
     initGlobalListeners();
     disableSiteLightbox();
+    enhanceClickableNonButtonElements();
     updateCartUI();
 });
 
@@ -79,6 +80,33 @@ function disableSiteLightbox() {
     } catch (e) {
         // Non-fatal — surface errors to console for debugging
         console.warn('disableSiteLightbox error', e);
+    }
+}
+
+// Enhance non-button clickable elements for keyboard and screen reader users
+function enhanceClickableNonButtonElements() {
+    try {
+        // Select elements with inline onclick handlers that are not naturally focusable
+        document.querySelectorAll('[onclick]').forEach((el) => {
+            const tag = (el.tagName || '').toUpperCase();
+            if (tag === 'A' || tag === 'BUTTON' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+            if (el.getAttribute('role') === 'button') return;
+            const hasTab = el.hasAttribute('tabindex');
+            // Only modify elements that don't already expose keyboard focus
+            if (!hasTab) el.setAttribute('tabindex', '0');
+            if (!el.getAttribute('role')) el.setAttribute('role', 'button');
+
+            // Add keyboard activation for Enter and Space
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    // Trigger the original click handler or navigate if it's present
+                    el.click();
+                }
+            });
+        });
+    } catch (e) {
+        console.warn('enhanceClickableNonButtonElements error', e);
     }
 }
 
