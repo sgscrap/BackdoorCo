@@ -302,14 +302,14 @@
                     <div class="channel-info">
                         <p>Email</p><span>Send status update email</span>
                     </div>
-                    <div class="toggle on" id="toggleEmail" onclick="this.classList.toggle('on')"></div>
+                    <button type="button" class="toggle on" id="toggleEmail" aria-pressed="true" onclick="this.classList.toggle('on'); this.setAttribute('aria-pressed', this.classList.contains('on'))"></button>
                 </div>
                 <div class="channel-row">
                     <div class="channel-icon ch-blue"><i class="fa-solid fa-comment-sms color-blue"></i></div>
                     <div class="channel-info">
                         <p>SMS</p><span>Send text message</span>
                     </div>
-                    <div class="toggle" id="toggleSMS" onclick="this.classList.toggle('on')"></div>
+                    <button type="button" class="toggle" id="toggleSMS" aria-pressed="false" onclick="this.classList.toggle('on'); this.setAttribute('aria-pressed', this.classList.contains('on'))"></button>
                 </div>
             </div>
             <div class="modal-form-group"><label class="modal-label">Note (optional)</label><textarea
@@ -340,21 +340,21 @@
                     <div class="channel-info">
                         <p>Email</p><span>Send email notification</span>
                     </div>
-                    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    <button type="button" class="toggle on" aria-pressed="true" onclick="this.classList.toggle('on'); this.setAttribute('aria-pressed', this.classList.contains('on'))"></button>
                 </div>
                 <div class="channel-row">
                     <div class="channel-icon ch-blue"><i class="fa-solid fa-comment-sms color-blue"></i></div>
                     <div class="channel-info">
                         <p>SMS</p><span>Send text message</span>
                     </div>
-                    <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                    <button type="button" class="toggle" aria-pressed="false" onclick="this.classList.toggle('on'); this.setAttribute('aria-pressed', this.classList.contains('on'))"></button>
                 </div>
                 <div class="channel-row">
                     <div class="channel-icon ch-purple"><i class="fa-solid fa-bell color-purple"></i></div>
                     <div class="channel-info">
                         <p>Push Notification</p><span>Send push to mobile app</span>
                     </div>
-                    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    <button type="button" class="toggle on" aria-pressed="true" onclick="this.classList.toggle('on'); this.setAttribute('aria-pressed', this.classList.contains('on'))"></button>
                 </div>
             </div>
             <div class="modal-footer"><button class="btn-ghost"
