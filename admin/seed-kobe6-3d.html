@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Kobe 6 3D | Backdoor Admin</title>
+    <link rel="stylesheet" href="admin.css?v=2.2">
+    <style>
+        .seed-wrap {
+            max-width: 560px;
+            margin: 80px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .seed-img-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        }
+
+        .seed-img-grid img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            display: block;
+        }
+
+        .seed-body {
+            padding: 32px;
+        }
+
+        .seed-title {
+            font-family: "Bebas Neue", cursive;
+            font-size: 26px;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .seed-meta {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .seed-tag {
+            padding: 3px 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        .seed-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-family: "Bebas Neue", cursive;
+            font-size: 18px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .seed-btn:hover:not(:disabled) {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+        }
+
+        .seed-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .seed-status {
+            margin-top: 16px;
+            font-size: 0.88rem;
+            text-align: center;
+            color: var(--text-secondary);
+            min-height: 22px;
+        }
+
+        .seed-status.success {
+            color: var(--accent);
+        }
+
+        .seed-status.error {
+            color: var(--accent-red);
+        }
+    </style>
+</head>
+
+<body class="admin-body" style="display:flex;align-items:flex-start;justify-content:center;padding:40px 20px">
+
+    <div class="seed-wrap">
+        <div class="seed-img-grid" id="imgGrid">
+            <img src="https://i.imgur.com/542ZtOL.jpg" alt="1" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/IZwwDuX.jpg" alt="2" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/7GNOHJu.jpg" alt="3" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/JsVXqd1.jpg" alt="4" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/ra2ZBs1.jpg" alt="5" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/WWrU9aP.jpg" alt="6" onerror="this.style.display='none'">
+        </div>
+
+        <div class="seed-body">
+            <div class="seed-title">Nike Kobe 6 Protro<br>'ASG Hollywood 3D' (2026)</div>
+            <div class="seed-meta">
+                <span class="seed-tag">Nike</span>
+                <span class="seed-tag">Sneakers</span>
+                <span class="seed-tag">Dark Grey/Daring Red</span>
+                <span class="seed-tag">10 images</span>
+            </div>
+
+            <button class="seed-btn" id="addBtn" onclick="addProduct()">
+                Add to Store
+            </button>
+            <div class="seed-status" id="status">Requires admin login.</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, auth } from './firebase-config.js';
+        import { collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+
+        const btn = document.getElementById('addBtn');
+        const status = document.getElementById('status');
+
+        let authed = false;
+
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                status.textContent = 'Not logged in — redirecting to admin login…';
+                setTimeout(() => window.location.href = 'index.html', 1500);
+            } else {
+                authed = true;
+                status.textContent = `Logged in as ${user.email}. Ready to add.`;
+            }
+        });
+
+        const IMAGES = [
+            'https://i.imgur.com/542ZtOL.jpg',
+            'https://i.imgur.com/IZwwDuX.jpg',
+            'https://i.imgur.com/7GNOHJu.jpg',
+            'https://i.imgur.com/JsVXqd1.jpg',
+            'https://i.imgur.com/ra2ZBs1.jpg',
+            'https://i.imgur.com/WWrU9aP.jpg',
+            'https://i.imgur.com/HaZcoi6.jpg',
+            'https://i.imgur.com/93HJGu2.jpg',
+            'https://i.imgur.com/pVQtloE.jpg',
+            'https://i.imgur.com/F344KZK.jpg'
+        ];
+
+        window.addProduct = async () => {
+            if (!authed) return;
+            btn.disabled = true;
+            btn.textContent = 'Adding…';
+            status.className = 'seed-status';
+            status.textContent = 'Writing to Firestore…';
+
+            try {
+                const ref = await addDoc(collection(db, 'products'), {
+                    name: "Nike Kobe 6 Protro 'ASG Hollywood 3D' (2026)",
+                    sku: 'KB6-ASG-3D',
+                    brand: 'Nike',
+                    category: 'Sneakers',
+                    colorway: 'Dark Grey/Daring Red-Chlorine Blue',
+                    price: 220,
+                    stock: 10,
+                    status: 'active',
+                    featured: true,
+                    image: IMAGES[0],
+                    images: IMAGES,
+                    sizes: '8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 13, 14, 15',
+                    desc: "The Nike Kobe 6 Protro 'ASG Hollywood 3D' returns in 2026, bringing back the iconic 3D graphic upper originally debuted during the 2011 All-Star Game in Los Angeles. The mismatched Chlorine Blue and Daring Red accents pop against the textured dark grey base, completing the classic anaglyph 3D aesthetic.",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                });
+
+                status.className = 'seed-status success';
+                status.textContent = `✓ Added! Product ID: ${ref.id}`;
+                btn.textContent = 'Done ✓';
+
+                setTimeout(() => window.location.href = 'products.html', 2000);
+            } catch (err) {
+                status.className = 'seed-status error';
+                status.textContent = `Error: ${err.message}`;
+                btn.disabled = false;
+                btn.textContent = 'Add to Store';
+            }
+        };
+    </script>
+</body>
+
+</html>
