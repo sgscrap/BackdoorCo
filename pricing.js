@@ -987,10 +987,10 @@ function renderRulesTable() {
       <td>${r.condition}</td>
       <td>${r.action}</td>
       <td>
-        <div class="toggle-wrap">
-          <div class="toggle ${r.active ? 'on' : ''}" onclick="toggleRule(${r.id})"></div>
-          <span style="font-size:11px;color:${r.active ? 'var(--accent)' : 'var(--text3)'}">${r.active ? 'Active' : 'Off'}</span>
-        </div>
+                <div class="toggle-wrap">
+                    <button type="button" class="toggle ${r.active ? 'on' : ''}" onclick="toggleRule(${r.id})" aria-pressed="${r.active ? 'true' : 'false'}"></button>
+                    <span style="font-size:11px;color:${r.active ? 'var(--accent)' : 'var(--text3)'}">${r.active ? 'Active' : 'Off'}</span>
+                </div>
       </td>
     </tr>
   `).join('');
