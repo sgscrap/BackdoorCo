@@ -192,14 +192,14 @@ function renderDashboard() {
 function renderRecentOrders() {
     const list = document.getElementById('recentOrdersList');
     const recent = orders.slice(0, 5);
-    list.innerHTML = recent.map(o => `
-    <tr onclick="viewOrder('${o.id}')" style="cursor:pointer">
-      <td><span class="order-id">${o.id}</span></td>
-      <td>${o.customer.name}</td>
-      <td style="color:var(--text-primary);font-weight:600">$${(o.total || 0).toFixed(2)}</td>
-      <td><span class="status-pill ${o.status}">${o.status}</span></td>
-    </tr>
-  `).join('') || '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted)">No orders yet.</td></tr>';
+        list.innerHTML = recent.map(o => `
+        <tr tabindex="0" role="button" onclick="viewOrder('${o.id}')" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); viewOrder('${o.id}'); }" style="cursor:pointer">
+            <td><span class="order-id">${o.id}</span></td>
+            <td>${o.customer.name}</td>
+            <td style="color:var(--text-primary);font-weight:600">$${(o.total || 0).toFixed(2)}</td>
+            <td><span class="status-pill ${o.status}">${o.status}</span></td>
+        </tr>
+    `).join('') || '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted)">No orders yet.</td></tr>';
 }
 
 function renderLowStock() {
@@ -610,7 +610,7 @@ function confirmImporterImages() {
 function buildImporterSizeChips() {
     const container = document.getElementById('impSizeChips');
     if (!container) return;
-    container.innerHTML = IMPORTER_SIZES.map(s => `<div class="size-chip" onclick="toggleImporterSize('${s}', this)">${s}</div>`).join('');
+    container.innerHTML = IMPORTER_SIZES.map(s => `<button type="button" class="size-chip" onclick="toggleImporterSize('${s}', this)">${s}</button>`).join('');
 }
 
 function toggleImporterSize(s, el) {

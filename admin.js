@@ -939,7 +939,7 @@ function renderRecentOrders() {
     if (!list) return;
 
     list.innerHTML = orders.slice(0, 5).map((order) => `
-        <tr onclick="viewOrder('${escapeHtml(order.id)}')" style="cursor:pointer">
+        <tr tabindex="0" role="button" onclick="viewOrder('${escapeHtml(order.id)}')" onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); viewOrder('${escapeHtml(order.id)}'); }" style="cursor:pointer">
             <td><span class="order-id">${escapeHtml(order.id)}</span></td>
             <td>${escapeHtml(order.customer?.name || 'Unknown')}</td>
             <td style="color:var(--text-primary);font-weight:600">$${getOrderTotal(order).toFixed(2)}</td>
@@ -975,7 +975,7 @@ function renderLowStock() {
     lowStock.sort((left, right) => left.stock - right.stock);
 
     list.innerHTML = lowStock.slice(0, 4).map((entry) => `
-        <div class="inventory-item" onclick="openProductModal('${escapeHtml(entry.id)}')">
+        <button type="button" class="inventory-item" onclick="openProductModal('${escapeHtml(entry.id)}')">
             <div class="shoe-thumb"><img src="${escapeHtml(entry.img)}" alt="" style="${escapeHtml(getProductImageStyle(entry, 4))}"></div>
             <div class="shoe-info">
                 <div class="shoe-name">${escapeHtml(entry.name)} (${escapeHtml(entry.size)})</div>
@@ -986,7 +986,7 @@ function renderLowStock() {
                 </div>
             </div>
             <div class="shoe-price">$${Number(entry.price || 0).toFixed(0)}</div>
-        </div>
+        </button>
     `).join('') || '<p style="text-align:center; padding:20px; color:var(--text-muted)">Stock levels are healthy.</p>';
 }
 
