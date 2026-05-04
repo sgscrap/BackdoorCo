@@ -171,7 +171,7 @@ async function socialLogin(provider) {
             await ref.set({
                 first:  names[0] || '',
                 last:   names.slice(1).join(' ') || '',
-                email:  user.email,
+                email:  user.email || '',
                 photoURL: user.photoURL || '',
                 size:   '',
                 phone:  '',
