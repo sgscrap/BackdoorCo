@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Detail</title>
+  <!-- Optional CSS framework -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="product-page" style="max-width: 1200px; margin: 2rem auto; padding: 1rem;">
+    <!-- Breadcrumb -->
+    <nav><a href="/">Home</a> / <span id="product-category"></span> / <span id="product-name"></span></nav>
+
+    <div style="display: flex; gap: 2rem; margin-top: 1rem;">
+      <!-- Image Gallery -->
+      <div style="flex: 1;">
+        <div id="main-image-container">
+          <img id="main-product-image" src="" alt="Product" style="width: 100%; border-radius: 8px;">
+        </div>
+        <div id="thumbnail-gallery" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;"></div>
+      </div>
+
+      <!-- Product Info -->
+      <div style="flex: 1;">
+        <h1 id="product-title"></h1>
+        <div id="product-rating"></div>
+        <p id="product-price" style="font-size: 1.5rem; font-weight: bold;"></p>
+        <p id="product-description"></p>
+
+        <!-- Size Selector -->
+        <div id="size-selector" style="margin: 1rem 0;">
+          <label>Size:</label>
+          <div id="size-buttons" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+          <span id="size-stock-info" style="color: #888; margin-left: 0.5rem;"></span>
+        </div>
+
+        <!-- Backorder lead time (if applicable) -->
+        <p id="backorder-leadtime" style="color: #c00; display: none;"></p>
+
+        <!-- Add to Cart -->
+        <button id="add-to-cart-btn" disabled style="padding: 0.75rem 2rem; background: black; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          Add to Cart
+        </button>
+        <p id="cart-feedback" style="color: green; display: none;"></p>
+      </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <section id="reviews" style="margin-top: 3rem;">
+      <h2>Customer Reviews</h2>
+      <div id="reviews-container"></div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script type="module" src="simple-product-page.js"></script>
+  <script type="module" src="cart.js"></script>
+</body>
+</html>
