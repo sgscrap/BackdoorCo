@@ -84,6 +84,11 @@
                 Import Products
             </a>
 
+            <a class="nav-item" data-page="priceMonitor" onclick="switchTab('priceMonitor', this)">
+                <i class="nav-icon fa-solid fa-tags"></i>
+                Price Monitor
+            </a>
+
             <a class="nav-item" href="pricing.html">
                 <i class="nav-icon fa-solid fa-tags"></i>
                 Smart Pricing
@@ -270,6 +275,29 @@
                         </div>
                     </div>
                 </section>
+
+                    <!-- PRICE MONITOR SECTION -->
+                    <section class="content-section" id="priceMonitorSection">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">PRICE MONITOR</span>
+                                <div style="display:flex;gap:10px;align-items:center">
+                                    <label style="font-size:12px;color:var(--text-muted)">Undercut %</label>
+                                    <input id="pmPct" type="range" min="25" max="50" value="25" step="1" oninput="document.getElementById('pmPctVal').textContent = this.value + '%'; renderPriceMonitor();">
+                                    <span id="pmPctVal">25%</span>
+                                </div>
+                            </div>
+                            <div class="card-body" style="padding:10px">
+                                <div style="margin-bottom:10px">
+                                    <button class="btn-primary" onclick="applyAllSuggestedPrices()">Apply All Suggested Prices</button>
+                                    <button class="btn-secondary" onclick="renderPriceMonitor()">Refresh</button>
+                                </div>
+                                <div id="priceMonitorTableContainer">
+                                    <!-- Rendered by admin JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </section>
 
                 <!-- ORDERS SECTION -->
                 <section class="content-section" id="ordersSection">

@@ -165,6 +165,117 @@ function switchTab(tab, el) {
     if (tab === 'orders') renderOrders();
     if (tab === 'products') renderProducts();
     if (tab === 'customers') renderCustomers();
+    if (tab === 'priceMonitor') renderPriceMonitor();
+}
+
+// ============================================
+// PRICE MONITOR
+// ============================================
+function renderPriceMonitor() {
+    const container = document.getElementById('priceMonitorTableContainer');
+    if (!container) return;
+    const pct = parseInt(document.getElementById('pmPct')?.value || 25, 10) / 100;
+
+    if (!products || products.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted)">No products loaded.</p>';
+        return;
+    }
+
+    container.innerHTML = `
+        <table class="data-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Current Price</th>
+                    <th>Competitor Min Price</th>
+                    <th>Suggested Price (${Math.round(pct*100)}% under)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${products.map(p => {
+                    const compInputId = `comp_${p.id}`;
+                    const suggested = p._lastCompetitorPrice ? (p._lastCompetitorPrice * (1 - pct)) : (p.price * (1 - pct));
+                    return `
+                        <tr>
+                            <td><strong>${escapeHtml(p.name || p.sku || p.id)}</strong><div style="font-size:11px;color:var(--text-muted)">${escapeHtml(p.sku || p.id)}</div></td>
+                            <td>$${(p.price || 0).toFixed(2)}</td>
+                            <td><input type="number" step="0.01" id="${compInputId}" placeholder="paste min price" value="${p._lastCompetitorPrice || ''}" onchange="onCompetitorPriceChange('${p.id}')"></td>
+                            <td id="sugg_${p.id}">$${(suggested || 0).toFixed(2)}</td>
+                            <td><button class="btn-primary" onclick="applySuggestedPrice('${p.id}')">Apply</button></td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function onCompetitorPriceChange(productId) {
+    const input = document.getElementById(`comp_${productId}`);
+    if (!input) return;
+    const val = parseFloat(input.value);
+    const p = products.find(pr => pr.id === productId);
+    if (!p) return;
+    p._lastCompetitorPrice = isNaN(val) ? null : val;
+    const pct = parseInt(document.getElementById('pmPct')?.value || 25, 10) / 100;
+    const suggested = (p._lastCompetitorPrice || p.price) * (1 - pct);
+    const node = document.getElementById(`sugg_${productId}`);
+    if (node) node.textContent = `$${suggested.toFixed(2)}`;
+}
+
+async function applySuggestedPrice(productId) {
+    const p = products.find(pr => pr.id === productId);
+    if (!p) return showToast('Product not found', 'error');
+    const pct = parseInt(document.getElementById('pmPct')?.value || 25, 10) / 100;
+    const compVal = p._lastCompetitorPrice || parseFloat(document.getElementById(`comp_${productId}`)?.value) || null;
+    const base = compVal || p.price;
+    const newPrice = Number((base * (1 - pct)).toFixed(2));
+
+    if (!confirm(`Apply new price $${newPrice} to ${p.name}?`)) return;
+
+    try {
+        if (db && typeof db.collection === 'function') {
+            await db.collection('products').doc(productId).set({ price: newPrice }, { merge: true });
+            showToast(`Price updated to $${newPrice}` , 'success');
+        } else {
+            // Fallback: update local state only
+            p.price = newPrice;
+            renderProducts();
+            showToast('Local price updated (no DB connection).', 'warning');
+        }
+    } catch (err) {
+        console.error('Failed to update price', err);
+        showToast('Failed to update price: ' + err.message, 'error');
+    }
+}
+
+async function applyAllSuggestedPrices() {
+    if (!confirm('Apply suggested prices for all products shown?')) return;
+    const pct = parseInt(document.getElementById('pmPct')?.value || 25, 10) / 100;
+    for (const p of products) {
+        const compVal = p._lastCompetitorPrice || parseFloat(document.getElementById(`comp_${p.id}`)?.value) || null;
+        const base = compVal || p.price;
+        const newPrice = Number((base * (1 - pct)).toFixed(2));
+        try {
+            if (db && typeof db.collection === 'function') {
+                await db.collection('products').doc(p.id).set({ price: newPrice }, { merge: true });
+            } else {
+                p.price = newPrice;
+            }
+        } catch (err) {
+            console.error('Update failed for', p.id, err);
+            showToast(`Failed to update ${p.name}: ${err.message}`, 'error');
+        }
+    }
+    showToast('Applied suggested prices (attempted).', 'success');
+    renderProducts();
+    renderPriceMonitor();
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"'`]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'})[s]);
 }
 
 // ============================================
