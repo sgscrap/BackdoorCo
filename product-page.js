@@ -514,8 +514,14 @@ function renderProduct(product) {
     }).join('');
 
     const addToCartButton = document.getElementById('productAddToCart');
-    addToCartButton.disabled = soldOut;
-    addToCartButton.textContent = soldOut ? 'Out of Stock' : backorder ? 'Select Size for Backorder' : sizes.length > 0 ? 'Select Size' : 'Add to Cart';
+    // Disable add-to-cart if sold out or when sizes exist but none selected yet
+    const requiresSizeSelection = sizes.length > 0;
+    addToCartButton.disabled = soldOut || requiresSizeSelection;
+    addToCartButton.textContent = soldOut
+        ? 'Out of Stock'
+        : backorder
+            ? (requiresSizeSelection ? 'Select Size for Backorder' : 'Add Backorder')
+            : (requiresSizeSelection ? 'Select Size' : 'Add to Cart');
     if (!soldOut && sizes.length === 0) {
         selectedSize = 'One Size';
         selectedSizeBackorder = backorder;
@@ -645,7 +651,11 @@ window.selectProductSize = (button) => {
     button.classList.add('selected');
     selectedSize = button.dataset.size || '';
     selectedSizeBackorder = button.dataset.backorder === 'true';
-    document.getElementById('productAddToCart').textContent = selectedSizeBackorder ? 'Add Backorder' : 'Add to Cart';
+    const addBtn = document.getElementById('productAddToCart');
+    if (addBtn) {
+        addBtn.textContent = selectedSizeBackorder ? 'Add Backorder' : 'Add to Cart';
+        addBtn.disabled = false;
+    }
 
     const offerSize = document.getElementById('offerSize');
     if (offerSize) offerSize.value = selectedSize;
