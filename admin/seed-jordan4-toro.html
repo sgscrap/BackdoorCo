@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Jordan 4 Toro | Backdoor Admin</title>
+    <link rel="stylesheet" href="admin.css?v=2.2">
+    <style>
+        .seed-wrap {
+            max-width: 560px;
+            margin: 80px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .seed-img-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        }
+
+        .seed-img-grid img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            display: block;
+        }
+
+        .seed-body {
+            padding: 32px;
+        }
+
+        .seed-title {
+            font-family: "Bebas Neue", cursive;
+            font-size: 26px;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .seed-meta {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .seed-tag {
+            padding: 3px 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        .seed-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-family: "Bebas Neue", cursive;
+            font-size: 18px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .seed-btn:hover:not(:disabled) {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+        }
+
+        .seed-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .seed-status {
+            margin-top: 16px;
+            font-size: 0.88rem;
+            text-align: center;
+            color: var(--text-secondary);
+            min-height: 22px;
+        }
+
+        .seed-status.success {
+            color: var(--accent);
+        }
+
+        .seed-status.error {
+            color: var(--accent-red);
+        }
+    </style>
+</head>
+
+<body class="admin-body" style="display:flex;align-items:flex-start;justify-content:center;padding:40px 20px">
+
+    <div class="seed-wrap">
+        <div class="seed-img-grid" id="imgGrid">
+            <img src="https://i.imgur.com/Ls3CLOC.jpg" alt="1" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/K9Llix1.jpg" alt="2" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/SOJZOGy.jpg" alt="3" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/UBUUZZp.jpg" alt="4" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/NBl14B8.jpg" alt="5" onerror="this.style.display='none'">
+            <img src="https://i.imgur.com/fbKmhq7.jpg" alt="6" onerror="this.style.display='none'">
+        </div>
+
+        <div class="seed-body">
+            <div class="seed-title">Jordan 4 Retro<br>'Toro Bravo' (2026)</div>
+            <div class="seed-meta">
+                <span class="seed-tag">Jordan</span>
+                <span class="seed-tag">Sneakers</span>
+                <span class="seed-tag">Fire Red/Black-Cement Grey</span>
+                <span class="seed-tag">10 images</span>
+            </div>
+
+            <button class="seed-btn" id="addBtn" onclick="addProduct()">
+                Add to Store
+            </button>
+            <div class="seed-status" id="status">Requires admin login.</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, auth } from './firebase-config.js';
+        import { collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+
+        const btn = document.getElementById('addBtn');
+        const status = document.getElementById('status');
+
+        let authed = false;
+
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                status.textContent = 'Not logged in — redirecting to admin login…';
+                setTimeout(() => window.location.href = 'index.html', 1500);
+            } else {
+                authed = true;
+                status.textContent = `Logged in as ${user.email}. Ready to add.`;
+            }
+        });
+
+        const IMAGES = [
+            'https://i.imgur.com/Ls3CLOC.jpg',
+            'https://i.imgur.com/K9Llix1.jpg',
+            'https://i.imgur.com/SOJZOGy.jpg',
+            'https://i.imgur.com/UBUUZZp.jpg',
+            'https://i.imgur.com/NBl14B8.jpg',
+            'https://i.imgur.com/fbKmhq7.jpg',
+            'https://i.imgur.com/NgXzN0P.jpg',
+            'https://i.imgur.com/BaQfz3Y.jpg',
+            'https://i.imgur.com/yAA7Oen.jpg',
+            'https://i.imgur.com/2ZsP4HT.jpg'
+        ];
+
+        window.addProduct = async () => {
+            if (!authed) return;
+            btn.disabled = true;
+            btn.textContent = 'Adding…';
+            status.className = 'seed-status';
+            status.textContent = 'Writing to Firestore…';
+
+            try {
+                const ref = await addDoc(collection(db, 'products'), {
+                    name: "Jordan 4 Retro 'Toro Bravo' (2026)",
+                    sku: 'J4-TORO-2026',
+                    brand: 'Jordan',
+                    category: 'Sneakers',
+                    colorway: 'Fire Red/White-Black-Cement Grey',
+                    price: 350,
+                    stock: 10,
+                    status: 'active',
+                    featured: true,
+                    image: IMAGES[0],
+                    images: IMAGES,
+                    sizes: '7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 13, 14',
+                    desc: "The Air Jordan 4 Retro 'Toro Bravo' returns in 2026, bringing back the highly coveted all-red nubuck upper first seen in 2013. Black accents on the wings, midsole, and heel tab contrast sharply with the vibrant red base, while Cement Grey detailing appears on the eyelets, tongue tag, and outsole.",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                });
+
+                status.className = 'seed-status success';
+                status.textContent = `✓ Added! Product ID: ${ref.id}`;
+                btn.textContent = 'Done ✓';
+
+                setTimeout(() => window.location.href = 'products.html', 2000);
+            } catch (err) {
+                status.className = 'seed-status error';
+                status.textContent = `Error: ${err.message}`;
+                btn.disabled = false;
+                btn.textContent = 'Add to Store';
+            }
+        };
+    </script>
+</body>
+
+</html>
