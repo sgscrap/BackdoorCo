@@ -80,25 +80,7 @@
         </section>
     </main>
 
-    <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out;">
-        <img id="lightboxImage" src="" style="max-width: 90%; max-height: 90%; object-fit: contain; pointer-events: none;" oncontextmenu="return false;" draggable="false">
-    </div>
-
     <script type="module" src="reviews.js"></script>
-    <script>
-        window.openLightbox = (src) => {
-            const lb = document.getElementById('imageLightbox');
-            const img = document.getElementById('lightboxImage');
-            if (lb && img && src) {
-                img.src = src;
-                lb.style.display = 'flex';
-            }
-        };
-        window.closeLightbox = (e) => {
-            const lb = document.getElementById('imageLightbox');
-            if (lb) lb.style.display = 'none';
-        };
-    </script>
 
   <!-- Firebase SDKs & Global Auth -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
