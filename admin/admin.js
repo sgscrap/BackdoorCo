@@ -200,7 +200,12 @@ function renderPriceMonitor() {
                         <tr>
                             <td><strong>${escapeHtml(p.name || p.sku || p.id)}</strong><div style="font-size:11px;color:var(--text-muted)">${escapeHtml(p.sku || p.id)}</div></td>
                             <td>$${(p.price || 0).toFixed(2)}</td>
-                            <td><input type="number" step="0.01" id="${compInputId}" placeholder="paste min price" value="${p._lastCompetitorPrice || ''}" onchange="onCompetitorPriceChange('${p.id}')"></td>
+                            <td>
+                                <div style="display:flex;gap:6px;align-items:center">
+                                    <input type="number" step="0.01" id="${compInputId}" placeholder="paste min price" value="${p._lastCompetitorPrice || ''}" onchange="onCompetitorPriceChange('${p.id}')">
+                                    <button class="btn-secondary" onclick="fetchEbayForProduct('${p.id}')" title="Fetch eBay">eBay</button>
+                                </div>
+                            </td>
                             <td id="sugg_${p.id}">$${(suggested || 0).toFixed(2)}</td>
                             <td><button class="btn-primary" onclick="applySuggestedPrice('${p.id}')">Apply</button></td>
                         </tr>
@@ -209,6 +214,28 @@ function renderPriceMonitor() {
             </tbody>
         </table>
     `;
+}
+
+async function fetchEbayForProduct(productId) {
+    const p = products.find(pr => pr.id === productId);
+    if (!p) return showToast('Product not found', 'error');
+    // Build a query — prefer SKU then name
+    const q = encodeURIComponent(p.sku || p.name || p.id);
+    const url = `/.netlify/functions/price-monitor-ebay?q=${q}`;
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data.minPrice) {
+            p._lastCompetitorPrice = data.minPrice;
+            showToast(`eBay min: $${data.minPrice.toFixed(2)} (found ${data.found})`, 'success');
+            onCompetitorPriceChange(productId);
+        } else {
+            showToast('No prices found on eBay', 'warning');
+        }
+    } catch (err) {
+        console.error('eBay fetch failed', err);
+        showToast('eBay fetch failed: ' + err.message, 'error');
+    }
 }
 
 function onCompetitorPriceChange(productId) {
