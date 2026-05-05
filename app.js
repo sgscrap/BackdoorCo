@@ -247,6 +247,27 @@ function initGlobalListeners() {
         }
     });
 
+    // Coming Soon Modal — close handlers
+    const closeSoon = () => {
+        const m = document.getElementById('comingSoonModal');
+        if (m) m.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+    const comingSoonClose = document.getElementById('comingSoonClose');
+    const comingSoonAck = document.getElementById('comingSoonAck');
+    const comingSoonOverlay = document.getElementById('comingSoonOverlay');
+    if (comingSoonClose) comingSoonClose.addEventListener('click', closeSoon);
+    if (comingSoonAck) comingSoonAck.addEventListener('click', closeSoon);
+    if (comingSoonOverlay) comingSoonOverlay.addEventListener('click', closeSoon);
+
+    // Also handle Esc for coming soon
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const m = document.getElementById('comingSoonModal');
+            if (m && m.classList.contains('active')) closeSoon();
+        }
+    });
+
     // Search Redirect from Homepage
     const navSearch = document.getElementById('navSearch');
     if (navSearch && isHomePage) {
@@ -326,13 +347,17 @@ window.openProductPage = (value) => {
 
 function closeProductModal() {
     const modal = document.getElementById('productModal');
-    if (modal) modal.classList.remove('active');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+    }
     if (modalOverlay) modalOverlay.classList.remove('active');
     document.body.style.overflow = '';
 }
 
 window.selectModalSize = (el) => {
-    document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+    const modal = el.closest('#productModal') || document;
+    modal.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
     el.classList.add('selected');
 };
 
