@@ -145,7 +145,7 @@ const SEEDED_PRODUCTS = [
         sku: 'PRDA-AMC-001',
         slug: 'prada-americas-cup-burgundy-silver',
         cardImage: buildImgurImageUrl('sRovUH4'),
-        price: 950,
+        price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Burgundy/Silver',
@@ -161,7 +161,7 @@ const SEEDED_PRODUCTS = [
         imageFit: 'contain',
         imagePosition: '50% 50%',
         imageScale: 1.0,
-        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 950 })),
+        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 547 })),
         releaseDate: 'TBD',
         allowBackorder: true,
         backorderLeadTime: 'Ships in 1.5-2 weeks',
@@ -178,7 +178,7 @@ const SEEDED_PRODUCTS = [
         sku: 'PRDA-AMC-002',
         slug: 'prada-americas-cup-pearl-silver',
         cardImage: buildImgurImageUrl('wKQ1X0p'),
-        price: 950,
+        price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Pearl/Silver',
@@ -194,7 +194,7 @@ const SEEDED_PRODUCTS = [
         imageFit: 'contain',
         imagePosition: '50% 50%',
         imageScale: 1.0,
-        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 950 })),
+        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 547 })),
         releaseDate: 'TBD',
         allowBackorder: true,
         backorderLeadTime: 'Ships in 1.5-2 weeks',
@@ -211,7 +211,7 @@ const SEEDED_PRODUCTS = [
         sku: 'PRDA-AMC-003',
         slug: 'prada-americas-cup-green-silver',
         cardImage: buildImgurImageUrl('VP14puK'),
-        price: 950,
+        price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Green/Silver',
@@ -227,7 +227,7 @@ const SEEDED_PRODUCTS = [
         imageFit: 'contain',
         imagePosition: '50% 50%',
         imageScale: 1.0,
-        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 950 })),
+        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 547 })),
         releaseDate: 'TBD',
         allowBackorder: true,
         backorderLeadTime: 'Ships in 1.5-2 weeks',
@@ -244,7 +244,7 @@ const SEEDED_PRODUCTS = [
         sku: 'PRDA-AMC-004',
         slug: 'prada-americas-cup-red-silver',
         cardImage: buildImgurImageUrl('BU2UBWf'),
-        price: 895,
+        price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Red/Silver',
@@ -261,7 +261,7 @@ const SEEDED_PRODUCTS = [
         imageFit: 'contain',
         imagePosition: '50% 50%',
         imageScale: 1.0,
-        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 895 })),
+        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 547 })),
         releaseDate: 'TBD',
         allowBackorder: true,
         backorderLeadTime: 'Ships in 1.5-2 weeks',
@@ -278,7 +278,7 @@ const SEEDED_PRODUCTS = [
         sku: 'PRDA-AMC-005',
         slug: 'prada-americas-cup-yellow-silver',
         cardImage: buildImgurImageUrl('mNJWyDX'),
-        price: 895,
+        price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Sunny Yellow/Silver',
@@ -295,7 +295,7 @@ const SEEDED_PRODUCTS = [
         imageFit: 'contain',
         imagePosition: '50% 50%',
         imageScale: 1.0,
-        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 895 })),
+        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 547 })),
         releaseDate: 'TBD',
         allowBackorder: true,
         backorderLeadTime: 'Ships in 1.5-2 weeks',
@@ -624,6 +624,8 @@ const LEGACY_IMAGE_POSITIONS = {
     'right center': [76, 50]
 };
 
+const PRADA_SNEAKER_PRICE = 547;
+
 function isFootwearProduct(product) {
     const category = String(product?.category || '').toLowerCase();
     const brand = String(product?.brand || '').toLowerCase();
@@ -635,6 +637,16 @@ function isFootwearProduct(product) {
         name.includes('air max') ||
         name.includes('yeezy') ||
         (brand === 'jordan' && category !== 'apparel')
+    );
+}
+
+function isPradaSneaker(product) {
+    const brand = String(product?.brand || '').toLowerCase();
+    const name = String(product?.name || '').toLowerCase();
+    const category = String(product?.category || '').toLowerCase();
+    return (
+        (brand === 'prada' || name.includes('prada')) &&
+        (category === 'sneakers' || category === 'shoes' || name.includes("america's cup"))
     );
 }
 
@@ -651,6 +663,16 @@ export function applyProductOverrides(product) {
     const productName = String(nextProduct.name || '').toLowerCase();
     if ((productId.includes('prada') || productName.includes("prada")) && nextProduct.brand !== 'Prada') {
         nextProduct.brand = 'Prada';
+    }
+
+    if (isPradaSneaker(nextProduct)) {
+        nextProduct.price = PRADA_SNEAKER_PRICE;
+        if (Array.isArray(nextProduct.sizes)) {
+            nextProduct.sizes = nextProduct.sizes.map((entry) => ({
+                ...entry,
+                price: PRADA_SNEAKER_PRICE
+            }));
+        }
     }
 
     // Default shoes to backorder flow when out of stock
