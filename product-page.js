@@ -953,8 +953,10 @@ async function handleOfferSubmit(event) {
         return;
     }
 
-    if (offerAmount < (Number(currentProduct.price) || 0) * 0.4) {
-        showToast('Your offer is too low. Please enter a more competitive amount.', 'warn');
+    const askingPrice = Number(currentProduct.price) || 0;
+    const prominentThreshold = Math.min(askingPrice * 0.65, Math.max(250, askingPrice * 0.55));
+    if (askingPrice > 0 && offerAmount < prominentThreshold) {
+        showToast('Enter a stronger offer so our team can review it.', 'warn');
         if (submitButton) {
             submitButton.disabled = false;
             submitButton.textContent = originalLabel;

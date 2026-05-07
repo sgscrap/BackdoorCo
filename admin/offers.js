@@ -19,7 +19,7 @@ let currentOfferId = null;
 function initOffers() {
     onSnapshot(query(collection(db, 'offers'), orderBy('createdAt', 'desc')), snap => {
         allOffers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        document.getElementById('offersBadge').textContent = allOffers.filter(o => o.status === 'pending').length;
+        document.getElementById('offersBadge').textContent = allOffers.filter(o => isProminentLead(o) && o.status === 'pending').length;
         renderOffers();
     });
     onSnapshot(collection(db, 'products'), snap =>
@@ -29,10 +29,14 @@ function initOffers() {
             snap.docs.filter(d => d.data().status === 'pending').length);
 }
 
+function isProminentLead(offer) {
+    return Boolean(offer?.prominentLead) || String(offer?.leadType || '') === 'prominent_offer';
+}
+
 function renderOffers() {
     const filtered = currentFilter === 'all'
-        ? [...allOffers]
-        : allOffers.filter(o => o.status === currentFilter);
+        ? allOffers.filter(isProminentLead)
+        : allOffers.filter(o => isProminentLead(o) && o.status === currentFilter);
     const tbody = document.getElementById('offersBody');
 
     if (!filtered.length) {
@@ -65,6 +69,7 @@ function renderOffers() {
             <td>
                 <strong style="color:${offerColor}">$${(parseFloat(o.offerAmount) || 0).toFixed(2)}</strong>
                 ${pctStr ? `<div style="font-size:0.72rem;color:var(--text-secondary)">${pctStr}</div>` : ''}
+                ${o.leadScore ? `<div style="font-size:0.72rem;color:var(--text-secondary)">Lead score ${Number(o.leadScore).toFixed(0)}</div>` : ''}
             </td>
             <td style="font-size:0.8rem">${o.size || '—'}</td>
             <td><span class="pill ${o.status}">${o.status}</span></td>

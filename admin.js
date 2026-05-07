@@ -910,7 +910,11 @@ function switchTab(tab, el) {
 }
 
 function getPendingOfferCount() {
-    return offers.filter((offer) => String(offer.status || 'pending').toLowerCase() === 'pending').length;
+    return offers.filter((offer) => isProminentLead(offer) && String(offer.status || 'pending').toLowerCase() === 'pending').length;
+}
+
+function isProminentLead(offer) {
+    return Boolean(offer?.prominentLead) || String(offer?.leadType || '') === 'prominent_offer';
 }
 
 function renderDashboard() {
@@ -1334,7 +1338,7 @@ function setProductImageFit(value) {
     updateProductImagePreview();
 }
 
-function updateProductImagePreview() {
+function updateSingleProductImagePreviewLegacy() {
     const image = document.getElementById('productImagePreview');
     const rawUrl = document.getElementById('productImage')?.value.trim();
     const url = resolveImgurUrl(rawUrl) || rawUrl;
@@ -1578,12 +1582,14 @@ function renderOffers() {
     const tbody = document.getElementById('offersTableBody');
     if (!tbody) return;
 
-    if (offers.length === 0) {
+    const prominentOffers = offers.filter(isProminentLead);
+
+    if (prominentOffers.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="empty-state-row">No offers yet.</td></tr>';
         return;
     }
 
-    tbody.innerHTML = offers.map((offer) => {
+    tbody.innerHTML = prominentOffers.map((offer) => {
         const status = String(offer.status || 'pending').toLowerCase();
         const updatedAt = offer.updatedAt?.toDate ? offer.updatedAt.toDate().toLocaleDateString() : offer.createdAt?.toDate ? offer.createdAt.toDate().toLocaleDateString() : 'Just now';
         const offerAmount = Number(offer.offerAmount || 0);
@@ -1605,6 +1611,7 @@ function renderOffers() {
                 <td>
                     <strong>${formatCurrency(offerAmount)}</strong>
                     <div class="table-subtext">Ask ${formatCurrency(askingPrice)}</div>
+                    ${offer.leadScore ? `<div class="table-subtext">Lead score ${Number(offer.leadScore).toFixed(0)}</div>` : ''}
                     ${counterAmount > 0 ? `<div class="table-subtext">Counter ${formatCurrency(counterAmount)}</div>` : ''}
                 </td>
                 <td><span class="status-pill ${escapeHtml(status)}">${escapeHtml(status)}</span></td>
