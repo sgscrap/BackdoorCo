@@ -667,12 +667,14 @@ export function applyProductOverrides(product) {
 
     if (isPradaSneaker(nextProduct)) {
         nextProduct.price = PRADA_SNEAKER_PRICE;
-        if (Array.isArray(nextProduct.sizes)) {
-            nextProduct.sizes = nextProduct.sizes.map((entry) => ({
-                ...entry,
-                price: PRADA_SNEAKER_PRICE
-            }));
-        }
+        nextProduct.isOutOfStock = false;
+        nextProduct.allowBackorder = true;
+        nextProduct.sizes = DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({
+            size,
+            stock: 1,
+            price: PRADA_SNEAKER_PRICE,
+            backorder: false
+        }));
     }
 
     // Default shoes to backorder flow when out of stock
