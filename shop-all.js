@@ -293,6 +293,9 @@ function updateFilterCounts() {
         Prada: allProducts.filter(
             p => p.brand === 'Prada'
         ).length,
+        Dior: allProducts.filter(
+            p => p.brand === 'Dior'
+        ).length,
         Nike: allProducts.filter(
             p => p.brand === 'Nike'
         ).length,
