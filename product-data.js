@@ -14,8 +14,43 @@ function buildImgurImageUrl(id, extension = 'jpg') {
 }
 
 const DEFAULT_ADULT_SIZE_OPTIONS = ['US 7', 'US 7.5', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 10.5', 'US 11', 'US 11.5', 'US 12', 'US 13', 'US 14', 'US 15'];
+const DEFAULT_EU_SIZE_OPTIONS = ['EU 38', 'EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45', 'EU 46'];
 
 const SEEDED_PRODUCTS = [
+    {
+        id: 'seed-dior-b30-countdown-tech-beige-brown-orange',
+        name: 'B30 Countdown Tech Sneaker',
+        sku: '3SN342ABF_H726',
+        slug: 'b30-countdown-tech-sneaker-beige-brown-orange',
+        cardImage: buildImgurImageUrl('Bd6LKRo'),
+        price: 625,
+        retailPrice: 1250,
+        brand: 'Dior',
+        category: 'Sneakers',
+        colorway: 'Beige/Brown/Orange/Gray',
+        description: 'The B30 Countdown Tech sneaker is crafted in beige semi-transparent N3O nylon with brown and orange technical fabric and gray rubber. The sporty low-top silhouette features Dior B30 and CD30 signatures, a lace-up closure, welded construction, and an ultralightweight outsole in a blend of brown rubber and foam with gray trim.',
+        image: buildImgurImageUrl('Bd6LKRo'),
+        images: [
+            buildImgurImageUrl('Bd6LKRo'),
+            buildImgurImageUrl('jhWUd9n'),
+            buildImgurImageUrl('0z709mm'),
+            buildImgurImageUrl('wGMIXin'),
+            buildImgurImageUrl('ZdTY76W')
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 50%',
+        imageScale: 1.0,
+        sizes: DEFAULT_EU_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 625 })),
+        releaseDate: 'Spring 2026',
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
     {
         id: 'seed-kobe-5-alternate-bruce-lee',
         name: "Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee'",
