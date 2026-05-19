@@ -2548,6 +2548,67 @@ body {
   vertical-align: middle;
 }
 
+.product-img-cell {
+  width: 48px;
+  height: 48px;
+}
+
+.product-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+}
+
+.product-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 150px;
+}
+
+.product-name {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.product-sku {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.action-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-icon:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-icon.danger:hover {
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
 .pill {
   display: inline-block;
   padding: 4px 12px;

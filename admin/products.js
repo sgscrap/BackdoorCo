@@ -16,6 +16,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { cloudifyUpload as uploadImage } from "./cloudify.js";
 
+const SITE_ORIGIN = window.location.origin || "https://backdoorco.xyz";
+
 // ================================
 // AUTH GUARD
 // ================================
@@ -46,6 +48,86 @@ let currentFilter = "all";
 let currentSort = "name";
 let editingId = null;
 let deleteId = null;
+
+function formatMoney(value) {
+  const amount = Number(value) || 0;
+  return amount.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function slugify(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function buildLiveProductUrl(product) {
+  const id = encodeURIComponent(product.id || "");
+  const slug = encodeURIComponent(slugify(product.name || ""));
+  return `${SITE_ORIGIN}/product.html?id=${id}&slug=${slug}`;
+}
+
+function getReorderUrl(product) {
+  return String(product.reorderUrl || product.orderUrl || product.supplierUrl || "").trim();
+}
+
+function getReorderCost(product) {
+  return Number(product.reorderCost ?? product.orderCost ?? product.supplierPrice ?? 0) || 0;
+}
+
+function renderReorderCell(product) {
+  const sitePrice = Number(product.price) || 0;
+  const reorderUrl = getReorderUrl(product);
+  const reorderCost = getReorderCost(product);
+  const difference = reorderCost > 0 ? sitePrice - reorderCost : 0;
+  const margin = sitePrice > 0 && reorderCost > 0 ? (difference / sitePrice) * 100 : 0;
+  const differenceColor = difference >= 0 ? "var(--accent)" : "var(--accent-red)";
+
+  return `
+    <div class="product-name-cell" style="gap:4px">
+      <span class="product-name" style="font-size:0.78rem">${reorderCost > 0 ? formatMoney(reorderCost) : "No cost set"}</span>
+      <span class="product-sku" style="color:${differenceColor}">
+        ${reorderCost > 0 ? `${difference >= 0 ? "+" : ""}${formatMoney(difference)} / ${margin.toFixed(1)}%` : "Add supplier price"}
+      </span>
+      <div class="action-btns" style="margin-top:4px">
+        <button class="btn-icon" onclick="openLiveProduct('${product.id}')" title="Open live product">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </button>
+        ${reorderUrl
+          ? `<button class="btn-icon" onclick="openReorderLink('${product.id}')" title="Open reorder link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+            </button>`
+          : `<button class="btn-icon" onclick="editProduct('${product.id}')" title="Add reorder link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>`}
+      </div>
+    </div>`;
+}
 
 // ================================
 // REALTIME PRODUCTS LISTENER
@@ -84,8 +166,8 @@ function renderProducts() {
   if (searchVal) {
     filtered = filtered.filter(
       (p) =>
-        p.name.toLowerCase().includes(searchVal) ||
-        p.sku.toLowerCase().includes(searchVal),
+        String(p.name || "").toLowerCase().includes(searchVal) ||
+        String(p.sku || "").toLowerCase().includes(searchVal),
     );
   }
 
@@ -93,7 +175,7 @@ function renderProducts() {
     if (currentSort === "price") return a.price - b.price;
     if (currentSort === "stock") return b.stock - a.stock;
     if (currentSort === "newest") return 0;
-    return a.name.localeCompare(b.name);
+    return String(a.name || "").localeCompare(String(b.name || ""));
   });
 
   const tbody = document.getElementById("productsBody");
@@ -114,7 +196,7 @@ function renderProducts() {
             <td>
                 <div class="product-img-cell">
                     ${product.image
-          ? `<img src="${product.image}" alt="${product.name}" class="product-thumb">`
+          ? `<img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" class="product-thumb">`
           : `<div class="product-thumb" style="display:flex;align-items:center;justify-content:center">
                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -127,18 +209,19 @@ function renderProducts() {
             </td>
             <td>
                 <div class="product-name-cell">
-                    <span class="product-name">${product.name}</span>
-                    ${product.colorway ? `<span class="product-sku">${product.colorway}</span>` : ""}
+                    <span class="product-name">${escapeHtml(product.name)}</span>
+                    ${product.colorway ? `<span class="product-sku">${escapeHtml(product.colorway)}</span>` : ""}
                 </div>
             </td>
-            <td><span class="product-sku">${product.sku}</span></td>
-            <td><strong>$${parseFloat(product.price).toFixed(2)}</strong></td>
+            <td><span class="product-sku">${escapeHtml(product.sku)}</span></td>
+            <td><strong>${formatMoney(product.price)}</strong></td>
+            <td>${renderReorderCell(product)}</td>
             <td>
-                <span style="color:${product.stock < 5 ? "var(--red)" : "var(--text-primary)"}">
+                <span style="color:${product.stock < 5 ? "var(--accent-red)" : "var(--text-primary)"}">
                     ${product.stock} units
                 </span>
             </td>
-            <td><span class="pill ${product.category === "Sneakers" ? "new" : "hot"}">${product.category}</span></td>
+            <td><span class="pill ${product.category === "Sneakers" ? "new" : "hot"}">${escapeHtml(product.category)}</span></td>
             <td>
                 <button class="pill ${product.status}" style="cursor:pointer;border:none"
                     onclick="toggleStatus('${product.id}', '${product.status}')">
@@ -153,7 +236,7 @@ function renderProducts() {
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                         </svg>
                     </button>
-                    <button class="btn-icon danger" onclick="deleteProduct('${product.id}', '${product.name.replace(/'/g, "\\'")}')" title="Delete">
+                    <button class="btn-icon danger" onclick="deleteProduct('${product.id}', '${escapeHtml(product.name).replace(/'/g, "\\'")}')" title="Delete">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"/>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
@@ -180,6 +263,25 @@ window.toggleStatus = async (id, currentStatus) => {
   }
 };
 
+window.openReorderLink = (id) => {
+  const product = allProducts.find((entry) => entry.id === id);
+  const reorderUrl = product ? getReorderUrl(product) : "";
+  if (!reorderUrl) {
+    showToast("Add a reorder link first", true);
+    return;
+  }
+  window.open(reorderUrl, "_blank", "noopener,noreferrer");
+};
+
+window.openLiveProduct = (id) => {
+  const product = allProducts.find((entry) => entry.id === id);
+  if (!product) {
+    showToast("Product not found", true);
+    return;
+  }
+  window.open(buildLiveProductUrl(product), "_blank", "noopener,noreferrer");
+};
+
 // ================================
 // EDIT PRODUCT
 // ================================
@@ -203,6 +305,9 @@ window.editProduct = async (id) => {
     document.getElementById("productColor").value = p.colorway || "";
     document.getElementById("productBrand").value = p.brand || "";
     document.getElementById("productFeatured").checked = !!p.featured;
+    document.getElementById("productReorderUrl").value = getReorderUrl(p);
+    document.getElementById("productReorderCost").value = getReorderCost(p) || "";
+    document.getElementById("productReorderNote").value = p.reorderNote || "";
     document.getElementById("imageUrl").value = p.image || "";
 
     if (p.image) {
@@ -298,6 +403,9 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
     colorway: document.getElementById("productColor").value || "",
     brand: document.getElementById("productBrand").value || "",
     featured: document.getElementById("productFeatured").checked,
+    reorderUrl: document.getElementById("productReorderUrl").value.trim() || "",
+    reorderCost: parseFloat(document.getElementById("productReorderCost").value) || 0,
+    reorderNote: document.getElementById("productReorderNote").value || "",
     image: imageUrl || "",
     updatedAt: new Date(),
   };
