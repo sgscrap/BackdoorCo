@@ -118,7 +118,7 @@
           <span class="live-dot"></span>
           <span>LIVE</span>
         </div>
-        <button class="icon-btn" id="searchToggle" aria-label="Toggle search bar">
+        <button class="icon-btn" id="searchToggle" aria-label="Focus product search">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -135,12 +135,12 @@
     </div>
 
     <!-- Search Bar -->
-    <div class="search-bar d-none" id="searchBar">
+    <div class="search-bar" id="searchBar">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8" />
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
-      <input type="text" id="searchInput" placeholder="Search products by name, SKU..." />
+      <input type="text" id="searchInput" placeholder="Search products by name, SKU, brand, colorway, or category..." />
     </div>
 
     <!-- Filter Bar -->
@@ -149,22 +149,45 @@
         <button class="filter-tab active" data-filter="all">All</button>
         <button class="filter-tab" data-filter="Sneakers">Sneakers</button>
         <button class="filter-tab" data-filter="Apparel">Apparel</button>
+        <button class="filter-tab" data-filter="needs-reorder">Needs Reorder Link</button>
+        <button class="filter-tab" data-filter="low-stock">Low Stock</button>
         <button class="filter-tab" data-filter="active">Active</button>
         <button class="filter-tab" data-filter="inactive">Inactive</button>
       </div>
       <div class="filter-right">
+        <select id="brandFilter" class="sort-select" aria-label="Filter by brand">
+          <option value="">All Brands</option>
+        </select>
         <select id="sortSelect" class="sort-select" aria-label="Sort products">
           <option value="name">Sort: Name</option>
           <option value="price">Sort: Price</option>
           <option value="stock">Sort: Stock</option>
+          <option value="margin">Sort: Margin</option>
           <option value="newest">Sort: Newest</option>
         </select>
       </div>
     </div>
 
+    <div class="product-discovery-summary" id="productSummary">
+      <span id="summaryCount">0 products</span>
+      <span id="summaryMissingReorder">0 need reorder links</span>
+      <span id="summaryLowStock">0 low stock</span>
+    </div>
+
     <!-- Products Table -->
     <div class="table-wrap">
       <table class="admin-table" id="productsTable">
+        <colgroup>
+          <col class="col-image" />
+          <col class="col-name" />
+          <col class="col-sku" />
+          <col class="col-price" />
+          <col class="col-reorder" />
+          <col class="col-stock" />
+          <col class="col-category" />
+          <col class="col-status" />
+          <col class="col-actions" />
+        </colgroup>
         <thead>
           <tr>
             <th>IMAGE</th>

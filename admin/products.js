@@ -89,6 +89,43 @@ function getReorderCost(product) {
   return Number(product.reorderCost ?? product.orderCost ?? product.supplierPrice ?? 0) || 0;
 }
 
+function getStock(product) {
+  if (Array.isArray(product.sizes) && product.sizes.length) {
+    return product.sizes.reduce((sum, entry) => sum + (Number(entry?.stock) || 0), 0);
+  }
+  return Number(product.stock) || 0;
+}
+
+function getProductTimestamp(product) {
+  const value = product.updatedAt || product.createdAt || 0;
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (Number.isFinite(value?.seconds)) return value.seconds * 1000;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function renderProductImage(product) {
+  const image = String(product.image || product.cardImage || "").trim();
+  const fallback = `
+    <div class="product-thumb product-thumb-fallback" ${image ? 'style="display:none"' : ""}>
+      ${escapeHtml(String(product.name || "?").trim().charAt(0).toUpperCase() || "?")}
+    </div>`;
+
+  if (!image) return fallback;
+
+  return `
+    <div class="product-img-cell">
+      <img
+        src="${escapeHtml(image)}"
+        alt="${escapeHtml(product.name)}"
+        class="product-thumb"
+        loading="lazy"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+      />
+      ${fallback}
+    </div>`;
+}
+
 function renderReorderCell(product) {
   const sitePrice = Number(product.price) || 0;
   const reorderUrl = getReorderUrl(product);
@@ -142,9 +179,24 @@ function initProducts() {
     });
 
     document.getElementById("productsBadge").textContent = allProducts.length;
+    populateBrandFilter();
 
     renderProducts();
   });
+}
+
+function populateBrandFilter() {
+  const select = document.getElementById("brandFilter");
+  if (!select) return;
+
+  const currentValue = select.value;
+  const brands = [...new Set(allProducts.map((product) => product.brand).filter(Boolean))]
+    .sort((a, b) => String(a).localeCompare(String(b)));
+
+  select.innerHTML = '<option value="">All Brands</option>' + brands
+    .map((brand) => `<option value="${escapeHtml(brand)}">${escapeHtml(brand)}</option>`)
+    .join("");
+  select.value = brands.includes(currentValue) ? currentValue : "";
 }
 
 // ================================
@@ -157,8 +209,17 @@ function renderProducts() {
     filtered = filtered.filter((p) => p.status === "active");
   } else if (currentFilter === "inactive") {
     filtered = filtered.filter((p) => p.status === "inactive");
+  } else if (currentFilter === "needs-reorder") {
+    filtered = filtered.filter((p) => !getReorderUrl(p));
+  } else if (currentFilter === "low-stock") {
+    filtered = filtered.filter((p) => getStock(p) < 6);
   } else if (currentFilter !== "all") {
     filtered = filtered.filter((p) => p.category === currentFilter);
+  }
+
+  const brandFilter = document.getElementById("brandFilter")?.value || "";
+  if (brandFilter) {
+    filtered = filtered.filter((p) => p.brand === brandFilter);
   }
 
   const searchVal =
@@ -167,16 +228,22 @@ function renderProducts() {
     filtered = filtered.filter(
       (p) =>
         String(p.name || "").toLowerCase().includes(searchVal) ||
-        String(p.sku || "").toLowerCase().includes(searchVal),
+        String(p.sku || "").toLowerCase().includes(searchVal) ||
+        String(p.brand || "").toLowerCase().includes(searchVal) ||
+        String(p.category || "").toLowerCase().includes(searchVal) ||
+        String(p.colorway || "").toLowerCase().includes(searchVal),
     );
   }
 
   filtered.sort((a, b) => {
-    if (currentSort === "price") return a.price - b.price;
-    if (currentSort === "stock") return b.stock - a.stock;
-    if (currentSort === "newest") return 0;
+    if (currentSort === "price") return (Number(a.price) || 0) - (Number(b.price) || 0);
+    if (currentSort === "stock") return getStock(b) - getStock(a);
+    if (currentSort === "margin") return ((Number(b.price) || 0) - getReorderCost(b)) - ((Number(a.price) || 0) - getReorderCost(a));
+    if (currentSort === "newest") return getProductTimestamp(b) - getProductTimestamp(a);
     return String(a.name || "").localeCompare(String(b.name || ""));
   });
+
+  updateProductSummary(filtered);
 
   const tbody = document.getElementById("productsBody");
   const emptyState = document.getElementById("emptyState");
@@ -194,31 +261,20 @@ function renderProducts() {
       (product) => `
         <tr data-id="${product.id}">
             <td>
-                <div class="product-img-cell">
-                    ${product.image
-          ? `<img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" class="product-thumb">`
-          : `<div class="product-thumb" style="display:flex;align-items:center;justify-content:center">
-                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                   <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                   <circle cx="8.5" cy="8.5" r="1.5"/>
-                                   <polyline points="21 15 16 10 5 21"/>
-                               </svg>
-                           </div>`
-        }
-                </div>
+                ${renderProductImage(product)}
             </td>
             <td>
                 <div class="product-name-cell">
                     <span class="product-name">${escapeHtml(product.name)}</span>
-                    ${product.colorway ? `<span class="product-sku">${escapeHtml(product.colorway)}</span>` : ""}
+                    <span class="product-sku">${escapeHtml(product.brand || "No brand")}${product.colorway ? ` · ${escapeHtml(product.colorway)}` : ""}</span>
                 </div>
             </td>
             <td><span class="product-sku">${escapeHtml(product.sku)}</span></td>
             <td><strong>${formatMoney(product.price)}</strong></td>
             <td>${renderReorderCell(product)}</td>
             <td>
-                <span style="color:${product.stock < 5 ? "var(--accent-red)" : "var(--text-primary)"}">
-                    ${product.stock} units
+                <span style="color:${getStock(product) < 5 ? "var(--accent-red)" : "var(--text-primary)"}">
+                    ${getStock(product)} units
                 </span>
             </td>
             <td><span class="pill ${product.category === "Sneakers" ? "new" : "hot"}">${escapeHtml(product.category)}</span></td>
@@ -248,6 +304,19 @@ function renderProducts() {
     `,
     )
     .join("");
+}
+
+function updateProductSummary(filtered) {
+  const total = allProducts.length;
+  const missingReorder = allProducts.filter((product) => !getReorderUrl(product)).length;
+  const lowStock = allProducts.filter((product) => getStock(product) < 6).length;
+
+  document.getElementById("summaryCount").textContent =
+    `${filtered.length} shown / ${total} total`;
+  document.getElementById("summaryMissingReorder").textContent =
+    `${missingReorder} need reorder links`;
+  document.getElementById("summaryLowStock").textContent =
+    `${lowStock} low stock`;
 }
 
 // ================================
@@ -461,15 +530,15 @@ document.getElementById("sortSelect").addEventListener("change", (e) => {
   renderProducts();
 });
 
+document.getElementById("brandFilter")?.addEventListener("change", renderProducts);
+
 // ================================
 // SEARCH
 // ================================
 document.getElementById("searchToggle").addEventListener("click", () => {
   const bar = document.getElementById("searchBar");
-  bar.style.display = bar.style.display === "none" ? "flex" : "none";
-  if (bar.style.display === "flex") {
-    document.getElementById("searchInput").focus();
-  }
+  bar?.classList.remove("d-none");
+  document.getElementById("searchInput")?.focus();
 });
 
 document
