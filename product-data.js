@@ -25,6 +25,7 @@ const SEEDED_PRODUCTS = [
         cardImage: buildImgurImageUrl('Bd6LKRo'),
         price: 625,
         retailPrice: 1250,
+        addedAt: '2026-05-07T15:20:00-04:00',
         brand: 'Dior',
         category: 'Sneakers',
         colorway: 'Beige/Brown/Orange/Gray',
@@ -59,6 +60,7 @@ const SEEDED_PRODUCTS = [
         cardImage: buildImgurImageUrl('zuylE1R'),
         price: 625,
         retailPrice: 1250,
+        addedAt: '2026-05-07T15:28:00-04:00',
         brand: 'Dior',
         category: 'Sneakers',
         colorway: 'White/Gray/Green',
@@ -415,6 +417,7 @@ const SEEDED_PRODUCTS = [
         cardImage: buildImgurImageUrl('GlgWRVT'),
         price: 249.99,
         retailPrice: 450,
+        addedAt: '2026-05-19T00:51:00-04:00',
         brand: 'LOEWE',
         category: 'Apparel',
         colorway: 'White',
@@ -446,6 +449,7 @@ const SEEDED_PRODUCTS = [
         cardImage: buildImgurImageUrl('ZtPjsgZ'),
         price: 249.99,
         retailPrice: 450,
+        addedAt: '2026-05-19T00:54:00-04:00',
         brand: 'LOEWE',
         category: 'Apparel',
         colorway: 'White',
@@ -1025,6 +1029,28 @@ function getProductMatchKey(product) {
     const sku = String(product?.sku || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     if (sku) return `sku:${sku}`;
     return `name:${slugify(product?.name || '')}`;
+}
+
+function parseTimestamp(value) {
+    if (!value) return 0;
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string') {
+        const parsed = Date.parse(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+    if (typeof value.toMillis === 'function') return value.toMillis();
+    if (Number.isFinite(value.seconds)) return value.seconds * 1000;
+    if (Number.isFinite(value._seconds)) return value._seconds * 1000;
+    return 0;
+}
+
+export function getProductSortTimestamp(product) {
+    return Math.max(
+        parseTimestamp(product?.addedAt),
+        parseTimestamp(product?.updatedAt),
+        parseTimestamp(product?.createdAt),
+        parseTimestamp(product?.releaseDate)
+    );
 }
 
 export function getSeededProducts() {

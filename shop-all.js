@@ -11,6 +11,7 @@ import {
 import {
     buildProductHref,
     getProductCardImage,
+    getProductSortTimestamp,
     mergeCatalogProducts
 } from './product-data.js';
 
@@ -177,11 +178,14 @@ function renderProducts() {
             );
             break;
         default: // newest
-            filtered.sort((a, b) =>
-                (b.createdAt?.seconds || 0) -
-                (a.createdAt?.seconds || 0)
-            );
+            filtered.sort((a, b) => {
+                const byDate = getProductSortTimestamp(b) - getProductSortTimestamp(a);
+                if (byDate !== 0) return byDate;
+                return String(a.name || '').localeCompare(String(b.name || ''));
+            });
     }
+
+    updateCollectionHeader(filtered);
 
     // Update results count
     if (resultsCount) {
@@ -323,10 +327,34 @@ function updateFilterCounts() {
 // UPDATE SUBTITLE
 // ================================
 function updateSubtitle() {
+    if (currentSort === 'newest' && currentFilter === 'all' && !searchTerm) {
+        return;
+    }
+
     const sub = document.getElementById('shopAllSubtitle');
     if (sub && allProducts.length > 0) {
         sub.textContent =
             `${allProducts.length} products available now.`;
+    }
+}
+
+function updateCollectionHeader(filteredProducts = []) {
+    const title = document.querySelector('.shop-hero-left h1');
+    const sub = document.getElementById('shopAllSubtitle');
+    if (!title || !sub) return;
+
+    if (currentSort === 'newest' && currentFilter === 'all' && !searchTerm) {
+        const latest = filteredProducts[0];
+        title.innerHTML = 'NEW <span class="green-text">DROPS</span>';
+        sub.textContent = latest
+            ? `Latest update: ${latest.name}. Showing ${filteredProducts.length} current products.`
+            : 'Latest products added to Backdoor.';
+        return;
+    }
+
+    title.innerHTML = 'ALL <span class="green-text">PRODUCTS</span>';
+    if (allProducts.length > 0) {
+        sub.textContent = `${allProducts.length} products available now.`;
     }
 }
 
