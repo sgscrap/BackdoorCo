@@ -408,6 +408,37 @@ const SEEDED_PRODUCTS = [
         createdAt: { seconds: 0 }
     },
     {
+        id: 'seed-loewe-logo-embroidered-cotton-jersey-tshirt',
+        name: 'LOEWE Logo-Embroidered Cotton-Jersey T-Shirt',
+        sku: 'LOEWE-LOGO-TEE-001',
+        slug: 'loewe-logo-embroidered-cotton-jersey-t-shirt',
+        cardImage: buildImgurImageUrl('GlgWRVT'),
+        price: 249.99,
+        retailPrice: 450,
+        brand: 'LOEWE',
+        category: 'Apparel',
+        colorway: 'White',
+        description: 'LOEWE logo-embroidered cotton-jersey T-shirt with a clean crewneck profile, short sleeves, and signature front logo detailing. A premium everyday tee built from soft cotton jersey.',
+        image: buildImgurImageUrl('GlgWRVT'),
+        images: [
+            buildImgurImageUrl('GlgWRVT'),
+            buildImgurImageUrl('zgnwMeg')
+        ],
+        imageFit: 'cover',
+        imagePosition: '50% 50%',
+        imageScale: 1.0,
+        sizes: ['S', 'M', 'L', 'XL'].map((size) => ({ size, stock: 1, price: 249.99 })),
+        releaseDate: 'TBD',
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
         id: 'seed-yeezy-slide-onyx',
         name: "adidas Yeezy Slide 'Onyx'",
         sku: 'HQ6448',

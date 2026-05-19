@@ -296,6 +296,9 @@ function updateFilterCounts() {
         Dior: allProducts.filter(
             p => p.brand === 'Dior'
         ).length,
+        LOEWE: allProducts.filter(
+            p => p.brand === 'LOEWE'
+        ).length,
         Nike: allProducts.filter(
             p => p.brand === 'Nike'
         ).length,
