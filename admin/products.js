@@ -81,6 +81,14 @@ function buildLiveProductUrl(product) {
   return `${SITE_ORIGIN}/product.html?id=${id}&slug=${slug}`;
 }
 
+function resolveProductImageUrl(value) {
+  const image = String(value || "").trim();
+  if (!image) return "";
+  if (/^(https?:|data:|blob:)/i.test(image)) return image;
+  if (image.startsWith("/")) return `${SITE_ORIGIN}${image}`;
+  return `${SITE_ORIGIN}/${image.replace(/^\.?\//, "")}`;
+}
+
 function getReorderUrl(product) {
   return String(product.reorderUrl || product.orderUrl || product.supplierUrl || "").trim();
 }
@@ -105,7 +113,7 @@ function getProductTimestamp(product) {
 }
 
 function renderProductImage(product) {
-  const image = String(product.image || product.cardImage || "").trim();
+  const image = resolveProductImageUrl(product.image || product.cardImage);
   const fallback = `
     <div class="product-thumb product-thumb-fallback" ${image ? 'style="display:none"' : ""}>
       ${escapeHtml(String(product.name || "?").trim().charAt(0).toUpperCase() || "?")}

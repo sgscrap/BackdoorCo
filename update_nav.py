@@ -23,6 +23,7 @@ NAV_TEMPLATE = """<nav class="navbar" id="navbar">
             </div>
         </div>
         <a class="nav-link {drops_active}" href="shop-all.html?sort=newest">New Drops</a>
+        <a class="nav-link {reviews_active}" href="reviews.html">Reviews</a>
         <a class="nav-link {about_active}" href="about.html">About</a>
     </div>
     <div class="nav-right">
@@ -59,6 +60,7 @@ NAV_TEMPLATE = """<nav class="navbar" id="navbar">
     <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
     <p class="nav-mobile-section">Explore</p>
     <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
+    <a class="nav-link" href="reviews.html">Reviews</a>
     <a class="nav-link" href="about.html">About</a>
 </div>"""
 
@@ -89,6 +91,7 @@ def update_file(filepath):
     shop_active = "active" if filename == "shop-all.html" else ""
     brands_active = ""
     drops_active = ""
+    reviews_active = "active" if filename == "reviews.html" else ""
     about_active = "active" if filename == "about.html" else ""
     
     # Format template
@@ -96,6 +99,7 @@ def update_file(filepath):
         shop_active=shop_active,
         brands_active=brands_active,
         drops_active=drops_active,
+        reviews_active=reviews_active,
         about_active=about_active
     )
     
