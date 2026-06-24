@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <title>Social Desk | Backdoor Admin</title>
+  <link rel="stylesheet" href="admin.css?v=2.2" />
+  <link rel="stylesheet" href="social.css?v=1.0" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body class="admin-body social-admin-body">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="sidebar-logo-text">B</span>
+      <span class="sidebar-brand">BACKDOOR</span>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="userAvatar">A</div>
+      <div class="user-info">
+        <span class="user-name" id="userName">Admin</span>
+        <span class="user-role">Super Admin</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-label">MAIN</p>
+      <a href="dashboard.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+        </svg>
+        Dashboard
+      </a>
+      <a href="orders.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+        Orders
+        <span class="nav-badge" id="ordersBadge">0</span>
+      </a>
+      <a href="products.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+        </svg>
+        Products
+        <span class="nav-badge" id="productsBadge">0</span>
+      </a>
+      <a href="customers.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        Customers
+      </a>
+      <a href="offers.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+          <line x1="7" y1="7" x2="7.01" y2="7" />
+        </svg>
+        Offers
+        <span class="nav-badge" id="offersBadge">0</span>
+      </a>
+      <a href="reviews.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+        Reviews
+      </a>
+
+      <p class="nav-label">TOOLS</p>
+      <a href="social.html" class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="M21 15l-5-5L5 21" />
+        </svg>
+        Social Desk
+      </a>
+      <a href="analytics.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="18" y1="20" x2="18" y2="10" />
+          <line x1="12" y1="20" x2="12" y2="4" />
+          <line x1="6" y1="20" x2="6" y2="14" />
+        </svg>
+        Analytics
+      </a>
+      <a href="settings.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+        </svg>
+        Settings
+      </a>
+    </nav>
+
+    <button class="logout-btn" id="logoutBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" y1="12" x2="9" y2="12" />
+      </svg>
+      Logout
+    </button>
+  </aside>
+
+  <main class="admin-main social-main">
+    <div class="admin-topbar social-topbar">
+      <div class="topbar-left">
+        <h1 class="page-title">SOCIAL DESK</h1>
+        <p class="page-subtitle">Build product drop assets and captions.</p>
+      </div>
+      <div class="topbar-right">
+        <div class="live-indicator" id="liveIndicator">
+          <span class="live-dot"></span>
+          <span>LIVE</span>
+        </div>
+        <button class="add-btn" id="downloadBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Export PNG
+        </button>
+      </div>
+    </div>
+
+    <section class="asset-desk">
+      <aside class="asset-controls" aria-label="Social asset controls">
+        <div class="ctrl-section">
+          <div class="ctrl-heading">
+            <h2>Quick Presets</h2>
+          </div>
+          <div class="preset-grid">
+            <button type="button" class="preset-btn active" data-preset="drop">Product Drop</button>
+            <button type="button" class="preset-btn" data-preset="story">Story Drop</button>
+            <button type="button" class="preset-btn" data-preset="sale">Sale Push</button>
+            <button type="button" class="preset-btn" data-preset="restock">Restock Alert</button>
+            <button type="button" class="preset-btn" data-preset="collage">Top 4 Grid</button>
+          </div>
+        </div>
+
+        <div class="ctrl-section">
+          <div class="ctrl-heading">
+            <h2>Product Source</h2>
+            <span id="productCountLabel">Loading</span>
+          </div>
+          <div class="form-group">
+            <label for="productSearch">Search Catalog</label>
+            <input type="search" id="productSearch" placeholder="Search product, brand, SKU..." autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label for="productSelect">Selected Product</label>
+            <select id="productSelect"></select>
+          </div>
+          <div class="product-snapshot" id="productSnapshot"></div>
+        </div>
+
+        <div class="ctrl-section">
+          <div class="ctrl-heading">
+            <h2>Format</h2>
+          </div>
+          <div class="segmented" id="ratioGroup" role="group" aria-label="Asset ratio">
+            <button type="button" class="segment active" data-ratio="1-1">Square</button>
+            <button type="button" class="segment" data-ratio="9-16">Story</button>
+            <button type="button" class="segment" data-ratio="16-9">Wide</button>
+          </div>
+          <div class="form-row compact">
+            <div class="form-group">
+              <label for="templateSelect">Template</label>
+              <select id="templateSelect">
+                <option value="drop">Product Drop</option>
+                <option value="story">Story Drop</option>
+                <option value="sale">Sale Push</option>
+                <option value="restock">Restock Alert</option>
+                <option value="collage">Top 4 Grid</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="themeSelect">Theme</label>
+              <select id="themeSelect">
+                <option value="backdoor">Backdoor Black</option>
+                <option value="mono">Luxury Mono</option>
+                <option value="white">White Studio</option>
+                <option value="volt">Volt Drop</option>
+                <option value="red">Sale Red</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctrl-section">
+          <div class="ctrl-heading">
+            <h2>Copy</h2>
+          </div>
+          <div class="form-group">
+            <label for="kickerInput">Kicker</label>
+            <input type="text" id="kickerInput" value="NEW DROP" />
+          </div>
+          <div class="form-group">
+            <label for="headlineInput">Headline</label>
+            <input type="text" id="headlineInput" />
+          </div>
+          <div class="form-group">
+            <label for="bodyInput">Body</label>
+            <textarea id="bodyInput" rows="3"></textarea>
+          </div>
+          <div class="form-row compact">
+            <div class="form-group">
+              <label for="badgeInput">Badge</label>
+              <input type="text" id="badgeInput" value="AVAILABLE NOW" />
+            </div>
+            <div class="form-group">
+              <label for="ctaInput">CTA</label>
+              <input type="text" id="ctaInput" value="SHOP BACKDOOR" />
+            </div>
+          </div>
+          <div class="form-row compact">
+            <div class="form-group">
+              <label for="handleInput">Handle</label>
+              <input type="text" id="handleInput" value="@backdoorco" />
+            </div>
+            <div class="form-group">
+              <label for="promoInput">Promo Code</label>
+              <input type="text" id="promoInput" placeholder="Optional" />
+            </div>
+          </div>
+        </div>
+
+        <div class="ctrl-section">
+          <div class="ctrl-heading">
+            <h2>Media</h2>
+          </div>
+          <div class="toggle-row">
+            <label><input type="checkbox" id="priceToggle" checked /> Show price</label>
+            <label><input type="checkbox" id="sizesToggle" checked /> Show sizes</label>
+          </div>
+          <div class="form-group">
+            <label for="imageUrlInput">Image URL Override</label>
+            <input type="url" id="imageUrlInput" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label for="imageUploadInput">Upload Image</label>
+            <input type="file" id="imageUploadInput" accept="image/*" />
+          </div>
+        </div>
+
+        <div class="ctrl-section">
+          <div class="ctrl-heading">
+            <h2>Caption</h2>
+          </div>
+          <textarea id="captionOutput" class="caption-output" readonly rows="8"></textarea>
+          <button type="button" class="copy-caption-btn" id="copyCaptionBtn">Copy Caption</button>
+        </div>
+      </aside>
+
+      <section class="asset-stage" aria-label="Social asset preview">
+        <div class="stage-toolbar">
+          <div>
+            <span id="stageTitle">Product Drop</span>
+            <small id="resolutionLabel">1080 x 1080</small>
+          </div>
+          <a id="openProductLink" class="stage-link" href="../shop-all.html" target="_blank" rel="noopener">Open Product</a>
+        </div>
+        <div class="canvas-viewport" id="canvasViewport">
+          <div class="canvas-scale-shell" id="canvasScaleShell">
+            <div id="assetCanvas" class="asset-canvas ratio-1-1 theme-backdoor">
+              <div class="canvas-grain"></div>
+              <div id="assetTemplateRoot"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="social.js?v=1.0"></script>
+</body>
+
+</html>
