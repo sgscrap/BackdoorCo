@@ -22,13 +22,9 @@ const SITE_ORIGIN = window.location.origin || "https://backdoorco.xyz";
 // AUTH GUARD
 // ================================
 onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    window.location.href = "index.html";
-    return;
-  }
-  document.getElementById("userName").textContent = user.email.split("@")[0];
+  document.getElementById("userName").textContent = user?.email?.split("@")[0] || "Admin";
   document.getElementById("userAvatar").textContent =
-    user.email[0].toUpperCase();
+    user?.email?.[0]?.toUpperCase() || "A";
 
   initProducts();
 });
@@ -90,11 +86,11 @@ function resolveProductImageUrl(value) {
 }
 
 function getReorderUrl(product) {
-  return String(product.reorderUrl || product.orderUrl || product.supplierUrl || "").trim();
+  return String(product.purchaseUrl || product.reorderUrl || product.orderUrl || product.supplierUrl || "").trim();
 }
 
 function getReorderCost(product) {
-  return Number(product.reorderCost ?? product.orderCost ?? product.supplierPrice ?? 0) || 0;
+  return Number(product.purchaseCost ?? product.reorderCost ?? product.orderCost ?? product.supplierPrice ?? 0) || 0;
 }
 
 function getStock(product) {
@@ -126,6 +122,7 @@ function renderProductImage(product) {
       <img
         src="${escapeHtml(image)}"
         alt="${escapeHtml(product.name)}"
+        referrerpolicy="no-referrer"
         class="product-thumb"
         loading="lazy"
         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
@@ -387,6 +384,23 @@ window.editProduct = async (id) => {
     document.getElementById("productReorderNote").value = p.reorderNote || "";
     document.getElementById("imageUrl").value = p.image || "";
 
+    // Load image display settings
+    const fitToggle = document.getElementById('imageFitToggle');
+    const fitLabel = document.getElementById('imageFitLabel');
+    fitToggle.checked = (p.imageFit === 'cover');
+    fitLabel.textContent = fitToggle.checked ? 'Cover' : 'Contain';
+    document.getElementById('imagePosX').value = Number.isFinite(p.imageOffsetX) ? p.imageOffsetX : 50;
+    document.getElementById('imagePosY').value = Number.isFinite(p.imageOffsetY) ? p.imageOffsetY : 50;
+    document.getElementById('posXVal').textContent = (Number.isFinite(p.imageOffsetX) ? p.imageOffsetX : 50) + '%';
+    document.getElementById('posYVal').textContent = (Number.isFinite(p.imageOffsetY) ? p.imageOffsetY : 50) + '%';
+    const scale = Number.isFinite(p.imageScale) ? p.imageScale : 1;
+    document.getElementById('imageScaleSlider').value = Math.round(scale * 100);
+    document.getElementById('scaleVal').textContent = scale.toFixed(2);
+    document.getElementById('imagePaddingInput').value = parseInt(p.imagePadding) || 4;
+    document.getElementById('imageAspectRatio').value = typeof p.imageAspect === 'string' ? p.imageAspect : '';
+
+    updateImageDisplayPreview(p.image || '');
+
     if (p.image) {
       document.getElementById("imagePreview").innerHTML =
         `<img src="${p.image}" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
@@ -484,6 +498,12 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
     reorderCost: parseFloat(document.getElementById("productReorderCost").value) || 0,
     reorderNote: document.getElementById("productReorderNote").value || "",
     image: imageUrl || "",
+    imageFit: document.getElementById('imageFitToggle').checked ? 'cover' : 'contain',
+    imageOffsetX: parseInt(document.getElementById('imagePosX').value) || 50,
+    imageOffsetY: parseInt(document.getElementById('imagePosY').value) || 50,
+    imageScale: (parseInt(document.getElementById('imageScaleSlider').value) || 100) / 100,
+    imagePadding: (() => { const pv = parseInt(document.getElementById('imagePaddingInput').value); return isNaN(pv) ? 4 : pv; })(),
+    imageAspect: document.getElementById('imageAspectRatio')?.value || '',
     updatedAt: new Date(),
   };
 
@@ -645,10 +665,11 @@ function initImageUI() {
       const url = e.target.value.trim();
       if (url) {
         urlPreviewImg.src = url;
-        urlPreviewImg.onload = () => { urlPreview.classList.remove("hidden"); };
+        urlPreviewImg.onload = () => { urlPreview.classList.remove("hidden"); updateImageDisplayPreview(url); };
         urlPreviewImg.onerror = () => { urlPreview.classList.add("hidden"); };
       } else {
         urlPreview.classList.add("hidden");
+        updateImageDisplayPreview('');
       }
     }, 500);
   });
@@ -671,8 +692,59 @@ function handleFilePreview(file) {
     currentPreviewDataUrl = ev.target.result;
     croppedBlob = null;
     cropStatus.textContent = '';
+    updateImageDisplayPreview(ev.target.result);
   };
   reader.readAsDataURL(file);
+}
+
+// ── Image Display Preview (live crop/position/scale) ──
+function updateImageDisplayPreview(src) {
+  const section = document.getElementById('imageDisplaySection');
+  const preview = document.getElementById('imgDisplayPreview');
+  const hint = document.getElementById('imgDisplayHint');
+  const card = document.getElementById('imgDisplayCard');
+  const fitToggle = document.getElementById('imageFitToggle');
+  const posX = document.getElementById('imagePosX');
+  const posY = document.getElementById('imagePosY');
+  const scaleSlider = document.getElementById('imageScaleSlider');
+  const padInput = document.getElementById('imagePaddingInput');
+  const aspectRatio = document.getElementById('imageAspectRatio');
+
+  if (!src) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+  hint.style.display = 'none';
+  preview.src = src;
+
+  // Aspect ratio map (constant)
+  const aspectMap = { square: '1/1', portrait: '3/4', landscape: '4/3', wide: '16/9' };
+
+  function apply() {
+    const fit = fitToggle.checked ? 'cover' : 'contain';
+    card.classList.toggle('cover-fit', fitToggle.checked);
+    preview.style.objectFit = fit;
+    preview.style.objectPosition = posX.value + '% ' + posY.value + '%';
+    preview.style.transform = 'scale(' + ((parseInt(scaleSlider.value) || 100) / 100) + ')';
+    preview.style.padding = (parseInt(padInput.value) || 0) + 'px';
+    document.getElementById('posXVal').textContent = posX.value + '%';
+    document.getElementById('posYVal').textContent = posY.value + '%';
+    document.getElementById('scaleVal').textContent = ((parseInt(scaleSlider.value) || 100) / 100).toFixed(2);
+    document.getElementById('imageFitLabel').textContent = fitToggle.checked ? 'Cover' : 'Contain';
+
+    // Apply aspect ratio to preview card
+    const aspect = aspectRatio?.value || '';
+    card.style.aspectRatio = aspectMap[aspect] || 'auto';
+  }
+
+  fitToggle.onchange = apply;
+  posX.oninput = apply;
+  posY.oninput = apply;
+  scaleSlider.oninput = apply;
+  padInput.oninput = apply;
+  if (aspectRatio) aspectRatio.onchange = apply;
+  apply();
 }
 
 function parseAspect(value) {
@@ -781,6 +853,23 @@ function closeModal() {
     .forEach((c) => c.classList.remove("active"));
   document.querySelector('[data-tab="upload"]').classList.add("active");
   document.getElementById("uploadTab").classList.add("active");
+
+  // Reset image display section
+  document.getElementById('imageDisplaySection').style.display = 'none';
+  document.getElementById('imgDisplayPreview').src = '';
+  document.getElementById('imgDisplayHint').style.display = '';
+  document.getElementById('imageFitToggle').checked = false;
+  document.getElementById('imagePosX').value = 50;
+  document.getElementById('imagePosY').value = 50;
+  document.getElementById('imageScaleSlider').value = 100;
+  document.getElementById('imagePaddingInput').value = 4;
+  document.getElementById('posXVal').textContent = '50%';
+  document.getElementById('posYVal').textContent = '50%';
+  document.getElementById('scaleVal').textContent = '1.00';
+  document.getElementById('imageFitLabel').textContent = 'Contain';
+  const aspectSelect = document.getElementById('imageAspectRatio');
+  if (aspectSelect) aspectSelect.value = '';
+
   editingId = null;
 }
 
@@ -793,6 +882,7 @@ document.getElementById("addProductBtn").addEventListener("click", () => {
   editingId = null;
   document.getElementById("modalTitle").textContent = "Add Product";
   document.getElementById("productForm").reset();
+  document.getElementById('imageDisplaySection').style.display = 'none';
   openModal();
 });
 

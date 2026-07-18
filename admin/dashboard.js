@@ -3,9 +3,8 @@ import { collection, onSnapshot, query, orderBy, getDocs } from 'https://www.gst
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 onAuthStateChanged(auth, user => {
-    if (!user) { window.location.href = 'index.html'; return; }
-    document.getElementById('userName').textContent = user.email.split('@')[0];
-    document.getElementById('userAvatar').textContent = user.email[0].toUpperCase();
+    document.getElementById('userName').textContent = user?.email?.split('@')[0] || 'Admin';
+    document.getElementById('userAvatar').textContent = user?.email?.[0]?.toUpperCase() || 'A';
     initDashboard();
 });
 
@@ -23,6 +22,7 @@ function initDashboard() {
         // Inventory spotlight: top 3 low-stock items
         const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderInventorySpotlight(products);
+        renderImageRatioSummary(products);
     });
 
     // ── ORDERS ──
@@ -92,6 +92,66 @@ function renderInventorySpotlight(products) {
                 </div>
                 <span class="spotlight-stock ${isLow ? 'low' : ''}">${stock} left</span>
             </div>`;
+    }).join('');
+}
+
+// ============================================
+// IMAGE RATIO SUMMARY
+// ============================================
+function renderImageRatioSummary(products) {
+    const el = document.getElementById('imageRatioSummary');
+    if (!el) return;
+
+    const RATIO_LABELS = {
+        '': 'Auto (natural)',
+        'square': '1:1 Square',
+        'portrait': '3:4 Portrait',
+        'landscape': '4:3 Landscape',
+        'wide': '16:9 Widescreen'
+    };
+
+    const RATIO_ICONS = {
+        '': '⬜',
+        'square': '🟩',
+        'portrait': '🟦',
+        'landscape': '🟨',
+        'wide': '🟪'
+    };
+
+    // Count products per ratio
+    const counts = {};
+    products.forEach(p => {
+        const aspect = typeof p.imageAspect === 'string' && p.imageAspect ? p.imageAspect : '';
+        counts[aspect] = (counts[aspect] || 0) + 1;
+    });
+
+    const entries = Object.entries(RATIO_LABELS).map(([key, label]) => ({
+        key,
+        label,
+        count: counts[key] || 0,
+        icon: RATIO_ICONS[key] || '⬜'
+    })).sort((a, b) => b.count - a.count);
+
+    if (products.length === 0) {
+        el.innerHTML = '<p style="color:var(--text-muted);padding:12px 0;font-size:0.82rem;">No products yet.</p>';
+        return;
+    }
+
+    el.innerHTML = entries.map(e => {
+        const pct = products.length > 0 ? Math.round((e.count / products.length) * 100) : 0;
+        const barWidth = Math.max(2, pct);
+        return `
+            <div class="ratio-summary-item">
+                <span class="ratio-summary-icon">${e.icon}</span>
+                <div class="ratio-summary-info">
+                    <span class="ratio-summary-label">${e.label}</span>
+                    <div class="ratio-summary-bar-track">
+                        <div class="ratio-summary-bar" style="width:${barWidth}%"></div>
+                    </div>
+                </div>
+                <span class="ratio-summary-count">${e.count}</span>
+            </div>
+        `;
     }).join('');
 }
 

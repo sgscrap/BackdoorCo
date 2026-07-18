@@ -16,7 +16,7 @@ function buildImgurImageUrl(id, extension = 'jpg') {
 const DEFAULT_ADULT_SIZE_OPTIONS = ['US 7', 'US 7.5', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 10.5', 'US 11', 'US 11.5', 'US 12', 'US 13', 'US 14', 'US 15'];
 const DEFAULT_EU_SIZE_OPTIONS = ['EU 38', 'EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45', 'EU 46'];
 
-const SEEDED_PRODUCTS = [
+export const SEEDED_PRODUCTS = [
     {
         id: 'seed-nigel-sylvester-air-jordan-4-retro-og-sail',
         name: "Nigel Sylvester x Air Jordan 4 Retro OG 'Sail'",
@@ -547,6 +547,116 @@ const SEEDED_PRODUCTS = [
         createdAt: { seconds: 0 }
     },
     {
+        id: 'seed-burberry-logo-embroidered-tshirt-beige',
+        name: "Burberry Logo-Embroidered T-Shirt 'Beige'",
+        sku: 'KW2664',
+        slug: 'burberry-logo-embroidered-t-shirt-beige',
+        cardImage: buildImgurImageUrl('sEBwTSp', 'jpeg'),
+        price: 300,
+        addedAt: '2026-06-30T04:30:00-04:00',
+        brand: 'Burberry',
+        category: 'Apparel',
+        colorway: 'Beige/Blue',
+        description: 'Burberry logo-embroidered cotton T-shirt in beige with blue cord embroidery. A clean short-sleeve crewneck profile with premium everyday styling.',
+        image: buildImgurImageUrl('sEBwTSp', 'jpeg'),
+        images: [
+            buildImgurImageUrl('sEBwTSp', 'jpeg'),
+            buildImgurImageUrl('VvcLvzZ', 'jpeg'),
+            buildImgurImageUrl('bSEMN1X', 'jpeg'),
+            buildImgurImageUrl('bhLlBdF', 'jpeg'),
+            buildImgurImageUrl('pHWUsJi', 'jpeg'),
+            buildImgurImageUrl('rU9xb0C', 'jpeg')
+        ],
+        imageFit: 'cover',
+        imagePosition: '50% 50%',
+        imageScale: 1.0,
+        stock: 4,
+        sizes: ['S', 'M', 'L', 'XL'].map((size) => ({ size, stock: 1, price: 300 })),
+        releaseDate: 'TBD',
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
+        id: 'seed-moncler-logo-patch-cargo-shorts-black',
+        name: 'Moncler Logo-Patch Cargo Shorts',
+        sku: 'KW2673',
+        slug: 'moncler-logo-patch-cargo-shorts-black',
+        cardImage: buildImgurImageUrl('fnNx2eq', 'png'),
+        price: 350,
+        addedAt: '2026-06-30T12:20:00-04:00',
+        brand: 'Moncler',
+        category: 'Apparel',
+        colorway: 'Black',
+        description: 'Moncler logo-patch cargo shorts in black with a utility pocket layout, relaxed casual profile, and signature logo patch detailing.',
+        image: buildImgurImageUrl('fnNx2eq', 'png'),
+        images: [
+            buildImgurImageUrl('fnNx2eq', 'png'),
+            buildImgurImageUrl('5uTrLDt', 'png'),
+            buildImgurImageUrl('SjBAfvc', 'png'),
+            buildImgurImageUrl('IEFBf8Y', 'png'),
+            buildImgurImageUrl('5iZTCId', 'png'),
+            buildImgurImageUrl('PGvS3Mf', 'jpeg'),
+            buildImgurImageUrl('Z1Ea3sH', 'jpeg'),
+            buildImgurImageUrl('P0ipzDF', 'jpeg'),
+            buildImgurImageUrl('IDPOPNT', 'jpeg')
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 50%',
+        imageScale: 1.0,
+        imagePadding: '10px',
+        stock: 3,
+        sizes: ['IT 48', 'IT 50', 'IT 52'].map((size) => ({ size, stock: 1, price: 350 })),
+        releaseDate: 'TBD',
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
+        id: 'seed-fendi-teddy-bear-plush-toy-tshirt-white',
+        name: "Fendi Teddy Bear Plush Toy T-Shirt 'White'",
+        sku: 'KW2672',
+        slug: 'fendi-teddy-bear-plush-toy-t-shirt-white',
+        cardImage: buildImgurImageUrl('0R0mmrx', 'png'),
+        price: 400,
+        addedAt: '2026-06-30T12:35:00-04:00',
+        brand: 'Fendi',
+        category: 'Apparel',
+        colorway: 'White/Multicolor',
+        description: 'Regular-fit short-sleeved crewneck Fendi T-shirt in white cotton with a multicolor teddy bear plush toy maxi print on the chest. Part of the Silvia and The Baguette capsule collection designed in collaboration with Japanese artist TAROUT. Made in Italy from 100% cotton.',
+        image: buildImgurImageUrl('0R0mmrx', 'png'),
+        images: [
+            buildImgurImageUrl('0R0mmrx', 'png'),
+            buildImgurImageUrl('jSrif7J', 'png'),
+            buildImgurImageUrl('ZM04Xdh', 'png')
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 50%',
+        imageScale: 1.0,
+        imagePadding: '10px',
+        stock: 4,
+        sizes: ['S', 'M', 'L', 'XL'].map((size) => ({ size, stock: 1, price: 400 })),
+        releaseDate: 'TBD',
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        isFeatured: false,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
+    {
         id: 'seed-yeezy-slide-onyx',
         name: "adidas Yeezy Slide 'Onyx'",
         sku: 'HQ6448',
@@ -799,6 +909,7 @@ const SEEDED_PRODUCTS = [
         createdAt: { seconds: 0 }
     }
 ];
+
 
 const IMGUR_SIZE_SUFFIXES = new Set(['s', 'b', 't', 'm', 'l', 'h']);
 
@@ -1077,12 +1188,47 @@ export function getProductCardImageScale(product) {
 }
 
 export function getProductCardImagePadding(product) {
+    const explicit = String(product?.imagePadding || '').trim();
+    if (/^\d{1,2}(?:\.\d+)?(?:px|%)$/.test(explicit)) return explicit;
+    const numericPadding = Number(product?.imagePadding);
+    if (Number.isFinite(numericPadding)) return `${clamp(numericPadding, 0, 40)}px`;
     if (String(product?.imageFit || '').toLowerCase() === 'cover') return '0';
     if (matchesBlackCat(product)) return '2px';
     if (matchesKidsTravisBlackPhantom(product)) return '2px';
     if (matchesVelvetBrown(product)) return '2px';
     return isFootwearProduct(product) ? '4px' : '0';
 }
+
+export function getProductCardImageStyle(product) {
+    const scale = getProductCardImageScale(product);
+    const hoverScale = Math.min(1.5, Number((scale + 0.04).toFixed(2)));
+
+    return [
+        `object-fit: ${getProductImageFit(product)}`,
+        `object-position: ${getProductImagePosition(product)}`,
+        `padding: ${getProductCardImagePadding(product)}`,
+        'box-sizing: border-box',
+        `--product-image-scale: ${scale}`,
+        `--product-image-hover-scale: ${hoverScale}`
+    ].join('; ');
+}
+
+export function getProductCardClass(product) {
+    const fit = getProductImageFit(product);
+    const classes = [];
+    if (fit === 'contain' && !isFootwearProduct(product)) classes.push(' shop-card--contain-image');
+    // Add aspect ratio class
+    const aspect = getProductAspectRatio(product);
+    if (aspect) classes.push(` shop-card--aspect-${aspect}`);
+    return classes.join('');
+}
+
+export function getProductAspectRatio(product) {
+    const value = String(product?.imageAspect || '').trim().toLowerCase();
+    return VALID_ASPECT_RATIOS.has(value) ? value : '';
+}
+
+const VALID_ASPECT_RATIOS = new Set(['square', 'portrait', 'landscape', 'wide']);
 
 function slugify(value) {
     return String(value || '')

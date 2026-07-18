@@ -264,6 +264,34 @@
     transition: transform 0.4s ease;
 }
 
+.shop-card--contain-image .shop-card-img img {
+    object-fit: contain;
+    padding: 10px;
+    box-sizing: border-box;
+    background: #1a1a1a;
+}
+
+/* Aspect ratio presets for shop card image containers */
+.shop-card--aspect-square .shop-card-img {
+    aspect-ratio: 1 / 1;
+    height: auto;
+}
+
+.shop-card--aspect-portrait .shop-card-img {
+    aspect-ratio: 3 / 4;
+    height: auto;
+}
+
+.shop-card--aspect-landscape .shop-card-img {
+    aspect-ratio: 4 / 3;
+    height: auto;
+}
+
+.shop-card--aspect-wide .shop-card-img {
+    aspect-ratio: 16 / 9;
+    height: auto;
+}
+
 .shop-card:hover .shop-card-img img {
     transform: scale(var(--product-image-hover-scale, 1.04));
 }
@@ -349,7 +377,18 @@
     font-size: 0.62rem;
     letter-spacing: 0.1em;
     color: rgba(255, 255, 255, 0.2);
+    margin-bottom: 5px;
+}
+
+.shop-card-sizes {
+    min-height: 1.1rem;
     margin-bottom: 10px;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.38);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .shop-card-bottom {
