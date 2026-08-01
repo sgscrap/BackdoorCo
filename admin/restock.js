@@ -462,8 +462,17 @@ async function lookupRetailPriceRestock(btn) {
     const res = await fetch('/.netlify/functions/price-monitor-retail?url=' + encodeURIComponent(url));
     const data = await res.json().catch(function () { return {}; });
     if (!res.ok || !data.ok) {
-      const msg = (data && data.error) || ('HTTP ' + res.status);
-      if (typeof showToast === 'function') showToast('Lookup failed: ' + msg);
+      // Distinguish a NOT-DEPLOYED function from a real function failure.
+      // A missing function makes Netlify return its HTML "Page not found"
+      // (HTTP 404, body is NOT JSON, so data is {}), while a deployed
+      // function always answers JSON - even its errors carry data.error.
+      const deployedFunction = data && (typeof data.ok === 'boolean' || data.error);
+      if (!deployedFunction && res.status === 404) {
+        if (typeof showToast === 'function') showToast('Price monitor not deployed yet - Netlify builds paused.', true);
+      } else {
+        const msg = (data && data.error) || ('HTTP ' + res.status);
+        if (typeof showToast === 'function') showToast('Lookup failed: ' + msg, true);
+      }
       setBusyRestock(btn, false, 'Lookup price'); return;
     }
     const priceField = document.getElementById('targetPriceInput');
