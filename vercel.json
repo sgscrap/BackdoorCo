@@ -17,6 +17,10 @@
     {
       "source": "/__/auth/(.*)",
       "destination": "https://coalition-aec44.firebaseapp.com/__/auth/$1"
+    },
+    {
+      "source": "/.netlify/functions/(.*)",
+      "destination": "https://backdoorco2.netlify.app/.netlify/functions/$1"
     }
   ]
 }
