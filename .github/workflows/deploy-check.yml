@@ -1,0 +1,211 @@
+# ─────────────────────────────────────────────────────────────
+# PR Deploy Check — verifies every pull request before it can
+# merge, so a bad push never breaks production on Vercel or
+# Netlify (both auto-deploy from main).
+#
+# Jobs:
+#   integrity            Always runs. Zero secrets needed. Validates
+#                        every page's mobile menu, internal links,
+#                        CSS/JS assets, and images.
+#   vercel-deploy-check  Always runs. If VERCEL secrets are configured,
+#                        pulls project settings, runs the real build,
+#                        and deploys a PREVIEW (never production).
+#                        Otherwise it reports "skipped" and passes.
+#   netlify-deploy-check Always runs. If NETLIFY secrets are configured,
+#                        creates a DRAFT deploy (never --prod).
+#                        Otherwise it reports "skipped" and passes.
+#
+# NOTE: deploy jobs are STEP-guarded (not job-level if:), so they
+# always complete with a status. If you later add these to branch
+# protection as required checks, unconfigured secrets won't leave
+# PRs stuck "pending" — the jobs complete either way. For the
+# strictest gate, require `integrity` (always enforced) plus the
+# two deploy checks once all five secrets exist.
+#
+# Required secrets (set in GitHub → Settings → Secrets and
+# variables → Actions):
+#   VERCEL_TOKEN         Personal/org access token (vercel.com/account/tokens)
+#   VERCEL_ORG_ID        From `.vercel/project.json` (orgId)
+#   VERCEL_PROJECT_ID    From `.vercel/project.json` (projectId)
+#   NETLIFY_AUTH_TOKEN   Personal access token (app.netlify.com/user/applications)
+#   NETLIFY_SITE_ID      From `netlify site:info` (site id)
+# ─────────────────────────────────────────────────────────────
+name: PR Deploy Check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-check-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ── 1. Static integrity (always runs) ─────────────────────
+  integrity:
+    name: Site integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run integrity checks
+        run: node scripts/check-site-integrity.js
+
+  # ── 2. Vercel preview deploy (step-guarded on secrets) ────
+  vercel-deploy-check:
+    name: Vercel preview build
+    needs: integrity
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check Vercel secrets
+        id: secrets
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "VERCEL_TOKEN/VERCEL_ORG_ID/VERCEL_PROJECT_ID not configured — skipping Vercel preview check."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Vercel CLI
+        if: steps.secrets.outputs.configured == 'true'
+        run: npm i -g vercel@latest
+
+      - name: Pull project settings
+        if: steps.secrets.outputs.configured == 'true'
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build (static; fails on framework/entrypoint issues)
+        if: steps.secrets.outputs.configured == 'true'
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy preview (non-production)
+        if: steps.secrets.outputs.configured == 'true'
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt --yes --token=${{ secrets.VERCEL_TOKEN }} | grep -oE 'https://[^ ]+
+
+      - name: Note skipped check
+        if: steps.secrets.outputs.configured != 'true'
+        run: echo "Vercel preview check skipped — configure VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID secrets to enable." >> "$GITHUB_STEP_SUMMARY"
+
+  # ── 3. Netlify draft deploy (step-guarded on secrets) ─────
+  netlify-deploy-check:
+    name: Netlify draft deploy
+    needs: integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check Netlify secrets
+        id: secrets
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "NETLIFY_AUTH_TOKEN/NETLIFY_SITE_ID not configured — skipping Netlify draft check."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Netlify CLI
+        if: steps.secrets.outputs.configured == 'true'
+        run: npm i -g netlify-cli@latest
+
+      - name: Deploy draft (non-production)
+        if: steps.secrets.outputs.configured == 'true'
+        id: deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          OUT=$(netlify deploy --build --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID --message="PR #${{ github.event.pull_request.number }} deploy check")
+          echo "$OUT"
+          echo "### ✅ Netlify draft deployed" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Note skipped check
+        if: steps.secrets.outputs.configured != 'true'
+        run: echo "Netlify draft check skipped — configure NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID secrets to enable." >> "$GITHUB_STEP_SUMMARY"
+ | tail -1)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "### ✅ Vercel preview deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Note skipped check
+        if: steps.secrets.outputs.configured != 'true'
+        run: echo "Vercel preview check skipped — configure VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID secrets to enable." >> "$GITHUB_STEP_SUMMARY"
+
+  # ── 3. Netlify draft deploy (step-guarded on secrets) ─────
+  netlify-deploy-check:
+    name: Netlify draft deploy
+    needs: integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check Netlify secrets
+        id: secrets
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "NETLIFY_AUTH_TOKEN/NETLIFY_SITE_ID not configured — skipping Netlify draft check."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Netlify CLI
+        if: steps.secrets.outputs.configured == 'true'
+        run: npm i -g netlify-cli@latest
+
+      - name: Deploy draft (non-production)
+        if: steps.secrets.outputs.configured == 'true'
+        id: deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          OUT=$(netlify deploy --build --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID --message="PR #${{ github.event.pull_request.number }} deploy check")
+          echo "$OUT"
+          echo "### ✅ Netlify draft deployed" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Note skipped check
+        if: steps.secrets.outputs.configured != 'true'
+        run: echo "Netlify draft check skipped — configure NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID secrets to enable." >> "$GITHUB_STEP_SUMMARY"
