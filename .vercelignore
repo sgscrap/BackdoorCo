@@ -1,0 +1,20 @@
+# Vercel only needs the static site files. Skip everything else.
+.git
+.gitignore
+.github
+.netlify
+.netlifyignore
+.freebuff
+.scratch
+node_modules
+scripts
+netlify
+server.js
+deploy.ps1
+test-browser.js
+check-homepage.js
+check-shop-page.js
+*.db
+*.db-shm
+*.db-wal
+admin/restock-private.local.json

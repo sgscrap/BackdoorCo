@@ -1,0 +1,22 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups" }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/__/auth/(.*)",
+      "destination": "https://coalition-aec44.firebaseapp.com/__/auth/$1"
+    }
+  ]
+}
