@@ -4,7 +4,7 @@
 
 This README documents the architecture, file structure, data model, and developer workflows so a new contributor can navigate the project quickly.
 
-- **Live storefront:** `https://backdoorco2.netlify.app`
+- **Live storefront:** `https://backdoorco.vercel.app`
 - **Repo:** `github.com/sgscrap/BackdoorCo`
 - **Firebase project:** `coalition-aec44`
 
@@ -560,7 +560,7 @@ Works for Lyst, Farfetch, END., SSENSE, Mr Porter, Nordstrom, Net-A-Porter. JS-o
 
 ## Contact & Support
 
-- Live storefront: [backdoorco.xyz](https://backdoorco2.netlify.app/)
+- Live storefront: [backdoorco.xyz](https://backdoorco.vercel.app/)
 - Social: [@backdoorco](https://instagram.com/backdoorco) · [TikTok](https://tiktok.com/@backdoorco) · [X / Twitter](https://twitter.com/backdoorco)
 - Repository: [github.com/sgscrap/BackdoorCo](https://github.com/sgscrap/BackdoorCo)
 - Support email: `support@backdoorco.xyz`

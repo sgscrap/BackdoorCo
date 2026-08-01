@@ -58,7 +58,7 @@ for (const file of listHtml(ROOT)) {
   if (menuCount === 0 && hasNavbar) fail(`${rel}: missing #navMobileMenu`);
 
   // 2. OG / twitter images resolve
-  const ogRe = /(?:og:image|twitter:image)[^>]*content="https:\/\/(?:backdoorco\.xyz|backdoorco2\.netlify\.app)\/([^"]+)"/g;
+  const ogRe = /(?:og:image|twitter:image)[^>]*content="https:\/\/(?:backdoorco\.xyz|backdoorco2\.netlify\.app|backdoorco\.vercel\.app)\/([^"]+)"/g;
   let m;
   while ((m = ogRe.exec(src))) {
     const target = m[1].split('?')[0];
