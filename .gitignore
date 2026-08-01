@@ -6,3 +6,7 @@ build/
 .vscode/
 .netlify
 .npm-cache/
+admin/restock-private.local.json
+.scratch/
+.vercel
+.env*
