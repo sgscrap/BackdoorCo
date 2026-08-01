@@ -16,6 +16,8 @@
 
 const dns = require('dns');
 const net = require('net');
+const http = require('http');
+const https = require('https');
 
 const REQUEST_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (compatible; PriceMonitor/1.0; +https://backdoorco.xyz)',
@@ -27,6 +29,11 @@ const REQUEST_HEADERS = {
 // The endpoint is publicly reachable with no auth, so the target host must
 // never resolve to a private, loopback, or link-local address (which could
 // otherwise probe cloud metadata, local services, or internal subnets).
+// The request is PINNED to the verified IP: we resolve once, validate, then
+// connect to that exact address (sending the original Host header + TLS SNI),
+// so a DNS-rebinding attacker who answers the first lookup with a public IP
+// and a later lookup with 169.254.169.254 can never win - there is no second
+// resolution at connect time. Every redirect hop is re-validated the same way.
 
 function isPrivateIp(ip) {
   if (net.isIPv4(ip)) {
@@ -55,20 +62,30 @@ function isPrivateIp(ip) {
   return true; // unknown form -> block
 }
 
-// Extract the embedded IPv4 from an IPv4-mapped/NAT64 IPv6 literal, or null.
-// Accepts dotted-quad (::ffff:127.0.0.1), 2x16-bit (::ffff:7f00:1), the
-// zero-padded 3-group (::ffff:0:7f00:1), and single 32-bit (::ffff:7f000001)
-// forms; returns the dotted-quad string so the caller can reuse isPrivateIp.
+// Extract the embedded IPv4 from an IPv4-mapped/NAT64/IPv4-compatible IPv6
+// literal, or null. Accepts dotted-quad (::ffff:127.0.0.1), 2x16-bit
+// (::ffff:7f00:1), the zero-padded 3-group (::ffff:0:7f00:1), single 32-bit
+// (::ffff:7f000001), and the deprecated IPv4-compatible forms (::127.0.0.1 /
+// ::0:7f00:1); returns the dotted-quad string so the caller can reuse
+// isPrivateIp. A bare "::" prefix is only treated as embedded IPv4 when it
+// is a dotted-quad or the strict 3-group ::0:xxxx:xxxx shape - anything else
+// is an ordinary IPv6 address, not an IPv4 in disguise.
 function extractMappedIpv4(low) {
   let rest = null;
+  let compat = false; // deprecated IPv4-compatible ::a.b.c.d / ::0:xxxx:xxxx
   if (low.startsWith('::ffff:')) rest = low.slice('::ffff:'.length);
   else if (low.startsWith('64:ff9b::')) rest = low.slice('64:ff9b::'.length);
+  else if (low.startsWith('::')) { rest = low.slice('::'.length); compat = true; }
   if (!rest) return null;
 
   if (rest.includes('.')) return net.isIPv4(rest) ? rest : null;
 
   const groups = rest.split(':').filter(Boolean).map((g) => parseInt(g, 16));
   if (!groups.length || groups.some((n) => !Number.isFinite(n))) return null;
+
+  // Strictly only ::0:xxxx:xxxx (3 groups, first must be 0) counts as
+  // IPv4-compatible; ::1:2:3:4:5:6... is a real IPv6 address, not embedded v4.
+  if (compat && groups.length !== 3) return null;
 
   let a, b, c, d;
   if (groups.length === 1) {
@@ -87,8 +104,13 @@ function extractMappedIpv4(low) {
   return `${a}.${b}.${c}.${d}`;
 }
 
-function assertSafeHost(hostname) {
+// Resolve the target host ONCE and return the IP to pin the connection to.
+// Fail-closed: if ANY answer is private, the whole request is refused. The
+// caller connects to the returned literal IP, so DNS is never re-queried at
+// connect time (no TOCTOU window for a rebinding attacker).
+function resolveSafeIp(target) {
   return new Promise((resolve, reject) => {
+    const hostname = target.hostname.replace(/^\[|\]$/g, ''); // strip IPv6 brackets
     dns.lookup(hostname, { all: true }, (err, addresses) => {
       if (err) return reject(new Error('Host resolution failed'));
       if (!addresses || !addresses.length) return reject(new Error('No addresses for host'));
@@ -97,22 +119,67 @@ function assertSafeHost(hostname) {
           return reject(new Error(`Blocked private/internal address ${entry.address}`));
         }
       }
-      resolve();
+      resolve(addresses[0].address); // pin: connect to this exact IP only
     });
   });
 }
 
-// Follow redirects manually (max 5 hops) so every intermediate host is
-// re-validated against the SSRF guard instead of fetch() following blindly.
+// GET a URL by connecting to a specific pinned IP. Sends the original Host
+// header (and, for https, the hostname as TLS servername so SNI + certificate
+// verification still target the intended site). No DNS resolution happens
+// here - the verified IP is used as-is.
+function requestWithPinnedIp(target, ip) {
+  return new Promise((resolve, reject) => {
+    const isHttps = target.protocol === 'https:';
+    const mod = isHttps ? https : http;
+    const options = {
+      protocol: target.protocol,
+      hostname: ip,                // pinned verified address - never re-resolved
+      port: target.port || (isHttps ? 443 : 80),
+      path: (target.pathname || '/') + (target.search || ''),
+      method: 'GET',
+      headers: { ...REQUEST_HEADERS, Host: target.host },
+      timeout: 15000,
+    };
+    if (isHttps) options.servername = target.hostname;
+
+    const req = mod.request(options, (res) => {
+      const chunks = [];
+      res.on('data', (c) => chunks.push(c));
+      res.on('end', () => {
+        resolve({
+          ok: res.statusCode >= 200 && res.statusCode < 300,
+          status: res.statusCode,
+          statusText: res.statusMessage,
+          headers: res.headers,
+          url: target.href,
+          text: async () => Buffer.concat(chunks).toString('utf8'),
+        });
+      });
+    });
+    req.on('timeout', () => req.destroy(new Error('Request timeout')));
+    req.on('error', reject);
+    req.end();
+  });
+}
+
+// Follow redirects manually (max 5 hops). Every hop is resolved once,
+// validated, and pinned - a redirect can never bounce to an internal host.
 async function fetchSafely(target) {
   let current = target;
   for (let hop = 0; hop < 5; hop++) {
-    await assertSafeHost(current.hostname);
-    const res = await fetch(current, { headers: REQUEST_HEADERS, redirect: 'manual' });
+    const ip = await resolveSafeIp(current);
+    const res = await requestWithPinnedIp(current, ip);
     if (res.status >= 300 && res.status < 400) {
-      const location = res.headers.get('location');
+      let location = res.headers.location;
+      if (Array.isArray(location)) location = location[0];
       if (!location) return res;
       current = new URL(location, current);
+      // Redirects may point anywhere - only follow http(s) targets, never
+      // ftp:, file:, etc. (which requestWithPinnedIp would mis-handle).
+      if (current.protocol !== 'http:' && current.protocol !== 'https:') {
+        throw new Error(`Blocked redirect to ${current.protocol}`);
+      }
       continue;
     }
     return res;
@@ -293,3 +360,13 @@ function decodeEntities(s) {
 function json(statusCode, body) {
   return { statusCode, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
 }
+
+// Exported for unit tests (Netlify only invokes exports.handler).
+exports.isPrivateIp = isPrivateIp;
+exports.extractMappedIpv4 = extractMappedIpv4;
+exports.resolveSafeIp = resolveSafeIp;
+exports.fetchSafely = fetchSafely;
+exports.extractFromJsonLd = extractFromJsonLd;
+exports.extractFromOpenGraph = extractFromOpenGraph;
+exports.extractFromHeuristic = extractFromHeuristic;
+exports.parsePrice = parsePrice;
