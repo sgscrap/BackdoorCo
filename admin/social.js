@@ -18,7 +18,7 @@ import {
   mergeCatalogProducts,
 } from "../product-data.js";
 
-const SITE_ORIGIN = "https://backdoorco.xyz";
+const SITE_ORIGIN = "https://backdoorco2.netlify.app";
 
 const canvas = document.getElementById("assetCanvas");
 const templateRoot = document.getElementById("assetTemplateRoot");

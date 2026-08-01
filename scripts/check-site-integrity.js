@@ -5,8 +5,8 @@
 // Checks (hard-fail):
 //   1. Every page with a mobile menu has EXACTLY one #navMobileMenu
 //      (regression guard for the duplicate-menu bug).
-//   2. og:image / twitter:image content pointing at backdoorco.xyz
-//      resolves to a real file in the repo (e.g. og-image.png).
+//   2. og:image / twitter:image content pointing at backdoorco.xyz or
+//      backdoorco2.netlify.app resolves to a real file in the repo (e.g. og-image.png).
 //   3. Every internal href to a *.html page resolves to a real file.
 //   4. Every locally-referenced .css / .js asset exists.
 //   5. Every locally-referenced image (products/*, etc.) exists.
@@ -58,7 +58,7 @@ for (const file of listHtml(ROOT)) {
   if (menuCount === 0 && hasNavbar) fail(`${rel}: missing #navMobileMenu`);
 
   // 2. OG / twitter images resolve
-  const ogRe = /(?:og:image|twitter:image)[^>]*content="https:\/\/backdoorco\.xyz\/([^"]+)"/g;
+  const ogRe = /(?:og:image|twitter:image)[^>]*content="https:\/\/(?:backdoorco\.xyz|backdoorco2\.netlify\.app)\/([^"]+)"/g;
   let m;
   while ((m = ogRe.exec(src))) {
     const target = m[1].split('?')[0];

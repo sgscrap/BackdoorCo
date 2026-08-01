@@ -16,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { cloudifyUpload as uploadImage } from "./cloudify.js";
 
-const SITE_ORIGIN = window.location.origin || "https://backdoorco.xyz";
+const SITE_ORIGIN = window.location.origin || "https://backdoorco2.netlify.app";
 
 // ================================
 // AUTH GUARD

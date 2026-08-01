@@ -1,0 +1,5 @@
+# Backdoor — robots.txt
+User-agent: *
+Allow: /
+
+Sitemap: https://backdoorco2.netlify.app/sitemap.xml
