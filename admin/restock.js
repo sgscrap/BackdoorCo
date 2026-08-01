@@ -509,7 +509,7 @@ async function publishToPortalRestock(btn) {
   const data = collectRestockFormDataForPublish();
   if (!data.title || !data.retailUrl) { if (typeof showToast === 'function') showToast('Need a title + retail URL.'); return; }
   const currentUser = auth.currentUser;
-  if (!currentUser) { if (typeof showToast === 'function') showToast('Sign in to publish.'); return; }
+  if (!currentUser) { if (typeof showToast === 'function') showToast('Sign in to publish.', true); return; }
   setBusyRestock(btn, true, 'Publishing...');
   try {
     const docId = (data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80))
@@ -544,7 +544,15 @@ async function publishToPortalRestock(btn) {
     setBusyRestock(btn, false, 'Published');
     setTimeout(function () { setBusyRestock(btn, false, 'Publish to Portal'); }, 3000);
   } catch (err) {
-    if (typeof showToast === 'function') showToast('Publish failed: ' + (err.message || err));
+    // Triage: a Firestore permission-denied with a signed-in user means the
+    // account lacks the 'admin' custom claim (restock_ideas rules require
+    // request.auth.token.admin == true). Everything else is a real error.
+    const denied = err && (err.code === 'permission-denied' || /permission-?denied|insufficient permissions/i.test(String((err && err.message) || '')));
+    if (denied) {
+      if (typeof showToast === 'function') showToast('No admin claim - grant "admin" in Firebase console.', true);
+    } else {
+      if (typeof showToast === 'function') showToast('Publish failed: ' + ((err && err.message) || err), true);
+    }
     setBusyRestock(btn, false, 'Publish to Portal');
   }
 }
