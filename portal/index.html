@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Backdoor · Restock Portal</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="../admin/admin.css">
+<style>
+  body.portal { background: #f5f5f5; color: #1a1a1a; }
+  .portal-loading {
+    min-height: 70vh; display: flex; align-items: center; justify-content: center;
+    color: #777; font-size: 0.95rem; letter-spacing: 0.02em;
+  }
+  .portal-loading code { background: #ececec; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; }
+  #portalContent { display: none; }
+  .portal-header {
+    padding: 28px 36px 24px; border-bottom: 1px solid #e6e6e6; background: white;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  }
+  .portal-header h1 {
+    margin: 0 0 4px; font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em;
+  }
+  .portal-header .subtitle { color: #666; font-size: 0.85rem; }
+  .portal-header .subtitle code { background: #f0f0f0; padding: 1px 6px; border-radius: 3px; font-size: 0.8rem; }
+  .portal-header .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 700;
+    text-decoration: none; border: 1px solid #1a1a1a; color: #1a1a1a; background: white;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.primary { background: #1a1a1a; color: white; }
+  .btn.primary:hover { background: #c8f65d; color: #1a1a1a; border-color: #c8f65d; }
+
+  .portal-toolbar {
+    display: flex; gap: 12px; align-items: center; padding: 16px 36px;
+    background: white; border-bottom: 1px solid #eee; flex-wrap: wrap;
+  }
+  .portal-toolbar input[type=search] {
+    flex: 1; min-width: 240px; max-width: 520px; padding: 9px 14px;
+    border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; background: #fcfcfc;
+  }
+  .portal-toolbar input[type=search]:focus { outline: none; border-color: #1a1a1a; background: white; }
+  .portal-toolbar .count { font-size: 0.8rem; color: #888; }
+
+  .portal-grid {
+    display: grid; gap: 22px; padding: 28px 36px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  .portal-card {
+    background: white; border: 1px solid #e8e8e8; border-radius: 14px;
+    overflow: hidden; display: flex; flex-direction: column;
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .portal-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.08); }
+  .portal-card .img-wrap {
+    width: 100%; aspect-ratio: 1/1; background: linear-gradient(135deg, #f6f6f6, #ececec);
+    display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 0.8rem;
+    overflow: hidden;
+  }
+  .portal-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .portal-card .body { padding: 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .portal-card .brand {
+    color: #888; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800;
+  }
+  .portal-card .title { font-weight: 600; font-size: 0.95rem; line-height: 1.35; min-height: 2.6em; color: #1a1a1a; }
+  .portal-card .price-row { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .portal-card .retail-price { font-weight: 800; font-size: 1.15rem; }
+  .portal-card .retail-strike { color: #999; text-decoration: line-through; font-size: 0.85rem; }
+  .portal-card .margin-line { font-weight: 800; font-size: 0.82rem; margin-left: auto; white-space: nowrap; }
+  .portal-card .margin-line.positive { color: #1a6a2a; }
+  .portal-card .margin-line.negative { color: #b03030; }
+  .portal-card .pill-time { background: #f4f4f4 !important; color: #666 !important; font-style: italic; }
+  .portal-card .meta-line { font-size: 0.75rem; color: #888; display: flex; gap: 8px; flex-wrap: wrap; }
+  .portal-card .meta-line .pill {
+    background: #f0f0f0; padding: 2px 8px; border-radius: 99px; font-weight: 600;
+  }
+  .portal-card .meta-line .pill.status-watching { background: #fff4d6; color: #8a5a00; }
+  .portal-card .meta-line .pill.status-ready     { background: #d6f6d8; color: #1a6a2a; }
+  .portal-card .meta-line .pill.status-missing  { background: #ffe2e2; color: #a02020; }
+  .portal-card .meta-line .pill.status-lowstock { background: #ffe9d4; color: #7a4400; }
+  .portal-card .links { display: flex; gap: 8px; margin-top: auto; padding-top: 14px; }
+  .portal-card .links .btn { flex: 1; justify-content: center; padding: 8px 10px; font-size: 0.78rem; }
+
+  .portal-empty {
+    grid-column: 1/-1; text-align: center; padding: 80px 20px; color: #777;
+  }
+  .portal-empty h2 { color: #444; font-weight: 700; margin: 0 0 12px; }
+  .portal-empty a { color: #1a1a1a; font-weight: 700; }
+  .portal-empty code { background: #f0f0f0; padding: 2px 8px; border-radius: 4px; }
+</style>
+</head>
+<body class="portal">
+
+<div class="portal-loading" id="portalLoading">
+  <div>Authenticating…</div>
+</div>
+
+<div id="portalContent">
+  <header class="portal-header">
+    <div>
+      <h1>Restock Portal</h1>
+      <div class="subtitle">Private — admin-only · sourced from <code>restock_ideas</code> Firestore collection</div>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="../admin/restock.html">Open Restock Desk →</a>
+    </div>
+  </header>
+
+  <div class="portal-toolbar">
+    <input type="search" id="portalSearch" placeholder="Search by brand, title, status…">
+    <div class="count" id="portalCount"></div>
+  </div>
+
+  <div class="portal-grid" id="portalGrid"></div>
+</div>
+
+<!-- Firebase compat SDK + admin gate (mirrors /admin/* pages) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  window.firebaseConfig = {
+    apiKey: 'AIzaSyDq98ddvXGZLdxPCm0Gd-6gRtOmvBdBctw',
+    authDomain: 'backdoorco.xyz',
+    projectId: 'coalition-aec44',
+    storageBucket: 'coalition-aec44.firebasestorage.app',
+    messagingSenderId: '312196142925',
+    appId: '1:312196142925:web:4cf2ffcb29c1b66fe39cd6',
+  };
+</script>
+<script src="./portal.js"></script>
+</body>
+</html>

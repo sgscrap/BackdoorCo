@@ -205,6 +205,36 @@
   background: var(--bg-secondary);
 }
 
+.restock-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.csv-btn {
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border-radius: 7px;
+  min-height: 32px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.csv-btn:hover {
+  color: var(--text-primary);
+  border-color: rgba(200, 246, 93, 0.48);
+  background: var(--bg-secondary);
+}
+
 .restock-tabs {
   display: flex;
   flex-wrap: wrap;

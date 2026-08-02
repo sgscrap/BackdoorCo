@@ -241,6 +241,7 @@ function renderTable() {
         <td>
           <div class="row-actions">
             <button type="button" class="row-action primary" data-action="select" data-id="${escapeHtml(product.id)}">Edit</button>
+            <button type="button" class="row-action" data-action="copy" data-id="${escapeHtml(product.id)}" title="Copy supplier-ready summary">Copy</button>
             <button type="button" class="row-action" data-action="purchase" data-id="${escapeHtml(product.id)}" ${purchase ? "" : "disabled"}>Buy</button>
             <button type="button" class="row-action" data-action="retail" data-id="${escapeHtml(product.id)}" ${retail ? "" : "disabled"}>Retail</button>
           </div>
@@ -435,6 +436,8 @@ restockBody.addEventListener("click", (event) => {
     state.productId = product.id;
     productSelect.value = product.id;
     renderAll();
+  } else if (button.dataset.action === "copy") {
+    copyProductSummaryRestock(product);
   } else if (button.dataset.action === "purchase") {
     openProductUrl("purchase", product);
   } else if (button.dataset.action === "retail") {
@@ -556,6 +559,94 @@ async function publishToPortalRestock(btn) {
     setBusyRestock(btn, false, 'Publish to Portal');
   }
 }
+
+function exportCsvRestock() {
+  const rows = state.filteredProducts.filter(matchesCurrentFilter);
+  if (!rows.length) { if (typeof showToast === 'function') showToast('No products in the current filter to export.', true); return; }
+
+  const escapeCell = function (value) {
+    const s = String(value ?? '');
+    // Neutralise CSV formula injection (=, +, -, @) so pasting into Excel
+    // never evaluates a formula from catalog data.
+    const guarded = /^[=+\-@]/.test(s) ? ("'" + s) : s;
+    return /[",\n\r]/.test(guarded) ? '"' + guarded.replace(/"/g, '""') + '"' : guarded;
+  };
+
+  const header = ['Product', 'Brand', 'SKU', 'Stock', 'Purchase URL', 'Retail URL', 'Purchase Cost', 'Target Retail', 'Margin', 'Status', 'Target Sizes', 'Notes'];
+  const lines = [header.map(escapeCell).join(',')];
+
+  rows.forEach(function (product) {
+    const record = getRecord(product);
+    const purchaseCost = Number(record.purchaseCost ?? product.reorderCost ?? 0) || 0;
+    const targetPrice = Number(record.targetPrice ?? product.price ?? 0) || 0;
+    const margin = purchaseCost > 0 ? targetPrice - purchaseCost : '';
+    const stock = getStock(product);
+    const status = getStatusLabel(record.restockStatus || 'watching');
+    lines.push([
+      escapeCell(product.name || 'Untitled product'),
+      escapeCell(product.brand || ''),
+      escapeCell(product.sku || ''),
+      stock,
+      escapeCell(record.purchaseUrl || ''),
+      escapeCell(record.retailUrl || ''),
+      purchaseCost > 0 ? purchaseCost.toFixed(2) : '',
+      targetPrice > 0 ? targetPrice.toFixed(2) : '',
+      margin !== '' ? margin.toFixed(2) : '',
+      escapeCell(status),
+      escapeCell(record.targetSizes || ''),
+      escapeCell(record.restockNote || ''),
+    ].join(','));
+  });
+
+  const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'backdoor-restock-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  if (typeof showToast === 'function') showToast('Exported ' + rows.length + ' products to CSV.');
+}
+
+function copyProductSummaryRestock(product) {
+  const record = getRecord(product);
+  const sizes = record.targetSizes || getSizesText(product) || 'No sizes listed';
+  const purchaseCost = Number(record.purchaseCost ?? product.reorderCost ?? 0) || 0;
+  const targetPrice = Number(record.targetPrice ?? product.price ?? 0) || 0;
+  const margin = purchaseCost > 0 ? formatMoney(targetPrice - purchaseCost) : 'No cost';
+  const purchase = normalizeUrl(record.purchaseUrl);
+  const retail = normalizeUrl(record.retailUrl);
+  const summary = [
+    (product.brand ? product.brand + ' - ' : '') + (product.name || 'Untitled product'),
+    'Sizes: ' + sizes + ' | Stock: ' + getStock(product) + ' units',
+    'Cost ' + formatMoney(purchaseCost) + ' / Target ' + formatMoney(targetPrice) + ' / Margin ' + margin,
+    'Status: ' + getStatusLabel(record.restockStatus || 'watching'),
+    'Purchase: ' + (purchase || 'not set'),
+    'Retail: ' + (retail || 'not set'),
+  ].join('\n');
+
+  const onDone = function () { if (typeof showToast === 'function') showToast('Summary copied to clipboard.'); };
+  const onFail = function () {
+    if (typeof showToast === 'function') showToast('Copy blocked by browser - copy manually.', true);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(summary).then(onDone, onFail);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = summary;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); onDone(); } catch (_) { onFail(); }
+    document.body.removeChild(ta);
+  }
+}
+
+document.getElementById('exportCsvBtn')?.addEventListener('click', exportCsvRestock);
 
 if (lookupUrlBtnRestock)       lookupUrlBtnRestock.addEventListener('click',       function () { lookupRetailPriceRestock(lookupUrlBtnRestock); });
 if (publishToPortalBtnRestock) publishToPortalBtnRestock.addEventListener('click', function () { publishToPortalRestock(publishToPortalBtnRestock); });
