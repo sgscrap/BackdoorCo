@@ -12,6 +12,7 @@ import {
     buildProductHref,
     getProductCardClass,
     getProductCardImage,
+    getProductCardImageStyle,
     getProductSizes,
     getProductSortTimestamp,
     getTotalStock,
@@ -273,6 +274,7 @@ function renderProducts() {
                                 loading="${i < 4
                     ? 'eager'
                     : 'lazy'}"
+                                style="${getProductCardImageStyle(p)}"
                                 onerror="this.style.display='none'">`
                 : `<div class="no-img-placeholder">
                                <i class="fa-solid fa-shoe-prints"></i>

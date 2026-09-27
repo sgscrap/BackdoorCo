@@ -1216,7 +1216,7 @@ export function getProductCardImageStyle(product) {
 export function getProductCardClass(product) {
     const fit = getProductImageFit(product);
     const classes = [];
-    if (fit === 'contain' && !isFootwearProduct(product)) classes.push(' shop-card--contain-image');
+    if (fit === 'contain') classes.push(' shop-card--contain-image');
     // Add aspect ratio class
     const aspect = getProductAspectRatio(product);
     if (aspect) classes.push(` shop-card--aspect-${aspect}`);

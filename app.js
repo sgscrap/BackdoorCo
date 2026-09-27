@@ -7,6 +7,7 @@ import {
     buildProductHref,
     getProductCardClass,
     getProductCardImage,
+    getProductCardImageStyle,
     mergeCatalogProducts
 } from './product-data.js';
 
@@ -182,6 +183,7 @@ function renderMostWanted() {
                          alt="${p.name}"
                          referrerpolicy="no-referrer"
                          loading="${i < 2 ? 'eager' : 'lazy'}"
+                         style="${getProductCardImageStyle(p)}"
                          onerror="this.style.display='none'">
                 
                 </div>
