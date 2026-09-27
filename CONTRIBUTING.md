@@ -32,7 +32,7 @@ Be respectful, be specific, and assume good intent. Sneaker culture can get loud
 
 ## Prerequisites
 
-- **Node.js 18+** (Netlify Functions runtime; matches `engines` implied by `netlify/functions/*.js`).
+- **Node.js 22+** (Netlify Functions runtime; matches `engines` / `netlify.toml` `NODE_VERSION`).
 - **npm** (project currently ships `package-lock.json`).
 - **Netlify CLI** (`npm i -g netlify-cli`) — required only if you'll touch serverless functions.
 - **Git** with a working GitHub account that has write access to `sgscrap/BackdoorCo`.
