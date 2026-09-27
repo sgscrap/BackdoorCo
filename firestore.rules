@@ -44,14 +44,14 @@ service cloud.firestore {
       allow read, write, delete: if request.auth != null && request.auth.token.admin == true;
     }
 
-    // ── Social Desk: drafts ──
+    // ── Social Desk: drafts (conservative: any authenticated user may read/write; tighten to admin if needed) ──
     match /social_drafts/{draftId} {
-      allow read, write, delete: if true;
+      allow read, write, delete: if request.auth != null;
     }
 
-    // ── Social Desk: scheduled posts ──
+    // ── Social Desk: scheduled posts (conservative: any authenticated user may read/write) ──
     match /scheduled_posts/{postId} {
-      allow read, write, delete: if true;
+      allow read, write, delete: if request.auth != null;
     }
 
   }

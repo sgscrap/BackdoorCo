@@ -257,6 +257,8 @@ These are not for first-time contributors — they're documented so the next own
 - **`product-data.js`** applies runtime overrides (auto-correct brand for "prada" id/name; lock Prada sneakers to $547 + 1-stock-per-size + allowBackorder; nudge normal footwear to `allowBackorder: true`). If your new product needs a different rule, prefer extending `applyProductOverrides` rather than mutating Firestore or CSS.
 - **Stripe & PayPal checkout share cart shape + shipping options** in their `_shared/*.js` modules. Any change should be made in lockstep in both files.
 - **Firestore functions** (`fire/firestore.*` queries) are memoised inside the module that uses them; if you add a new collection, audit the rules in `firestore.rules` first.
+- **Firebase `apiKey` in HTML is public by design** (browser SDK). Auth enforcement lives in `firestore.rules` and env-gated server functions, not in hiding the key. `social_drafts`/`scheduled_posts` writes require `request.auth != null` (conservative). Tighten to `admin == true` when the team is ready.
+- **Security headers** (`netlify.toml` `[[headers]]` and `vercel.json` `headers`) are the browser's enforcement point. CSP currently allows `'unsafe-inline'` for Firebase/Stripe/PayPal + existing inline scripts; the next hardening step is hashing or centralizing `firebaseConfig` into `admin/firebase-config.js` to allow removing `unsafe-inline`.
 
 ---
 
