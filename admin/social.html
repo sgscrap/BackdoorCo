@@ -8,7 +8,9 @@
   <title>Social Desk | Backdoor Admin</title>
   <link rel="stylesheet" href="admin.css?v=2.2" />
   <link rel="stylesheet" href="social.css?v=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700;900&family=Oswald:wght@400;700&family=Playfair+Display:wght@400;700;900&family=Poppins:wght@400;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 
 <body class="admin-body social-admin-body">
@@ -78,6 +80,15 @@
       </a>
 
       <p class="nav-label">TOOLS</p>
+      <a href="restock.html" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+          <polyline points="21 3 21 9 15 9" />
+          <path d="M8 12h8" />
+          <path d="M12 8v8" />
+        </svg>
+        Restock Desk
+      </a>
       <a href="social.html" class="nav-item active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -147,6 +158,9 @@
             <button type="button" class="preset-btn" data-preset="sale">Sale Push</button>
             <button type="button" class="preset-btn" data-preset="restock">Restock Alert</button>
             <button type="button" class="preset-btn" data-preset="collage">Top 4 Grid</button>
+            <button type="button" class="preset-btn" data-preset="holiday">Holiday Drop</button>
+            <button type="button" class="preset-btn" data-preset="teaser">Collab Teaser</button>
+            <button type="button" class="preset-btn" data-preset="flash">Flash Sale</button>
           </div>
         </div>
 
@@ -163,7 +177,33 @@
             <label for="productSelect">Selected Product</label>
             <select id="productSelect"></select>
           </div>
+          <button type="button" class="preset-btn add-queue-btn" id="addQueueBtn" style="width:100%;margin-top:4px">+ Add to Queue</button>
           <div class="product-snapshot" id="productSnapshot"></div>
+        </div>
+
+        <div class="ctrl-section" id="draftsSection">
+          <div class="ctrl-heading">
+            <h2>Drafts</h2>
+          </div>
+          <div class="form-row compact">
+            <div class="form-group">
+              <label for="draftNameInput">Draft Name</label>
+              <input type="text" id="draftNameInput" placeholder="Summer Drop Campaign" />
+            </div>
+          </div>
+          <button type="button" class="preset-btn" id="saveDraftBtn" style="width:100%">Save Draft</button>
+          <div class="drafts-list" id="draftsList"></div>
+        </div>
+
+        <div class="ctrl-section" id="queueSection">
+          <div class="ctrl-heading">
+            <h2>Batch Queue</h2>
+            <span id="queueCount">0 items</span>
+          </div>
+          <div class="queue-list" id="queueList"></div>
+          <button type="button" class="copy-caption-btn batch-export-btn" id="batchExportBtn" style="background:rgba(108,92,231,0.2);border-color:rgba(108,92,231,0.4);color:#b8acf6" disabled>📦 Export Queue as ZIP</button>
+          <div class="batch-progress" id="batchProgress" style="width:100%;height:4px;background:var(--border-light);border-radius:999px;margin-top:8px;overflow:hidden;display:none"><div style="height:100%;background:var(--accent);border-radius:999px;transition:width .3s ease;width:0"></div></div>
+          <button type="button" class="copy-caption-btn" id="clearQueueBtn" style="margin-top:4px;font-size:0.68rem">Clear Queue</button>
         </div>
 
         <div class="ctrl-section">
@@ -177,6 +217,30 @@
           </div>
           <div class="form-row compact">
             <div class="form-group">
+              <label for="fontSelect">Font</label>
+              <select id="fontSelect">
+                <option value="space-grotesk">Space Grotesk</option>
+                <option value="inter">Inter</option>
+                <option value="bebas">Bebas Neue</option>
+                <option value="playfair">Playfair Display</option>
+                <option value="oswald">Oswald</option>
+                <option value="poppins">Poppins</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="weightSelect">Weight</label>
+              <select id="weightSelect">
+                <option value="300">Light</option>
+                <option value="400">Regular</option>
+                <option value="500">Medium</option>
+                <option value="600">Semi Bold</option>
+                <option value="700">Bold</option>
+                <option value="900" selected>Black</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row compact">
+            <div class="form-group">
               <label for="templateSelect">Template</label>
               <select id="templateSelect">
                 <option value="drop">Product Drop</option>
@@ -184,6 +248,9 @@
                 <option value="sale">Sale Push</option>
                 <option value="restock">Restock Alert</option>
                 <option value="collage">Top 4 Grid</option>
+                <option value="holiday">Holiday Drop</option>
+                <option value="teaser">Collab Teaser</option>
+                <option value="flash">Flash Sale</option>
               </select>
             </div>
             <div class="form-group">
@@ -194,6 +261,8 @@
                 <option value="white">White Studio</option>
                 <option value="volt">Volt Drop</option>
                 <option value="red">Sale Red</option>
+                <option value="holiday">Holiday</option>
+                <option value="teaser">Teaser</option>
               </select>
             </div>
           </div>
@@ -241,9 +310,14 @@
           <div class="ctrl-heading">
             <h2>Media</h2>
           </div>
-          <div class="toggle-row">
+          <div class="toggle-row toggle-row--3col">
             <label><input type="checkbox" id="priceToggle" checked /> Show price</label>
+            <label><input type="checkbox" id="priceVisitToggle" /> Visit site</label>
             <label><input type="checkbox" id="sizesToggle" checked /> Show sizes</label>
+          </div>
+          <div class="form-group" id="visitUrlGroup" style="display:none">
+            <label for="visitSiteUrlInput">Visit Site URL</label>
+            <input type="url" id="visitSiteUrlInput" placeholder="https://backdoorco.vercel.app/shop-all" />
           </div>
           <div class="form-group">
             <label for="imageUrlInput">Image URL Override</label>
@@ -257,10 +331,47 @@
 
         <div class="ctrl-section">
           <div class="ctrl-heading">
+            <h2>Effects</h2>
+          </div>
+          <div class="form-group">
+            <label for="filterSelect">Image Filter</label>
+            <select id="filterSelect">
+              <option value="none">None</option>
+              <option value="grayscale">Grayscale</option>
+              <option value="sepia">Sepia</option>
+              <option value="contrast">High Contrast</option>
+              <option value="warm">Warm</option>
+              <option value="cool">Cool</option>
+            </select>
+          </div>
+          <div class="toggle-row">
+            <label><input type="checkbox" id="blurToggle" /> Blur background</label>
+            <label><input type="checkbox" id="watermarkToggle" /> Watermark</label>
+          </div>
+          <div class="form-group">
+            <label for="grainSlider">Grain <span id="grainValue">16%</span></label>
+            <input type="range" id="grainSlider" min="0" max="100" value="16" />
+          </div>
+        </div>
+
+        <div class="ctrl-section">
+          <div class="ctrl-heading">
             <h2>Caption</h2>
           </div>
           <textarea id="captionOutput" class="caption-output" readonly rows="8"></textarea>
           <button type="button" class="copy-caption-btn" id="copyCaptionBtn">Copy Caption</button>
+        </div>
+
+        <div class="ctrl-section">
+          <div class="ctrl-heading">
+            <h2>Schedule</h2>
+          </div>
+          <div class="form-group">
+            <label for="scheduleDateInput">Post Date &amp; Time</label>
+            <input type="datetime-local" id="scheduleDateInput" />
+          </div>
+          <button type="button" class="copy-caption-btn" id="schedulePostBtn" style="background:rgba(108,92,231,0.2);border-color:rgba(108,92,231,0.4);color:#b8acf6">Schedule Post</button>
+          <div class="scheduled-grid" id="scheduledGrid"></div>
         </div>
       </aside>
 

@@ -1,10 +1,10 @@
 # Backdoor
 
-> **Backdoor** is a New York-based premium marketplace for **authenticated sneakers and streetwear**. The storefront, admin dashboard, payment flows, market-price monitor, and offer pipeline are all part of a single static-site-plus-serverless codebase hosted on Netlify and backed by Firebase.
+> **Backdoor** is a New York-based premium marketplace for **authenticated sneakers and streetwear**. The storefront, admin dashboard, payment flows, market-price monitor, and offer pipeline are all part of a single static-site-plus-serverless codebase hosted on Vercel (static site) with Netlify serverless functions proxied behind it, and backed by Firebase.
 
 This README documents the architecture, file structure, data model, and developer workflows so a new contributor can navigate the project quickly.
 
-- **Live storefront:** `https://backdoorco.vercel.app`
+- **Live storefront:** `https://backdoorco.xyz` (Vercel; alt alias `https://backdoorco.vercel.app`)
 - **Repo:** `github.com/sgscrap/BackdoorCo`
 - **Firebase project:** `coalition-aec44`
 
@@ -77,7 +77,7 @@ The frontend is **pure static** — all HTML, CSS, and JS files are served as-is
 | Serverless          | Netlify Functions (Node 18), shared helpers in `_shared/`                                  |
 | Price monitoring    | In-repo scraper functions for eBay & Prada + composite snapshot                             |
 | CI                  | GitHub Actions CodeQL (`codeql-analysis.yml`, `codeql.yml`)                                  |
-| Deployment          | Netlify (`netlify.toml`), publishes the project root                                       |
+| Deployment          | Vercel (`vercel.json`, project `backdoorco`) for the static site; Netlify (`netlify.toml`) for serverless functions                                       |
 
 There is **no React/Vue/build pipeline** — pages are hand-written HTML and the client-side code is dispatched as native ES modules. See `package.json` for the only production runtime dependency roots (Express + Firebase Admin + Stripe + Multer), all used by `server.js` and the serverless functions.
 
@@ -493,18 +493,23 @@ COOKIE_DOMAIN / SITE_ORIGIN        # optional overrides; functions derive from r
 
 ## Deployment
 
-- **Host**: Netlify. `netlify.toml` publishes project root as the site (so all HTML, CSS, JS, and `products/*` images deploy as static assets).
-- **Functions dir**: `netlify/functions`.
-- **SPA-style fallback**: a single `[[redirects]]` rule proxies `/__/auth/*` to `coalition-aec44.firebaseapp.com` so Firebase Auth's hosted handler URLs resolve cleanly.
-- **Security headers**: `Cross-Origin-Opener-Policy: same-origin-allow-popups` is set globally via `[[headers]]` for `/` — needed for Stripe/PayPal popups.
+The frontend is deployed to **Vercel** (project `backdoorco`); the serverless functions remain on **Netlify**.
+
+- **Host (static site)**: Vercel — `vercel.json` publishes the repo root as-is (`buildCommand: null`, `outputDirectory: "."`, `cleanUrls: true`, `trailingSlash: false`), so all HTML, CSS, JS, and `products/*` images deploy as static assets.
+- **Domains**: `backdoorco.xyz` (apex) and `www.backdoorco.xyz` (308 redirect → apex) are attached to the Vercel project; `backdoorco.vercel.app` is Vercel's default alias.
+- **Functions dir**: `netlify/functions` — these still run on Netlify (site `backdoorco2.netlify.app`).
+- **Netlify Functions proxy**: `vercel.json` rewrites `/.netlify/functions/*` → `https://backdoorco2.netlify.app/.netlify/functions/*`, so checkout, payments, offers, and price monitors work unchanged on the Vercel domain. The `backdoorco2` Netlify site must stay deployed.
+- **Auth proxy**: `netlify.toml` (`[[redirects]]`) and `vercel.json` (`rewrites`) both proxy `/__/auth/*` → `coalition-aec44.firebaseapp.com` so Firebase Auth's hosted handler URLs resolve cleanly.
+- **Security headers**: `Cross-Origin-Opener-Policy: same-origin-allow-popups` is set globally (via `[[headers]]` in `netlify.toml` and `headers` in `vercel.json`) — needed for Stripe/PayPal popups.
 - **Ignored paths**: `.npm-cache/` and secrets, per `.netlifyignore` and `.gitignore`.
 - **CI**: GitHub Actions CodeQL runs only for `.github/**` workflows per `codeql.yml`.
 
 ### Deploy flow
 
-1. Push to `main` → Netlify builds (no build step) + deploys.
-2. Admin changes are made from the running site (admin pages write back to Firestore directly).
-3. New products usually go through the **Import / Imgur Paste** flow inside the admin SPA (`admin/index.html` → Import tab) or the local Express helper `server.js`.
+1. Deploy the static site from the repo root with `vercel --prod` (no build step — `buildCommand: null`).
+2. Netlify redeploys when `netlify/functions/*` (or the Netlify site config) changes.
+3. Admin changes are made from the running site (admin pages write back to Firestore directly).
+4. New products usually go through the **Import / Imgur Paste** flow inside the admin SPA (`admin/index.html` → Import tab) or the local Express helper `server.js`.
 
 ---
 
@@ -560,7 +565,7 @@ Works for Lyst, Farfetch, END., SSENSE, Mr Porter, Nordstrom, Net-A-Porter. JS-o
 
 ## Contact & Support
 
-- Live storefront: [backdoorco.xyz](https://backdoorco.vercel.app/)
+- Live storefront: [backdoorco.xyz](https://backdoorco.xyz/)
 - Social: [@backdoorco](https://instagram.com/backdoorco) · [TikTok](https://tiktok.com/@backdoorco) · [X / Twitter](https://twitter.com/backdoorco)
 - Repository: [github.com/sgscrap/BackdoorCo](https://github.com/sgscrap/BackdoorCo)
 - Support email: `support@backdoorco.xyz`

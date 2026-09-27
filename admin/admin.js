@@ -76,14 +76,9 @@ function initFirebaseListeners() {
 
 function checkAuth() {
     auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('adminDashboard').classList.remove('hidden');
-            renderDashboard();
-        } else {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('adminDashboard').classList.add('hidden');
-        }
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        renderDashboard();
     });
 }
 

@@ -17,6 +17,9 @@ NAV_TEMPLATE = """<nav class="navbar" id="navbar">
                 <a href="shop-all.html?filter=Prada" class="current-cat-link">Prada</a>
                 <a href="shop-all.html?filter=Dior" class="current-cat-link">Dior</a>
                 <a href="shop-all.html?filter=LOEWE" class="current-cat-link">LOEWE</a>
+                <a href="shop-all.html?filter=Burberry" class="current-cat-link">Burberry</a>
+                <a href="shop-all.html?filter=Moncler" class="current-cat-link">Moncler</a>
+                <a href="shop-all.html?filter=Fendi" class="current-cat-link">Fendi</a>
                 <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
                 <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
                 <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
@@ -55,6 +58,9 @@ NAV_TEMPLATE = """<nav class="navbar" id="navbar">
     <a class="nav-link" href="shop-all.html?filter=Prada">Prada</a>
     <a class="nav-link" href="shop-all.html?filter=Dior">Dior</a>
     <a class="nav-link" href="shop-all.html?filter=LOEWE">LOEWE</a>
+    <a class="nav-link" href="shop-all.html?filter=Burberry">Burberry</a>
+    <a class="nav-link" href="shop-all.html?filter=Moncler">Moncler</a>
+    <a class="nav-link" href="shop-all.html?filter=Fendi">Fendi</a>
     <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
     <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
     <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>

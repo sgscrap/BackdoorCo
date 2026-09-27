@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://backdoorco.vercel.app/sitemap.xml
+Sitemap: https://backdoorco.xyz/sitemap.xml

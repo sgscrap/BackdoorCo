@@ -10,8 +10,12 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import {
     buildProductHref,
+    getProductCardClass,
     getProductCardImage,
+    getProductSizes,
     getProductSortTimestamp,
+    getTotalStock,
+    isOutOfStock,
     mergeCatalogProducts
 } from './product-data.js';
 
@@ -30,6 +34,30 @@ const grid = document.getElementById('shopAllGrid');
 const loading = document.getElementById('shopLoading');
 const noResults = document.getElementById('shopNoResults');
 const resultsCount = document.getElementById('resultsCount');
+
+function getCardSizeSummary(product) {
+    const sizes = getProductSizes(product).map((entry) => entry.size).filter(Boolean);
+    if (!sizes.length) return '';
+    if (sizes.length <= 4) return `Sizes ${sizes.join(', ')}`;
+    return `Sizes ${sizes[0]} - ${sizes[sizes.length - 1]}`;
+}
+
+function setActiveFilterTab(filter) {
+    document.querySelectorAll('.shop-filter-tab').forEach((tab) => {
+        tab.classList.toggle('active', tab.dataset.filter === filter);
+    });
+}
+
+function syncUrlState({ replace = false } = {}) {
+    const params = new URLSearchParams();
+    if (currentFilter && currentFilter !== 'all') params.set('filter', currentFilter);
+    if (currentSort && currentSort !== 'price-high') params.set('sort', currentSort);
+    if (searchTerm) params.set('search', searchTerm);
+
+    const query = params.toString();
+    const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}`;
+    window.history[replace ? 'replaceState' : 'pushState']({}, '', nextUrl);
+}
 
 // ================================
 // HIDE SKELETON — KEY FIX
@@ -209,8 +237,13 @@ function renderProducts() {
 
     // Build HTML
     if (grid) {
-        grid.innerHTML = filtered.map((p, i) => `
-            <a class="shop-card"
+        grid.innerHTML = filtered.map((p, i) => {
+            const stock = getTotalStock(p);
+            const outOfStock = isOutOfStock(p);
+            const sizeSummary = getCardSizeSummary(p);
+
+            return `
+            <a class="shop-card${getProductCardClass(p)}"
                  data-id="${p.id}"
                  href="${buildProductHref(p)}"
                  style="animation-delay:${Math.min(i * 0.04, 0.3)}s"
@@ -221,13 +254,13 @@ function renderProducts() {
                 ? `<span class="hot-badge">HOT</span>`
                 : ''
             }
-                    ${p.stock <= 3 && p.stock > 0
+                    ${stock <= 3 && stock > 0
                 ? `<span class="low-badge">
-                               ${p.stock} LEFT
+                               ${stock} LEFT
                            </span>`
                 : ''
             }
-                    ${p.stock === 0
+                    ${outOfStock
                 ? `<div class="sold-overlay">
                                <span>SOLD OUT</span>
                            </div>`
@@ -236,6 +269,7 @@ function renderProducts() {
                     ${getProductCardImage(p)
                 ? `<img src="${getProductCardImage(p)}"
                                 alt="${p.name}"
+                                referrerpolicy="no-referrer"
                                 loading="${i < 4
                     ? 'eager'
                     : 'lazy'}"
@@ -254,6 +288,7 @@ function renderProducts() {
                     <p class="shop-card-cat">
                         ${(p.category || '').toUpperCase()}
                     </p>
+                    ${sizeSummary ? `<p class="shop-card-sizes">${sizeSummary}</p>` : ''}
                     <div class="shop-card-bottom">
                         <div>
                             <p class="shop-card-label">
@@ -264,7 +299,7 @@ function renderProducts() {
                 .toFixed(0)}
                             </p>
                         </div>
-                        ${p.stock > 0
+                        ${!outOfStock
                 ? `<span class="shop-buy-btn"
                                    onclick="event.stopPropagation();
                                    event.preventDefault();
@@ -278,7 +313,7 @@ function renderProducts() {
                     </div>
                 </div>
             </a>
-        `).join('');
+        `}).join('');
     }
 
     // Show grid — hides skeletons
@@ -302,6 +337,15 @@ function updateFilterCounts() {
         ).length,
         LOEWE: allProducts.filter(
             p => p.brand === 'LOEWE'
+        ).length,
+        Burberry: allProducts.filter(
+            p => p.brand === 'Burberry'
+        ).length,
+        Moncler: allProducts.filter(
+            p => p.brand === 'Moncler'
+        ).length,
+        Fendi: allProducts.filter(
+            p => p.brand === 'Fendi'
         ).length,
         Nike: allProducts.filter(
             p => p.brand === 'Nike'
@@ -393,10 +437,9 @@ function updateCartDisplay() {
 // ================================
 document.querySelectorAll('.shop-filter-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-        document.querySelectorAll('.shop-filter-tab')
-            .forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
         currentFilter = tab.dataset.filter;
+        setActiveFilterTab(currentFilter);
+        syncUrlState();
         renderProducts();
     });
 });
@@ -408,6 +451,7 @@ const sortSelect = document.getElementById('shopSort');
 if (sortSelect) {
     sortSelect.addEventListener('change', (e) => {
         currentSort = e.target.value;
+        syncUrlState();
         renderProducts();
     });
 }
@@ -432,6 +476,7 @@ if (searchInput) {
 
         searchDebounce = setTimeout(() => {
             searchTerm = e.target.value.toLowerCase().trim();
+            syncUrlState({ replace: true });
             renderProducts();
         }, 300);
     });
@@ -442,6 +487,7 @@ if (clearSearchBtn) {
         if (searchInput) searchInput.value = '';
         clearSearchBtn.classList.add('d-none');
         searchTerm = '';
+        syncUrlState();
         renderProducts();
     });
 }
@@ -462,10 +508,8 @@ if (clearFiltersBtn) {
         }
         if (sortSelect) sortSelect.value = 'price-high';
 
-        document.querySelectorAll('.shop-filter-tab')
-            .forEach(t => t.classList.remove('active'));
-        document.querySelector('[data-filter="all"]')
-            ?.classList.add('active');
+        setActiveFilterTab('all');
+        syncUrlState();
 
         renderProducts();
     });
@@ -492,10 +536,9 @@ function readUrlParams() {
     if (filterParam) {
         currentFilter = filterParam;
         // Activate matching tab if it exists
-        document.querySelectorAll('.shop-filter-tab').forEach(t => t.classList.remove('active'));
+        setActiveFilterTab(filterParam);
         const matchingTab = document.querySelector(`[data-filter="${filterParam}"]`);
         if (matchingTab) {
-            matchingTab.classList.add('active');
             // Open containing accordion if closed
             const accordion = matchingTab.closest('.sidebar-accordion');
             if (accordion && !accordion.classList.contains('open')) {

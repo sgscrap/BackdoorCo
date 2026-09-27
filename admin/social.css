@@ -171,6 +171,30 @@
   margin-bottom: 12px;
 }
 
+.toggle-row--3col {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.canvas-price--visit {
+  font-size: 42px;
+  color: var(--canvas-accent);
+  font-style: italic;
+}
+
+.canvas-visit-url {
+  font-size: 28px;
+  color: var(--canvas-muted);
+  font-style: normal;
+  font-weight: 700;
+  margin-top: 6px;
+  opacity: 0.85;
+  word-break: break-all;
+}
+
+#visitUrlGroup {
+  margin-top: -4px;
+}
+
 .toggle-row label {
   display: flex;
   align-items: center;
@@ -235,6 +259,77 @@
   margin-top: 10px;
 }
 
+.add-queue-btn {
+  width: 100%;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  min-height: 34px;
+}
+
+.queue-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  padding: 6px 12px 6px 14px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  max-width: 100%;
+}
+
+.queue-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-chip button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.2s;
+}
+
+.queue-chip button:hover {
+  color: #f44;
+}
+
+.queue-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 0;
+}
+
+.queue-list:empty::after {
+  content: 'No products queued';
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  padding: 8px 0;
+}
+
+.batch-export-btn:hover {
+  background: rgba(108, 92, 231, 0.35) !important;
+  border-color: rgba(108, 92, 231, 0.6) !important;
+  color: #d4c8ff !important;
+}
+
+.batch-export-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.batch-progress.active {
+  display: block;
+}
+
 .asset-stage {
   display: flex;
   flex-direction: column;
@@ -277,6 +372,12 @@
   text-decoration: none;
   min-height: 34px;
   white-space: nowrap;
+}
+
+/* ── Font system variables ── */
+.asset-canvas {
+  --canvas-font: "Space Grotesk", sans-serif;
+  --canvas-weight: 900;
 }
 
 .canvas-viewport {
@@ -397,6 +498,27 @@
   background: linear-gradient(135deg, #260505, #7e1010 72%, #1a0303);
 }
 
+.theme-holiday {
+  --canvas-bg: #0a1a0a;
+  --canvas-panel: #0d0d0d;
+  --canvas-ink: #fff;
+  --canvas-muted: rgba(255, 255, 255, 0.64);
+  --canvas-accent: #ffd700;
+  --canvas-line: rgba(255, 255, 255, 0.16);
+  background: linear-gradient(135deg, #0a2a0a, #1a0a0a 50%, #0a1a0a);
+}
+
+.theme-teaser {
+  --canvas-bg: #020408;
+  --canvas-panel: #0a0a10;
+  --canvas-ink: #e0e0e0;
+  --canvas-muted: rgba(224, 224, 224, 0.48);
+  --canvas-accent: #6c5ce7;
+  --canvas-line: rgba(108, 92, 231, 0.2);
+  background: linear-gradient(160deg, #020408, #0a0a18 40%, #050510);
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(108, 92, 231, 0.03) 2px, rgba(108, 92, 231, 0.03) 4px), linear-gradient(160deg, #020408, #0a0a18 40%, #050510);
+}
+
 .canvas-card {
   position: absolute;
   inset: 0;
@@ -468,7 +590,7 @@
   color: var(--canvas-ink);
   font-size: 88px;
   line-height: 0.92;
-  font-weight: 950;
+  font-weight: 900;
   max-width: 760px;
   text-wrap: balance;
 }
@@ -623,7 +745,7 @@
   color: var(--canvas-accent);
   font-size: 130px;
   line-height: 0.88;
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .theme-white .template-sale .sale-price,
@@ -671,6 +793,99 @@
   padding: 54px;
   grid-template-rows: auto 1fr auto;
   gap: 28px;
+}
+
+.template-holiday {
+  padding: 72px;
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: 42px;
+}
+
+.template-holiday .copy-zone {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.template-holiday .copy-stack {
+  display: grid;
+  gap: 25px;
+}
+
+.theme-holiday .canvas-kicker,
+.theme-holiday .canvas-badge {
+  color: #ffd700;
+  border-color: #ffd700;
+}
+
+.template-teaser {
+  padding: 80px 72px;
+  grid-template-rows: auto 1fr auto;
+  gap: 56px;
+  justify-items: center;
+  text-align: center;
+}
+
+.template-teaser .teaser-icon {
+  font-size: 120px;
+  line-height: 1;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 40px rgba(108, 92, 231, 0.4));
+}
+
+.template-teaser .teaser-reveal {
+  color: var(--canvas-accent);
+  font-size: 28px;
+  font-weight: 900;
+  border: 2px solid var(--canvas-accent);
+  border-radius: 999px;
+  padding: 14px 32px;
+  display: inline-flex;
+  width: max-content;
+}
+
+.theme-teaser .canvas-badge {
+  color: #6c5ce7;
+  border-color: #6c5ce7;
+}
+
+.template-flash {
+  padding: 68px;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 40px;
+}
+
+.template-flash .copy-zone {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.template-flash .flash-price {
+  color: var(--canvas-accent);
+  font-size: 130px;
+  line-height: 0.88;
+  font-weight: 900;
+}
+
+.template-flash .flash-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--canvas-panel);
+  border: 3px solid var(--canvas-line);
+  border-radius: 18px;
+  padding: 22px 32px;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--canvas-ink);
+  letter-spacing: 0.04em;
+}
+
+.theme-white .template-flash .flash-price,
+.theme-volt .template-flash .flash-price {
+  color: #050505;
 }
 
 .collage-grid {
@@ -826,6 +1041,248 @@
   font-weight: 900;
   text-align: center;
   padding: 40px;
+}
+
+/* ── Drafts ── */
+.drafts-list {
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.drafts-list:empty::after {
+  content: 'No saved drafts';
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  padding: 8px 0;
+}
+
+.draft-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.draft-item:hover {
+  border-color: rgba(200, 246, 93, 0.45);
+}
+
+.draft-item .draft-info {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.draft-item .draft-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.draft-item .draft-date {
+  font-size: 0.64rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.draft-item .draft-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 2px 4px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.draft-item .draft-delete:hover {
+  color: #f44;
+}
+
+/* ── Effects ── */
+.asset-controls input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--border-light);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+
+.asset-controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #050505;
+}
+
+/* Image filter data attributes */
+.product-media img[data-filter="grayscale"] {
+  filter: grayscale(100%) drop-shadow(0 42px 48px rgba(0, 0, 0, 0.4));
+}
+
+.product-media img[data-filter="sepia"] {
+  filter: sepia(100%) drop-shadow(0 42px 48px rgba(0, 0, 0, 0.4));
+}
+
+.product-media img[data-filter="contrast"] {
+  filter: contrast(1.5) saturate(1.2) drop-shadow(0 42px 48px rgba(0, 0, 0, 0.4));
+}
+
+.product-media img[data-filter="warm"] {
+  filter: sepia(0.3) saturate(1.4) hue-rotate(-10deg) drop-shadow(0 42px 48px rgba(0, 0, 0, 0.4));
+}
+
+.product-media img[data-filter="cool"] {
+  filter: saturate(0.8) hue-rotate(180deg) drop-shadow(0 42px 48px rgba(0, 0, 0, 0.4));
+}
+
+/* Blur effect */
+.product-media.blur-bg {
+  filter: blur(8px);
+}
+
+/* Watermark */
+.canvas-watermark {
+  position: absolute;
+  bottom: 54px;
+  right: 54px;
+  z-index: 10;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--canvas-muted);
+  opacity: 0.45;
+  pointer-events: none;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.canvas-watermark strong {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--canvas-muted);
+  color: var(--canvas-bg);
+  font-size: 20px;
+}
+
+/* ── Scheduler ── */
+.scheduled-grid {
+  margin-top: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.scheduled-grid:empty::after {
+  content: 'No scheduled posts';
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  padding: 8px 0;
+}
+
+.scheduled-card {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+}
+
+.scheduled-card img {
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: #111;
+}
+
+.scheduled-card .sched-info {
+  overflow: hidden;
+  min-width: 0;
+}
+
+.scheduled-card .sched-time {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scheduled-card .sched-caption {
+  font-size: 0.64rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scheduled-card .sched-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 2px 4px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.scheduled-card .sched-delete:hover {
+  color: #f44;
+}
+
+/* ── Font system selectors (placed last to override same-specificity template rules) ── */
+.asset-canvas .canvas-title,
+.asset-canvas .canvas-body,
+.asset-canvas .canvas-kicker,
+.asset-canvas .canvas-price,
+.asset-canvas .canvas-price--visit,
+.asset-canvas .canvas-visit-url,
+.asset-canvas .canvas-cta,
+.asset-canvas .canvas-meta,
+.asset-canvas .canvas-sizes,
+.asset-canvas .canvas-badge,
+.asset-canvas .sale-price,
+.asset-canvas .flash-price,
+.asset-canvas .flash-timer,
+.asset-canvas .collage-price,
+.asset-canvas .collage-name,
+.asset-canvas .restock-row,
+.asset-canvas .brand-mark,
+.asset-canvas .teaser-icon,
+.asset-canvas .teaser-reveal,
+.asset-canvas .empty-product {
+  font-family: var(--canvas-font, "Space Grotesk", sans-serif);
+  font-weight: var(--canvas-weight, 900);
 }
 
 @media (max-width: 1280px) {

@@ -8,12 +8,10 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.token.admin == true;
     }
 
-    // ── Orders ──
+    // ── Orders (public read for local dev, admin write) ──
     match /orders/{orderId} {
-      // Anyone can create (checkout flow)
-      allow create: if true;
-      // Only the order owner or admin can read/update
-      allow read, update: if request.auth != null && (
+      allow read, create: if true;
+      allow update: if request.auth != null && (
         resource.data.userId == request.auth.uid ||
         request.auth.token.admin == true
       );
@@ -22,15 +20,12 @@ service cloud.firestore {
 
     // ── Users ──
     match /users/{userId} {
-      // Only the authenticated user can read/write their own document
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
     // ── Offers ──
     match /offers/{offerId} {
-      // Anyone can submit an offer
       allow create: if true;
-      // Only admin can read and manage offers
       allow read, update, delete: if request.auth != null && request.auth.token.admin == true;
     }
 
@@ -42,6 +37,21 @@ service cloud.firestore {
         resource.data.userId == request.auth.uid ||
         request.auth.token.admin == true
       );
+    }
+
+    // ── Restock Portal (admin-only) ──
+    match /restock_ideas/{ideaId} {
+      allow read, write, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // ── Social Desk: drafts ──
+    match /social_drafts/{draftId} {
+      allow read, write, delete: if true;
+    }
+
+    // ── Social Desk: scheduled posts ──
+    match /scheduled_posts/{postId} {
+      allow read, write, delete: if true;
     }
 
   }

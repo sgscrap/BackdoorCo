@@ -509,6 +509,7 @@ function renderProduct(product) {
     currentImageIndex = 0;
 
     const mainImage = document.getElementById('productMainImage');
+    mainImage.referrerPolicy = 'no-referrer';
     mainImage.src = productImages[0] || '';
     mainImage.alt = `${product.name} image 1`;
 
@@ -658,7 +659,7 @@ function renderGalleryControls() {
                 onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); selectProductImage(this); }"
                 aria-label="View image ${index + 1}"
             >
-                <img src="${src}" alt="View ${index + 1}" loading="lazy" onerror="this.style.display='none'">
+                <img src="${src}" alt="View ${index + 1}" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display='none'">
             </button>
         `).join('');
         dots.style.display = hasMultiple ? 'flex' : 'none';
@@ -671,6 +672,7 @@ function setProductImage(index) {
     currentImageIndex = (index + productImages.length) % productImages.length;
     const mainImage = document.getElementById('productMainImage');
     if (mainImage) {
+        mainImage.referrerPolicy = 'no-referrer';
         mainImage.src = productImages[currentImageIndex];
         mainImage.alt = `${currentProduct?.name || 'Product'} image ${currentImageIndex + 1}`;
     }

@@ -5,6 +5,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import {
     buildProductHref,
+    getProductCardClass,
     getProductCardImage,
     mergeCatalogProducts
 } from './product-data.js';
@@ -150,7 +151,7 @@ function renderMostWanted() {
     }
 
     productGrid.innerHTML = topPriced.map((p, i) => `
-        <div class="mw-card drop-card"
+        <div class="mw-card drop-card${getProductCardClass(p)}"
              data-id="${p.id}"
              style="animation-delay:${i * 0.1}s">
 
@@ -179,6 +180,7 @@ function renderMostWanted() {
 
                     <img src="${getProductCardImage(p) || ''}"
                          alt="${p.name}"
+                         referrerpolicy="no-referrer"
                          loading="${i < 2 ? 'eager' : 'lazy'}"
                          onerror="this.style.display='none'">
                 

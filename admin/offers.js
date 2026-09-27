@@ -3,9 +3,8 @@ import { collection, onSnapshot, query, orderBy, updateDoc, doc } from 'https://
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 onAuthStateChanged(auth, user => {
-    if (!user) { window.location.href = 'index.html'; return; }
-    document.getElementById('userName').textContent = user.email.split('@')[0];
-    document.getElementById('userAvatar').textContent = user.email[0].toUpperCase();
+    document.getElementById('userName').textContent = user?.email?.split('@')[0] || 'Admin';
+    document.getElementById('userAvatar').textContent = user?.email?.[0]?.toUpperCase() || 'A';
     initOffers();
 });
 

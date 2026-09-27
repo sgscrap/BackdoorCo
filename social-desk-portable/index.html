@@ -1,0 +1,3886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!--
+  Voltride Social Media Asset Desk (portable workspace)
+  Drops into any static site. Replace sample-listings.js with your own listings,
+  or add / merge entries into window.voltrideDatabase. No login required.
+-->
+<script src="sample-listings.js"></script>
+
+<script>
+ if (window.self !== window.top) {
+ document.documentElement.classList.add('in-iframe');
+ }
+</script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Generate high-resolution social media covers and promotional graphics for Voltride dirtbike listings." />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Social Media Asset Desk | Voltride</title>
+<link rel="icon" type="image/png" href="assets/favicon.webp" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Voltride" />
+<meta property="og:url" content="https://voltride.com/social-generator" />
+<meta property="og:title" content="Social Media Asset Desk | Voltride" />
+<meta property="og:description" content="Generate high-resolution social media covers and promotional graphics for Voltride music releases." />
+<meta property="og:image" content="https://voltride.example/assets/og-image.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" as="style" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" />
+<!-- Load html2canvas via CDN -->
+
+<button id="back-to-top" aria-label="Back to top" style="position:fixed;bottom:24px;left:24px;width:44px;height:44px;background:#D72638;color:#F2EDE2;border:none;font-size:20px;cursor:pointer;z-index:999;opacity:0;transition:opacity 0.3s;display:none;">&uarr;</button>
+<script>
+(function(){
+ var btn=document.getElementById('back-to-top');
+ window.addEventListener('scroll',function(){if(window.scrollY>400){btn.style.display='block';setTimeout(function(){btn.style.opacity='1';},10);}else{btn.style.opacity='0';setTimeout(function(){btn.style.display='none';},300);}});
+ btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+}());
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+ html.in-iframe header.ws-header {
+ display: none !important;
+ }
+ html.in-iframe .workspace {
+ height: 100vh !important;
+ }
+
+ :root {
+ /* Voltride Brand Colors */
+ --paper: #F2EDE2;
+ --paper-deep: #E8E1D1;
+ --ink: #141414;
+ --ink-soft: #3A3A38;
+ --muted: #6F6A60;
+ --red: #D72638;
+ --red-deep: #A11E2C;
+ --gold: #E8A33D;
+ 
+ /* Workspace UI Colors */
+ --ws-bg: #0F0F12;
+ --ws-panel: #18181F;
+ --ws-border: #2D2D37;
+ --ws-text: #E4E4EB;
+ --ws-text-muted: #9A9AAB;
+ --ws-accent: #E8A33D;
+ --ws-accent-hover: #f1b353;
+ }
+
+ * { box-sizing: border-box; margin: 0; padding: 0; }
+ body {
+ background: var(--ws-bg);
+ color: var(--ws-text);
+ font-family: 'DM Sans', sans-serif;
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ overflow-x: hidden;
+ }
+
+ /* Header */
+ header.ws-header {
+ background: linear-gradient(180deg, #1C1C26 0%, var(--ws-panel) 100%);
+ border-bottom: 1px solid var(--ws-border);
+ padding: 14px 24px;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ position: relative;
+ z-index: 10;
+ gap: 16px;
+ }
+ /* Subtle gold accent line across top of header */
+ header.ws-header::before {
+ content: '';
+ position: absolute;
+ top: 0; left: 0; right: 0;
+ height: 2px;
+ background: linear-gradient(90deg, transparent 0%, var(--ws-accent) 30%, var(--red) 70%, transparent 100%);
+ opacity: 0.6;
+ }
+ .ws-logo {
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ text-decoration: none;
+ color: inherit;
+ }
+ .ws-logo-img {
+ display: block;
+ filter: drop-shadow(0 2px 4px rgba(0,0,0,0.24));
+ height: 44px;
+ max-width: 180px;
+ object-fit: contain;
+ width: auto;
+ }
+ .ws-logo strong {
+ font-family: 'Anton', sans-serif;
+ font-size: 24px;
+ letter-spacing: 0.05em;
+ text-transform: uppercase;
+ }
+ .ws-logo strong span { color: var(--red); }
+ .ws-badge {
+ background: var(--ws-border);
+ color: var(--ws-accent);
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.1em;
+ padding: 4px 8px;
+ border-radius: 4px;
+ text-transform: uppercase;
+ }
+ .back-btn {
+ color: var(--ws-text-muted);
+ text-decoration: none;
+ font-size: 13px;
+ font-weight: 500;
+ display: inline-flex;
+ align-items: center;
+ gap: 6px;
+ transition: color 0.2s;
+ }
+ .back-btn:hover { color: var(--ws-text); }
+ .ws-header-actions {
+ align-items: center;
+ display: flex;
+ flex-wrap: wrap;
+ gap: 10px;
+ justify-content: flex-end;
+ }
+ .ws-social-link {
+ border: 1px solid var(--ws-border);
+ color: var(--ws-text-muted);
+ font-size: 11px;
+ font-weight: 700;
+ letter-spacing: 0.12em;
+ padding: 7px 10px;
+ text-decoration: none;
+ text-transform: uppercase;
+ }
+ .ws-social-link:hover {
+ border-color: var(--ws-accent);
+ color: var(--ws-text);
+ }
+
+ /* Workspace Layout */
+ .workspace {
+ flex: 1;
+ display: grid;
+ grid-template-columns: 400px 1fr;
+ height: calc(100vh - 72px);
+ overflow: hidden;
+ }
+ .ws-footer {
+ background: var(--ws-panel);
+ border-top: 1px solid var(--ws-border);
+ color: var(--ws-text-muted);
+ display: flex;
+ flex-wrap: wrap;
+ font-size: 10px;
+ font-weight: 700;
+ gap: 14px;
+ justify-content: center;
+ letter-spacing: 0.14em;
+ padding: 10px 24px;
+ text-transform: uppercase;
+ }
+ .ws-footer a { color: var(--ws-text); text-decoration: none; }
+ .ws-footer a:hover { color: var(--ws-accent); }
+ .ws-footer .deploy-fingerprint {
+ color: var(--ws-text-muted);
+ max-width: 280px;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+ }
+
+ /* Left Panel (Controls) */
+ .controls-panel {
+ background: var(--ws-panel);
+ border-right: 1px solid var(--ws-border);
+ overflow-y: auto;
+ padding: 20px 22px;
+ display: flex;
+ flex-direction: column;
+ gap: 6px;
+ scrollbar-width: thin;
+ scrollbar-color: var(--ws-border) transparent;
+ }
+ .controls-panel::-webkit-scrollbar { width: 4px; }
+ .controls-panel::-webkit-scrollbar-track { background: transparent; }
+ .controls-panel::-webkit-scrollbar-thumb { background: var(--ws-border); border-radius: 2px; }
+ .controls-panel::-webkit-scrollbar-thumb:hover { background: var(--ws-accent); }
+
+ /* Section blocks */
+ .ctrl-section {
+ background: rgba(255,255,255,0.022);
+ border: 1px solid var(--ws-border);
+ border-radius: 10px;
+ padding: 14px 16px 16px;
+ transition: border-color 0.2s;
+ }
+ .ctrl-section:hover { border-color: rgba(232,163,61,0.2); }
+
+ .section-title {
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.2em;
+ text-transform: uppercase;
+ color: var(--ws-accent);
+ margin-bottom: 14px;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ }
+ .section-title::before {
+ content: '';
+ display: block;
+ width: 3px;
+ height: 14px;
+ background: var(--ws-accent);
+ border-radius: 2px;
+ flex-shrink: 0;
+ }
+ .form-group {
+ display: flex;
+ flex-direction: column;
+ gap: 5px;
+ margin-bottom: 12px;
+ }
+ .form-group:last-child { margin-bottom: 0; }
+ .form-group label {
+ font-size: 11px;
+ font-weight: 600;
+ color: var(--ws-text-muted);
+ letter-spacing: 0.04em;
+ }
+ .form-control, select, textarea {
+ background: #13131A;
+ border: 1px solid var(--ws-border);
+ color: var(--ws-text);
+ padding: 9px 11px;
+ font-size: 13px;
+ border-radius: 6px;
+ width: 100%;
+ outline: none;
+ transition: border-color 0.18s, box-shadow 0.18s;
+ font-family: inherit;
+ }
+ .form-control:focus, select:focus, textarea:focus {
+ border-color: var(--ws-accent);
+ box-shadow: 0 0 0 3px rgba(232,163,61,0.1);
+ }
+ textarea {
+ resize: vertical;
+ min-height: 60px;
+ }
+ select {
+ cursor: pointer;
+ appearance: none;
+ background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A9AAB' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+ background-repeat: no-repeat;
+ background-position: right 10px center;
+ padding-right: 30px;
+ }
+ .toggle-group {
+ display: grid;
+ grid-template-columns: repeat(2, 1fr);
+ gap: 6px;
+ }
+ .toggle-btn {
+ background: #13131A;
+ border: 1px solid var(--ws-border);
+ color: var(--ws-text-muted);
+ padding: 9px 6px;
+ font-size: 11px;
+ font-weight: 700;
+ text-align: center;
+ border-radius: 8px;
+ cursor: pointer;
+ transition: all 0.18s;
+ user-select: none;
+ letter-spacing: 0.04em;
+ }
+ .toggle-btn:hover { border-color: rgba(232,163,61,0.5); color: var(--ws-text); }
+ .toggle-btn.active {
+ background: linear-gradient(135deg, var(--ws-accent) 0%, #f1b353 100%);
+ color: #141414;
+ border-color: transparent;
+ font-weight: 800;
+ box-shadow: 0 2px 10px rgba(232,163,61,0.3);
+ }
+ .checkbox-group {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ font-size: 12px;
+ cursor: pointer;
+ color: var(--ws-text);
+ user-select: none;
+ margin-bottom: 6px;
+ padding: 4px 0;
+ transition: color 0.15s;
+ }
+ .checkbox-group:hover { color: var(--ws-accent); }
+ .checkbox-group input { cursor: pointer; accent-color: var(--ws-accent); width: 15px; height: 15px; }
+
+ /* File upload styling */
+ .file-input-wrapper {
+ position: relative;
+ overflow: hidden;
+ display: inline-block;
+ width: 100%;
+ }
+ .file-input-btn {
+ background: #13131A;
+ border: 1.5px dashed var(--ws-border);
+ color: var(--ws-text-muted);
+ padding: 12px;
+ border-radius: 8px;
+ text-align: center;
+ cursor: pointer;
+ font-size: 12px;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ gap: 5px;
+ transition: all 0.18s;
+ letter-spacing: 0.02em;
+ }
+ .file-input-btn:hover {
+ border-color: var(--ws-accent);
+ color: var(--ws-text);
+ background: #1e1e28;
+ }
+ .file-input-wrapper input[type=file] {
+ position: absolute;
+ left: 0; top: 0;
+ opacity: 0;
+ width: 100%; height: 100%;
+ cursor: pointer;
+ }
+
+ /* Export panel */
+ .export-btn {
+ background: linear-gradient(135deg, #D72638 0%, #c21e2e 100%);
+ color: white;
+ border: none;
+ padding: 15px;
+ font-size: 13px;
+ font-weight: 800;
+ letter-spacing: 0.12em;
+ text-transform: uppercase;
+ border-radius: 8px;
+ cursor: pointer;
+ width: 100%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ gap: 8px;
+ box-shadow: 0 4px 20px rgba(215, 38, 56, 0.4);
+ transition: all 0.2s;
+ margin-top: 8px;
+ position: relative;
+ overflow: hidden;
+ }
+ .export-btn::after {
+ content: '';
+ position: absolute;
+ inset: 0;
+ background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+ transform: translateX(-100%);
+ transition: transform 0.4s;
+ }
+ .export-btn:hover::after { transform: translateX(100%); }
+ .export-btn:hover {
+ background: linear-gradient(135deg, #e62f43 0%, #d72638 100%);
+ transform: translateY(-2px);
+ box-shadow: 0 8px 24px rgba(215, 38, 56, 0.5);
+ }
+ .export-btn:active { transform: translateY(0); }
+
+ /* Right Panel (Preview Area) */
+ .preview-panel {
+ background: #0A0A0E;
+ background-image:
+ radial-gradient(circle at 50% 50%, rgba(232,163,61,0.03) 0%, transparent 70%),
+ radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+ background-size: 100% 100%, 24px 24px;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ position: relative;
+ padding: 40px;
+ overflow: hidden;
+ }
+ /* Corner rulers for the preview panel */
+ .preview-panel::before {
+ content: '';
+ position: absolute;
+ inset: 0;
+ background:
+ linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+ linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+ background-size: 80px 80px;
+ pointer-events: none;
+ }
+ /* LIVE badge */
+ .preview-live-badge {
+ position: absolute;
+ top: 14px;
+ left: 16px;
+ display: flex;
+ align-items: center;
+ gap: 6px;
+ font-size: 10px;
+ font-weight: 800;
+ letter-spacing: 0.2em;
+ text-transform: uppercase;
+ color: var(--ws-text-muted);
+ background: rgba(255,255,255,0.05);
+ border: 1px solid var(--ws-border);
+ border-radius: 20px;
+ padding: 5px 10px;
+ z-index: 5;
+ }
+ .preview-live-dot {
+ width: 7px;
+ height: 7px;
+ background: #22c55e;
+ border-radius: 50%;
+ animation: livePulse 2s ease-in-out infinite;
+ flex-shrink: 0;
+ }
+ @keyframes livePulse {
+ 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+ 50% { opacity: 0.7; box-shadow: 0 0 0 5px rgba(34,197,94,0); }
+ }
+ /* Format label */
+ .preview-format-badge {
+ position: absolute;
+ top: 14px;
+ right: 16px;
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.15em;
+ text-transform: uppercase;
+ color: var(--ws-text-muted);
+ background: rgba(255,255,255,0.05);
+ border: 1px solid var(--ws-border);
+ border-radius: 20px;
+ padding: 5px 10px;
+ z-index: 5;
+ transition: all 0.2s;
+ }
+ .canvas-wrapper {
+ position: relative;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ width: 100%;
+ height: 100%;
+ }
+
+ /* Native card sizes: */
+ /* We render them at full resolution but scaled down visually */
+ #promo-canvas {
+ background: var(--paper);
+ color: var(--ink);
+ position: absolute;
+ overflow: hidden;
+ box-shadow:
+ 0 0 0 1px rgba(255,255,255,0.06),
+ 0 30px 80px rgba(0,0,0,0.8),
+ 0 0 60px rgba(232,163,61,0.06);
+ font-family: 'DM Sans', sans-serif;
+ transform-origin: center center;
+ flex-shrink: 0;
+ transition: box-shadow 0.3s;
+ }
+ #promo-canvas:hover {
+ box-shadow:
+ 0 0 0 1px rgba(232,163,61,0.15),
+ 0 30px 80px rgba(0,0,0,0.8),
+ 0 0 80px rgba(232,163,61,0.12);
+ }
+
+ /* Size configurations */
+ .ratio-1-1 { width: 1080px; height: 1080px; }
+ .ratio-9-16 { width: 1080px; height: 1920px; }
+ .ratio-16-9 { width: 1200px; height: 675px; }
+
+ /* Canvas Template Styles */
+ .canvas-inner {
+ width: 100%;
+ height: 100%;
+ position: relative;
+ padding: 60px;
+ display: flex;
+ flex-direction: column;
+ justify-content: space-between;
+ }
+ .ratio-9-16 .canvas-inner {
+ padding: 100px 70px;
+ }
+ .ratio-16-9 .canvas-inner {
+ padding: 45px 60px;
+ }
+
+ /* Paper grain background texture overlay */
+ .canvas-texture {
+ content: '';
+ position: absolute;
+ inset: 0;
+ pointer-events: none;
+ z-index: 10;
+ mix-blend-mode: multiply;
+ opacity: 0.35;
+ background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.08 0 0 0 0 0.08 0 0 0 0.5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+ }
+
+ /* Template Content Layouts */
+
+ /* Voltride Masthead block inside post card */
+ .card-masthead {
+ border-bottom: 3px double var(--ink);
+ padding-bottom: 20px;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ width: 100%;
+ z-index: 2;
+ }
+ .ratio-16-9 .card-masthead {
+ padding-bottom: 12px;
+ }
+ .card-masthead-title {
+ font-family: 'Anton', sans-serif;
+ font-size: 42px;
+ line-height: 0.85;
+ text-transform: uppercase;
+ letter-spacing: 0.02em;
+ }
+ .card-masthead-title span { color: var(--red); }
+ .card-masthead-meta {
+ font-size: 11px;
+ font-weight: 700;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
+ color: var(--ink-soft);
+ text-align: right;
+ line-height: 1.4;
+ }
+
+ /* 1. Single Promotion Template */
+ .template-single {
+ display: grid;
+ grid-template-rows: 1fr auto;
+ align-items: center;
+ gap: 32px;
+ height: 100%;
+ width: 100%;
+ z-index: 1;
+ }
+ .ratio-9-16 .template-single {
+ grid-template-rows: auto 1fr auto;
+ gap: 48px;
+ }
+ .ratio-16-9 .template-single {
+ grid-template-columns: 1fr 1.2fr;
+ grid-template-rows: 1fr;
+ align-items: center;
+ gap: 40px;
+ }
+ 
+ .single-media-area {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ position: relative;
+ width: 100%;
+ }
+ .single-cover-frame {
+ width: 380px;
+ height: 380px;
+ background: #0d0d0d;
+ border: 2px solid var(--ink);
+ box-shadow: 0 16px 36px rgba(0,0,0,0.25);
+ position: relative;
+ z-index: 3;
+ overflow: hidden;
+ }
+ .ratio-9-16 .single-cover-frame {
+ width: 480px;
+ height: 480px;
+ }
+ .ratio-16-9 .single-cover-frame {
+ width: 290px;
+ height: 290px;
+ }
+ .single-cover-frame img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ }
+ .cover-fallback {
+ width: 100%;
+ height: 100%;
+ background: linear-gradient(135deg, var(--red-deep), var(--ink));
+ display: flex;
+ flex-direction: column;
+ justify-content: space-between;
+ padding: 30px;
+ color: var(--paper);
+ }
+ .cover-fallback strong {
+ font-family: 'Anton', sans-serif;
+ font-size: 52px;
+ line-height: 0.9;
+ text-transform: uppercase;
+ }
+ .cover-fallback span {
+ font-size: 11px;
+ font-weight: 700;
+ letter-spacing: 0.2em;
+ text-transform: uppercase;
+ }
+
+ /* Interactive Vinyl disc visual accessory */
+ .vinyl-disc-accessory {
+ width: 380px;
+ height: 380px;
+ border-radius: 50%;
+ background:
+ radial-gradient(circle, transparent 0 6%, rgba(232, 163, 61, 0.7) 6.5% 7.5%, transparent 8% 22%, rgba(242, 237, 226, 0.12) 22.5% 23%, transparent 23.5% 36%, rgba(242, 237, 226, 0.08) 36.5% 37%, transparent 37.5%),
+ repeating-radial-gradient(circle, #222222 0 3px, #080808 3px 6px);
+ border: 1px solid rgba(0,0,0,0.5);
+ position: absolute;
+ left: 200px;
+ z-index: 2;
+ box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
+ transform: rotate(15deg);
+ display: grid;
+ place-items: center;
+ transition: left 0.3s;
+ }
+ .ratio-9-16 .vinyl-disc-accessory {
+ width: 440px;
+ height: 440px;
+ left: auto;
+ top: 60px;
+ z-index: 1;
+ transform: rotate(25deg);
+ }
+ .ratio-16-9 .vinyl-disc-accessory {
+ width: 290px;
+ height: 290px;
+ left: 140px;
+ }
+ .vinyl-label-accessory {
+ width: 38%;
+ height: 38%;
+ border-radius: 50%;
+ border: 2px solid rgba(255,255,255,0.2);
+ background-size: cover;
+ background-position: center;
+ }
+
+ .single-info-area {
+ display: flex;
+ flex-direction: column;
+ gap: 16px;
+ z-index: 2;
+ }
+ .ratio-16-9 .single-info-area {
+ justify-content: center;
+ height: 100%;
+ }
+ .promo-kicker {
+ font-size: 12px;
+ font-weight: 700;
+ letter-spacing: 0.25em;
+ text-transform: uppercase;
+ color: var(--red);
+ }
+ .promo-artist {
+ font-family: 'Anton', sans-serif;
+ font-size: 80px;
+ line-height: 0.85;
+ text-transform: uppercase;
+ }
+ .ratio-9-16 .promo-artist {
+ font-size: 96px;
+ }
+ .ratio-16-9 .promo-artist {
+ font-size: 64px;
+ }
+ .promo-title {
+ font-family: 'Fraunces', serif;
+ font-style: italic;
+ font-size: 46px;
+ font-weight: 500;
+ color: var(--red);
+ line-height: 1.1;
+ margin-top: 4px;
+ }
+ .ratio-9-16 .promo-title {
+ font-size: 58px;
+ }
+ .ratio-16-9 .promo-title {
+ font-size: 38px;
+ }
+ .promo-subtext {
+ font-family: 'Fraunces', serif;
+ font-size: 18px;
+ color: var(--ink-soft);
+ line-height: 1.4;
+ max-width: 580px;
+ margin-top: 8px;
+ }
+ .promo-platforms {
+ display: flex;
+ gap: 16px;
+ font-size: 11px;
+ font-weight: 700;
+ letter-spacing: 0.12em;
+ text-transform: uppercase;
+ color: var(--muted);
+ border-top: 1px dashed rgba(20,20,20,0.2);
+ padding-top: 16px;
+ margin-top: 10px;
+ }
+
+ /* 2. Mixtape Promotion Template */
+ .template-mixtape {
+ display: grid;
+ grid-template-columns: 1.1fr 1fr;
+ gap: 40px;
+ height: 100%;
+ align-items: center;
+ z-index: 2;
+ }
+ .ratio-9-16 .template-mixtape {
+ grid-template-columns: 1fr;
+ grid-template-rows: auto 1fr;
+ gap: 48px;
+ }
+ .ratio-16-9 .template-mixtape {
+ grid-template-columns: 1fr 1.3fr;
+ gap: 40px;
+ }
+ 
+ .mixtape-left {
+ display: flex;
+ flex-direction: column;
+ gap: 18px;
+ }
+ .mixtape-cover-frame {
+ aspect-ratio: 1;
+ width: 100%;
+ background: var(--ink);
+ border: 2px solid var(--ink);
+ box-shadow: 0 16px 36px rgba(0,0,0,0.3);
+ position: relative;
+ overflow: hidden;
+ }
+ .mixtape-cover-frame img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ }
+ 
+ .mixtape-right {
+ display: flex;
+ flex-direction: column;
+ gap: 20px;
+ }
+ .tracklist-box {
+ background: var(--paper-deep);
+ border: 1px solid var(--ink);
+ padding: 24px;
+ box-shadow: 6px 6px 0 var(--ink);
+ position: relative;
+ }
+ .tracklist-box::before {
+ content: '';
+ position: absolute;
+ top: 0; left: 0;
+ width: 40px; height: 5px;
+ background: var(--red);
+ }
+ .tracklist-box h4 {
+ font-family: 'Anton', sans-serif;
+ font-size: 18px;
+ letter-spacing: 0.1em;
+ text-transform: uppercase;
+ margin-bottom: 12px;
+ border-bottom: 1px dashed rgba(20,20,20,0.2);
+ padding-bottom: 6px;
+ }
+ .tracklist-box ol {
+ list-style: none;
+ font-size: 13px;
+ line-height: 1.5;
+ }
+ .tracklist-box li {
+ padding: 4px 0;
+ border-bottom: 1px dashed rgba(20,20,20,0.08);
+ display: flex;
+ justify-content: space-between;
+ }
+ .tracklist-box li b {
+ color: var(--red);
+ }
+ .tracklist-box li:last-child {
+ border-bottom: none;
+ }
+
+ /* 3. Top Artist of the Week Template */
+ .template-artist {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 40px;
+ align-items: center;
+ height: 100%;
+ z-index: 2;
+ }
+ .ratio-9-16 .template-artist {
+ grid-template-columns: 1fr;
+ grid-template-rows: 1.1fr 1fr;
+ gap: 48px;
+ }
+ .ratio-16-9 .template-artist {
+ grid-template-columns: 0.9fr 1.1fr;
+ gap: 40px;
+ }
+ 
+ .artist-portrait-area {
+ width: 100%;
+ height: 100%;
+ min-height: 380px;
+ background: #090909;
+ border: 2px solid var(--ink);
+ box-shadow: 0 20px 45px rgba(0,0,0,0.28);
+ overflow: hidden;
+ position: relative;
+ }
+ .ratio-16-9 .artist-portrait-area {
+ min-height: 280px;
+ }
+ .artist-portrait-area img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ }
+ .artist-badge-marquee {
+ position: absolute;
+ top: 20px;
+ left: 20px;
+ background: var(--gold);
+ color: var(--ink);
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.16em;
+ padding: 6px 12px;
+ text-transform: uppercase;
+ }
+ 
+ .artist-editorial-area {
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ gap: 20px;
+ }
+ .editorial-header {
+ border-bottom: 2px solid var(--ink);
+ padding-bottom: 12px;
+ }
+ .editorial-header h2 {
+ font-family: 'Anton', sans-serif;
+ font-size: 58px;
+ line-height: 0.85;
+ }
+ .editorial-header h2 span {
+ color: var(--red);
+ }
+ .artist-quote-box {
+ font-family: 'Fraunces', serif;
+ font-size: 24px;
+ font-style: italic;
+ line-height: 1.45;
+ color: var(--ink);
+ position: relative;
+ padding-left: 24px;
+ border-left: 4px solid var(--red);
+ }
+ .ratio-9-16 .artist-quote-box {
+ font-size: 28px;
+ }
+ .ratio-16-9 .artist-quote-box {
+ font-size: 18px;
+ }
+
+ /* 4. Custom Announcement / Drop Calendar Template */
+ .template-announcement {
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ height: 100%;
+ text-align: center;
+ gap: 32px;
+ z-index: 2;
+ }
+ .announcement-badge {
+ background: var(--red);
+ color: var(--paper);
+ font-size: 12px;
+ font-weight: 700;
+ letter-spacing: 0.22em;
+ padding: 8px 20px;
+ text-transform: uppercase;
+ }
+ .announcement-headline {
+ font-family: 'Anton', sans-serif;
+ font-size: 80px;
+ line-height: 0.85;
+ text-transform: uppercase;
+ max-width: 900px;
+ }
+ .ratio-9-16 .announcement-headline {
+ font-size: 92px;
+ }
+ .ratio-16-9 .announcement-headline {
+ font-size: 60px;
+ }
+ .announcement-headline em {
+ font-family: 'Fraunces', serif;
+ font-style: italic;
+ color: var(--red);
+ text-transform: none;
+ font-weight: 500;
+ }
+ .announcement-details {
+ background: var(--paper-deep);
+ border: 1px dashed var(--ink);
+ padding: 24px 48px;
+ max-width: 600px;
+ }
+ .announcement-details p {
+ font-family: 'Fraunces', serif;
+ font-size: 18px;
+ line-height: 1.4;
+ color: var(--ink-soft);
+ }
+ .announcement-details strong {
+ font-family: 'Anton', sans-serif;
+ color: var(--red);
+ font-size: 28px;
+ display: block;
+ margin-top: 8px;
+ }
+
+ /* 5. Brand Feature Template (Month/Week) */
+ .template-brand {
+ display: grid;
+ grid-template-columns: 1fr 1.1fr;
+ gap: 40px;
+ align-items: center;
+ height: 100%;
+ z-index: 2;
+ }
+ .ratio-9-16 .template-brand {
+ grid-template-columns: 1fr;
+ grid-template-rows: auto 1fr;
+ gap: 36px;
+ }
+ .ratio-16-9 .template-brand {
+ grid-template-columns: 0.9fr 1.1fr;
+ gap: 36px;
+ }
+
+ .brand-product-area {
+ width: 100%;
+ height: 100%;
+ min-height: 380px;
+ background: #090909;
+ border: 2px solid var(--ink);
+ box-shadow: 0 20px 45px rgba(0,0,0,0.28);
+ overflow: hidden;
+ position: relative;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ }
+ .ratio-9-16 .brand-product-area {
+ min-height: 420px;
+ }
+ .ratio-16-9 .brand-product-area {
+ min-height: 280px;
+ }
+ .brand-product-area img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ }
+ 
+ .brand-badge-marquee {
+ position: absolute;
+ top: 20px;
+ left: 20px;
+ background: var(--red);
+ color: var(--paper);
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.16em;
+ padding: 6px 12px;
+ text-transform: uppercase;
+ z-index: 4;
+ }
+ 
+ /* Brand of the week gets a gold badge */
+ .template-brand-week .brand-badge-marquee {
+ background: var(--gold);
+ color: var(--ink);
+ }
+ 
+ .brand-editorial-area {
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ gap: 20px;
+ width: 100%;
+ }
+ 
+ .brand-header {
+ border-bottom: 2px solid var(--ink);
+ padding-bottom: 12px;
+ }
+ 
+ .brand-header h2 {
+ font-family: 'Anton', sans-serif;
+ font-size: 56px;
+ line-height: 0.85;
+ text-transform: uppercase;
+ }
+ 
+ .brand-header h2 span {
+ color: var(--red);
+ }
+ 
+ .template-brand-week .brand-header h2 span {
+ color: var(--gold);
+ }
+
+ .brand-product-title {
+ font-family: 'Fraunces', serif;
+ font-style: italic;
+ font-size: 28px;
+ font-weight: 500;
+ line-height: 1.1;
+ margin-top: 8px;
+ }
+ 
+ .brand-spec-box {
+ background: var(--paper-deep);
+ border: 1px dashed var(--ink);
+ padding: 20px;
+ box-shadow: 4px 4px 0 var(--ink);
+ position: relative;
+ }
+ 
+ .brand-spec-box::before {
+ content: '';
+ position: absolute;
+ top: 0; left: 0;
+ width: 40px; height: 5px;
+ background: var(--red);
+ }
+ 
+ .template-brand-week .brand-spec-box::before {
+ background: var(--gold);
+ }
+ 
+ .brand-spec-box p {
+ font-family: 'Fraunces', serif;
+ font-size: 18px;
+ line-height: 1.45;
+ color: var(--ink-soft);
+ }
+ 
+ .ratio-16-9 .brand-spec-box p {
+ font-size: 15px;
+ }
+ 
+ .brand-spec-footer {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-top: 14px;
+ font-size: 11px;
+ font-weight: 700;
+ letter-spacing: 0.12em;
+ text-transform: uppercase;
+ color: var(--muted);
+ border-top: 1px dashed rgba(20,20,20,0.15);
+ padding-top: 10px;
+ }
+ 
+ .brand-spec-footer span b {
+ color: var(--red);
+ }
+ 
+ .template-brand-week .brand-spec-footer span b {
+ color: var(--gold);
+ }
+
+ /* 6. Video Promo Template - full-bleed cinematic layout */
+ .template-video {
+ position: absolute;
+ inset: 0;
+ display: flex;
+ flex-direction: column;
+ justify-content: flex-end;
+ z-index: 1;
+ }
+ .video-bg-fill {
+ position: absolute;
+ inset: 0;
+ background-size: cover;
+ background-position: center;
+ background-color: #090909;
+ z-index: 0;
+ }
+ .video-bg-fill img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ display: block;
+ }
+ .video-gradient-veil {
+ position: absolute;
+ inset: 0;
+ background: linear-gradient(
+ to top,
+ rgba(0,0,0,0.95) 0%,
+ rgba(0,0,0,0.65) 35%,
+ rgba(0,0,0,0.15) 65%,
+ rgba(0,0,0,0.05) 100%
+ );
+ z-index: 1;
+ }
+ .video-top-bar {
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ padding: 36px 60px;
+ z-index: 3;
+ }
+ .ratio-16-9 .video-top-bar { padding: 24px 40px; }
+ .ratio-9-16 .video-top-bar { padding: 80px 60px 36px; }
+ .video-masthead-title {
+ font-family: 'Anton', sans-serif;
+ font-size: 32px;
+ line-height: 0.9;
+ text-transform: uppercase;
+ letter-spacing: 0.02em;
+ color: #fff;
+ }
+ .ratio-16-9 .video-masthead-title { font-size: 24px; }
+ .video-masthead-title span { color: var(--red); }
+ .video-watch-badge {
+ background: var(--red);
+ color: #fff;
+ font-size: 10px;
+ font-weight: 800;
+ letter-spacing: 0.2em;
+ padding: 7px 16px;
+ text-transform: uppercase;
+ border-radius: 2px;
+ }
+ .video-bottom-info {
+ position: relative;
+ z-index: 3;
+ padding: 40px 60px 50px;
+ display: flex;
+ flex-direction: column;
+ gap: 10px;
+ }
+ .ratio-16-9 .video-bottom-info { padding: 24px 40px 30px; }
+ .ratio-9-16 .video-bottom-info { padding: 40px 60px 100px; }
+ .video-kicker {
+ font-size: 11px;
+ font-weight: 700;
+ letter-spacing: 0.22em;
+ text-transform: uppercase;
+ color: var(--gold);
+ }
+ .video-artist-name {
+ font-family: 'Anton', sans-serif;
+ font-size: 72px;
+ line-height: 0.87;
+ text-transform: uppercase;
+ color: #fff;
+ text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+ }
+ .ratio-16-9 .video-artist-name { font-size: 44px; }
+ .ratio-9-16 .video-artist-name { font-size: 88px; }
+ .video-release-title {
+ font-family: 'Fraunces', serif;
+ font-style: italic;
+ font-size: 36px;
+ font-weight: 500;
+ color: rgba(255,255,255,0.85);
+ line-height: 1.1;
+ }
+ .ratio-16-9 .video-release-title { font-size: 22px; }
+ .ratio-9-16 .video-release-title { font-size: 44px; }
+ .video-desc {
+ font-family: 'Fraunces', serif;
+ font-size: 16px;
+ color: rgba(255,255,255,0.6);
+ line-height: 1.4;
+ max-width: 600px;
+ margin-top: 4px;
+ }
+ .ratio-16-9 .video-desc { font-size: 13px; }
+ .video-meta-strip {
+ display: flex;
+ gap: 20px;
+ align-items: center;
+ margin-top: 10px;
+ border-top: 1px solid rgba(255,255,255,0.15);
+ padding-top: 14px;
+ }
+ .video-meta-strip span {
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.15em;
+ text-transform: uppercase;
+ color: rgba(255,255,255,0.5);
+ }
+ .video-meta-strip span b { color: rgba(255,255,255,0.85); }
+
+ /* 7. Top 4 of the Week Collage Template */
+ .template-collage {
+ display: flex;
+ flex-direction: column;
+ gap: 0;
+ height: 100%;
+ width: 100%;
+ z-index: 2;
+ }
+ .collage-header {
+ padding: 0 0 18px;
+ border-bottom: 3px double var(--ink);
+ display: flex;
+ justify-content: space-between;
+ align-items: flex-end;
+ flex-shrink: 0;
+ }
+ .collage-header-left h2 {
+ font-family: 'Anton', sans-serif;
+ font-size: 38px;
+ line-height: 0.85;
+ text-transform: uppercase;
+ }
+ .collage-header-left h2 span { color: var(--red); }
+ .collage-header-right {
+ text-align: right;
+ }
+ .collage-header-right p {
+ font-size: 11px;
+ font-weight: 700;
+ letter-spacing: 0.16em;
+ text-transform: uppercase;
+ color: var(--muted);
+ }
+ .collage-header-right strong {
+ font-family: 'Fraunces', serif;
+ font-style: italic;
+ font-size: 18px;
+ color: var(--red);
+ }
+ .collage-grid {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ grid-template-rows: 1fr 1fr;
+ gap: 10px;
+ flex: 1;
+ margin-top: 18px;
+ min-height: 0;
+ }
+ .ratio-9-16 .collage-grid {
+ gap: 12px;
+ }
+ .ratio-16-9 .collage-grid {
+ gap: 8px;
+ }
+ .collage-cell {
+ background: var(--ink);
+ border: 1px solid var(--ink);
+ overflow: hidden;
+ position: relative;
+ display: flex;
+ align-items: flex-end;
+ }
+ .collage-cell img {
+ position: absolute;
+ inset: 0;
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ display: block;
+ }
+ .collage-cell-veil {
+ position: absolute;
+ inset: 0;
+ background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.1) 55%);
+ z-index: 1;
+ }
+ .collage-cell-info {
+ position: relative;
+ z-index: 2;
+ padding: 12px;
+ width: 100%;
+ }
+ .collage-rank {
+ font-family: 'Anton', sans-serif;
+ font-size: 28px;
+ line-height: 1;
+ color: var(--red);
+ display: block;
+ }
+ .ratio-16-9 .collage-rank { font-size: 20px; }
+ .collage-artist {
+ font-family: 'Anton', sans-serif;
+ font-size: 17px;
+ line-height: 1;
+ color: #fff;
+ text-transform: uppercase;
+ display: block;
+ margin-top: 2px;
+ }
+ .ratio-16-9 .collage-artist { font-size: 13px; }
+ .collage-track {
+ font-family: 'Fraunces', serif;
+ font-style: italic;
+ font-size: 13px;
+ color: rgba(255,255,255,0.72);
+ display: block;
+ margin-top: 1px;
+ }
+ .ratio-16-9 .collage-track { font-size: 11px; }
+ .collage-placeholder {
+ position: absolute;
+ inset: 0;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ background: linear-gradient(135deg, rgba(215,38,56,0.25), rgba(20,20,20,0.6));
+ gap: 8px;
+ z-index: 0;
+ }
+ .collage-placeholder span {
+ font-family: 'Anton', sans-serif;
+ font-size: 44px;
+ color: rgba(255,255,255,0.15);
+ line-height: 1;
+ }
+ .collage-placeholder p {
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.2em;
+ color: rgba(255,255,255,0.25);
+ text-transform: uppercase;
+ }
+ .collage-footer {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-top: 14px;
+ padding-top: 12px;
+ border-top: 1px dashed rgba(20,20,20,0.2);
+ flex-shrink: 0;
+ }
+ .collage-footer span {
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
+ color: var(--muted);
+ }
+ .collage-footer strong {
+ font-family: 'Anton', sans-serif;
+ font-size: 14px;
+ color: var(--red);
+ }
+
+ /* 8. Memorial / In Loving Memory Tribute Template */
+ .template-memorial {
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ height: 100%;
+ text-align: center;
+ gap: 20px;
+ z-index: 2;
+ position: relative;
+ }
+ .memorial-candle-row {
+ font-size: 32px;
+ opacity: 0.7;
+ letter-spacing: 8px;
+ margin-bottom: 4px;
+ }
+ .ratio-16-9 .memorial-candle-row { font-size: 22px; }
+ .memorial-artwork-frame {
+ width: 340px;
+ height: 340px;
+ border-radius: 8px;
+ overflow: hidden;
+ background: #0a0a0a;
+ border: 2px solid rgba(232,163,61,0.35);
+ box-shadow: 0 0 40px rgba(232,163,61,0.12), 0 12px 32px rgba(0,0,0,0.4);
+ position: relative;
+ flex-shrink: 0;
+ }
+ .memorial-artwork-frame::after {
+ content: "";
+ position: absolute;
+ inset: 0;
+ border-radius: 6px;
+ box-shadow: inset 0 0 30px rgba(0,0,0,0.35);
+ pointer-events: none;
+ z-index: 2;
+ }
+ .memorial-artwork-frame img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ display: block;
+ }
+ .ratio-9-16 .memorial-artwork-frame { width: 440px; height: 440px; }
+ .ratio-16-9 .memorial-artwork-frame { width: 200px; height: 200px; }
+ .memorial-header {
+ font-family: 'Anton', sans-serif;
+ font-size: 22px;
+ letter-spacing: 0.25em;
+ text-transform: uppercase;
+ color: var(--gold);
+ line-height: 1;
+ }
+ .ratio-9-16 .memorial-header { font-size: 28px; }
+ .ratio-16-9 .memorial-header { font-size: 16px; }
+ .memorial-artist-name {
+ font-family: 'Fraunces', serif;
+ font-style: italic;
+ font-size: 48px;
+ font-weight: 300;
+ line-height: 1;
+ color: var(--paper);
+ max-width: 700px;
+ }
+ .ratio-9-16 .memorial-artist-name { font-size: 60px; }
+ .ratio-16-9 .memorial-artist-name { font-size: 30px; }
+ .memorial-badge {
+ background: var(--red);
+ color: var(--paper);
+ font-family: 'Anton', sans-serif;
+ font-size: 14px;
+ letter-spacing: 0.2em;
+ padding: 6px 20px;
+ text-transform: uppercase;
+ }
+ .memorial-dates {
+ font-family: 'DM Sans', sans-serif;
+ font-size: 15px;
+ font-weight: 700;
+ letter-spacing: 0.12em;
+ color: var(--gold);
+ }
+ .ratio-16-9 .memorial-dates { font-size: 12px; }
+ .memorial-subtext {
+ font-family: 'Fraunces', serif;
+ font-size: 16px;
+ line-height: 1.5;
+ color: rgba(242,237,226,0.65);
+ max-width: 600px;
+ font-style: italic;
+ }
+ .ratio-16-9 .memorial-subtext { font-size: 12px; max-width: 480px; }
+ .ratio-9-16 .memorial-subtext { font-size: 18px; }
+ .memorial-footer {
+ display: flex;
+ gap: 20px;
+ align-items: center;
+ font-size: 10px;
+ font-weight: 700;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
+ color: var(--muted);
+ border-top: 1px solid rgba(255,255,255,0.08);
+ padding-top: 14px;
+ }
+ .memorial-footer span b { color: var(--gold); }
+ #promo-canvas.theme-dark .memorial-artist-name { color: var(--paper); }
+ #promo-canvas.theme-dark .memorial-subtext { color: rgba(242,237,226,0.65); }
+ #promo-canvas.theme-dark .memorial-footer { color: rgba(242,237,226,0.5); }
+ #promo-canvas.theme-paper .memorial-artist-name { color: var(--ink); }
+ #promo-canvas.theme-paper .memorial-subtext { color: var(--ink-soft); }
+ #promo-canvas.theme-red .memorial-artist-name { color: var(--paper); }
+ #promo-canvas.theme-gold .memorial-artist-name { color: var(--ink); }
+
+/* New Drop Ribbon */
+ .new-drop-ribbon {
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ background: var(--red);
+ color: #fff;
+ font-family: 'Anton', sans-serif;
+ font-size: 13px;
+ letter-spacing: 0.2em;
+ text-transform: uppercase;
+ text-align: center;
+ padding: 10px;
+ z-index: 20;
+ }
+
+ /* Caption Generator Sidebar Panel */
+ .caption-box {
+ background: #20202A;
+ border: 1px solid var(--ws-border);
+ border-radius: 6px;
+ padding: 12px;
+ margin-top: 4px;
+ }
+ .caption-box textarea {
+ background: transparent;
+ border: none;
+ color: var(--ws-text);
+ font-size: 11px;
+ line-height: 1.55;
+ min-height: 90px;
+ padding: 0;
+ resize: vertical;
+ width: 100%;
+ font-family: inherit;
+ }
+ .copy-btn {
+ background: #2D2D37;
+ border: 1px solid var(--ws-border);
+ border-radius: 4px;
+ color: var(--ws-text-muted);
+ cursor: pointer;
+ font-size: 11px;
+ font-weight: 700;
+ letter-spacing: 0.1em;
+ margin-top: 8px;
+ padding: 8px 12px;
+ text-transform: uppercase;
+ transition: all 0.2s;
+ width: 100%;
+ }
+ .copy-btn:hover { border-color: var(--ws-accent); color: var(--ws-text); }
+ .copy-btn.copied { border-color: #3a9e6a; color: #3a9e6a; }
+
+ /* Collage Artist Slot Picker */
+ .collage-slot-row {
+ background: #20202A;
+ border: 1px solid var(--ws-border);
+ border-radius: 6px;
+ padding: 10px 12px;
+ display: flex;
+ flex-direction: column;
+ gap: 6px;
+ margin-bottom: 8px;
+ }
+ .collage-slot-label {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ margin-bottom: 2px;
+ }
+ .collage-slot-num {
+ background: var(--red);
+ color: #fff;
+ font-family: 'Anton', sans-serif;
+ font-size: 13px;
+ width: 22px;
+ height: 22px;
+ border-radius: 50%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ flex-shrink: 0;
+ }
+ .collage-slot-label span {
+ font-size: 11px;
+ font-weight: 700;
+ color: var(--ws-text-muted);
+ letter-spacing: 0.08em;
+ text-transform: uppercase;
+ }
+ .collage-slot-select {
+ background: #13131A;
+ border: 1px solid var(--ws-border);
+ border-radius: 4px;
+ color: var(--ws-text);
+ font-size: 12px;
+ padding: 7px 10px;
+ width: 100%;
+ outline: none;
+ cursor: pointer;
+ }
+ .collage-slot-select:focus { border-color: var(--ws-accent); }
+ .collage-slot-custom {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 6px;
+ margin-top: 2px;
+ }
+ .collage-slot-custom input {
+ background: #13131A;
+ border: 1px solid var(--ws-border);
+ border-radius: 4px;
+ color: var(--ws-text);
+ font-size: 11px;
+ padding: 6px 8px;
+ outline: none;
+ width: 100%;
+ }
+ .collage-slot-custom input::placeholder { color: var(--ws-text-muted); font-size: 10px; }
+ .collage-slot-custom input:focus { border-color: var(--ws-accent); }
+ .collage-slot-img-row {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ margin-top: 2px;
+ }
+ .collage-slot-img-row .file-input-wrapper { flex: 1; }
+ .collage-slot-thumb {
+ width: 36px;
+ height: 36px;
+ border-radius: 3px;
+ object-fit: cover;
+ border: 1px solid var(--ws-border);
+ display: none;
+ flex-shrink: 0;
+ }
+
+ /* Decorative Stickers & Elements */
+ .badge-stamp {
+ position: absolute;
+ width: 90px;
+ height: 90px;
+ border-radius: 50%;
+ border: 2px dashed var(--red);
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ color: var(--red);
+ font-weight: 700;
+ font-size: 9px;
+ letter-spacing: 0.1em;
+ text-transform: uppercase;
+ text-align: center;
+ transform: rotate(-12deg);
+ z-index: 5;
+ }
+ .badge-stamp strong {
+ font-family: 'Anton', sans-serif;
+ font-size: 18px;
+ line-height: 1;
+ font-weight: 400;
+ }
+ 
+ .parental-advisory-sticker {
+ position: absolute;
+ background: black;
+ color: white;
+ font-family: 'DM Sans', sans-serif;
+ font-weight: 800;
+ border: 1px solid white;
+ text-align: center;
+ border-radius: 2px;
+ padding: 6px 12px;
+ font-size: 9px;
+ letter-spacing: 0.05em;
+ line-height: 1;
+ z-index: 5;
+ box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+ }
+ .parental-advisory-sticker span {
+ display: block;
+ font-size: 5px;
+ font-weight: 400;
+ letter-spacing: 0.25em;
+ margin-top: 1px;
+ border-top: 0.5px solid white;
+ padding-top: 1px;
+ }
+ 
+ .barcode-sticker {
+ position: absolute;
+ background: white;
+ border: 1px solid #141414;
+ padding: 6px 10px;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ z-index: 5;
+ box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+ }
+ .barcode-lines {
+ width: 80px;
+ height: 25px;
+ background: repeating-linear-gradient(90deg, #000 0 1px, #fff 1px 3px, #000 3px 4px, #fff 4px 6px, #000 6px 8px);
+ }
+ .barcode-sticker span {
+ font-size: 7px;
+ font-family: monospace;
+ color: #141414;
+ margin-top: 4px;
+ font-weight: 700;
+ }
+
+ .verified-badge {
+ position: absolute;
+ background: var(--gold);
+ color: var(--ink);
+ font-weight: 800;
+ font-size: 9px;
+ letter-spacing: 0.1em;
+ text-transform: uppercase;
+ padding: 4px 8px;
+ border: 1px solid var(--ink);
+ transform: rotate(5deg);
+ z-index: 5;
+ box-shadow: 2px 2px 0 var(--ink);
+ }
+
+ /* Color Theme Variations */
+ #promo-canvas.theme-paper { background: var(--paper); color: var(--ink); }
+ #promo-canvas.theme-dark { background: var(--ink); color: var(--paper); }
+ #promo-canvas.theme-red { background: var(--red); color: var(--paper); }
+ #promo-canvas.theme-gold { background: var(--gold); color: var(--ink); }
+ #promo-canvas.theme-custom-color { background: var(--paper); color: var(--ink); }
+
+ #promo-canvas.theme-paper .card-masthead { border-color: var(--ink); color: var(--ink); }
+ #promo-canvas.theme-dark .card-masthead { border-color: var(--paper); color: var(--paper); }
+ #promo-canvas.theme-red .card-masthead { border-color: var(--paper); color: var(--paper); }
+ #promo-canvas.theme-gold .card-masthead { border-color: var(--ink); color: var(--ink); }
+ #promo-canvas.theme-custom-color .card-masthead { border-color: var(--ink); color: var(--ink); }
+ 
+ #promo-canvas.theme-paper .promo-subtext, #promo-canvas.theme-paper .announcement-details p { color: var(--ink-soft); }
+ #promo-canvas.theme-dark .promo-subtext, #promo-canvas.theme-dark .announcement-details p { color: rgba(242, 237, 226, 0.75); }
+ #promo-canvas.theme-red .promo-subtext, #promo-canvas.theme-red .announcement-details p { color: rgba(242, 237, 226, 0.85); }
+ #promo-canvas.theme-gold .promo-subtext, #promo-canvas.theme-gold .announcement-details p { color: var(--ink-soft); }
+ #promo-canvas.theme-custom-color .promo-subtext, #promo-canvas.theme-custom-color .announcement-details p { color: var(--ink-soft); }
+
+ #promo-canvas.theme-paper .tracklist-box { background: var(--paper-deep); color: var(--ink); border-color: var(--ink); box-shadow: 6px 6px 0 var(--ink); }
+ #promo-canvas.theme-dark .tracklist-box { background: rgba(255,255,255,0.06); color: var(--paper); border-color: var(--paper); box-shadow: 6px 6px 0 var(--paper); }
+ #promo-canvas.theme-red .tracklist-box { background: var(--red-deep); color: var(--paper); border-color: var(--paper); box-shadow: 6px 6px 0 var(--paper); }
+ #promo-canvas.theme-gold .tracklist-box { background: var(--paper-deep); color: var(--ink); border-color: var(--ink); box-shadow: 6px 6px 0 var(--ink); }
+ #promo-canvas.theme-custom-color .tracklist-box { background: var(--paper-deep); color: var(--ink); border-color: var(--ink); box-shadow: 6px 6px 0 var(--ink); }
+
+ #promo-canvas.theme-paper .announcement-details { background: var(--paper-deep); border-color: var(--ink); }
+ #promo-canvas.theme-dark .announcement-details { background: rgba(255,255,255,0.06); border-color: var(--paper); }
+ #promo-canvas.theme-red .announcement-details { background: var(--red-deep); border-color: var(--paper); }
+ #promo-canvas.theme-gold .announcement-details { background: var(--paper-deep); border-color: var(--ink); }
+ #promo-canvas.theme-custom-color .announcement-details { background: var(--paper-deep); border-color: var(--ink); }
+
+ /* Brand Template Adaptations */
+ #promo-canvas.theme-paper .brand-spec-box { background: var(--paper-deep); color: var(--ink); border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+ #promo-canvas.theme-dark .brand-spec-box { background: rgba(255,255,255,0.06); color: var(--paper); border-color: var(--paper); box-shadow: 4px 4px 0 var(--paper); }
+ #promo-canvas.theme-red .brand-spec-box { background: var(--red-deep); color: var(--paper); border-color: var(--paper); box-shadow: 4px 4px 0 var(--paper); }
+ #promo-canvas.theme-gold .brand-spec-box { background: var(--paper-deep); color: var(--ink); border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+ #promo-canvas.theme-custom-color .brand-spec-box { background: var(--paper-deep); color: var(--ink); border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+
+ #promo-canvas.theme-paper .brand-header { border-color: var(--ink); }
+ #promo-canvas.theme-dark .brand-header { border-color: var(--paper); }
+ #promo-canvas.theme-red .brand-header { border-color: var(--paper); }
+ #promo-canvas.theme-gold .brand-header { border-color: var(--ink); }
+ #promo-canvas.theme-custom-color .brand-header { border-color: var(--ink); }
+
+ /* Draggable overlays cursor styles */
+ .badge-stamp, .parental-advisory-sticker, .verified-badge, .barcode-sticker {
+ cursor: grab;
+ user-select: none;
+ touch-action: none;
+ }
+ .badge-stamp:active, .parental-advisory-sticker:active, .verified-badge:active, .barcode-sticker:active {
+ cursor: grabbing;
+ }
+
+ /* Workspace Navigation Panel */
+ .nav-strip {
+ display: flex;
+ justify-content: flex-start;
+ align-items: center;
+ gap: 16px;
+ }
+ 
+ /* Responsive Workspace for Mobile */
+ @media (max-width: 900px) {
+ header.ws-header {
+ align-items: flex-start;
+ flex-direction: column;
+ gap: 12px;
+ }
+ .ws-header-actions {
+ justify-content: flex-start;
+ }
+ .workspace {
+ grid-template-columns: 1fr;
+ grid-template-rows: auto 1fr;
+ height: auto;
+ overflow: visible;
+ }
+ .controls-panel {
+ height: 450px;
+ border-right: none;
+ border-bottom: 1px solid var(--ws-border);
+ }
+ .preview-panel {
+ min-height: 500px;
+ padding: 20px;
+ }
+ }
+
+@keyframes fadePageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+main { animation: fadePageIn 0.4s ease-out; }
+
+/* Quick Presets Grid */
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.preset-btn {
+  background: #13131A;
+  border: 1px solid var(--ws-border);
+  border-radius: 6px;
+  color: var(--ws-text-muted);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 10px 6px;
+  text-align: center;
+  transition: all 0.18s;
+  line-height: 1.3;
+  user-select: none;
+}
+.preset-btn:hover {
+  border-color: var(--ws-accent);
+  color: var(--ws-text);
+  background: #1e1e28;
+}
+.preset-btn:active {
+  transform: scale(0.97);
+}
+.preset-icon {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+</style>
+</head>
+<body>
+
+ <header class="ws-header">
+ <div class="nav-strip">     <a class="back-btn" href="../index.html">
+      <span>&#9664;</span> Back to Voltride
+     </a>
+ <a class="ws-logo" href="../index.html">
+ <img src="assets/logo-wordmark.svg" fetchpriority="high" alt="Voltride" class="ws-logo-img" />
+ </a>
+ </div>
+ <div style="flex:1; text-align:center;">
+ <div style="font-family:'Anton',sans-serif; font-size:15px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ws-text); line-height:1;">Social <span style="color:var(--ws-accent);">Asset Desk</span></div>
+ <div style="font-size:10px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--ws-text-muted); margin-top:3px;">Voltride Listings</div>
+ </div>
+ <div class="ws-header-actions">
+ <a class="ws-social-link" href="../index.html" style="border-color:rgba(232,163,61,0.35); color:var(--ws-accent);">Home Voltride</a>
+ <a class="ws-social-link" href="https://www.instagram.com/voltride/" target="_blank" rel="noopener noreferrer">IG</a>
+ <a class="ws-social-link" href="https://www.youtube.com/@voltride" target="_blank" rel="noopener noreferrer">YT</a>
+ <a class="ws-social-link" href="index.html" style="border-color:rgba(232,163,61,0.35); color:var(--ws-accent);">+ New Post</a>
+ </div>
+ </header>
+
+ <main class="workspace">
+ 
+ <!-- Controls Sidebar -->
+ <div class="controls-panel">
+
+
+ <!-- Quick Presets -->
+ <div class="ctrl-section">
+ <h3 class="section-title">Quick Presets</h3>
+ <div class="preset-grid">
+ <button class="preset-btn" onclick="applyQuickPreset('video')"><span class="preset-icon">🎬</span>New Video Post</button>
+ <button class="preset-btn" onclick="applyQuickPreset('spotlight')"><span class="preset-icon">⭐</span>Artist Spotlight</button>
+ <button class="preset-btn" onclick="applyQuickPreset('countdown')"><span class="preset-icon">⏳</span>Release Countdown</button>
+ <button class="preset-btn" onclick="applyQuickPreset('mixtape')"><span class="preset-icon">💿</span>Mixtape Dropping</button>
+ <button class="preset-btn" onclick="applyQuickPreset('story')"><span class="preset-icon">📱</span>Story Format</button>  <button class="preset-btn" onclick="applyQuickPreset('youtube')"><span class="preset-icon">▶️</span>YouTube Card</button>
+  <button class="preset-btn" onclick="applyQuickPreset('memorial')"><span class="preset-icon">🕯️</span>Memorial Tribute</button>
+   </div>
+   <div class="preset-grid" id="release-preset-grid" aria-label="Generated release presets"></div>
+   </div>
+  <!-- Presets Selector -->
+ <div class="ctrl-section">
+ <h3 class="section-title">Import Release</h3>
+ <div class="form-group">
+ <label for="import-preset">Select Bike Listing</label>
+ <select id="import-preset">
+ <option value="custom">-- Custom Input (Start Fresh) --</option>
+ </select>
+ </div>
+ </div>
+
+ <!-- Layout Settings -->
+ <div class="ctrl-section">
+ <h3 class="section-title">Layout</h3>
+ <div class="form-group">
+ <label>Platform &amp; Aspect Ratio</label>
+ <div class="toggle-group" id="ratio-toggles">
+ <div class="toggle-btn active" data-ratio="1-1">1:1 Feed</div>
+ <div class="toggle-btn" data-ratio="9-16">9:16 Story</div>
+ <div class="toggle-btn" data-ratio="16-9" style="grid-column: span 2; margin-top: 4px;">16:9 Facebook / Marketplace Card</div>
+ </div>
+ </div>
+ <div class="form-group">
+ <label>Post Template</label>
+ <select id="promo-template">
+ <option value="single">Single Bike Listing</option>
+ <option value="mixtape">Lineup / Specs Card</option>
+ <option value="video_promo">Walkaround Video Card</option>
+ <option value="artist">Seller Spotlight</option>
+ <option value="collage">Featured 4 Listings</option>
+ <option value="announcement">Sale / Store Bulletin</option>
+ <option value="brand_month">Manufacturer of the Month</option>
+ <option value="brand_week">Manufacturer of the Week</option>
+ <option value="memorial">Tribute Build / Owner Spotlight</option>
+ </select>
+ </div>
+ </div>
+
+ <!-- Image upload -->
+ <div class="ctrl-section">
+ <h3 class="section-title">Artwork & Media</h3>
+ <div class="form-group">
+ <label>Upload Cover Image</label>
+ <div class="file-input-wrapper">
+ <div class="file-input-btn">
+ <span style="font-size: 20px;">IMG</span>
+ <span>Choose Image (PNG/JPG)</span>
+ </div>
+ <input type="file" id="image-upload" accept="image/*" />
+ </div>
+ </div>
+ <!-- Collage 4-slot uploader (shown only for collage template) -->
+ <div id="group-collage-uploads" style="display:none;">
+ <p style="font-size:11px; color:var(--ws-text-muted); margin-bottom:8px; line-height:1.4;">Upload one image per artist slot. Each slot can also receive a fallback gradient.</p>
+ <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+ <div>
+ <label style="font-size:11px; color:var(--ws-text-muted); font-weight:700; display:block; margin-bottom:4px;">#1 Artist</label>
+ <div class="file-input-wrapper">
+ <div class="file-input-btn" style="padding:8px; font-size:11px;">Upload</div>
+ <input type="file" id="collage-img-1" accept="image/*" />
+ </div>
+ </div>
+ <div>
+ <label style="font-size:11px; color:var(--ws-text-muted); font-weight:700; display:block; margin-bottom:4px;">#2 Artist</label>
+ <div class="file-input-wrapper">
+ <div class="file-input-btn" style="padding:8px; font-size:11px;">Upload</div>
+ <input type="file" id="collage-img-2" accept="image/*" />
+ </div>
+ </div>
+ <div>
+ <label style="font-size:11px; color:var(--ws-text-muted); font-weight:700; display:block; margin-bottom:4px;">#3 Artist</label>
+ <div class="file-input-wrapper">
+ <div class="file-input-btn" style="padding:8px; font-size:11px;">Upload</div>
+ <input type="file" id="collage-img-3" accept="image/*" />
+ </div>
+ </div>
+ <div>
+ <label style="font-size:11px; color:var(--ws-text-muted); font-weight:700; display:block; margin-bottom:4px;">#4 Artist</label>
+ <div class="file-input-wrapper">
+ <div class="file-input-btn" style="padding:8px; font-size:11px;">Upload</div>
+ <input type="file" id="collage-img-4" accept="image/*" />
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Content Editor -->
+ <div class="ctrl-section">
+ <h3 class="section-title">Content Editor</h3>
+ <div class="form-group">
+ <label for="input-kicker">Kicker (Category / Format)</label>
+ <input type="text" id="input-kicker" class="form-control" value="SINGLE RELEASE" placeholder="e.g. SINGLE - BALTIMORE" />
+ </div>
+ <div class="form-group">
+ <label for="input-artist">Artist Name</label>
+ <input type="text" id="input-artist" class="form-control" value="OTR CHAZ" placeholder="e.g. OTR CHAZ" />
+ </div>
+ <div class="form-group">
+ <label for="input-title">Title / Release Name</label>
+ <input type="text" id="input-title" class="form-control" value="Not Allowed" placeholder="e.g. Not Allowed" />
+ </div>
+ <div class="form-group">
+ <label for="input-subtext">Quote / Description / Subhead</label>
+ <textarea id="input-subtext" placeholder="Add an editorial quote or description..."></textarea>
+ </div>
+ <div class="form-group" id="group-tracklist" style="display: none;">
+ <label for="input-tracklist">Tracklist (One per line)</label>
+ <textarea id="input-tracklist" placeholder="01. Intro&#10;02. Song Title&#10;03. Outro" style="min-height: 120px;"></textarea>
+ </div>
+ <!-- Collage 4-slot artist picker (shown only for collage template) -->
+ <div id="group-collage-artists" style="display:none;">
+ <p style="font-size:11px; color:var(--ws-text-muted); margin-bottom:10px; line-height:1.5;">Pick each artist from the database or type custom names. Upload a photo per slot or it uses database artwork automatically.</p>
+
+ <!-- Slot 1 -->
+ <div class="collage-slot-row">
+ <div class="collage-slot-label">
+ <div class="collage-slot-num">1</div>
+ <span>Artist Slot #1</span>
+ </div>
+ <select class="collage-slot-select" id="collage-select-1">
+ <option value="custom">-- Type custom below --</option>
+ </select>
+ <div class="collage-slot-custom">
+ <input type="text" id="collage-name-1" placeholder="Artist name" />
+ <input type="text" id="collage-track-1" placeholder="Track / project" />
+ </div>
+ <div class="collage-slot-img-row">
+ <div class="file-input-wrapper">
+ <div class="file-input-btn" style="padding:6px 10px; font-size:11px;">Custom Photo</div>
+ <input type="file" id="collage-img-1" accept="image/*" />
+ </div>
+ <img loading="lazy" class="collage-slot-thumb" id="collage-thumb-1" src="" alt="" />
+ </div>
+ </div>
+
+ <!-- Slot 2 -->
+ <div class="collage-slot-row">
+ <div class="collage-slot-label">
+ <div class="collage-slot-num" style="background:var(--red-deep);">2</div>
+ <span>Artist Slot #2</span>
+ </div>
+ <select class="collage-slot-select" id="collage-select-2">
+ <option value="custom">-- Type custom below --</option>
+ </select>
+ <div class="collage-slot-custom">
+ <input type="text" id="collage-name-2" placeholder="Artist name" />
+ <input type="text" id="collage-track-2" placeholder="Track / project" />
+ </div>
+ <div class="collage-slot-img-row">
+ <div class="file-input-wrapper">
+ <div class="file-input-btn" style="padding:6px 10px; font-size:11px;">Custom Photo</div>
+ <input type="file" id="collage-img-2" accept="image/*" />
+ </div>
+ <img loading="lazy" class="collage-slot-thumb" id="collage-thumb-2" src="" alt="" />
+ </div>
+ </div>
+
+ <!-- Slot 3 -->
+ <div class="collage-slot-row">
+ <div class="collage-slot-label">
+ <div class="collage-slot-num" style="background:var(--gold); color:var(--ink);">3</div>
+ <span>Artist Slot #3</span>
+ </div>
+ <select class="collage-slot-select" id="collage-select-3">
+ <option value="custom">-- Type custom below --</option>
+ </select>
+ <div class="collage-slot-custom">
+ <input type="text" id="collage-name-3" placeholder="Artist name" />
+ <input type="text" id="collage-track-3" placeholder="Track / project" />
+ </div>
+ <div class="collage-slot-img-row">
+ <div class="file-input-wrapper">
+ <div class="file-input-btn" style="padding:6px 10px; font-size:11px;">Custom Photo</div>
+ <input type="file" id="collage-img-3" accept="image/*" />
+ </div>
+ <img loading="lazy" class="collage-slot-thumb" id="collage-thumb-3" src="" alt="" />
+ </div>
+ </div>
+
+ <!-- Slot 4 -->
+ <div class="collage-slot-row">
+ <div class="collage-slot-label">
+ <div class="collage-slot-num" style="background:#3A3A38;">4</div>
+ <span>Artist Slot #4</span>
+ </div>
+ <select class="collage-slot-select" id="collage-select-4">
+ <option value="custom">-- Type custom below --</option>
+ </select>
+ <div class="collage-slot-custom">
+ <input type="text" id="collage-name-4" placeholder="Artist name" />
+ <input type="text" id="collage-track-4" placeholder="Track / project" />
+ </div>
+ <div class="collage-slot-img-row">
+ <div class="file-input-wrapper">
+ <div class="file-input-btn" style="padding:6px 10px; font-size:11px;">Custom Photo</div>
+ <input type="file" id="collage-img-4" accept="image/*" />
+ </div>
+ <img loading="lazy" class="collage-slot-thumb" id="collage-thumb-4" src="" alt="" />
+ </div>
+ </div>
+ </div>
+ <div class="form-group">
+ <label for="input-badge">Badge / Status Text</label>
+ <input type="text" id="input-badge" class="form-control" value="OUT NOW" placeholder="e.g. OUT NOW, COMING SOON, JUN 05" />
+ </div>
+ </div>
+
+ <!-- Styling Options -->
+ <div class="ctrl-section">
+ <h3 class="section-title">Aesthetic</h3>
+ <div class="form-group">
+ <label for="style-theme">Color Palette Theme</label>
+ <select id="style-theme">
+ <option value="paper">Paper Cream (#F2EDE2)</option>
+ <option value="dark">Deep Ink Black (#141414)</option>
+ <option value="red">Crimson Red (#D72638)</option>
+ <option value="gold">Gold Yellow (#E8A33D)</option>
+ <option value="custom-color">-- Custom Palette --</option>
+ </select>
+ </div>
+ 
+ <div id="custom-color-controls" style="display: none; margin-bottom: 14px; gap: 8px; flex-direction: column; background: #20202A; padding: 12px; border-radius: 6px; border: 1px solid var(--ws-border);">
+ <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+ <span style="font-size: 11px; font-weight: 600; color: var(--ws-text-muted);">Card Background</span>
+ <input type="color" id="custom-bg-color" value="#F2EDE2" style="width: 50px; height: 28px; padding: 0; border: none; border-radius: 4px; cursor: pointer; background: none;" />
+ </div>
+ <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px;">
+ <span style="font-size: 11px; font-weight: 600; color: var(--ws-text-muted);">Ink / Text Color</span>
+ <input type="color" id="custom-ink-color" value="#141414" style="width: 50px; height: 28px; padding: 0; border: none; border-radius: 4px; cursor: pointer; background: none;" />
+ </div>
+ <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px;">
+ <span style="font-size: 11px; font-weight: 600; color: var(--ws-text-muted);">Accent Tone</span>
+ <input type="color" id="custom-accent-color" value="#D72638" style="width: 50px; height: 28px; padding: 0; border: none; border-radius: 4px; cursor: pointer; background: none;" />
+ </div>
+ </div>
+ 
+ <div class="form-group">
+ <label>Grunge & Paper Grain Opacity</label>
+ <input type="range" id="grain-slider" min="0" max="100" value="35" style="width: 100%; accent-color: var(--ws-accent);" />
+ </div>
+
+ <div style="margin-top: 10px;">
+ <label class="checkbox-group">
+ <input type="checkbox" id="toggle-vinyl" checked />
+ <span>Show Vinyl Disc peeking out (Singles)</span>
+ </label>   <label class="checkbox-group">
+    <input type="checkbox" id="toggle-parental" checked />
+    <span>"As-Is" condition notice sticker</span>
+   </label>
+ <label class="checkbox-group">
+ <input type="checkbox" id="toggle-barcode" checked />
+ <span>CSS Barcode Sticker overlay</span>
+ </label>
+ <label class="checkbox-group">
+ <input type="checkbox" id="toggle-verified" checked />
+ <span>Verified Voltride Seller badge</span>
+ </label>
+ <label class="checkbox-group">
+ <input type="checkbox" id="toggle-new-drop-ribbon" />
+ <span>New Drop Ribbon (top banner)</span>
+ </label>
+ </div>
+ </div>
+
+ <!-- Export Panel -->
+ <div class="ctrl-section">
+ <h3 class="section-title">Export</h3>
+ <button type="button" class="export-btn" id="download-btn">
+ <span>DL</span> Download High-Res PNG (2x)
+ </button>
+ </div>
+
+ <!-- Caption Generator Panel -->
+ <div class="ctrl-section">
+ <h3 class="section-title">Caption Generator</h3>
+ <p style="font-size: 11px; color: var(--ws-text-muted); margin-bottom: 10px; line-height: 1.5;">Live caption for Instagram, Facebook &amp; X &mdash; updates as you type. Configured for dirtbike listings.</p>
+ <div class="caption-box">
+ <textarea id="generated-caption" readonly placeholder="Caption will appear here..." style="min-height:110px; font-size:12px; line-height:1.5;"></textarea>
+ </div>
+ <button type="button" class="copy-btn" id="copy-caption-btn">Copy Caption</button>
+ </div>
+
+ </div>
+
+ <!-- Preview Canvas Area -->
+ <div class="preview-panel">
+ <!-- LIVE indicator -->
+ <div class="preview-live-badge">
+ <div class="preview-live-dot"></div>
+ Live Preview
+ </div>
+ <!-- Format label (updated by JS) -->
+ <div class="preview-format-badge" id="preview-format-label">1080 &times; 1080 &bull; 1:1</div>
+
+ <div class="canvas-wrapper" id="canvas-wrapper">
+ 
+ <!-- The actual card is rendered here -->
+ <div id="promo-canvas" class="ratio-1-1 theme-paper">
+ <div class="canvas-texture" id="grain-layer"></div>
+ 
+ <!-- Inner content containing templates -->
+ <div class="canvas-inner">
+ 
+ <!-- 1. Header (Voltride Branding) -->
+ <div class="card-masthead">
+ <div class="card-masthead-title">
+ VOLT<span>RIDE</span>
+ </div>
+ <div class="card-masthead-meta">
+ RELEASE DESK<br>
+ <span id="masthead-date">MAY 22, 2026</span>
+ </div>
+ </div>
+
+ <!-- Placeholder content populated dynamically -->
+ <div id="template-root" style="width: 100%; height: 100%; flex-grow: 1; display: flex; align-items: center;">
+ <!-- Target Template Injection -->
+ </div>
+
+ </div>
+
+ <!-- New Drop Ribbon (conditionally shown) -->
+ <div class="new-drop-ribbon" id="new-drop-ribbon" style="display: none;">
+ NEW DROP - VOLTRIDE - <span id="ribbon-date"></span>
+ </div>
+
+ <!-- Absolute Stickers overlays -->
+ <div class="badge-stamp" id="stamp-badge-sticker" style="top: 75px; right: 90px; display: flex;">
+ STREAM<br><strong>NOW</strong>
+ </div>
+ 
+ <div class="parental-advisory-sticker" id="parental-sticker" style="bottom: 40px; left: 40px;">
+ PARENTAL<br>ADVISORY
+ <span>EXPLICIT CONTENT</span>
+ </div>
+
+ <div class="verified-badge" id="verified-badge-sticker" style="top: 155px; left: 40px;">
+ VERIFIED VOLTRIDE
+ </div>
+ 
+ <div class="barcode-sticker" id="barcode-sticker" style="bottom: 40px; right: 40px;">
+ <div class="barcode-lines"></div>
+ <span>VOLT-2026-DIRT</span>
+ </div>
+
+ </div>
+
+ </div>
+ </div>
+
+ </main>
+
+ <footer class="ws-footer">
+ <span>2026 Voltride</span>
+ <a href="tribute-build.html">In Loving Memory</a>
+ <a href="https://www.instagram.com/voltride/" target="_blank" rel="noopener noreferrer">Instagram</a>
+ <a href="https://www.youtube.com/@voltride" target="_blank" rel="noopener noreferrer">YouTube</a>
+ <span class="deploy-fingerprint" data-deploy-fingerprint>Build: checking...</span>
+ </footer>
+
+ <script>
+ // Social Desk presets are built from catalog-data.js, the same shared source that powers videos.html.
+ // Keep this local map limited to Social Desk-only presets that do not belong in the public release feed.
+// Voltride data bridge.
+// window.voltrideDatabase is set by sample-listings.js (loaded earlier in <head>).
+// Each listing already uses the workspace's internal field names, so this bridge
+// just copies them into `database` and lets the helpers below group them.
+ const database = window.voltrideDatabase || {};
+
+ function assetDeskReleaseArtist(release) {
+ return release.displayArtist || release.artist || 'Voltride';
+ }
+
+ function assetDeskTitle(release) {
+ return release.assetDeskTitle || release.title || release.release || ((release.year || '') + ' ' + (release.artist || '') + ' ' + (release.release || '')).trim() || 'Untitled listing';
+ }
+
+ function assetDeskDateTime(release) {
+ if (!release.year) return 0;
+ const parsed = new Date(String(release.year) + '-01-01');
+ return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+ }
+
+ function assetDeskDateLabel(release) {
+ return release.year || '';
+ }
+
+ function assetDeskCleanUrl(url) {
+ if (!url) return '';
+ if (/^https?:\/\//.test(url)) return url;
+ return 'https://voltride.example/' + String(url).replace(/\.html$/, '');
+ }
+
+ // Map listing.type (dirtbike semantics) -> workspace template key.
+ function assetDeskTemplateType(release) {
+ const type = String(release.type || '').toLowerCase();
+ if (type === 'lineup' || type === 'mixtape' || type === 'album') return 'mixtape';
+ if (type === 'walkaround' || type === 'video' || type === 'video_promo') return 'video_promo';
+ if (type === 'featured-4' || type === 'collage') return 'collage';
+ if (type === 'seller' || type === 'spotlight' || type === 'artist') return 'artist';
+ if (type === 'sale' || type === 'announcement') return 'announcement';
+ if (type === 'mfr-month' || type === 'brand_month') return 'brand_month';
+ if (type === 'mfr-week' || type === 'brand_week') return 'brand_week';
+ if (type === 'tribute-build' || type === 'memorial') return 'memorial';
+ return 'single';
+ }
+
+ function assetDeskBadge(release) {
+ if (release.badge) return release.badge;
+ if (release.status === 'sold' || release.status === 'archive') return 'SOLD';
+ if (release.status === 'price-drop') return 'PRICE DROP';
+ if (release.status === 'upcoming' || release.releaseAt) return 'COMING SOON';
+ if (release.price) return release.price;
+ return 'FOR SALE';
+ }
+
+ function assetDeskKicker(release) {
+ const template = assetDeskTemplateType(release);
+ const region = release.region || 'Nationwide';
+ if (template === 'mixtape') return 'Lineup | ' + region;
+ if (template === 'video_promo') return 'Walkaround | ' + region;
+ if (template === 'collage') return 'Featured 4 | ' + region;
+ if (template === 'artist') return 'Seller Spotlight | ' + region;
+ if (template === 'announcement') return 'Store Bulletin | ' + region;
+ if (template === 'memorial') return 'Tribute Build | ' + region;
+ if (template === 'brand_month') return 'Manufacturer of the Month | ' + region;
+ if (template === 'brand_week') return 'Manufacturer of the Week | ' + region;
+ return 'For Sale | ' + region;
+ }
+
+ function assetDeskEntryFromRelease(release) { return release; }
+
+ function assetDeskGeneratedReleases() {
+ return Object.keys(database)
+ .map(function(id) { return Object.assign({ id: id }, database[id]); })
+ .filter(function(release) { return release && (release.artist || release.id); })
+ .sort(function(a, b) { return assetDeskDateTime(b) - assetDeskDateTime(a); });
+ }
+
+ function hydrateGeneratedAssetDeskDatabase() {
+ Object.keys(database).forEach(function(id) { delete database[id]; });
+ const listings = window.voltrideDatabase || {};
+ Object.keys(listings).forEach(function(id) {
+ database[id] = Object.assign({ id: id }, listings[id]);
+ });
+ return assetDeskGeneratedReleases();
+ }
+
+ function assetDeskGroup(release) {
+ const template = assetDeskTemplateType(release);
+ if (release.status === 'archive' || release.status === 'sold') return 'Sold Archive';
+ if (template === 'video_promo') return 'Walkaround Videos';
+ if (template === 'mixtape') return 'Lineups';
+ if (template === 'collage') return 'Featured Listings';
+ if (template === 'artist') return 'Sellers';
+ if (template === 'memorial') return 'Tribute Builds';
+ if (template === 'announcement') return 'Store Bulletins';
+ return 'For Sale';
+ }
+
+ function assetDeskOptionLabel(release) {
+ const year = release.year ? (release.year + ' ') : '';
+ const make = release.displayArtist || release.artist || 'Bike';
+ const model = release.assetDeskTitle || release.release || '';
+ let suffix = '';
+ if (release.status === 'sold' || release.status === 'archive') suffix = ' (SOLD)';
+ if (release.status === 'price-drop') suffix = ' (PRICE DROP)';
+ return (year + make + (model ? ' ' + model : '')).trim() + suffix;
+ }
+
+ function assetDeskFillSelect(select, releases) {
+ if (!select) return;
+ const selected = select.value || 'custom';
+ select.innerHTML = '<option value="custom">-- Custom Input (Start Fresh) --</option>';
+ const groups = {};
+ releases.forEach(function(release) {
+ const group = assetDeskGroup(release);
+ if (!groups[group]) groups[group] = [];
+ groups[group].push(release);
+ });
+ ['For Sale', 'Walkaround Videos', 'Lineups', 'Featured Listings', 'Sellers', 'Tribute Builds', 'Store Bulletins', 'Sold Archive'].forEach(function(groupName) {
+ const groupReleases = groups[groupName];
+ if (!groupReleases || !groupReleases.length) return;
+ const optgroup = document.createElement('optgroup');
+ optgroup.label = groupName;
+ groupReleases.forEach(function(release) {
+ const option = document.createElement('option');
+ option.value = release.id;
+ option.textContent = assetDeskOptionLabel(release);
+ option.setAttribute('data-generated-from', 'voltride-listings');
+ optgroup.appendChild(option);
+ });
+ select.appendChild(optgroup);
+ });
+ if (Array.prototype.some.call(select.options, function(option) { return option.value === selected; })) {
+ select.value = selected;
+ }
+ }
+
+ function assetDeskHtml(value) {
+ return String(value || '')
+ .replace(/&/g, '&amp;')
+ .replace(/</g, '&lt;')
+ .replace(/>/g, '&gt;')
+ .replace(/"/g, '&quot;')
+ .replace(/'/g, '&#039;');
+ }
+
+ function renderGeneratedReleaseButtons(releases) {
+ const grid = document.getElementById('release-preset-grid');
+ if (!grid) return;
+ const featured = releases
+ .filter(function(release) { return release.assetDeskFeatured && (release.artwork || release.cover); })
+ .slice(0, 10);
+ grid.innerHTML = featured.map(function(release) {
+ return '<button class="preset-btn" data-generated-from="voltride-listings" data-release-preset="' + assetDeskHtml(release.id) + '"><span class="preset-icon">\ud83c\udfcd\ud83c\udffe</span>' + assetDeskHtml(assetDeskOptionLabel(release)) + '</button>';
+ }).join('');
+ grid.querySelectorAll('[data-release-preset]').forEach(function(button) {
+ button.addEventListener('click', function() {
+ applyQuickPreset(button.getAttribute('data-release-preset'));
+ });
+ });
+ }
+
+ function hydrateAssetDeskControls() {
+ const releases = hydrateGeneratedAssetDeskDatabase();
+ assetDeskFillSelect(presetSelect, releases);
+ document.querySelectorAll('.collage-slot-select').forEach(function(select) {
+ assetDeskFillSelect(select, releases);
+ });
+ renderGeneratedReleaseButtons(releases);
+ }
+
+
+ // Keep track of current state
+ const state = {
+ ratio: '1-1',
+ template: 'single',
+ theme: 'paper',
+ uploadedImage: null,
+ customImageSrc: null,
+ platform: 'instagram'
+ };
+
+ // Set ribbon date on load
+ (() => {
+ const rd = new Date();
+ document.getElementById('ribbon-date').textContent = rd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
+ })();
+
+ // Auto-update Date
+ const today = new Date();
+ const dateOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+ document.getElementById('masthead-date').textContent = today.toLocaleDateString('en-US', dateOptions).toUpperCase();
+
+ // DOM Elements
+ const canvas = document.getElementById('promo-canvas');
+ const templateRoot = document.getElementById('template-root');
+ const ratioToggles = document.getElementById('ratio-toggles');
+ const presetSelect = document.getElementById('import-preset');
+ const templateSelect = document.getElementById('promo-template');
+ const styleThemeSelect = document.getElementById('style-theme');
+ hydrateAssetDeskControls();
+ 
+ // Form Inputs
+ const kickerInput = document.getElementById('input-kicker');
+ const artistInput = document.getElementById('input-artist');
+ const titleInput = document.getElementById('input-title');
+ const subtextInput = document.getElementById('input-subtext');
+ const tracklistInput = document.getElementById('input-tracklist');
+ const badgeInput = document.getElementById('input-badge');
+ const imageUpload = document.getElementById('image-upload');
+ const grainSlider = document.getElementById('grain-slider');
+ 
+ // Sticker Toggles
+ const toggleVinyl = document.getElementById('toggle-vinyl');
+ const toggleParental = document.getElementById('toggle-parental');
+ const toggleBarcode = document.getElementById('toggle-barcode');
+ const toggleVerified = document.getElementById('toggle-verified');
+
+ // Stickers DOM elements
+ const parentalSticker = document.getElementById('parental-sticker');
+ const barcodeSticker = document.getElementById('barcode-sticker');
+ const verifiedBadge = document.getElementById('verified-badge-sticker');
+ const stampBadge = document.getElementById('stamp-badge-sticker');
+
+ // Custom Color Inputs
+ const customColorControls = document.getElementById('custom-color-controls');
+ const customBgInput = document.getElementById('custom-bg-color');
+ const customInkInput = document.getElementById('custom-ink-color');
+ const customAccentInput = document.getElementById('custom-accent-color');
+
+ // Scale preview to fit screen
+ function updatePreviewScaling() {
+ const container = document.getElementById('canvas-wrapper');
+ const parentWidth = container.clientWidth;
+ const parentHeight = container.clientHeight;
+ const canvasWidth = canvas.offsetWidth;
+ const canvasHeight = canvas.offsetHeight;
+ 
+ const scaleX = (parentWidth - 40) / canvasWidth;
+ const scaleY = (parentHeight - 40) / canvasHeight;
+ const scale = Math.min(scaleX, scaleY, 0.95);
+ 
+ canvas.style.transform = `scale(${scale})`;
+ canvas.style.transformOrigin = 'center center';
+ state.scale = scale; // Save scale globally for coordinate transformations when dragging
+ }
+
+ // Initialize/switch aspect ratio
+ function setAspectRatio(ratio) {
+ state.ratio = ratio;
+ canvas.className = '';
+ 
+ if (ratio === '1-1') {
+ canvas.classList.add('ratio-1-1');
+ } else if (ratio === '9-16') {
+ canvas.classList.add('ratio-9-16');
+ } else if (ratio === '16-9') {
+ canvas.classList.add('ratio-16-9');
+ }
+ 
+ canvas.classList.add('theme-' + state.theme);
+
+ // Update preview format badge
+ const formatBadge = document.getElementById('preview-format-label');
+ if (formatBadge) {
+ const labels = { '1-1': '1080 x 1080 - 1:1 Feed', '9-16': '1080 x 1920 - 9:16 Story', '16-9': '1200 x 675 - 16:9 Card' };
+ formatBadge.textContent = labels[ratio] || ratio;
+ }
+ 
+ // Dynamic positioning of absolute sticker overlays based on ratio
+ adjustStickerPositions(ratio);
+ 
+ renderTemplate();
+ updatePreviewScaling();
+
+ }
+
+ function adjustStickerPositions(ratio) {
+ // Clear previously dragged inline styles to avoid layout conflicts
+ [parentalSticker, barcodeSticker, verifiedBadge, stampBadge].forEach(sticker => {
+ sticker.style.left = '';
+ sticker.style.top = '';
+ sticker.style.right = '';
+ sticker.style.bottom = '';
+ });
+
+ if (ratio === '9-16') {
+ parentalSticker.style.bottom = '80px';
+ parentalSticker.style.left = '60px';
+ barcodeSticker.style.bottom = '80px';
+ barcodeSticker.style.right = '60px';
+ verifiedBadge.style.top = '220px';
+ verifiedBadge.style.left = '60px';
+ stampBadge.style.top = '110px';
+ stampBadge.style.right = '80px';
+ } else if (ratio === '16-9') {
+ parentalSticker.style.bottom = '35px';
+ parentalSticker.style.left = '45px';
+ barcodeSticker.style.bottom = '35px';
+ barcodeSticker.style.right = '45px';
+ verifiedBadge.style.top = '110px';
+ verifiedBadge.style.left = '45px';
+ stampBadge.style.top = '50px';
+ stampBadge.style.right = '70px';
+ } else {
+ // 1:1
+ parentalSticker.style.bottom = '40px';
+ parentalSticker.style.left = '40px';
+ barcodeSticker.style.bottom = '40px';
+ barcodeSticker.style.right = '40px';
+ verifiedBadge.style.top = '155px';
+ verifiedBadge.style.left = '40px';
+ stampBadge.style.top = '75px';
+ stampBadge.style.right = '90px';
+ }
+ }
+
+ // Custom color helper functions
+ function adjustColorBrightness(hex, percent) {
+ let R = parseInt(hex.substring(1, 3), 16);
+ let G = parseInt(hex.substring(3, 5), 16);
+ let B = parseInt(hex.substring(5, 7), 16);
+
+ R = parseInt(R * (100 + percent) / 100);
+ G = parseInt(G * (100 + percent) / 100);
+ B = parseInt(B * (100 + percent) / 100);
+
+ R = (R < 255) ? R : 255;
+ G = (G < 255) ? G : 255;
+ B = (B < 255) ? B : 255;
+
+ R = (R > 0) ? R : 0;
+ G = (G > 0) ? G : 0;
+ B = (B > 0) ? B : 0;
+
+ const rHex = R.toString(16).padStart(2, '0');
+ const gHex = G.toString(16).padStart(2, '0');
+ const bHex = B.toString(16).padStart(2, '0');
+
+ return `#${rHex}${gHex}${bHex}`;
+ }
+
+ function getSoftInk(hex) {
+ let R = parseInt(hex.substring(1, 3), 16);
+ let G = parseInt(hex.substring(3, 5), 16);
+ let B = parseInt(hex.substring(5, 7), 16);
+ 
+ R = Math.min(255, R + 40);
+ G = Math.min(255, G + 40);
+ B = Math.min(255, B + 40);
+ 
+ return `#${R.toString(16).padStart(2, '0')}${G.toString(16).padStart(2, '0')}${B.toString(16).padStart(2, '0')}`;
+ }
+
+ function updateCustomColors() {
+ if (state.theme === 'custom-color') {
+ const bgVal = customBgInput.value;
+ const inkVal = customInkInput.value;
+ const accentVal = customAccentInput.value;
+ 
+ canvas.style.setProperty('--paper', bgVal);
+ canvas.style.setProperty('--paper-deep', adjustColorBrightness(bgVal, -6));
+ canvas.style.setProperty('--ink', inkVal);
+ canvas.style.setProperty('--ink-soft', getSoftInk(inkVal));
+ canvas.style.setProperty('--red', accentVal);
+ } else {
+ canvas.style.removeProperty('--paper');
+ canvas.style.removeProperty('--paper-deep');
+ canvas.style.removeProperty('--ink');
+ canvas.style.removeProperty('--ink-soft');
+ canvas.style.removeProperty('--red');
+ }
+ }
+
+ // Auto-fit long typography to parent container boundary
+ function autoFitText(element, maxFontSize, minFontSize = 14) {
+ if (!element) return;
+ 
+ const originalWhiteSpace = element.style.whiteSpace;
+ element.style.whiteSpace = 'nowrap';
+ element.style.fontSize = maxFontSize + 'px';
+ 
+ const parent = element.parentElement;
+ if (!parent) {
+ element.style.whiteSpace = originalWhiteSpace;
+ return;
+ }
+ 
+ let parentWidth = parent.clientWidth - 20; // 20px padding buffer
+ if (parentWidth <= 0) {
+ parentWidth = canvas.offsetWidth - 140; // fallback margin
+ }
+ 
+ let currentFontSize = maxFontSize;
+ while (element.scrollWidth > parentWidth && currentFontSize > minFontSize) {
+ currentFontSize -= 2;
+ element.style.fontSize = currentFontSize + 'px';
+ }
+ 
+ element.style.whiteSpace = originalWhiteSpace;
+ }
+
+ // Fill template content
+ function renderTemplate() {
+ templateRoot.innerHTML = '';
+
+ // For full-bleed / collage templates, stretch to fill; others center-align
+ const fullBleedTemplates = ['video_promo', 'collage'];
+ templateRoot.style.alignItems = fullBleedTemplates.includes(state.template) ? 'stretch' : 'center';
+
+ // Video promo renders its own masthead - hide the default card-masthead
+ const cardMasthead = canvas.querySelector('.card-masthead');
+ if (cardMasthead) {
+ cardMasthead.style.display = (state.template === 'video_promo') ? 'none' : '';
+ }
+ 
+ const artistName = artistInput.value.toUpperCase();
+ const releaseTitle = titleInput.value;
+ const kickerText = kickerInput.value.toUpperCase();
+ const description = subtextInput.value;
+ const badgeText = badgeInput.value.toUpperCase();
+ const showVinyl = toggleVinyl.checked;
+ 
+ // Determine what image source to use
+ let imgSrc = state.customImageSrc;
+ if (!imgSrc && presetSelect.value !== 'custom') {
+ const item = database[presetSelect.value];
+ if (item && item.artwork) imgSrc = item.artwork;
+ }
+ 
+ // Badge stamp text sync
+ stampBadge.innerHTML = badgeText.replace(' ', '<br>') || 'OUT<br><strong>NOW</strong>';
+ if (badgeText.includes('OUT') || badgeText.includes('STREAM') || badgeText.includes('WATCH')) {
+ stampBadge.style.display = toggleVerified.checked ? 'flex' : 'none';
+ } else {
+ stampBadge.innerHTML = `<span style="font-size:10px;">DATE</span><br><strong style="font-size:18px;">${badgeText}</strong>`;
+ }
+
+    if (state.template === 'memorial') {
+      document.getElementById('group-tracklist').style.display = 'none';
+      document.getElementById('group-collage-uploads').style.display = 'none';
+      document.getElementById('group-collage-artists').style.display = 'none';
+      const wrapper = document.createElement('div');
+      wrapper.className = 'template-memorial';
+      const candleRow = document.createElement('div');
+      candleRow.className = 'memorial-candle-row';
+      candleRow.textContent = '🕯️';
+      wrapper.appendChild(candleRow);
+      const artFrame = document.createElement('div');
+      artFrame.className = 'memorial-artwork-frame';
+      const fallback = document.createElement('div');
+      fallback.className = 'cover-fallback';
+      fallback.style.background = 'linear-gradient(135deg, #141414, #2a1a1a)';
+      fallback.innerHTML = '<strong>R.I.P.</strong><span>IN LOVING MEMORY</span>';
+      if (imgSrc) {
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.alt = 'Memorial photo';
+        img.onerror = function() { this.replaceWith(fallback); };
+        artFrame.appendChild(img);
+      } else {
+        artFrame.appendChild(fallback);
+      }
+      wrapper.appendChild(artFrame);
+      const header = document.createElement('div');
+      header.className = 'memorial-header';
+      header.textContent = kickerText || 'IN LOVING MEMORY';
+      wrapper.appendChild(header);
+      const artist = document.createElement('h2');
+      artist.className = 'memorial-artist-name';
+      artist.textContent = artistName || 'ARTIST NAME';
+      wrapper.appendChild(artist);
+      const badge = document.createElement('div');
+      badge.className = 'memorial-badge';
+      badge.textContent = badgeText || 'R.I.P.';
+      wrapper.appendChild(badge);
+      const dateMatch = description.match(/(\d{4})[\u2013\u2014-](\d{4})/);
+      if (dateMatch) {
+        const dates = document.createElement('div');
+        dates.className = 'memorial-dates';
+        dates.textContent = dateMatch[1] + ' \u2013 ' + dateMatch[2];
+        wrapper.appendChild(dates);
+      }
+      if (description) {
+        const subtext = document.createElement('p');
+        subtext.className = 'memorial-subtext';
+        subtext.textContent = description;
+        wrapper.appendChild(subtext);
+      }
+      const footer = document.createElement('div');
+      footer.className = 'memorial-footer';
+      const region = (presetSelect.value !== 'custom' && database[presetSelect.value]) ? (database[presetSelect.value].region || 'DMV') : 'DMV';
+      footer.innerHTML = '<span>REGION - <b>' + region.toUpperCase() + '</b></span><span>REST IN PEACE</span>';
+      wrapper.appendChild(footer);
+      templateRoot.appendChild(wrapper);
+    } else  if (state.template === 'single') {
+ document.getElementById('group-tracklist').style.display = 'none';
+ 
+ const wrapper = document.createElement('div');
+ wrapper.className = 'template-single';
+ 
+ const mediaArea = document.createElement('div');
+ mediaArea.className = 'single-media-area';
+ 
+ const frame = document.createElement('div');
+ frame.className = 'single-cover-frame';
+ 
+ const fallback = document.createElement('div');
+ fallback.className = 'cover-fallback';
+ fallback.innerHTML = `<strong>${artistName || 'DMV'}</strong><span>${releaseTitle || 'TRACK'}</span>`;
+ if (imgSrc) {
+ const img = document.createElement('img');
+ img.src = imgSrc;
+ img.alt = 'Cover art';
+ img.onerror = function() { this.replaceWith(fallback); };
+ frame.appendChild(img);
+ } else {
+ frame.appendChild(fallback);
+ }
+ 
+ mediaArea.appendChild(frame);
+ 
+ if (showVinyl) {
+ const vinyl = document.createElement('div');
+ vinyl.className = 'vinyl-disc-accessory';
+ 
+ const label = document.createElement('div');
+ label.className = 'vinyl-label-accessory';
+ if (imgSrc) {
+ label.style.backgroundImage = `url('${imgSrc}')`;
+ } else {
+ label.style.background = 'linear-gradient(135deg, var(--red-deep), var(--ink))';
+ }
+ vinyl.appendChild(label);
+ mediaArea.appendChild(vinyl);
+ 
+ // Adjust position so vinyl pops out
+ if (state.ratio === '1-1') {
+ frame.style.transform = 'translateX(-70px)';
+ vinyl.style.left = '490px';
+ } else if (state.ratio === '16-9') {
+ frame.style.transform = 'translateX(-45px)';
+ vinyl.style.left = '325px';
+ } else {
+ // Story
+ frame.style.transform = 'translateY(-20px)';
+ vinyl.style.top = '340px';
+ vinyl.style.left = '320px';
+ }
+ } else {
+ frame.style.transform = '';
+ }
+ 
+ const infoArea = document.createElement('div');
+ infoArea.className = 'single-info-area';
+ 
+ const kicker = document.createElement('span');
+ kicker.className = 'promo-kicker';
+ kicker.textContent = kickerText || 'SINGLE RELEASE';
+ 
+ const artist = document.createElement('h2');
+ artist.className = 'promo-artist';
+ artist.textContent = artistName || 'ARTIST NAME';
+ 
+ const title = document.createElement('h3');
+ title.className = 'promo-title';
+ title.innerHTML = `<em>${releaseTitle || 'Release Title'}</em>`;
+ 
+ infoArea.appendChild(kicker);
+ infoArea.appendChild(artist);
+ infoArea.appendChild(title);
+ 
+ if (description) {
+ const desc = document.createElement('p');
+ desc.className = 'promo-subtext';
+ desc.textContent = description;
+ infoArea.appendChild(desc);
+ }
+ 
+ const platforms = document.createElement('div');
+ platforms.className = 'promo-platforms';
+ platforms.innerHTML = '<span>Spotify</span> - <span>Apple Music</span> - <span>YouTube</span> - <span>Soundcloud</span>';
+ infoArea.appendChild(platforms);
+ 
+ wrapper.appendChild(mediaArea);
+ wrapper.appendChild(infoArea);
+ templateRoot.appendChild(wrapper);
+ 
+ } else if (state.template === 'mixtape') {
+ document.getElementById('group-tracklist').style.display = 'flex';
+ 
+ const wrapper = document.createElement('div');
+ wrapper.className = 'template-mixtape';
+ 
+ const left = document.createElement('div');
+ left.className = 'mixtape-left';
+ 
+ const frame = document.createElement('div');
+ frame.className = 'mixtape-cover-frame';
+ 
+ const fallback = document.createElement('div');
+ fallback.className = 'cover-fallback';
+ fallback.innerHTML = `<strong>${artistName || 'DMV'}</strong><span>${releaseTitle || 'MIXTAPE'}</span>`;
+ if (imgSrc) {
+ const img = document.createElement('img');
+ img.src = imgSrc;
+ img.onerror = function() { this.replaceWith(fallback); };
+ frame.appendChild(img);
+ } else {
+ frame.appendChild(fallback);
+ }
+ 
+ left.appendChild(frame);
+ 
+ const right = document.createElement('div');
+ right.className = 'mixtape-right';
+ 
+ const info = document.createElement('div');
+ info.className = 'single-info-area';
+ 
+ const kicker = document.createElement('span');
+ kicker.className = 'promo-kicker';
+ kicker.textContent = kickerText || 'TAPE DROP';
+ 
+ const artist = document.createElement('h2');
+ artist.className = 'promo-artist';
+ artist.style.fontSize = (state.ratio === '16-9') ? '44px' : '54px';
+ artist.textContent = artistName || 'ARTIST NAME';
+ 
+ const title = document.createElement('h3');
+ title.className = 'promo-title';
+ title.style.fontSize = (state.ratio === '16-9') ? '28px' : '36px';
+ title.innerHTML = `<em>${releaseTitle || 'Project Title'}</em>`;
+ 
+ info.appendChild(kicker);
+ info.appendChild(artist);
+ info.appendChild(title);
+ 
+ // Tracklist parser
+ const tracklistBox = document.createElement('div');
+ tracklistBox.className = 'tracklist-box';
+ 
+ const tHeader = document.createElement('h4');
+ tHeader.textContent = 'Project Tracklist';
+ tracklistBox.appendChild(tHeader);
+ 
+ const ol = document.createElement('ol');
+ const tracklines = tracklistInput.value.split('\n').filter(l => l.trim() !== '');
+ 
+ if (tracklines.length > 0) {
+ tracklines.slice(0, state.ratio === '16-9' ? 4 : 6).forEach((line, index) => {
+ const li = document.createElement('li');
+ li.innerHTML = `<span><b>0${index+1}</b> ${line.replace(/^\d+[\.\s\-]+/, '')}</span>`;
+ ol.appendChild(li);
+ });
+ } else {
+ ol.innerHTML = '<li><span><b>01</b> Tracklist Pending</span></li><li><span><b>02</b> Drop watch active</span></li>';
+ }
+ 
+ tracklistBox.appendChild(ol);
+ right.appendChild(info);
+ right.appendChild(tracklistBox);
+ 
+ wrapper.appendChild(left);
+ wrapper.appendChild(right);
+ templateRoot.appendChild(wrapper);
+ 
+ } else if (state.template === 'artist') {
+ document.getElementById('group-tracklist').style.display = 'none';
+ 
+ const wrapper = document.createElement('div');
+ wrapper.className = 'template-artist';
+ 
+ const portrait = document.createElement('div');
+ portrait.className = 'artist-portrait-area';
+ 
+ const fallback = document.createElement('div');
+ fallback.className = 'cover-fallback';
+ fallback.style.background = 'linear-gradient(135deg, var(--gold), var(--ink))';
+ fallback.innerHTML = `<strong>${artistName[0] || 'A'}</strong><span>ARTIST FOCUS</span>`;
+ if (imgSrc) {
+ const img = document.createElement('img');
+ img.src = imgSrc;
+ img.onerror = function() { this.replaceWith(fallback); };
+ portrait.appendChild(img);
+ } else {
+ portrait.appendChild(fallback);
+ }
+ 
+ const marquee = document.createElement('div');
+ marquee.className = 'artist-badge-marquee';
+ marquee.textContent = 'ARTIST OF THE WEEK';
+ portrait.appendChild(marquee);
+ 
+ const editorial = document.createElement('div');
+ editorial.className = 'artist-editorial-area';
+ 
+ const head = document.createElement('div');
+ head.className = 'editorial-header';
+ head.innerHTML = `<span class="promo-kicker" style="color:var(--gold)">VERIFIED VOLTRIDE SELLER</span><h2>${artistName || 'SELLER FEATURE'}</h2>`;
+ 
+ const quote = document.createElement('div');
+ quote.className = 'artist-quote-box';
+ quote.innerHTML = `"${description || 'No artist quote filled. Open the content sidebar and drop down a custom bio or quote for this week\'s feature.'}"`;
+ 
+ editorial.appendChild(head);
+ editorial.appendChild(quote);
+ 
+ wrapper.appendChild(portrait);
+ wrapper.appendChild(editorial);
+ templateRoot.appendChild(wrapper);
+ 
+ } else if (state.template === 'announcement') {
+ document.getElementById('group-tracklist').style.display = 'none';
+ 
+ const wrapper = document.createElement('div');
+ wrapper.className = 'template-announcement';
+ 
+ const badge = document.createElement('span');
+ badge.className = 'announcement-badge';
+ badge.textContent = kickerText || 'SIGNAL BULLETIN';
+ 
+ const headline = document.createElement('h2');
+ headline.className = 'announcement-headline';
+ 
+ // Emphasize the second word
+ const words = releaseTitle.split(' ');
+ if (words.length > 1) {
+ const first = words[0];
+ const rest = words.slice(1).join(' ');
+ headline.innerHTML = `${first} <em>${rest}</em>`;
+ } else {
+ headline.innerHTML = `<em>${releaseTitle || 'CUSTOM ANNOUNCEMENT'}</em>`;
+ }
+ 
+ const detailsBox = document.createElement('div');
+ detailsBox.className = 'announcement-details';
+ 
+ const detailsPara = document.createElement('p');
+ detailsPara.textContent = description || 'Voltride brings Baltimore music first. Submissions are open for independent artists. Follow the music desk calendar for releases.';
+ 
+ const subtext = document.createElement('strong');
+ subtext.textContent = badgeText || 'voltride.example';
+ 
+ detailsBox.appendChild(detailsPara);
+ detailsBox.appendChild(subtext);
+ 
+ wrapper.appendChild(badge);
+ wrapper.appendChild(headline);
+ wrapper.appendChild(detailsBox);
+ templateRoot.appendChild(wrapper);
+ } else if (state.template === 'brand_month' || state.template === 'brand_week') {
+ document.getElementById('group-tracklist').style.display = 'none';
+ 
+ const wrapper = document.createElement('div');
+ wrapper.className = `template-brand${state.template === 'brand_week' ? ' template-brand-week' : ''}`;
+ 
+ const mediaArea = document.createElement('div');
+ mediaArea.className = 'brand-product-area';
+ 
+ const fallback = document.createElement('div');
+ fallback.className = 'cover-fallback';
+ fallback.style.background = state.template === 'brand_week' ? 'linear-gradient(135deg, var(--gold), var(--ink))' : 'linear-gradient(135deg, var(--red-deep), var(--ink))';
+ fallback.innerHTML = `<strong>${artistName || 'DMV'}</strong><span>PRODUCT SHOT</span>`;
+ if (imgSrc) {
+ const img = document.createElement('img');
+ img.src = imgSrc;
+ img.onerror = function() { this.replaceWith(fallback); };
+ img.alt = 'Brand Product';
+ mediaArea.appendChild(img);
+ } else {
+ mediaArea.appendChild(fallback);
+ }
+ 
+ const badgeMarquee = document.createElement('div');
+ badgeMarquee.className = 'brand-badge-marquee';
+ badgeMarquee.textContent = kickerText || (state.template === 'brand_week' ? 'BRAND OF THE WEEK' : 'BRAND OF THE MONTH');
+ mediaArea.appendChild(badgeMarquee);
+ 
+ const editorialArea = document.createElement('div');
+ editorialArea.className = 'brand-editorial-area';
+ 
+ const brandHeader = document.createElement('div');
+ brandHeader.className = 'brand-header';
+ 
+ const bName = document.createElement('h2');
+ bName.innerHTML = artistName ? `${artistName.split(' ')[0]} <span>${artistName.split(' ').slice(1).join(' ')}</span>` : 'BRAND <span>NAME</span>';
+ 
+ const pTitle = document.createElement('h3');
+ pTitle.className = 'brand-product-title';
+ pTitle.innerHTML = `<em>${releaseTitle || 'Featured Product'}</em>`;
+ 
+ brandHeader.appendChild(bName);
+ brandHeader.appendChild(pTitle);
+ 
+ const specBox = document.createElement('div');
+ specBox.className = 'brand-spec-box';
+ 
+ const specText = document.createElement('p');
+ specText.textContent = description || 'Highlighting DMV independent designers, local streetwear collections, Deadstock cut-and-sew apparel, and authentic boutique archives.';
+ specBox.appendChild(specText);
+ 
+ const specFooter = document.createElement('div');
+ specFooter.className = 'brand-spec-footer';
+ 
+ const itemRegion = (presetSelect.value !== 'custom' && database[presetSelect.value]) ? (database[presetSelect.value].region || 'BALTIMORE') : 'BALTIMORE';
+ 
+ specFooter.innerHTML = `
+ <span>REGION - <b>${itemRegion.toUpperCase()}</b></span>
+ <span>EST - <b>${badgeText || '2026'}</b></span>
+ `;
+ specBox.appendChild(specFooter);
+ 
+ editorialArea.appendChild(brandHeader);
+ editorialArea.appendChild(specBox);
+ 
+ wrapper.appendChild(mediaArea);
+ wrapper.appendChild(editorialArea);
+ templateRoot.appendChild(wrapper);
+ } else if (state.template === 'video_promo') {
+ document.getElementById('group-tracklist').style.display = 'none';
+ document.getElementById('group-collage-uploads').style.display = 'none';
+ document.getElementById('group-collage-artists').style.display = 'none';
+
+ const wrapper = document.createElement('div');
+ wrapper.className = 'template-video';
+
+ // Background image fill
+ const bgFill = document.createElement('div');
+ bgFill.className = 'video-bg-fill';
+ if (imgSrc) {
+ const bgImg = document.createElement('img');
+ bgImg.src = imgSrc;
+ bgImg.alt = 'Video background';
+ bgImg.onerror = function() { this.style.display = 'none'; };
+ bgFill.appendChild(bgImg);
+ }
+ wrapper.appendChild(bgFill);
+
+ // Gradient veil
+ const veil = document.createElement('div');
+ veil.className = 'video-gradient-veil';
+ wrapper.appendChild(veil);
+
+ // Top bar: masthead + badge
+ const topBar = document.createElement('div');
+ topBar.className = 'video-top-bar';
+ const presetData = database[presetSelect.value] || {};
+ topBar.innerHTML = `
+ <div class="video-masthead-title">VOLT<span>RIDE</span></div>
+ <div class="video-watch-badge">${badgeText || 'FOR SALE'}</div>
+ `;
+ wrapper.appendChild(topBar);
+
+ // Bottom info block
+ const bottomInfo = document.createElement('div');
+ bottomInfo.className = 'video-bottom-info';
+
+ const vKicker = document.createElement('span');
+ vKicker.className = 'video-kicker';
+ vKicker.textContent = kickerText || ' For Sale | VOLTRIDE';
+
+ const vArtist = document.createElement('h2');
+ vArtist.className = 'video-artist-name';
+ vArtist.textContent = artistName || 'ARTIST NAME';
+
+ const vTitle = document.createElement('h3');
+ vTitle.className = 'video-release-title';
+ vTitle.innerHTML = `<em>${releaseTitle || 'Video Title'}</em>`;
+
+ bottomInfo.appendChild(vKicker);
+ bottomInfo.appendChild(vArtist);
+ bottomInfo.appendChild(vTitle);
+
+ if (description) {
+ const vDesc = document.createElement('p');
+ vDesc.className = 'video-desc';
+ vDesc.textContent = description;
+ bottomInfo.appendChild(vDesc);
+ }
+
+ const metaStrip = document.createElement('div');
+ metaStrip.className = 'video-meta-strip';
+ const director = presetData.director || '';
+ const dropped = presetData.dropped || '';
+ metaStrip.innerHTML = `
+ <span>REGION - <b>${(presetData.region || 'DMV').toUpperCase()}</b></span>
+ ${director ? `<span>DIRECTOR - <b>${director}</b></span>` : ''}
+ ${dropped ? `<span>DROPPED - <b>${dropped.toUpperCase()}</b></span>` : ''}
+ <span>voltride.example</span>
+ `;
+ bottomInfo.appendChild(metaStrip);
+
+ wrapper.appendChild(bottomInfo);
+ templateRoot.appendChild(wrapper);
+
+ // Auto-fit artist name
+ setTimeout(() => {
+ autoFitText(vArtist, state.ratio === '16-9' ? 44 : (state.ratio === '9-16' ? 88 : 72));
+ }, 0);
+
+ } else if (state.template === 'collage') {
+ document.getElementById('group-tracklist').style.display = 'none';
+ document.getElementById('group-collage-uploads').style.display = 'block';
+ document.getElementById('group-collage-artists').style.display = 'block';
+
+ const wrapper = document.createElement('div');
+ wrapper.className = 'template-collage';
+
+ // Collage header
+ const colHeader = document.createElement('div');
+ colHeader.className = 'collage-header';
+ const weekLabel = kickerText || 'WEEK ' + String(Math.ceil((new Date().getDate()) / 7)).padStart(2, '0');
+ colHeader.innerHTML = `
+ <div class="collage-header-left">
+ <h2>TOP <span>4</span></h2>
+ </div>
+ <div class="collage-header-right">
+ <p>${weekLabel}</p>
+ <strong>${releaseTitle || 'Artists of the Week'}</strong>
+ </div>
+ `;
+ wrapper.appendChild(colHeader);
+
+ // Read slot data from pickers
+ const slotColors = [
+ 'linear-gradient(135deg, #D72638 0%, #141414 100%)',
+ 'linear-gradient(135deg, #A11E2C 0%, #141414 100%)',
+ 'linear-gradient(135deg, #E8A33D 0%, #141414 100%)',
+ 'linear-gradient(135deg, #3A3A38 0%, #141414 100%)'
+ ];
+
+ // Build slot data array from pickers
+ const slotData = [1, 2, 3, 4].map(num => {
+ const selectEl = document.getElementById(`collage-select-${num}`);
+ const nameEl = document.getElementById(`collage-name-${num}`);
+ const trackEl = document.getElementById(`collage-track-${num}`);
+ const selectedKey = selectEl ? selectEl.value : 'custom';
+ const dbEntry = (selectedKey !== 'custom' && database[selectedKey]) ? database[selectedKey] : null;
+
+ let artSrc = state.collageImages && state.collageImages[num - 1]; // Custom upload takes priority
+ if (!artSrc && dbEntry && dbEntry.artwork) artSrc = dbEntry.artwork; // Then DB artwork
+
+ const artistText = (nameEl && nameEl.value.trim()) ? nameEl.value.trim() : (dbEntry ? dbEntry.artist : '');
+ const trackText = (trackEl && trackEl.value.trim()) ? trackEl.value.trim() : (dbEntry ? dbEntry.release : '');
+
+ return { artSrc, artistText, trackText };
+ });
+
+ // Collage grid
+ const grid = document.createElement('div');
+ grid.className = 'collage-grid';
+
+ slotData.forEach((slot, i) => {
+ const num = i + 1;
+ const cell = document.createElement('div');
+ cell.className = 'collage-cell';
+
+ if (slot.artSrc) {
+ const img = document.createElement('img');
+ img.src = slot.artSrc;
+ img.alt = `Artist ${num}`;
+ cell.appendChild(img);
+ const veilEl = document.createElement('div');
+ veilEl.className = 'collage-cell-veil';
+ cell.appendChild(veilEl);
+ } else {
+ const placeholder = document.createElement('div');
+ placeholder.className = 'collage-placeholder';
+ placeholder.style.background = slotColors[i];
+ placeholder.innerHTML = `<span>#${num}</span><p>${slot.artistText ? slot.artistText.toUpperCase() : 'UPLOAD PHOTO'}</p>`;
+ cell.appendChild(placeholder);
+ }
+
+ const infoBlock = document.createElement('div');
+ infoBlock.className = 'collage-cell-info';
+
+ const rankSpan = document.createElement('span');
+ rankSpan.className = 'collage-rank';
+ rankSpan.textContent = `#${num}`;
+ infoBlock.appendChild(rankSpan);
+
+ if (slot.artistText) {
+ const artistSpan = document.createElement('span');
+ artistSpan.className = 'collage-artist';
+ artistSpan.textContent = slot.artistText.toUpperCase();
+ infoBlock.appendChild(artistSpan);
+ }
+ if (slot.trackText) {
+ const trackSpan = document.createElement('span');
+ trackSpan.className = 'collage-track';
+ trackSpan.textContent = slot.trackText;
+ infoBlock.appendChild(trackSpan);
+ }
+
+ cell.appendChild(infoBlock);
+ grid.appendChild(cell);
+ });
+
+ wrapper.appendChild(grid);
+
+ // Collage footer
+ const colFooter = document.createElement('div');
+ colFooter.className = 'collage-footer';
+ const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
+ colFooter.innerHTML = `
+ <span>VOLTRIDE - ${dateStr}</span>
+ <strong>voltride.example</strong>
+ `;
+ wrapper.appendChild(colFooter);
+ templateRoot.appendChild(wrapper);
+ }
+
+ // Apply text auto-fitting
+  if (state.template === 'memorial') {
+    const artistEl = templateRoot.querySelector('.memorial-artist-name');
+    if (artistEl) {
+      let baseSize = 48;
+      if (state.ratio === '9-16') baseSize = 60;
+      if (state.ratio === '16-9') baseSize = 30;
+      autoFitText(artistEl, baseSize);
+    }
+  } else  if (state.template === 'single') {
+ const artistEl = templateRoot.querySelector('.promo-artist');
+ if (artistEl) {
+ let baseSize = 80;
+ if (state.ratio === '9-16') baseSize = 96;
+ if (state.ratio === '16-9') baseSize = 64;
+ autoFitText(artistEl, baseSize);
+ }
+ const titleEl = templateRoot.querySelector('.promo-title');
+ if (titleEl) {
+ let baseSize = 46;
+ if (state.ratio === '9-16') baseSize = 58;
+ if (state.ratio === '16-9') baseSize = 38;
+ autoFitText(titleEl, baseSize);
+ }
+ } else if (state.template === 'mixtape') {
+ const artistEl = templateRoot.querySelector('.promo-artist');
+ if (artistEl) {
+ let baseSize = (state.ratio === '16-9') ? 44 : 54;
+ autoFitText(artistEl, baseSize);
+ }
+ const titleEl = templateRoot.querySelector('.promo-title');
+ if (titleEl) {
+ let baseSize = (state.ratio === '16-9') ? 28 : 36;
+ autoFitText(titleEl, baseSize);
+ }
+ } else if (state.template === 'artist') {
+ const artistEl = templateRoot.querySelector('.editorial-header h2');
+ if (artistEl) {
+ autoFitText(artistEl, 58);
+ }
+ } else if (state.template === 'announcement') {
+ const headlineEl = templateRoot.querySelector('.announcement-headline');
+ if (headlineEl) {
+ let baseSize = 80;
+ if (state.ratio === '9-16') baseSize = 92;
+ if (state.ratio === '16-9') baseSize = 60;
+ autoFitText(headlineEl, baseSize);
+ }
+ } else if (state.template === 'brand_month' || state.template === 'brand_week') {
+ const brandNameEl = templateRoot.querySelector('.brand-header h2');
+ if (brandNameEl) {
+ autoFitText(brandNameEl, 56);
+ }
+ const prodTitleEl = templateRoot.querySelector('.brand-product-title');
+ if (prodTitleEl) {
+ autoFitText(prodTitleEl, 28);
+ }
+ }
+ }
+
+ // Generate caption based on current template
+ function updateCaption() {
+ const captionEl = document.getElementById('generated-caption');
+ if (!captionEl) return;
+ const artist = artistInput.value || 'Artist';
+ const title = titleInput.value || 'Release';
+ const desc = subtextInput.value;
+ const kicker = kickerInput.value || 'Voltride';
+ const badge = badgeInput.value || '';
+ const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+ let caption = '';
+    if (state.template === 'memorial') {
+      const region = (presetSelect.value !== 'custom' && database[presetSelect.value]) ? (database[presetSelect.value].region || 'DMV') : 'DMV';
+      caption = '🙏🕊️ In loving memory of ' + artist + '. ' + region + '. Rest in peace.\n\n#RIP ' + artist.replace(/\s+/g, '') + ' #voltride #RestInPeace #ForeverRemembered';
+    } else  if (state.template === 'video_promo') {
+      const presetData = database[presetSelect.value] || {};
+      const director = presetData.director ? `\nCaptured by: ${presetData.director}` : '';
+      const watchLine = presetData.url ? `Watch now on Voltride\n${presetData.url}` : 'Watch now on Voltride';
+      caption = `${artist} - "${title}" | Official Video\n${desc ? desc + '\n' : ''}${director}\n\n${watchLine}\n@voltride\n\n#voltride #ForSale #Walkaround #MarylandDirtBike #BaltimoreMoto #WashingtonDCDirtBike`;
+ } else if (state.template === 'single') {
+ caption = `${artist} - "${title}"${badge ? ' - ' + badge : ''}\n${desc ? desc + '\n' : ''}\nListed at voltride.example\n@voltride\n\n#voltride #${kicker.replace(/[^a-z0-9]/gi,'').toUpperCase()} #UsedDirtbike #BaltimoreDirtBike #MarylandMoto`;
+ } else if (state.template === 'mixtape') {
+ caption = `${artist} - "${title}" | Full Project Out Now${badge ? ' - ' + badge : ''}\n${desc ? desc + '\n' : ''}\nStream the full tape - @voltride\n\n#voltride #Lineup #Lineup #UsedDirtbike #MarylandMoto`;
+ } else if (state.template === 'artist') {
+ caption = `Seller Spotlight: ${artist}\n${desc ? '"' + desc + '"\n' : ''}\nVerified DMV Talent - @voltride\n\n#voltride #SellerSpotlight #BaltimoreDirtBike #MarylandMoto`;
+ } else if (state.template === 'collage') {
+ const slotLines = [1, 2, 3, 4].map(num => {
+ const sel = document.getElementById(`collage-select-${num}`);
+ const nameEl = document.getElementById(`collage-name-${num}`);
+ const trackEl = document.getElementById(`collage-track-${num}`);
+ const dbKey = sel ? sel.value : 'custom';
+ const db = (dbKey !== 'custom' && database[dbKey]) ? database[dbKey] : null;
+ const a = (nameEl && nameEl.value.trim()) ? nameEl.value.trim() : (db ? db.artist : '');
+ const t = (trackEl && trackEl.value.trim()) ? trackEl.value.trim() : (db ? db.release : '');
+ return a || t ? `#${num} ${a}${t ? ' - ' + t : ''}` : '';
+ }).filter(Boolean);
+ const listStr = slotLines.join('\n');
+ caption = `Voltride - Top 4 of the Week\n\n${listStr}\n\nFollow @voltride for weekly DMV music coverage\n\n#voltride #Top4 #BaltimoreDirtBike #WashingtonDCDirtBike #MarylandMoto #UsedDirtbike`;
+ } else if (state.template === 'brand_month') {
+ caption = `Brand of the Month: ${artist}\n${desc ? desc + '\n' : ''}\n${kicker}\n@voltride\n\n#voltride #DirtBikeStyle #LocalDealer #OffroadStyle #MfrOfTheMonth`;
+ } else if (state.template === 'brand_week') {
+ caption = `Brand of the Week: ${artist}\n${desc ? desc + '\n' : ''}\n${kicker}\n@voltride\n\n#voltride #DirtBikeStyle #LocalDealer #OffroadStyle #MfrOfTheWeek`;
+ } else {
+ caption = `${artist} - ${title}\n${desc ? desc + '\n' : ''}\n@voltride - DMVSignal.com\n\n#voltride #Baltimore #Maryland #DMV`;
+ }
+ captionEl.value = caption;
+ }
+
+ // Attach Event Listeners
+ 
+ // Ratio Toggles
+ ratioToggles.addEventListener('click', (e) => {
+ const btn = e.target.closest('.toggle-btn');
+ if (!btn) return;
+ 
+ ratioToggles.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+ btn.classList.add('active');
+ setAspectRatio(btn.dataset.ratio);
+ });
+
+ // Preset Selection
+
+ // Quick Presets Engine — one-click content configuration
+ function applyQuickPreset(type) {
+   const presetKey = quickPresetAliases[type] || type;
+   const presets = {
+     video:      { template: 'video_promo',  ratio: '1-1',  theme: 'dark',  kicker: ' For Sale | DMV', artist: 'Artist Name', title: 'Video Title', subtext: 'New official video now streaming on Voltride.', badge: 'FOR SALE' },
+     spotlight:  { template: 'artist',       ratio: '1-1',  theme: 'paper', kicker: 'ARTIST SPOTLIGHT', artist: 'Artist Name', title: 'Feature Story', subtext: '"Add artist quote or bio here..."', badge: 'FEATURED' },
+     countdown:  { template: 'announcement', ratio: '1-1',  theme: 'red',   kicker: 'Coming Soon', artist: 'Artist Name', title: 'Coming Soon', subtext: 'New release dropping. Mark your calendar on voltride.com.', badge: 'TBA' },
+     mixtape:    { template: 'mixtape',       ratio: '1-1',  theme: 'dark',  kicker: 'Lineup | DMV', artist: 'Artist Name', title: 'Mixtape Title', subtext: 'Full project dropping soon. Tracklist below.', badge: 'DROPPING SOON' },
+     story:      { template: 'announcement', ratio: '9-16', theme: 'gold',  kicker: 'VOLTRIDE STORY', artist: '', title: 'Headline Here', subtext: 'Tap to read the full story on voltride.com.', badge: 'TAP TO READ' },
+     youtube:    { template: 'video_promo',  ratio: '16-9', theme: 'dark',  kicker: ' For Sale | DMV', artist: 'Artist Name', title: 'Video Title', subtext: 'Official video now streaming on YouTube.', badge: 'FOR SALE' },
+     memorial:    { template: 'memorial',  ratio: '1-1', theme: 'dark',  kicker: 'IN LOVING MEMORY | SOUTHEAST DC', artist: 'Rider Tribute', title: 'In Loving Memory', subtext: 'In loving memory of TrapHard Swagg (Adrian Hawkins), Southeast DC / Walker Mill, Maryland. 2006-2026. Rest in peace.', badge: 'R.I.P.', presetValue: 'rider-tribute' }
+   };
+
+   const p = presets[presetKey] || (database[presetKey] ? {
+     template: database[presetKey].type || 'single',
+     ratio: '1-1',
+     theme: database[presetKey].theme || 'dark',
+     kicker: database[presetKey].kicker || '',
+     artist: database[presetKey].artist || '',
+     title: database[presetKey].release || '',
+     subtext: database[presetKey].subtext || '',
+     badge: database[presetKey].badge || '',
+     vinyl: database[presetKey].vinyl,
+     presetValue: presetKey
+   } : null);
+   if (!p) return;
+
+   state.template = p.template;
+   templateSelect.value = p.template;
+
+   setAspectRatio(p.ratio);
+   document.querySelectorAll('#ratio-toggles .toggle-btn').forEach(btn => {
+     btn.classList.toggle('active', btn.dataset.ratio === p.ratio);
+   });
+
+   state.theme = p.theme;
+   styleThemeSelect.value = p.theme;
+   canvas.className = '';
+   canvas.classList.add('ratio-' + p.ratio);
+   canvas.classList.add('theme-' + p.theme);
+   customColorControls.style.display = (p.theme === 'custom-color') ? 'flex' : 'none';
+
+   kickerInput.value = p.kicker;
+   artistInput.value = p.artist;
+   titleInput.value = p.title;
+   subtextInput.value = p.subtext;
+   badgeInput.value = p.badge;
+
+   const presetValue = p.presetValue || 'custom';
+   presetSelect.value = Array.prototype.some.call(presetSelect.options, option => option.value === presetValue) ? presetValue : 'custom';
+   state.customImageSrc = null;
+   imageUpload.value = '';
+
+   document.getElementById('group-tracklist').style.display = (p.template === 'mixtape') ? 'flex' : 'none';
+   document.getElementById('group-collage-uploads').style.display = 'none';
+   document.getElementById('group-collage-artists').style.display = 'none';
+   toggleVinyl.checked = (typeof p.vinyl === 'boolean') ? p.vinyl : (presetKey === 'story');
+   // Hide vinyl toggle for memorial (no vinyl on tribute posts)
+   const vinylRow = document.getElementById('toggle-vinyl');
+   if (vinylRow) {
+     vinylRow.parentElement.style.display = (p.template === 'memorial') ? 'none' : '';
+   }
+
+   renderTemplate();
+   updateCaption();
+   updatePreviewScaling();
+ }
+ presetSelect.addEventListener('change', () => {
+ const val = presetSelect.value;
+ if (val === 'custom') {
+ state.customImageSrc = null;
+ imageUpload.value = '';
+ return;
+ }
+ 
+ const data = database[val];
+ if (!data) return;
+ 
+ // Auto fill form fields
+ kickerInput.value = data.kicker || '';
+ artistInput.value = data.artist || '';
+ titleInput.value = data.release || '';
+ subtextInput.value = data.subtext || '';
+ badgeInput.value = data.badge || '';
+ 
+ if (data.tracklist) {
+ tracklistInput.value = data.tracklist;
+ templateSelect.value = 'mixtape';
+ state.template = 'mixtape';
+ } else {
+ const targetTemplate = data.type || 'single';
+ // Guard: fall back to single for unrecognized template types
+ const validTemplates = ['single','mixtape','video_promo','artist','collage','announcement','brand_month','brand_week','memorial'];
+ const safeTemplate = validTemplates.includes(targetTemplate) ? targetTemplate : 'single';
+ templateSelect.value = safeTemplate;
+ state.template = safeTemplate;
+ // Hide vinyl toggle for memorial (no vinyl on tribute posts)
+ const vinylToggle = document.getElementById('toggle-vinyl');
+ if (vinylToggle) {
+   vinylToggle.parentElement.style.display =
+     (safeTemplate === 'memorial') ? 'none' : '';
+ }
+ }
+ 
+ if (data.theme) {
+ styleThemeSelect.value = data.theme;
+ state.theme = data.theme;
+ canvas.className = 'ratio-' + state.ratio + ' theme-' + data.theme;
+ customColorControls.style.display = 'none';
+ updateCustomColors();
+ }
+ 
+ toggleVinyl.checked = !!data.vinyl;
+ state.customImageSrc = null; // Clear custom image in favor of database preset
+ 
+ renderTemplate();
+ updateCaption();
+ });
+
+ // Inputs change listeners
+ [kickerInput, artistInput, titleInput, subtextInput, tracklistInput, badgeInput].forEach(input => {
+ input.addEventListener('input', () => { renderTemplate(); updateCaption(); });
+ });
+ // Collage slot handlers - dropdown select, custom name/track inputs, and custom photo upload
+ [1, 2, 3, 4].forEach(num => {
+ // Dropdown: auto-fill name/track from database
+ const selectEl = document.getElementById(`collage-select-${num}`);
+ const nameEl = document.getElementById(`collage-name-${num}`);
+ const trackEl = document.getElementById(`collage-track-${num}`);
+ const imgInput = document.getElementById(`collage-img-${num}`);
+ const thumbEl = document.getElementById(`collage-thumb-${num}`);
+
+ if (selectEl) {
+ selectEl.addEventListener('change', () => {
+ const key = selectEl.value;
+ if (key !== 'custom' && database[key]) {
+ const db = database[key];
+ // Auto-fill name + track only if user hasn't typed something custom
+ if (nameEl && !nameEl.dataset.userEdited) nameEl.value = db.artist || '';
+ if (trackEl && !trackEl.dataset.userEdited) trackEl.value = db.release || '';
+ // If we don't have a custom photo already, use DB artwork as preview
+ if (db.artwork && thumbEl) {
+ thumbEl.src = db.artwork;
+ thumbEl.onerror = function() { this.style.display = 'none'; };
+ thumbEl.style.display = 'block';
+ }
+ } else {
+ if (nameEl && !nameEl.dataset.userEdited) nameEl.value = '';
+ if (trackEl && !trackEl.dataset.userEdited) trackEl.value = '';
+ }
+ renderTemplate();
+ updateCaption();
+ });
+ }
+
+ // Name/track manual input: mark as user-edited so auto-fill doesn't override
+ if (nameEl) {
+ nameEl.addEventListener('input', () => {
+ nameEl.dataset.userEdited = nameEl.value ? 'true' : '';
+ renderTemplate();
+ updateCaption();
+ });
+ }
+ if (trackEl) {
+ trackEl.addEventListener('input', () => {
+ trackEl.dataset.userEdited = trackEl.value ? 'true' : '';
+ renderTemplate();
+ updateCaption();
+ });
+ }
+
+ // Custom photo upload: store in state and show thumb
+ if (imgInput) {
+ imgInput.addEventListener('change', (e) => {
+ const file = e.target.files[0];
+ if (!file) return;
+ const reader = new FileReader();
+ reader.onload = (ev) => {
+ if (!state.collageImages) state.collageImages = {};
+ state.collageImages[num - 1] = ev.target.result;
+ if (thumbEl) {
+ thumbEl.src = ev.target.result;
+ thumbEl.style.display = 'block';
+ }
+ renderTemplate();
+ };
+ reader.readAsDataURL(file);
+ });
+ }
+ });
+
+ // Template change
+ templateSelect.addEventListener('change', () => {
+ state.template = templateSelect.value;
+ const isCollage = state.template === 'collage';
+ document.getElementById('group-collage-uploads').style.display = isCollage ? 'block' : 'none';
+ document.getElementById('group-collage-artists').style.display = isCollage ? 'block' : 'none';
+ renderTemplate();
+ updateCaption();
+ });
+
+ // Color Theme change
+ styleThemeSelect.addEventListener('change', () => {
+ canvas.classList.remove('theme-' + state.theme);
+ state.theme = styleThemeSelect.value;
+ canvas.classList.add('theme-' + state.theme);
+ if (state.theme === 'custom-color') {
+ customColorControls.style.display = 'flex';
+ } else {
+ customColorControls.style.display = 'none';
+ }
+ updateCustomColors();
+ renderTemplate();
+ updateCaption();
+ });
+
+ [customBgInput, customInkInput, customAccentInput].forEach(input => {
+ input.addEventListener('input', () => {
+ updateCustomColors();
+ renderTemplate();
+ });
+ });
+
+ // Upload custom image (main single slot)
+ imageUpload.addEventListener('change', (e) => {
+ const file = e.target.files[0];
+ if (!file) return;
+ const reader = new FileReader();
+ reader.onload = (event) => {
+ state.customImageSrc = event.target.result;
+ renderTemplate();
+ };
+ reader.readAsDataURL(file);
+ });
+
+ // Grain slider
+ grainSlider.addEventListener('input', () => {
+ document.getElementById('grain-layer').style.opacity = grainSlider.value / 100;
+ });
+
+ // Sticker toggles
+ toggleVinyl.addEventListener('change', renderTemplate);
+ toggleParental.addEventListener('change', () => {
+ parentalSticker.style.display = toggleParental.checked ? 'block' : 'none';
+ });
+ toggleBarcode.addEventListener('change', () => {
+ barcodeSticker.style.display = toggleBarcode.checked ? 'flex' : 'none';
+ });
+ toggleVerified.addEventListener('change', () => {
+ verifiedBadge.style.display = toggleVerified.checked ? 'block' : 'none';
+ });
+
+ // New Drop Ribbon toggle
+ const toggleNewDropRibbon = document.getElementById('toggle-new-drop-ribbon');
+ const newDropRibbonEl = document.getElementById('new-drop-ribbon');
+ if (toggleNewDropRibbon && newDropRibbonEl) {
+ toggleNewDropRibbon.addEventListener('change', () => {
+ newDropRibbonEl.style.display = toggleNewDropRibbon.checked ? 'block' : 'none';
+ });
+ }
+
+ // Copy caption to clipboard
+ const copyCaptionBtn = document.getElementById('copy-caption-btn');
+ if (copyCaptionBtn) {
+ copyCaptionBtn.addEventListener('click', () => {
+ const captionEl = document.getElementById('generated-caption');
+ if (!captionEl || !captionEl.value) return;
+ navigator.clipboard.writeText(captionEl.value).then(() => {
+ copyCaptionBtn.textContent = 'OK Copied!';
+ copyCaptionBtn.classList.add('copied');
+ setTimeout(() => {
+ copyCaptionBtn.innerHTML = 'Copy Caption to Clipboard';
+ copyCaptionBtn.classList.remove('copied');
+ }, 2000);
+ }).catch(() => {
+ captionEl.select();
+ document.execCommand('copy');
+ copyCaptionBtn.textContent = 'OK Copied (fallback)';
+ setTimeout(() => { copyCaptionBtn.innerHTML = 'Copy Caption to Clipboard'; }, 2000);
+ });
+ });
+ }
+
+ // Download PNG Action
+
+ document.getElementById('download-btn').addEventListener('click', () => {
+ const btn = document.getElementById('download-btn');
+ const originalText = btn.innerHTML;
+ btn.innerHTML = '<span>...</span> Rendering Image...';
+ btn.disabled = true;
+
+ // Render with html2canvas
+ // We set useCORS to true so cross-origin assets (e.g. Google Fonts, images) load properly
+ // We temporarily clear transform scaling of canvas to ensure proper 1:1 image resolution capture
+ const originalTransform = canvas.style.transform;
+ canvas.style.transform = 'none';
+
+ html2canvas(canvas, {
+ useCORS: true,
+ allowTaint: true,
+ backgroundColor: null,
+ scale: 2, // Export at 2x scale for crisp retina display quality
+ width: canvas.offsetWidth,
+ height: canvas.offsetHeight,
+ logging: false
+ }).then(renderedCanvas => {
+ canvas.style.transform = originalTransform;
+ btn.innerHTML = originalText;
+ btn.disabled = false;
+
+ // Download link
+ const link = document.createElement('a');
+ const fileArtist = artistInput.value.toLowerCase().replace(/[^a-z0-9]/g, '_');
+ const fileTitle = titleInput.value.toLowerCase().replace(/[^a-z0-9]/g, '_');
+ link.download = `voltride_${state.template}_${fileArtist}_${fileTitle || 'post'}.png`;
+ link.href = renderedCanvas.toDataURL('image/png');
+ link.click();
+ }).catch(err => {
+ console.error('Render error:', err);
+ canvas.style.transform = originalTransform;
+ btn.innerHTML = '<span>!</span> Export Failed';
+ btn.disabled = false;
+ setTimeout(() => {
+ btn.innerHTML = originalText;
+ }, 3000);
+ });
+ });
+
+ // Window resize handler
+ window.addEventListener('resize', updatePreviewScaling);
+
+ // Drag-and-drop pointer logic for sticker overlays
+ function makeElementDraggable(element) {
+ let isDragging = false;
+ let startX = 0;
+ let startY = 0;
+ let startLeft = 0;
+ let startTop = 0;
+
+ element.addEventListener('pointerdown', (e) => {
+ // Only trigger on primary button (left click or touch press)
+ if (e.button !== 0) return;
+ 
+ isDragging = true;
+ startX = e.clientX;
+ startY = e.clientY;
+ 
+ // Grab current offsets relative to canvas
+ startLeft = element.offsetLeft;
+ startTop = element.offsetTop;
+ 
+ // Set capture to keep pointer events bound to this element
+ element.setPointerCapture(e.pointerId);
+ 
+ e.preventDefault();
+ });
+
+ element.addEventListener('pointermove', (e) => {
+ if (!isDragging) return;
+ 
+ const scale = state.scale || 1.0;
+ const dx = (e.clientX - startX) / scale;
+ const dy = (e.clientY - startY) / scale;
+ 
+ let newLeft = startLeft + dx;
+ let newTop = startTop + dy;
+ 
+ // Boundaries check inside the parent #promo-canvas
+ const maxLeft = canvas.offsetWidth - element.offsetWidth;
+ const maxTop = canvas.offsetHeight - element.offsetHeight;
+ 
+ newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+ newTop = Math.max(0, Math.min(newTop, maxTop));
+ 
+ element.style.left = newLeft + 'px';
+ element.style.top = newTop + 'px';
+ element.style.right = 'auto';
+ element.style.bottom = 'auto';
+ });
+
+ element.addEventListener('pointerup', (e) => {
+ if (!isDragging) return;
+ isDragging = false;
+ element.releasePointerCapture(e.pointerId);
+ });
+ 
+ element.addEventListener('pointercancel', (e) => {
+ if (!isDragging) return;
+ isDragging = false;
+ element.releasePointerCapture(e.pointerId);
+ });
+ }
+
+ // Initialize dragging behavior for all absolute stickers
+ [parentalSticker, barcodeSticker, verifiedBadge, stampBadge].forEach(makeElementDraggable);
+
+ // Bootstrap
+ setAspectRatio('1-1');
+ renderTemplate();
+ updateCaption();
+ </script>
+<script>
+(function(){
+ document.querySelectorAll('.hamburger').forEach(function(btn){
+ btn.addEventListener('click', function(){
+ var nav = btn.closest('nav').querySelector('.nav');
+ if(nav){
+ nav.classList.toggle('is-open');
+ btn.setAttribute('aria-expanded', nav.classList.contains('is-open'));
+ btn.innerHTML = nav.classList.contains('is-open') ? '&#10005;' : '&#9776;';
+ }
+ });
+ });
+ // Close on link click
+ document.querySelectorAll('.nav a:not(.dropdown-trigger)').forEach(function(link){
+ link.addEventListener('click', function(){
+ var nav = link.closest('.nav');
+ if(nav && nav.classList.contains('is-open')){
+ nav.classList.remove('is-open');
+ var btn = nav.closest('nav').querySelector('.hamburger');
+ if(btn){ btn.innerHTML = '&#9776;'; btn.setAttribute('aria-expanded','false'); }
+ }
+ });
+ });
+}());
+</script>
+
+ <script src="search.js"></script>
+ <script src="deploy-fingerprint.js"></script>
+
+<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+ <a href="../index.html"><span class="mob-icon">&#127968;</span>Home</a>
+ <a href="catalog.html"><span class="mob-icon">&#127925;</span>Music</a>
+ <a href="submit-catalog.html" class="mob-submit"><span class="mob-icon">+</span>Submit</a>
+ <a href="artists.html"><span class="mob-icon">&#128101;</span>Artists</a>
+ <a href="videos.html"><span class="mob-icon">&#127916;</span>Videos</a>
+</nav>
+</body>
+</html>
+
+
+

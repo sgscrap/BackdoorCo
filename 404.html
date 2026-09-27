@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Lost at the Backdoor</title>
+  <meta name="description" content="The page you're looking for doesn't exist. Let's get you back to the shop." />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="store.css" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200, 246, 93, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200, 246, 93, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+      mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+      pointer-events: none;
+    }
+    .glow {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(200, 246, 93, 0.05) 0%, transparent 70%);
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .code {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(120px, 25vw, 200px);
+      line-height: 0.85;
+      color: #c8f65d;
+      letter-spacing: 6px;
+      position: relative;
+      z-index: 2;
+      text-shadow: 0 0 40px rgba(200, 246, 93, 0.2);
+    }
+    .message {
+      font-size: clamp(18px, 3vw, 28px);
+      font-weight: 700;
+      margin: 8px 0 12px;
+      position: relative;
+      z-index: 2;
+    }
+    .sub {
+      color: #888;
+      font-size: 15px;
+      max-width: 400px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+      position: relative;
+      z-index: 2;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 36px;
+      background: #c8f65d;
+      border: none;
+      border-radius: 12px;
+      color: #000;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 20px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover {
+      background: #a8d94a;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 12px;
+      color: #888;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: #c8f65d;
+      color: #c8f65d;
+    }
+    .sneaker-emoji {
+      font-size: 72px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 10px 30px rgba(200, 246, 93, 0.1));
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow"></div>
+
+  <div class="sneaker-emoji">👟</div>
+  <div class="code">404</div>
+  <h1 class="message">This door doesn't open.</h1>
+  <p class="sub">The page you're looking for is either sold out, never existed, or took a wrong turn. Let's get you back to the heat.</p>
+  <div class="actions">
+    <a class="btn-primary" href="shop-all.html">
+      <i class="fa-solid fa-shoe-prints"></i> SHOP ALL
+    </a>
+    <a class="btn-secondary" href="index.html">
+      <i class="fa-solid fa-house"></i> GO HOME
+    </a>
+  </div>
+</body>
+</html>

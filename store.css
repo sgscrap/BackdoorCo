@@ -21,6 +21,9 @@
     --text2: #888888;
     --text3: #444444;
     --border: #222222;
+    --border2: #333333;
+}
+
 .hide-initial {
     display: none;
 }
@@ -4941,6 +4944,13 @@ body {
     object-fit: cover;
     transform: scale(var(--product-image-scale, 1));
     transition: transform 0.5s ease;
+}
+
+.mw-card.shop-card--contain-image .mw-card-img img {
+    object-fit: contain;
+    padding: 10px;
+    box-sizing: border-box;
+    background: #1a1a1a;
 }
 
 .mw-card:hover .mw-card-img img {
