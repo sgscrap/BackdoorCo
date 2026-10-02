@@ -71,6 +71,12 @@ jobs:
       - name: Catalogue images are local (no unmirrored third-party URLs)
         run: npm run check:catalog-images
 
+      # The storefront nav/footer live once in partials/ and are inlined into
+      # every page. Fail if a page was edited directly and now drifts from its
+      # partial (regenerate with `npm run build:chrome` and commit).
+      - name: Shared chrome is up to date
+        run: npm run check:chrome
+
       # Validates admin/instagram-rollout.json against the studio vocabulary and
       # the seeded catalogue. Fully offline, so it is deterministic.
       - name: Instagram rollout assets are valid (offline)
