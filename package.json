@@ -6,7 +6,7 @@
   "scripts": {
     "verify:readme": "node scripts/verify-readme.js",
     "verify:readme:json": "node scripts/verify-readme.js --json",
-    "test": "node scripts/price-monitor-retail.test.js && node scripts/crop-studio.test.js && node scripts/localize-catalog-image.test.js && node scripts/apply-product-overrides.test.js && node scripts/catalog-upload-fallback.test.js && node scripts/catalog-upload-server.test.js && node scripts/product-image-upload.test.js && node scripts/instagram-rollout.test.js && node scripts/rollout-import.test.js && node scripts/generate-instagram-rollout.test.js && node scripts/check-image-hotlinks.js",
+    "test": "node scripts/price-monitor-retail.test.js && node scripts/crop-studio.test.js && node scripts/localize-catalog-image.test.js && node scripts/apply-product-overrides.test.js && node scripts/catalog-upload-fallback.test.js && node scripts/catalog-upload-server.test.js && node scripts/product-image-upload.test.js && node scripts/instagram-rollout.test.js && node scripts/rollout-import.test.js && node scripts/generate-instagram-rollout.test.js && node scripts/diff-rollouts.test.js && node scripts/check-image-hotlinks.js",
     "check:hotlinks": "node scripts/check-image-hotlinks.js",
     "report:placeholders": "node scripts/report-placeholder-images.js",
     "check:catalog-images": "node scripts/report-placeholder-images.js --strict",
@@ -25,9 +25,11 @@
     "generate:instagram": "node scripts/generate-instagram-rollout.js --write --offline",
     "prepare:instagram:generated": "node scripts/prepare-instagram-rollout.js --offline --manifest admin/instagram-rollout.generated.json --out admin/instagram-rollout.generated.prepared.json --write",
     "check:instagram:generated": "node scripts/prepare-instagram-rollout.js --offline --manifest admin/instagram-rollout.generated.json",
+    "diff:instagram": "node scripts/diff-rollouts.js",
     "test:instagram-rollout": "node scripts/instagram-rollout.test.js",
     "test:rollout-import": "node scripts/rollout-import.test.js",
-    "test:generate-rollout": "node scripts/generate-instagram-rollout.test.js"
+    "test:generate-rollout": "node scripts/generate-instagram-rollout.test.js",
+    "test:diff-rollouts": "node scripts/diff-rollouts.test.js"
   },
   "repository": {
     "type": "git",
