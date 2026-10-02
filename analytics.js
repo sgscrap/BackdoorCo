@@ -5,7 +5,7 @@
 function renderCharts(days) {
     const opens = document.getElementById('opensChart');
     const clicks = document.getElementById('clicksChart');
-    if (!opens) return;
+    if (!opens || !clicks) return;
 
     const count = parseInt(days);
     // Mock data generation

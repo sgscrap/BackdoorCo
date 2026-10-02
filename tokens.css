@@ -1,0 +1,22 @@
+/* ─────────────────────────────────────────────────────────────
+   Design tokens — the :root custom properties shared by the
+   storefront stylesheets. Link this before the page stylesheets.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #161616;
+    --bg4: #1e1e1e;
+    --accent: #c8f65d;
+    --red: #ff4d4d;
+    --blue: #4d9fff;
+    --orange: #ff8c42;
+    --purple: #a855f7;
+    --green: #22c55e;
+    --text: #ffffff;
+    --text2: #888888;
+    --text3: #444444;
+    --border: #222222;
+    --border2: #333333;
+}

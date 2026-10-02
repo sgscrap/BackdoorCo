@@ -134,10 +134,12 @@ Backdoor/
 │
 ├── brand-logos/             # Brand wordmarks used in emails and OG cards
 │
-├── partials/                # Shared storefront chrome — inlined by scripts/build-chrome.js
+├── partials/                # Shared storefront chrome + scripts — inlined by scripts/build-chrome.js
 │   ├── nav.html             # Navbar + mobile menu (every storefront page)
 │   ├── footer-compact.html  # Compact support footer (most pages)
-│   └── footer-full.html     # Rich newsletter footer (index.html, about.html)
+│   ├── footer-full.html     # Rich newsletter footer (index.html, about.html)
+│   ├── global-scripts.html  # Firebase SDK/config, auth.js + shared page helpers
+│   └── head-css.html        # <link> tags for tokens.css + chrome.css (every page)
 
 ├── favicon.svg / favicon.png  # Brand mark
 │
@@ -162,6 +164,8 @@ Backdoor/
 ├── analytics.js             # Tiny analytics chart helper + email/save tracker
 ├── simple-product-page.js   # Lighter-weight fallback PDP module
 │
+├── chrome.css               # Shared navbar / cart drawer / toast / announce styles
+├── tokens.css               # Shared :root design tokens
 ├── css:  styles.css, store.css, checkout.css, accounts.css,
 │        shop-all.css, product.css, admin.css, pricing.css, email.css,
 │        tracking.css, social.css, restock.css
@@ -184,15 +188,30 @@ All customer pages share the same shell, generated from a single source:
 - **Top bar**: announcement banner + navbar + mobile menu (hamburger).
 - **Footer**: a rich newsletter footer on `index.html` / `about.html`, and a compact support footer on every other page.
 
-Each page's nav and footer are inlined from a partial in [`partials/`](partials/) between `<!-- @@chrome:nav:start -->` / `<!-- @@chrome:nav:end -->` (and `chrome:footer`) marker comments:
+Each page's nav, footer, and global scripts are inlined from a partial in [`partials/`](partials/) between `<!-- @@chrome:<name>:start -->` / `<!-- @@chrome:<name>:end -->` marker comments:
 
-| Partial | Used by |
-| --- | --- |
-| [`partials/nav.html`](partials/nav.html) | every storefront page |
-| [`partials/footer-compact.html`](partials/footer-compact.html) | all pages except `index.html` / `about.html` |
-| [`partials/footer-full.html`](partials/footer-full.html) | `index.html`, `about.html` |
+| Partial | Region | Used by |
+| --- | --- | --- |
+| [`partials/nav.html`](partials/nav.html) | `nav` | every storefront page |
+| [`partials/footer-compact.html`](partials/footer-compact.html) | `footer` | all pages except `index.html` / `about.html` |
+| [`partials/footer-full.html`](partials/footer-full.html) | `footer` | `index.html`, `about.html` |
+| [`partials/global-scripts.html`](partials/global-scripts.html) | `scripts` | every page except `404.html`, `checkout.html`, `product-detail.html` |
+| [`partials/head-css.html`](partials/head-css.html) | `headcss` | every storefront page (inserted before `store.css`) |
 
-Run **`npm run build:chrome`** after editing a partial to regenerate every page, and **`npm run check:chrome`** (enforced in CI) to fail the build when a page drifts from its partial. Change the nav or footer once, in one file.
+Run **`npm run build:chrome`** after editing a partial to regenerate every page, and **`npm run check:chrome`** (enforced in CI) to fail the build when a page drifts from its partial. Change the nav, footer, shared scripts, or shared CSS links once, in one file.
+
+### Shared CSS (`chrome.css` + `tokens.css`)
+
+Every storefront page links two shared stylesheets (via [`partials/head-css.html`](partials/head-css.html)) before its own:
+
+- **[`tokens.css`](tokens.css)** — the `:root` design tokens (`--bg`, `--accent`, `--text`, …). Previously copy-pasted into six stylesheets.
+- **[`chrome.css`](chrome.css)** — the navbar, mobile menu, cart drawer, toast, announcement bar and footer social buttons. These used to be duplicated across `store.css` and the page stylesheets.
+
+The page-specific stylesheets keep only their genuine divergences (e.g. `checkout.css` keeps its 64px navbar, `accounts.css` its bordered icon buttons) as overrides on top of the shared base. Change nav/cart/toast styling once, in `chrome.css`.
+
+### Storefront smoke test
+
+**`npm run test:smoke`** loads every storefront page in a real headless Chrome and fails if any page throws an uncaught JavaScript exception — the fastest way to catch a shared script that breaks on the one page that does not render an element it assumes exists. It adds no dependencies: it drives Chrome over the DevTools protocol and serves the repo from a temporary local server. Set `CHROME_PATH` to point at a specific browser, `SMOKE_BASE_URL` to target an already-running server, or `SMOKE_PAGES=index.html,about.html` to smoke a subset. If no Chrome/Chromium is found it prints a note and exits 0. Unhandled promise rejections and third-party network noise are reported as warnings rather than failures.
 
 The navbar links to:
 
@@ -204,7 +223,7 @@ The navbar links to:
 
 ### Global Library (loaded on every page)
 
-Every page ends with this trio of script tags (kept verbatim in every HTML file):
+Every page ends with this block, inlined from [`partials/global-scripts.html`](partials/global-scripts.html) between `<!-- @@chrome:scripts:start -->` / `<!-- @@chrome:scripts:end -->` (edit the partial, then `npm run build:chrome`):
 
 ```html
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -213,6 +232,8 @@ Every page ends with this trio of script tags (kept verbatim in every HTML file)
 <script>window.firebaseConfig = { apiKey, projectId: "coalition-aec44", ... };</script>
 <script src="auth.js"></script>
 ```
+
+The same partial also defines the two tiny helpers every storefront page shares — `closeAnnounce()` (dismiss the announcement bar) and `handleFooterSignup()` (the newsletter form handler). They used to be hand-copied into each page's inline scripts.
 
 - **`auth.js`** — Initializes Firebase Auth, subscribes to the signed-in user's Firestore doc (`users/{uid}`), and exposes `window.globalUser`, `window.globalProfile`, `window.globalWishlist`. It also injects the "Sign In" button / user-avatar dropdown into the navbar and wires up `window.toggleWishlist(productId)`.
 - **`app.js`** — Module that renders the "Most Wanted" 4-card grid on the home page, manages the cart sidebar / product modal, search-redirect, and toast system. Imported with `?v=2.4` cache busters.
@@ -607,8 +628,12 @@ Works for Lyst, Farfetch, END., SSENSE, Mr Porter, Nordstrom, Net-A-Porter. JS-o
 | Update Firestore security rules             | `firestore.rules`                                                                                               |
 | Adjust homepage live feed                   | `app.js` → search for "Most Wanted", or `index.html` for the inline brand cards                                  |
 | Change the site-wide nav or footer          | Edit `partials/nav.html` / `partials/footer-*.html`, then `npm run build:chrome`                                 |
+| Change site-wide scripts / Firebase config  | Edit `partials/global-scripts.html`, then `npm run build:chrome`                                                  |
+| Change navbar / cart / toast styling        | Edit `chrome.css` (shared base) or the page stylesheet for a page-specific override                              |
+| Change the site colour tokens               | Edit `tokens.css`                                                                                                 |
 | Add a new admin page                        | Drop the HTML+JS pair in `admin/`, mirror the sidebar nav (`<p class="nav-label">TOOLS</p>` etc.) + add an entry in every existing admin nav |
 | Set image crop/aspect ratio per product      | Edit product → Image Display section: Fit Mode toggle, Position X/Y sliders, Scale, Padding, Aspect Ratio dropdown (Auto / 1:1 Square / 3:4 Portrait / 4:3 Landscape / 16:9 Widescreen) |
+| Smoke-test every storefront page            | `npm run test:smoke` (headless Chrome, fails on uncaught JS exceptions)                                          |
 
 ---
 

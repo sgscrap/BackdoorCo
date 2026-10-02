@@ -1,32 +1,4 @@
-/* ══════════════════════════════════════════
-   BACKDOOR — SMART PRICING ENGINE STYLES
-══════════════════════════════════════════ */
 
-*,
-*::before,
-*::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-:root {
-    --bg: #0a0a0a;
-    --bg2: #111111;
-    --bg3: #161616;
-    --bg4: #1e1e1e;
-    --accent: #c8f65d;
-    --red: #ff4d4d;
-    --blue: #4d9fff;
-    --orange: #ff8c42;
-    --purple: #a855f7;
-    --green: #22c55e;
-    --text: #ffffff;
-    --text2: #888888;
-    --text3: #444444;
-    --border: #222222;
-    --border2: #2a2a2a;
-}
 
 body {
     font-family: 'Space Grotesk', sans-serif;
@@ -1380,18 +1352,6 @@ input[type=range]::-webkit-slider-thumb:hover {
     min-width: 280px;
 }
 
-.toast.error {
-    border-left-color: var(--red);
-}
-
-.toast.info {
-    border-left-color: var(--blue);
-}
-
-.toast.warn {
-    border-left-color: var(--orange);
-}
-
 @keyframes slideIn {
     from {
         transform: translateX(110%);
@@ -1438,8 +1398,8 @@ input[type=range]::-webkit-slider-thumb:hover {
     }
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 1100px) {
+/* ── RESPONSIVE ── */@media (max-width: 1100px) {
+
     .top-stats {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -1452,8 +1412,8 @@ input[type=range]::-webkit-slider-thumb:hover {
         grid-template-columns: 1fr;
     }
 }
-
 @media (max-width: 700px) {
+
     .top-stats {
         grid-template-columns: 1fr 1fr;
     }
@@ -1478,3 +1438,4 @@ input[type=range]::-webkit-slider-thumb:hover {
         grid-template-columns: 1fr;
     }
 }
+

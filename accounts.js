@@ -282,6 +282,9 @@ async function loadUserProfile(uid) {
    NAV UI
 ══════════════════════════════════════════ */
 function updateNavUI() {
+    // The nav auth controls are optional — auth.js injects its own avatar into
+    // the shared navbar, so pages that don't render #authButtons/#userMenu must
+    // not throw here.
     const authBtns = document.getElementById('authButtons');
     const userMenu = document.getElementById('userMenu');
 
@@ -289,30 +292,36 @@ function updateNavUI() {
         const first = userProfile.first || currentUser.displayName?.split(' ')[0] || 'User';
         const last  = userProfile.last  || currentUser.displayName?.split(' ').slice(1).join(' ') || '';
 
-        authBtns.classList.add('hidden');
-        userMenu.classList.remove('hidden');
+        if (authBtns) authBtns.classList.add('hidden');
+        if (userMenu) userMenu.classList.remove('hidden');
 
         const initials = getInitials(first, last);
-        document.getElementById('navAvatar').textContent  = initials;
-        document.getElementById('navName').textContent    = first;
-        document.getElementById('dropName').textContent   = `${first} ${last}`.trim();
-        document.getElementById('dropEmail').textContent  = currentUser.email || '';
+        const navAvatar = document.getElementById('navAvatar');
+        const navName = document.getElementById('navName');
+        const dropName = document.getElementById('dropName');
+        const dropEmail = document.getElementById('dropEmail');
+        if (navAvatar) navAvatar.textContent  = initials;
+        if (navName) navName.textContent    = first;
+        if (dropName) dropName.textContent   = `${first} ${last}`.trim();
+        if (dropEmail) dropEmail.textContent  = currentUser.email || '';
     } else {
-        authBtns.classList.remove('hidden');
-        userMenu.classList.add('hidden');
+        if (authBtns) authBtns.classList.remove('hidden');
+        if (userMenu) userMenu.classList.add('hidden');
     }
 
     updateWishlistBadge();
 }
 
 function toggleUserDropdown() {
-    document.getElementById('userDropdown').classList.toggle('open');
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) dropdown.classList.toggle('open');
 }
 
 document.addEventListener('click', (e) => {
     const wrap = document.querySelector('.user-menu-wrap');
     if (wrap && !wrap.contains(e.target)) {
-        document.getElementById('userDropdown').classList.remove('open');
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) dropdown.classList.remove('open');
     }
 });
 
@@ -326,7 +335,8 @@ function showPage(page) {
 
 function showAccountPage(tab) {
     if (!currentUser) { openAuth('login'); return; }
-    document.getElementById('userDropdown').classList.remove('open');
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) dropdown.classList.remove('open');
     showPage('account');
     populateAccountPage();
     switchAccTab(tab);
