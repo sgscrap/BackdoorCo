@@ -601,6 +601,6 @@ Works for Lyst, Farfetch, END., SSENSE, Mr Porter, Nordstrom, Net-A-Porter. JS-o
 - Live storefront: [backdoorco.xyz](https://backdoorco.xyz/)
 - Social: [@backdoorco](https://instagram.com/backdoorco) · [TikTok](https://tiktok.com/@backdoorco) · [X / Twitter](https://twitter.com/backdoorco)
 - Repository: [github.com/sgscrap/BackdoorCo](https://github.com/sgscrap/BackdoorCo)
-- Support email: `support@backdoorco.xyz`
+- Support email: `backdoor.co.inc@gmail.com`
 
 © 2026 Backdoor. New York, NY. Authentic sneakers guaranteed.
