@@ -326,9 +326,8 @@ function subscribeToProductQuery(productQuery, fallbackProduct, missingMessage =
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Only the real product-page shell has this container. The legacy
-    // product-detail.html also loads this module, so bail out instead of
-    // throwing on the elements it doesn't render.
+    // Only the real product-page shell has this container, so bail out on any
+    // page that doesn't render it instead of throwing on the missing elements.
     if (!document.getElementById('productPageLayout')) return;
 
     initShell();

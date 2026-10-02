@@ -69,7 +69,6 @@ const FOOTER_PAGES = {
   'men.html': 'compact',
   'pricing.html': 'compact',
   'privacy.html': 'compact',
-  'product-detail.html': 'compact',
   'product.html': 'compact',
   'returns.html': 'compact',
   'reviews.html': 'compact',
@@ -84,8 +83,8 @@ const FOOTER_PAGES = {
 
 // Pages that carry the shared global script block — the Firebase SDKs and
 // config, auth.js, and the small storefront helpers (announcement bar +
-// footer signup). 404, checkout and product-detail deliberately load a
-// different script profile and are excluded.
+// footer signup). 404 and checkout deliberately load a different script
+// profile and are excluded.
 const SCRIPT_PAGES = new Set([
   'about.html',
   'accessories.html',
@@ -130,7 +129,6 @@ const HEADCSS_PAGES = new Set([
   'men.html',
   'pricing.html',
   'privacy.html',
-  'product-detail.html',
   'product.html',
   'returns.html',
   'reviews.html',

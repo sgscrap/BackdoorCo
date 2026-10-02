@@ -11,9 +11,6 @@ scripts
 netlify
 server.js
 deploy.ps1
-test-browser.js
-check-homepage.js
-check-shop-page.js
 *.db
 *.db-shm
 *.db-wal

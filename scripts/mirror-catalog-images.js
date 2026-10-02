@@ -88,7 +88,6 @@ const DEFAULT_FILES = [
     'app.js',
     'pricing.js',
     'product-page.js',
-    'simple-product-page.js',
     'reviews-data.js',
     'admin.js',
     'admin/products.js',
