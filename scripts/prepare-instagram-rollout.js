@@ -252,8 +252,11 @@ function resolveAsset(asset, ctx) {
         collage: collage.map((entry) => ({ name: entry.name, price: entry.price })),
     });
 
-    // Matches the studio export naming: backdoor_<template>_<product-slug>.png
-    const filename = coerceString(asset.filename) || `backdoor_${template || 'asset'}_${copyLib.slugify(product?.name || 'asset')}.png`;
+    // Matches the studio export naming: backdoor_<template>_<product-slug>.png.
+    // The studio always has an active product selected, so a product-optional
+    // template is still named by that product rather than a bare "asset" slug.
+    const namingProduct = product || (PRODUCT_OPTIONAL.has(template) ? catalogue[0] : null);
+    const filename = coerceString(asset.filename) || `backdoor_${template || 'asset'}_${copyLib.slugify(namingProduct?.name || 'asset')}.png`;
 
     const postAt = coerceString(asset.schedule?.postAt);
     if (postAt) {
