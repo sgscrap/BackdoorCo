@@ -231,7 +231,8 @@ const rgbAt = (data, width, x, y) => {
     assert.equal(typeof ai.warmUpAi, 'function');
     assert.equal(typeof ai.isAiAvailable, 'function');
     assert.match(ai.AI_MODEL.url, /^https:\/\/cdn\.jsdelivr\.net\/npm\/@imgly\/background-removal@\d/);
-    assert.match(ai.AI_MODEL.url, new RegExp(ai.AI_MODEL.version.replace(/\./g, '\\.')));
+    assert.ok(ai.AI_MODEL.url.includes(ai.AI_MODEL.version), 'the URL should pin the exact version');
+    assert.ok(ai.AI_MODEL.url.includes(ai.AI_MODEL.package), 'the URL should name the package');
     assert.equal(ai.AI_MODEL.model, 'isnet_quint8', 'the smallest network should be the default');
     // Importing the module must not fetch anything.
     assert.equal(typeof ai.segmentWithAi === 'function' && typeof ai.warmUpAi === 'function', true);
