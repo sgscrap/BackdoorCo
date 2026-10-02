@@ -126,15 +126,9 @@ netlify functions:log
 # Quick HTTP smoke checks against a running netlify dev
 curl -X POST http://localhost:8888/.netlify/functions/price-monitor-ebay -G --data-urlencode "q=Jordan 1 Chicago"
 curl -X POST http://localhost:8888/.netlify/functions/create-offer -H 'Content-Type: application/json' -d '{}'
-
-# Sanity scripts (each has its own runner; see file top)
-node check-homepage.js
-node check-shop-page.js
-node check-prada.js
-node test-browser.js
 ```
 
-> The helper scripts at the repo root (`check-*.js`, `test-browser.js`, `update_nav.py`, `convert_utf8.py`, etc.) are intentionally excluded by `netlify.toml`'s `ignore` list, so they don't trigger re-deploys. You can keep them locally.
+> The helper scripts at the repo root (`update_nav.py`, `convert_utf8.py`, etc.) don't affect production; `netlify.toml`'s `ignore` list still skips a no-op rebuild when the only diffs are in paths like `deploy.ps1` or `server.js`. You can keep them locally.
 
 ---
 
@@ -246,7 +240,6 @@ Before opening a PR, please walk through this:
 - [ ] If I touched any *.html navbar (brand dropdown, "TOOLS" group, "MAIN" group), I updated **every** HTML file that includes that block.
 - [ ] If I touched the Firestore security model, I confirmed `/admin/*.html` still loads for an admin user and still bounces for an anonymous user.
 - [ ] I ran `npx netlify dev` and clicked through: home → shop-all → product → cart → checkout (Stripe test card + PayPal sandbox).
-- [ ] I ran at least one of `check-homepage.js`, `check-shop-page.js`, `check-prada.js`, `test-browser.js` against the affected page.
 
 > After squash-merge, the GitHub Actions CodeQL workflow (`.github/workflows/codeql.yml`) re-runs against `main`. CI failures block auto-deploy, so keep secrets and CodeQL alerts clean.
 
@@ -257,7 +250,7 @@ Before opening a PR, please walk through this:
 These are not for first-time contributors — they're documented so the next owner doesn't have to re-derive them.
 
 - **Admin claim**: write access to `products`, `orders`, `offers`, and `customers` collections in Firestore is gated by `request.auth.token.admin == true`. Grant the custom claim via Firebase Admin (`firebase-admin`) or the Firebase Console → Authentication → Users → ⋮ → Edit custom claims.
-- **Netlify publishes from `main`** per `netlify.toml`. Its `[build] ignore` directive is a **no-redeploy-if-unchanged** check, **not a publish-exclude**: because `publish = "."` every committed file **is** still deployed. The ignore list just lets the CLI skip a no-op rebuild when the only diffs are in `deploy.ps1`, `check-*.js`, `test-browser.js`, `server.js`, or similar. Treat local tweaks to those paths with care — they will still ship if their changes reach `main`.
+- **Netlify publishes from `main`** per `netlify.toml`. Its `[build] ignore` directive is a **no-redeploy-if-unchanged** check, **not a publish-exclude**: because `publish = "."` every committed file **is** still deployed. The ignore list just lets the CLI skip a no-op rebuild when the only diffs are in `deploy.ps1`, `server.js`, or similar. Treat local tweaks to those paths with care — they will still ship if their changes reach `main`.
 - **Restock Desk** (`admin/restock.html`) and **Social Desk** (`admin/social.html`) are intentionally `<meta name="robots" content="noindex, nofollow, noarchive">` and fully local — they write to `admin/restock-private.local.json`, which is already in `.gitignore`.
 - **`product-data.js`** applies runtime overrides (auto-correct brand for "prada" id/name; lock Prada sneakers to $547 + 1-stock-per-size + allowBackorder; nudge normal footwear to `allowBackorder: true`). If your new product needs a different rule, prefer extending `applyProductOverrides` rather than mutating Firestore or CSS.
 - **Stripe & PayPal checkout share cart shape + shipping options** in their `_shared/*.js` modules. Any change should be made in lockstep in both files.

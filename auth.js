@@ -63,7 +63,7 @@ function updateGlobalNavUI() {
     if (!navRight) return;
 
     // Remove existing auth buttons or user menus
-    const existingSignBtn = navRight.querySelector('.btn-signup-nav');
+    const existingSignBtn = navRight.querySelector('.btn-signin-nav');
     const existingUserBtn = navRight.querySelector('.nav-user-btn');
     if (existingSignBtn) existingSignBtn.remove();
     if (existingUserBtn) existingUserBtn.remove();
@@ -129,7 +129,7 @@ function updateGlobalNavUI() {
     } else {
         // Logged Out State -> Show Sign In Button
         const signBtn = document.createElement('button');
-        signBtn.className = 'btn-signup-nav';
+        signBtn.className = 'btn-signin-nav';
         signBtn.textContent = 'Sign In';
         signBtn.onclick = () => window.location.href = 'accounts.html';
         
