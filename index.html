@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <script src="image-fallback.js?v=1"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
@@ -55,12 +56,15 @@
             <div class="nav-dropdown-menu">
                 <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
                 <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+                <a href="shop-all.html?filter=Off-White" class="current-cat-link">Off-White</a>
+                <a href="shop-all.html?filter=True%20Religion" class="current-cat-link">True Religion</a>
                 <a href="shop-all.html?filter=Prada" class="current-cat-link">Prada</a>
                 <a href="shop-all.html?filter=Dior" class="current-cat-link">Dior</a>
                 <a href="shop-all.html?filter=LOEWE" class="current-cat-link">LOEWE</a>
                 <a href="shop-all.html?filter=Burberry" class="current-cat-link">Burberry</a>
                 <a href="shop-all.html?filter=Moncler" class="current-cat-link">Moncler</a>
                 <a href="shop-all.html?filter=Fendi" class="current-cat-link">Fendi</a>
+                <a href="shop-all.html?filter=Gucci" class="current-cat-link">Gucci</a>
                 <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
                 <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
                 <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
@@ -96,12 +100,15 @@
     <p class="nav-mobile-section">Brands</p>
     <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
     <a class="nav-link" href="shop-all.html?filter=Nike">Nike</a>
+    <a class="nav-link" href="shop-all.html?filter=Off-White">Off-White</a>
+    <a class="nav-link" href="shop-all.html?filter=True%20Religion">True Religion</a>
     <a class="nav-link" href="shop-all.html?filter=Prada">Prada</a>
     <a class="nav-link" href="shop-all.html?filter=Dior">Dior</a>
     <a class="nav-link" href="shop-all.html?filter=LOEWE">LOEWE</a>
     <a class="nav-link" href="shop-all.html?filter=Burberry">Burberry</a>
     <a class="nav-link" href="shop-all.html?filter=Moncler">Moncler</a>
     <a class="nav-link" href="shop-all.html?filter=Fendi">Fendi</a>
+    <a class="nav-link" href="shop-all.html?filter=Gucci">Gucci</a>
     <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
     <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
     <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
@@ -156,7 +163,7 @@
         </div>
         <button type="button" class="hero-shoe-card" onclick="openProductModal('AA3834-100')">
           <div class="shoe-card-badge"><i class="fa-solid fa-fire"></i> EXCLUSIVE DROP</div>
-          <img src="products/jordan-1-ow-alaska.png" alt="Off-White x Air Jordan 1 Alaska" class="hero-shoe-img-real" />
+          <img src="products/jordan-1-ow-alaska.png" alt="Off-White x Air Jordan 1 Alaska" class="hero-shoe-img-real" onerror="catalogImageFallback(this)" />
           <div class="shoe-card-info">
             <h2>OFF-WHITE X AJ1 "ALASKA"</h2>
             <p>Jordan · White/White · Deadstock</p>
@@ -295,33 +302,33 @@
     </div>
     <div class="brands-grid">
       <button type="button" class="brand-card" onclick="filterByBrandClick('Jordan')" aria-pressed="false">
-        <img src="products/jordan-4-black-cat.jpg" alt="Jordan" class="brand-card-img" />
+        <img src="products/jordan-4-black-cat.jpg" alt="Jordan" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">Jordan</div>
         <div class="brand-count">8 items</div>
       </button>
       <button type="button" class="brand-card" onclick="filterByBrandClick('Nike')" aria-pressed="false">
-        <img src="products/kobe-6-reverse-grinch.jpg" alt="Nike" class="brand-card-img" />
+        <img src="products/kobe-6-reverse-grinch.jpg" alt="Nike" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">Nike</div>
         <div class="brand-count">5 items</div>
       </button>
       <button type="button" class="brand-card" onclick="filterByBrandClick('Adidas')" aria-pressed="false">
-        <img src="products/pharrell-jellyfish-blue.jpg" alt="Adidas" class="brand-card-img" />
+        <img src="products/pharrell-jellyfish-blue.jpg" alt="Adidas" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">Adidas</div>
         <div class="brand-count">2 items</div>
       </button>
+      <button type="button" class="brand-card" onclick="filterByBrandClick('Off-White')" aria-pressed="false">
+        <img src="products/catalog/goat-com-654066-01-jpg-d6bbf0.webp" alt="Off-White" class="brand-card-img" onerror="catalogImageFallback(this)" />
+        <div class="brand-name">Off-White</div>
+        <div class="brand-count">1 item</div>
+      </button>
       <button type="button" class="brand-card" onclick="filterByBrandClick('Godspeed')" aria-pressed="false">
-        <img src="products/godspeed-surf-day.png" alt="Godspeed" class="brand-card-img" />
+        <img src="products/godspeed-surf-day.png" alt="Godspeed" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">Godspeed</div>
         <div class="brand-count">1 item</div>
       </button>
-      <button type="button" class="brand-card" onclick="filterByBrandClick('Nike')" aria-pressed="false">
-        <img src="products/nocta-sunset-jacket.jpg" alt="NOCTA" class="brand-card-img" />
+      <button type="button" class="brand-card" onclick="filterByBrandClick('NOCTA')" aria-pressed="false">
+        <img src="products/nocta-sunset-jacket.jpg" alt="NOCTA" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">NOCTA</div>
-        <div class="brand-count">1 item</div>
-      </button>
-      <button type="button" class="brand-card" onclick="filterByBrandClick('Jordan')" aria-pressed="false">
-        <img src="products/jordan-1-fragment-travis.jpg" alt="Travis Scott" class="brand-card-img" />
-        <div class="brand-name">Travis Scott</div>
         <div class="brand-count">1 item</div>
       </button>
     </div>
@@ -359,7 +366,7 @@
       </div>
       <div class="drop-right">
         <img src="products/jordan-1-fragment-travis.jpg" alt="Fragment x Travis Scott Jordan 1"
-          class="drop-right-img" />
+          class="drop-right-img" onerror="catalogImageFallback(this)" />
       </div>
     </button>
   </div>
@@ -478,7 +485,7 @@
         <div class="modal-badge-container">
           <span id="modalBadge" class="modal-badge"></span>
         </div>
-        <img src="" alt="Product Image" class="modal-image" id="modalImage" />
+        <img src="" alt="Product Image" class="modal-image" id="modalImage" onerror="catalogImageFallback(this)" />
         <div class="modal-details">
           <div class="modal-category" id="modalCategory">Sneakers</div>
           <h2 class="modal-name" id="modalTitle"></h2>

@@ -35,7 +35,7 @@ function renderReviewsPage(reviews) {
     grid.innerHTML = reviews.map((review) => `
         <article class="reviews-page-card">
             <div class="reviews-page-main-image">
-                ${review.image ? `<img src="${escapeHtml(review.image)}" alt="${escapeHtml(review.name)} review post" onerror="this.style.display='none';" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">` : '<i class="fa-solid fa-camera"></i>'}
+                ${review.image ? `<img src="${escapeHtml(review.image)}" alt="${escapeHtml(review.name)} review post" onerror="catalogImageFallback(this);" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">` : '<i class="fa-solid fa-camera"></i>'}
             </div>
             <div class="reviews-page-body-card">
                 <div class="product-review-card-head">
@@ -50,7 +50,7 @@ function renderReviewsPage(reviews) {
                     <div class="product-review-gallery product-review-gallery--full">
                         ${review.images.map((image, index) => `
                             <div class="product-review-thumb product-review-thumb--static">
-                                <img src="${escapeHtml(image)}" alt="${escapeHtml(review.name)} review image ${index + 1}" onerror="this.style.display='none';" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
+                                <img src="${escapeHtml(image)}" alt="${escapeHtml(review.name)} review image ${index + 1}" onerror="catalogImageFallback(this);" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
                             </div>
                         `).join('')}
                     </div>

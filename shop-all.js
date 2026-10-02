@@ -17,7 +17,9 @@ import {
     getProductSortTimestamp,
     getTotalStock,
     isOutOfStock,
-    mergeCatalogProducts
+    mergeCatalogProducts,
+    normalizeBrand,
+    normalizeCategory
 } from './product-data.js';
 
 // ================================
@@ -163,18 +165,15 @@ function loadAllProducts() {
 function renderProducts() {
     let filtered = [...allProducts];
 
-    // Apply category/brand filter
-    if (currentFilter === 'Men') {
-        // Temporarily treat 'Men' as the default for all current shoes and apparel
-        filtered = filtered.filter(p => p.category !== 'Women' && p.category !== 'Kids');
-    } else if (currentFilter === 'Shoes') {
-        // 'Shoes' category should include both strict 'Shoes' and legacy 'Sneakers'
-        filtered = filtered.filter(p => p.category === 'Shoes' || p.category === 'Sneakers');
-    } else if (currentFilter !== 'all') {
-        filtered = filtered.filter(p =>
-            p.brand === currentFilter ||
-            p.category === currentFilter
-        );
+    // Apply category/brand filter — uses canonical taxonomy via normalizeBrand/normalizeCategory
+    if (currentFilter !== 'all') {
+        const normFilterBrand = normalizeBrand(currentFilter);
+        const normFilterCat = normalizeCategory(currentFilter);
+        filtered = filtered.filter((p) => {
+            const nb = normalizeBrand(p.brand);
+            const nc = normalizeCategory(p.category);
+            return nb === normFilterBrand || nc === normFilterCat || p.brand === currentFilter || p.category === currentFilter;
+        });
     }
 
     // Apply search
@@ -275,7 +274,7 @@ function renderProducts() {
                     ? 'eager'
                     : 'lazy'}"
                                 style="${getProductCardImageStyle(p)}"
-                                onerror="this.style.display='none'">`
+                                onerror="catalogImageFallback(this)">`
                 : `<div class="no-img-placeholder">
                                <i class="fa-solid fa-shoe-prints"></i>
                            </div>`
@@ -326,41 +325,30 @@ function renderProducts() {
 // FILTER COUNTS
 // ================================
 function updateFilterCounts() {
+    const byBrand = (brand) => allProducts.filter((p) => normalizeBrand(p.brand) === brand).length;
+    const byCat = (cat) => allProducts.filter((p) => normalizeCategory(p.category) === cat).length;
     const counts = {
         all: allProducts.length,
-        Jordan: allProducts.filter(
-            p => p.brand === 'Jordan'
-        ).length,
-        Prada: allProducts.filter(
-            p => p.brand === 'Prada'
-        ).length,
-        Dior: allProducts.filter(
-            p => p.brand === 'Dior'
-        ).length,
-        LOEWE: allProducts.filter(
-            p => p.brand === 'LOEWE'
-        ).length,
-        Burberry: allProducts.filter(
-            p => p.brand === 'Burberry'
-        ).length,
-        Moncler: allProducts.filter(
-            p => p.brand === 'Moncler'
-        ).length,
-        Fendi: allProducts.filter(
-            p => p.brand === 'Fendi'
-        ).length,
-        Nike: allProducts.filter(
-            p => p.brand === 'Nike'
-        ).length,
-        Adidas: allProducts.filter(
-            p => p.brand === 'Adidas'
-        ).length,
-        Sneakers: allProducts.filter(
-            p => p.category === 'Sneakers'
-        ).length,
-        Apparel: allProducts.filter(
-            p => p.category === 'Apparel'
-        ).length
+        Jordan: byBrand('Jordan'),
+        Nike: byBrand('Nike'),
+        Adidas: byBrand('Adidas'),
+        Prada: byBrand('Prada'),
+        Dior: byBrand('Dior'),
+        LOEWE: byBrand('LOEWE'),
+        Burberry: byBrand('Burberry'),
+        Moncler: byBrand('Moncler'),
+        Fendi: byBrand('Fendi'),
+        Gucci: byBrand('Gucci'),
+        'Off-White': byBrand('Off-White'),
+        'True-Religion': byBrand('True Religion'),
+        'New Balance': byBrand('New Balance'),
+        Yeezy: byBrand('Yeezy'),
+        'Acne Studios': byBrand('Acne Studios'),
+        Godspeed: byBrand('Godspeed'),
+        NOCTA: byBrand('NOCTA'),
+        Sneakers: byCat('Sneakers'),
+        Apparel: byCat('Apparel'),
+        Accessories: byCat('Accessories')
     };
 
     Object.entries(counts).forEach(([key, count]) => {

@@ -1,3 +1,5 @@
+import { localizeCatalogImage } from './products/catalog/localize-image.mjs';
+
 const BLACK_CAT_REVIEW = {
     id: 'seed-black-cat-001',
     name: 'Je***',
@@ -7,9 +9,9 @@ const BLACK_CAT_REVIEW = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/VNqnsef.jpg',
-        'https://i.imgur.com/aP7Rpac.jpg',
-        'https://i.imgur.com/Au4g6uI.jpg'
+        'products/catalog/i-imgur-com-vnqnsef-32ef0f.jpg',
+        'products/catalog/i-imgur-com-ap7rpac-bcb0d2.jpg',
+        'products/catalog/i-imgur-com-au4g6ui-d5c363.png'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -23,9 +25,9 @@ const BLACK_CAT_REVIEW_TWO = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/8dtgMtK.jpg',
-        'https://i.imgur.com/gFB1ti2.jpg',
-        'https://i.imgur.com/yEu1MgJ.jpg'
+        'products/catalog/i-imgur-com-8dtgmtk-bc3a7a.jpg',
+        'products/catalog/i-imgur-com-gfb1ti2-8b9b3c.jpg',
+        'products/catalog/i-imgur-com-yeu1mgj-33fc1b.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -63,9 +65,9 @@ const BLACK_CAT_REVIEW_FIVE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/FoqfYo7.jpg',
-        'https://i.imgur.com/0XR2zFC.jpg',
-        'https://i.imgur.com/JUxFWl1.jpg'
+        'products/catalog/i-imgur-com-foqfyo7-4466bd.jpg',
+        'products/catalog/i-imgur-com-0xr2zfc-e5def0.jpg',
+        'products/catalog/i-imgur-com-juxfwl1-a33cc4.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -127,7 +129,7 @@ const BLACK_CAT_REVIEW_TEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/SwydzfY.jpg'
+        'products/catalog/i-imgur-com-swydzfy-fc46fa.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -141,7 +143,7 @@ const BLACK_CAT_REVIEW_ELEVEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/SaRPNuL.jpg'
+        'products/catalog/i-imgur-com-sarpnul-f643e0.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -155,8 +157,8 @@ const BLACK_CAT_REVIEW_TWELVE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/Ax0zKmx.jpg',
-        'https://i.imgur.com/Eaafpk5.jpg'
+        'products/catalog/i-imgur-com-ax0zkmx-066347.jpg',
+        'products/catalog/i-imgur-com-eaafpk5-148e09.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -182,8 +184,8 @@ const BLACK_CAT_REVIEW_FOURTEEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/mmZSLvZ.jpg',
-        'https://i.imgur.com/giaENyA.jpg'
+        'products/catalog/i-imgur-com-mmzslvz-de3922.jpg',
+        'products/catalog/i-imgur-com-giaenya-bb2148.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -197,7 +199,7 @@ const BLACK_CAT_REVIEW_FIFTEEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/mICQAuS.jpg'
+        'products/catalog/i-imgur-com-micqaus-8131fb.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -251,8 +253,8 @@ const KIDS_TRAVIS_REVIEW_FOUR = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/NgAQV5e.jpg',
-        'https://i.imgur.com/ki6ctgF.jpg'
+        'products/catalog/i-imgur-com-ngaqv5e-792792.jpg',
+        'products/catalog/i-imgur-com-ki6ctgf-ec9a60.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -280,7 +282,7 @@ const ADULT_BLACK_PHANTOM_REVIEW_TWO = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2026/03/18//202603180428033041949.jpg'
+        'products/catalog/img-kickwho-info-202603180428033041949-141583.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -321,7 +323,7 @@ const ADULT_BLACK_PHANTOM_REVIEW_FIVE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2025/11/06//202511060549464196870.jpg'
+        'products/catalog/img-kickwho-info-202511060549464196870-42a566.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -336,8 +338,8 @@ const ADULT_BLACK_PHANTOM_REVIEW_SIX = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2025/08/30//202508302227376800267.jpg',
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2025/08/30//202508302227377230130.jpg'
+        'products/catalog/img-kickwho-info-202508302227376800267-9cb0dc.webp',
+        'products/catalog/img-kickwho-info-202508302227377230130-4a6d34.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -352,7 +354,7 @@ const ADULT_BLACK_PHANTOM_REVIEW_SEVEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-001/2025/07/30//202507300908307184736.jpg'
+        'products/catalog/img-kickwho-info-202507300908307184736-b4a8dc.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -367,9 +369,9 @@ const ADULT_BLACK_PHANTOM_REVIEW_EIGHT = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/DM7866-001/2025/01/10/488049/202501100426155804099.jpg',
-        'https://www.kickwho.info/uploads/reviews/DM7866-001/2025/01/10/488049/202501100426156141271.jpg',
-        'https://www.kickwho.info/uploads/reviews/DM7866-001/2025/01/10/488049/202501100426152655847.jpg'
+        'products/catalog/kickwho-info-202501100426155804099-790a02.webp',
+        'products/catalog/kickwho-info-202501100426156141271-e59728.webp',
+        'products/catalog/kickwho-info-202501100426152655847-03b263.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -384,9 +386,9 @@ const VELVET_BROWN_REVIEW_ONE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/5yWKb5K.jpg',
-        'https://i.imgur.com/ecNmijY.jpg',
-        'https://i.imgur.com/wEtE5U0.jpg'
+        'products/catalog/i-imgur-com-5ywkb5k-867ba2.jpg',
+        'products/catalog/i-imgur-com-ecnmijy-85af74.jpg',
+        'products/catalog/i-imgur-com-wete5u0-ff5b2d.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -401,7 +403,7 @@ const VELVET_BROWN_REVIEW_TWO = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/5Z1t456.jpg'
+        'products/catalog/i-imgur-com-5z1t456-64c4cb.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -416,8 +418,8 @@ const VELVET_BROWN_REVIEW_THREE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/e7ccepa.jpg',
-        'https://i.imgur.com/5O6oUcQ.jpg'
+        'products/catalog/i-imgur-com-e7ccepa-c1166c.jpg',
+        'products/catalog/i-imgur-com-5o6oucq-ebdc39.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -432,7 +434,7 @@ const VELVET_BROWN_REVIEW_FOUR = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/Ut2T0rn.jpg'
+        'products/catalog/i-imgur-com-ut2t0rn-5b1f3b.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -512,8 +514,8 @@ const VELVET_BROWN_REVIEW_TEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/8MN75GW.jpg',
-        'https://i.imgur.com/nWvmCBY.jpg'
+        'products/catalog/i-imgur-com-8mn75gw-aec503.jpg',
+        'products/catalog/i-imgur-com-nwvmcby-2a20d6.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -567,7 +569,7 @@ const VELVET_BROWN_REVIEW_FOURTEEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://i.imgur.com/cUPY5xX.jpg'
+        'products/catalog/i-imgur-com-cupy5xx-a4d138.jpg'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -595,9 +597,9 @@ const VELVET_BROWN_REVIEW_SIXTEEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/11/22//202511220412056822850.jpg',
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/11/22//20251122041206493310.jpg',
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/11/22//202511220412065587055.jpg'
+        'products/catalog/img-kickwho-info-202511220412056822850-b68f1c.webp',
+        'products/catalog/img-kickwho-info-20251122041206493310-ddd047.webp',
+        'products/catalog/img-kickwho-info-202511220412065587055-c57154.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -651,9 +653,9 @@ const VELVET_BROWN_REVIEW_TWENTY = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/10/11//202510112057165873703.jpg',
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/10/11//202510112057162933695.jpg',
-        'https://img.kickwho.info/images/uploads/reviews/DM7866-202-1/2025/10/11//202510112057161433001.jpg'
+        'products/catalog/img-kickwho-info-202510112057165873703-e4e50c.webp',
+        'products/catalog/img-kickwho-info-202510112057162933695-d55a83.webp',
+        'products/catalog/img-kickwho-info-202510112057161433001-19e754.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -681,7 +683,7 @@ const VELVET_BROWN_REVIEW_TWENTY_TWO = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/DM7866-202-1/2024/12/29/485599/202412290135429959904.jpg'
+        'products/catalog/kickwho-info-202412290135429959904-f7862e.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -696,7 +698,7 @@ const YEEZY_SLIDE_ONYX_REVIEW_ONE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/08/27/238487/202208270346171520309.jpg'
+        'products/catalog/kickwho-info-202208270346171520309-38d43b.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -711,7 +713,7 @@ const YEEZY_SLIDE_ONYX_REVIEW_TWO = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/09/04/109869/202209041850565721072.jpg'
+        'products/catalog/kickwho-info-202209041850565721072-ff83d3.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -726,9 +728,9 @@ const YEEZY_SLIDE_ONYX_REVIEW_THREE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/10/13/242445/202210130529599661967.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/10/13/242445/202210130529599421914.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/10/13/242445/20221013052959605862.jpg'
+        'products/catalog/kickwho-info-202210130529599661967-ce8595.webp',
+        'products/catalog/kickwho-info-202210130529599421914-29a46c.webp',
+        'products/catalog/kickwho-info-20221013052959605862-ce5ea6.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -743,9 +745,9 @@ const YEEZY_SLIDE_ONYX_REVIEW_FOUR = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/289340/202211030651369830998.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/289340/202211030651361233923.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/289340/202211030651369320909.jpg'
+        'products/catalog/kickwho-info-202211030651369830998-5ed6a0.webp',
+        'products/catalog/kickwho-info-202211030651361233923-8a9793.webp',
+        'products/catalog/kickwho-info-202211030651369320909-865428.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -760,8 +762,8 @@ const YEEZY_SLIDE_ONYX_REVIEW_FIVE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/225986/202211032217545226069.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/03/225986/202211032217544574144.jpg'
+        'products/catalog/kickwho-info-202211032217545226069-0a59a5.webp',
+        'products/catalog/kickwho-info-202211032217544574144-1b492e.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -776,7 +778,7 @@ const YEEZY_SLIDE_ONYX_REVIEW_SIX = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/11/26/285337/202211261008133034788.jpg'
+        'products/catalog/kickwho-info-202211261008133034788-7f33aa.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -791,9 +793,9 @@ const YEEZY_SLIDE_ONYX_REVIEW_SEVEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/202212090417233877420.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/202212090417239306431.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/202212090417233967901.jpg'
+        'products/catalog/kickwho-info-202212090417233877420-da457b.webp',
+        'products/catalog/kickwho-info-202212090417239306431-732a7a.webp',
+        'products/catalog/kickwho-info-202212090417233967901-6e146a.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -808,8 +810,8 @@ const YEEZY_SLIDE_ONYX_REVIEW_EIGHT = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/202212090424457661304.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2022/12/09/170980/20221209042445360049.jpg'
+        'products/catalog/kickwho-info-202212090424457661304-631101.webp',
+        'products/catalog/kickwho-info-20221209042445360049-947c48.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -824,7 +826,7 @@ const YEEZY_SLIDE_ONYX_REVIEW_NINE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/04/02/271160/202304020713054861922.jpg'
+        'products/catalog/kickwho-info-202304020713054861922-6345af.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -839,7 +841,7 @@ const YEEZY_SLIDE_ONYX_REVIEW_TEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/05/02/189816/202305021355294868994.jpg'
+        'products/catalog/kickwho-info-202305021355294868994-af6e18.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -854,9 +856,9 @@ const YEEZY_SLIDE_ONYX_REVIEW_ELEVEN = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/05/10/229061/202305101019091309059.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/05/10/229061/20230510101909606832.jpg',
-        'https://www.kickwho.info/uploads/reviews/HQ6448/2023/05/10/229061/202305101019095737159.jpg'
+        'products/catalog/kickwho-info-202305101019091309059-b64ae4.webp',
+        'products/catalog/kickwho-info-20230510101909606832-1ee28d.webp',
+        'products/catalog/kickwho-info-202305101019095737159-099d9c.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -884,9 +886,9 @@ const KOBE_BRUCE_LEE_REVIEW_TWO = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://img.kickwho.info/images/uploads/reviews/CD4991-101/2025/10/04//202510040534269527516.jpg',
-        'https://img.kickwho.info/images/uploads/reviews/CD4991-101/2025/10/04//202510040534274452238.jpg',
-        'https://img.kickwho.info/images/uploads/reviews/CD4991-101/2025/10/04//202510040534278226265.jpg'
+        'products/catalog/img-kickwho-info-202510040534269527516-3b7bd0.webp',
+        'products/catalog/img-kickwho-info-202510040534274452238-684c6e.webp',
+        'products/catalog/img-kickwho-info-202510040534278226265-8ca6ee.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -966,8 +968,8 @@ const KOBE_BRUCE_LEE_REVIEW_EIGHT = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/CD4991-101/2024/11/26/377680/20241126200829715350.jpg',
-        'https://www.kickwho.info/uploads/reviews/CD4991-101/2024/11/26/377680/202411262008293165124.jpg'
+        'products/catalog/kickwho-info-20241126200829715350-a9923d.webp',
+        'products/catalog/kickwho-info-202411262008293165124-cd26d0.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -982,8 +984,8 @@ const KOBE_BRUCE_LEE_REVIEW_NINE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/CD4991-101/2024/11/22/464004/202411221456463305678.jpg',
-        'https://www.kickwho.info/uploads/reviews/CD4991-101/2024/11/22/464004/202411221456463092109.jpg'
+        'products/catalog/kickwho-info-202411221456463305678-69786b.webp',
+        'products/catalog/kickwho-info-202411221456463092109-c60257.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -1011,8 +1013,8 @@ const OFF_WHITE_BELT_REVIEW_TWO = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/F68804/2024/08/21/422192/20240821022429176656.jpg',
-        'https://www.kickwho.info/uploads/reviews/F68804/2024/08/21/422192/202408210224292189614.jpg'
+        'products/catalog/kickwho-info-20240821022429176656-ec6dca.webp',
+        'products/catalog/kickwho-info-202408210224292189614-caa3f6.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -1040,9 +1042,9 @@ const NB_2002R_SEA_SALT_REVIEW_ONE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/M2002RDC/2023/08/15/165239/20230815002628580776.jpg',
-        'https://www.kickwho.info/uploads/reviews/M2002RDC/2023/08/15/165239/202308150026284419340.jpg',
-        'https://www.kickwho.info/uploads/reviews/M2002RDC/2023/08/15/165239/202308150026281627791.jpg'
+        'products/catalog/kickwho-info-20230815002628580776-f1c86d.webp',
+        'products/catalog/kickwho-info-202308150026284419340-596245.webp',
+        'products/catalog/kickwho-info-202308150026281627791-e8d74c.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
@@ -1070,15 +1072,17 @@ const NB_2002R_SEA_SALT_REVIEW_THREE = {
     rating: 5,
     isHidden: false,
     images: [
-        'https://www.kickwho.info/uploads/reviews/M2002RDC/2025/01/08/275836/202501080815331986249.jpg'
+        'products/catalog/kickwho-info-202501080815331986249-14cc0f.webp'
     ],
     createdAtLabel: 'Verified buyer post'
 };
 
 function normalizeReview(review) {
-    const images = Array.isArray(review?.images)
+    const rawImages = Array.isArray(review?.images)
         ? review.images.filter(Boolean)
         : [review?.image].filter(Boolean);
+    // Review cards are storefront cards too, so they get the same treatment.
+    const images = rawImages.map(localizeCatalogImage);
 
     return {
         ...review,

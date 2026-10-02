@@ -53,7 +53,7 @@ function renderOffers() {
         <tr>
             <td>
                 <div style="display:flex;align-items:center;gap:10px">
-                    ${o.productImage ? `<img src="${o.productImage}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;flex-shrink:0" onerror="this.style.display='none'">` : ''}
+                    ${o.productImage ? `<img src="${o.productImage}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;flex-shrink:0" onerror="catalogImageFallback(this)">` : ''}
                     <div>
                         <div style="font-weight:600;font-size:0.82rem">${o.productName || '—'}</div>
                         ${o.productSku ? `<div style="font-size:0.72rem;color:var(--text-secondary)">${o.productSku}</div>` : ''}
@@ -92,7 +92,7 @@ window.openModal = (id) => {
 
     document.getElementById('modalBody').innerHTML = `
         <div style="display:flex;gap:16px;padding:20px 28px;border-bottom:1px solid var(--border)">
-            ${o.productImage ? `<img src="${o.productImage}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none'">` : ''}
+            ${o.productImage ? `<img src="${o.productImage}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="catalogImageFallback(this)">` : ''}
             <div style="padding-top:4px">
                 <div style="font-weight:700;font-size:1rem">${o.productName || '—'}</div>
                 ${o.productSku ? `<div style="font-size:0.78rem;color:var(--text-secondary);margin-top:3px">SKU: ${o.productSku}</div>` : ''}

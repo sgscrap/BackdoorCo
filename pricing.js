@@ -209,26 +209,6 @@ const TRACKED_MARKET_WATCH = [
             return id === 'seed-nb-2002r-protection-pack-sea-salt' || name.includes('protection pack sea salt');
         }
     },
-    {
-        key: 'off-white-the-ten',
-        benchmarkPrice: 1350,
-        benchmarkSourceLabel: 'StockX Lowest Ask',
-        benchmarkSourceUrl: 'https://stockx.com/nike-air-force-1-low-off-white',
-        match(product) {
-            const id = String(product?.id || '').toLowerCase();
-            const name = String(product?.name || '').toLowerCase();
-            const sku = String(product?.sku || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-            return id === 'seed-off-white-nike-air-force-1-low-the-ten' || sku === 'ao4606100' || (name.includes('air force 1') && name.includes('the ten'));
-        },
-        fallbackProduct: {
-            id: 'seed-off-white-nike-air-force-1-low-the-ten',
-            name: "Off-White x Nike Air Force 1 Low 'The Ten'",
-            brand: 'Nike x Off-White',
-            category: 'Sneakers',
-            price: 1300,
-            image: 'https://mysportsshoe.com/wp-content/uploads/2018/06/802491_01.jpg'
-        }
-    }
 ];
 
 /* ══════════════════════════════════════════
@@ -463,7 +443,7 @@ function renderOpportunityCards(targetId, items, status) {
     target.innerHTML = items.map((item) => `
         <article class="opportunity-card opportunity-card--${status}">
             <div class="opportunity-image">
-                <img src="${item.image}" alt="${item.name}">
+                <img src="${item.image}" alt="${item.name}" onerror="catalogImageFallback(this)">
             </div>
             <div class="opportunity-body">
                 <div class="opportunity-kicker">
@@ -1037,7 +1017,7 @@ function renderBulkTable() {
         <td>
           <div style="display:flex;align-items:center;gap:10px">
             ${item.image
-                ? `<img src="${item.image}" alt="${item.name}" style="width:44px;height:44px;border-radius:10px;background:#fff;object-fit:contain;padding:3px;flex-shrink:0;">`
+                ? `<img src="${item.image}" alt="${item.name}" onerror="catalogImageFallback(this)" style="width:44px;height:44px;border-radius:10px;background:#fff;object-fit:contain;padding:3px;flex-shrink:0;">`
                 : `<span style="font-size:20px">${item.emoji || '👟'}</span>`}
             <div>
               <div style="font-weight:700;color:var(--text)">${item.name}</div>

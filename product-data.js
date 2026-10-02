@@ -1,28 +1,148 @@
+import { localizeCatalogImage } from './products/catalog/localize-image.mjs';
+
 export const BLACK_CAT_IMAGES = [
-    'https://i.imgur.com/RK5BAet.jpg',
-    'https://i.imgur.com/0LaAQgf.png',
-    'https://i.imgur.com/3K8TkzE.png',
-    'https://i.imgur.com/q7uV2MM.png',
-    'https://i.imgur.com/XAzKOl2.png',
-    'https://i.imgur.com/o4zCCXe.png',
-    'https://i.imgur.com/ckIfHxm.png',
-    'https://i.imgur.com/RiQyQS4.png'
+    'products/catalog/i-imgur-com-rk5baet-dda5e3.jpg',
+    'products/catalog/i-imgur-com-0laaqgf-54bc02.png',
+    'products/catalog/i-imgur-com-3k8tkze-a9277e.png',
+    'products/catalog/i-imgur-com-q7uv2mm-cde2a1.png',
+    'products/catalog/i-imgur-com-xazkol2-9d2f11.png',
+    'products/catalog/i-imgur-com-o4zccxe-3e1586.png',
+    'products/catalog/i-imgur-com-ckifhxm-76e538.png',
+    'products/catalog/i-imgur-com-riqyqs4-552203.png'
 ];
 
-function buildImgurImageUrl(id, extension = 'jpg') {
-    return `https://i.imgur.com/${id}.${extension}`;
-}
+// Mirrored GOAT angle set (cover + nine additional shots) for the Off-White x
+// Nike Air Force 1 Low 'The Ten'. The Firestore record only stores the single
+// re-sourced cover, so the rest of the gallery is seeded here at read time.
+export const OFF_WHITE_AF1_TEN_IMAGES = [
+    'products/catalog/goat-com-246778-00-png-a39cf8.png',
+    'products/catalog/goat-com-246778-01-jpg-4971bc.jpg',
+    'products/catalog/goat-com-246778-02-jpg-b797b5.jpg',
+    'products/catalog/goat-com-246778-03-jpg-4170e3.jpg',
+    'products/catalog/goat-com-246778-04-jpg-3e42cc.jpg',
+    'products/catalog/goat-com-246778-05-jpg-56fb6a.jpg',
+    'products/catalog/goat-com-246778-06-jpg-8ad6bd.jpg',
+    'products/catalog/goat-com-246778-07-jpg-a53ae5.jpg',
+    'products/catalog/goat-com-246778-08-jpg-50009d.jpg',
+    'products/catalog/goat-com-246778-09-jpg-d38f1e.jpg'
+];
 
 const DEFAULT_ADULT_SIZE_OPTIONS = ['US 7', 'US 7.5', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 10.5', 'US 11', 'US 11.5', 'US 12', 'US 13', 'US 14', 'US 15'];
 const DEFAULT_EU_SIZE_OPTIONS = ['EU 38', 'EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45', 'EU 46'];
 
+export const CANONICAL_CATEGORIES = ['Sneakers', 'Apparel', 'Accessories'];
+export const CANONICAL_BRANDS = ['Acne Studios', 'Adidas', 'Burberry', 'Dior', 'Fendi', 'Godspeed', 'Gucci', 'Jordan', 'LOEWE', 'Moncler', 'New Balance', 'Nike', 'NOCTA', 'Off-White', 'Prada', 'True Religion', 'Yeezy'];
+
+const CATEGORY_ALIAS_MAP = {
+    'sneakers': 'Sneakers',
+    'sneaker': 'Sneakers',
+    'shoes': 'Sneakers',
+    'shoe': 'Sneakers',
+    'footwear': 'Sneakers',
+    'apparel': 'Apparel',
+    'clothing': 'Apparel',
+    'accessories': 'Accessories',
+    'accessory': 'Accessories',
+    'electronics': 'Accessories',
+    'collectibles': 'Accessories',
+    'collectible': 'Accessories',
+    'kids': 'Sneakers',
+    'men': 'Sneakers',
+    'women': 'Sneakers'
+};
+
+const BRAND_ALIAS_MAP = {
+    'off-white': 'Off-White',
+    'off white': 'Off-White',
+    'offwhite': 'Off-White',
+    'jordan': 'Jordan',
+    'nike': 'Nike',
+    'adidas': 'Adidas',
+    'prada': 'Prada',
+    'dior': 'Dior',
+    'loewe': 'LOEWE',
+    'burberry': 'Burberry',
+    'moncler': 'Moncler',
+    'fendi': 'Fendi',
+    'new balance': 'New Balance',
+    'newbalance': 'New Balance',
+    'yeezy': 'Yeezy',
+    'gucci': 'Gucci',
+    'acne studios': 'Acne Studios',
+    'acne': 'Acne Studios',
+    'godspeed': 'Godspeed',
+    'nocta': 'NOCTA',
+    'true religion': 'True Religion',
+    'true-religion': 'True Religion',
+    'truereligion': 'True Religion',
+    'asics': 'Asics'
+};
+
+export function normalizeCategory(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return raw;
+    const lower = raw.toLowerCase().replace(/[-_]+/g, ' ').trim();
+    if (CATEGORY_ALIAS_MAP[lower]) return CATEGORY_ALIAS_MAP[lower];
+    const canonical = CANONICAL_CATEGORIES.find((c) => c.toLowerCase() === lower);
+    if (canonical) return canonical;
+    return raw;
+}
+
+export function normalizeBrand(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return raw;
+    const lower = raw.toLowerCase().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if (lower.includes('off white') || lower.includes('offwhite')) return 'Off-White';
+    if (BRAND_ALIAS_MAP[lower]) return BRAND_ALIAS_MAP[lower];
+    const canonical = CANONICAL_BRANDS.find((b) => b.toLowerCase() === lower);
+    if (canonical) return canonical;
+    return raw;
+}
+
 export const SEEDED_PRODUCTS = [
+    {
+        id: 'seed-off-white-be-right-back-sneakers-light-grey-caramel',
+        name: "Off-White 'Be Right Back' Sneakers",
+        sku: 'OMIA295S26FAB0010564',
+        slug: 'off-white-be-right-back-sneakers-light-grey-caramel',
+        cardImage: 'products/off-white-be-right-back-01.jpg',
+        price: 350,
+        retailPrice: 650,
+        addedAt: '2026-09-30T18:00:00-04:00',
+        brand: 'Off-White',
+        category: 'Sneakers',
+        colorway: 'LIGHT GREY - CARAMEL',
+        description: "The Off-White 'Be Right Back' Sneakers in Light Grey/Caramel pair the label's signature arrow motif and industrial detailing with a layered grey and caramel upper on a chunky rubber sole. Upper: 37% Pu, 26% Textile, 19% Rpu, 18% Synthetic Suede. Outsole: 100% Rubber. Lining: 100% Polyester.",
+        image: 'products/off-white-be-right-back-01.jpg',
+        images: [
+            'products/off-white-be-right-back-01.jpg',
+            'products/off-white-be-right-back-02.jpg',
+            'products/off-white-be-right-back-03.jpg',
+            'products/off-white-be-right-back-04.jpg',
+            'products/off-white-be-right-back-05.jpg',
+            'products/off-white-be-right-back-06.jpg'
+        ],
+        imageFit: 'contain',
+        imagePosition: '50% 50%',
+        imageScale: 1.0,
+        sizes: DEFAULT_ADULT_SIZE_OPTIONS.map((size) => ({ size, stock: 1, price: 350 })),
+        releaseDate: '2026',
+        allowBackorder: true,
+        backorderLeadTime: 'Ships in 1.5-2 weeks',
+        status: 'active',
+        isHidden: false,
+        isOutOfStock: false,
+        featured: true,
+        isFeatured: true,
+        seeded: true,
+        createdAt: { seconds: 0 }
+    },
     {
         id: 'seed-nigel-sylvester-air-jordan-4-retro-og-sail',
         name: "Nigel Sylvester x Air Jordan 4 Retro OG 'Sail'",
         sku: 'NS-AJ4-SAIL',
         slug: 'nigel-sylvester-air-jordan-4-retro-og-sail',
-        cardImage: buildImgurImageUrl('6u61ao2'),
+        cardImage: 'products/catalog/i-imgur-com-6u61ao2-e98625.jpg',
         price: 320,
         retailPrice: 225,
         addedAt: '2026-06-24T11:25:00-04:00',
@@ -30,19 +150,19 @@ export const SEEDED_PRODUCTS = [
         category: 'Sneakers',
         colorway: 'Sail',
         description: "The Nigel Sylvester x Air Jordan 4 Retro OG 'Sail' brings the BMX rider's Bike Air storytelling to the Jordan 4 silhouette with a clean sail-based build, premium detailing, and collaborative Nigel Sylvester touches throughout.",
-        image: buildImgurImageUrl('6u61ao2'),
+        image: 'products/catalog/i-imgur-com-6u61ao2-e98625.jpg',
         images: [
-            buildImgurImageUrl('6u61ao2'),
-            buildImgurImageUrl('wFmVvdv'),
-            buildImgurImageUrl('LeTiuQq'),
-            buildImgurImageUrl('rUuu4Jf'),
-            buildImgurImageUrl('DKqeD61'),
-            buildImgurImageUrl('RHTWYLu'),
-            buildImgurImageUrl('xtHqfgL'),
-            buildImgurImageUrl('pPpnVGF'),
-            buildImgurImageUrl('9TYnUwT'),
-            buildImgurImageUrl('HitozYg'),
-            buildImgurImageUrl('s4gJJdB')
+            'products/catalog/i-imgur-com-6u61ao2-e98625.jpg',
+            'products/catalog/i-imgur-com-wfmvvdv-20311c.jpg',
+            'products/catalog/i-imgur-com-letiuqq-f8012e.jpg',
+            'products/catalog/i-imgur-com-ruuu4jf-896316.jpg',
+            'products/catalog/i-imgur-com-dkqed61-8c8546.jpg',
+            'products/catalog/i-imgur-com-rhtwylu-d62610.jpg',
+            'products/catalog/i-imgur-com-xthqfgl-6c6476.jpg',
+            'products/catalog/i-imgur-com-pppnvgf-fffdd9.jpg',
+            'products/catalog/i-imgur-com-9tynuwt-aa13f4.jpg',
+            'products/catalog/i-imgur-com-hitozyg-a5f69d.jpg',
+            'products/catalog/i-imgur-com-s4gjjdb-c316f3.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -63,7 +183,7 @@ export const SEEDED_PRODUCTS = [
         name: 'B30 Countdown Tech Sneaker',
         sku: '3SN342ABF_H726',
         slug: 'b30-countdown-tech-sneaker-beige-brown-orange',
-        cardImage: buildImgurImageUrl('Bd6LKRo'),
+        cardImage: 'products/catalog/i-imgur-com-bd6lkro-db35ac.png',
         price: 625,
         retailPrice: 1250,
         addedAt: '2026-05-07T15:20:00-04:00',
@@ -71,13 +191,13 @@ export const SEEDED_PRODUCTS = [
         category: 'Sneakers',
         colorway: 'Beige/Brown/Orange/Gray',
         description: 'The B30 Countdown Tech sneaker is crafted in beige semi-transparent N3O nylon with brown and orange technical fabric and gray rubber. The sporty low-top silhouette features Dior B30 and CD30 signatures, a lace-up closure, welded construction, and an ultralightweight outsole in a blend of brown rubber and foam with gray trim.',
-        image: buildImgurImageUrl('Bd6LKRo'),
+        image: 'products/catalog/i-imgur-com-bd6lkro-db35ac.png',
         images: [
-            buildImgurImageUrl('Bd6LKRo'),
-            buildImgurImageUrl('jhWUd9n'),
-            buildImgurImageUrl('0z709mm'),
-            buildImgurImageUrl('wGMIXin'),
-            buildImgurImageUrl('ZdTY76W')
+            'products/catalog/i-imgur-com-bd6lkro-db35ac.png',
+            'products/catalog/i-imgur-com-jhwud9n-6dff6a.png',
+            'products/catalog/i-imgur-com-0z709mm-b08b29.png',
+            'products/catalog/i-imgur-com-wgmixin-7d03bc.png',
+            'products/catalog/i-imgur-com-zdty76w-3abee9.png'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -98,7 +218,7 @@ export const SEEDED_PRODUCTS = [
         name: 'B30 Countdown Tech Sneaker',
         sku: '3SN342ABF_H728',
         slug: 'b30-countdown-tech-sneaker-white-gray-green',
-        cardImage: buildImgurImageUrl('zuylE1R'),
+        cardImage: 'products/catalog/i-imgur-com-zuyle1r-f6af7b.png',
         price: 625,
         retailPrice: 1250,
         addedAt: '2026-05-07T15:28:00-04:00',
@@ -106,13 +226,13 @@ export const SEEDED_PRODUCTS = [
         category: 'Sneakers',
         colorway: 'White/Gray/Green',
         description: 'The B30 Countdown Tech sneaker is crafted in white semi-transparent N3O nylon with gray and green technical fabric and gray rubber. The sporty low-top silhouette features Dior B30 and CD30 signatures, a lace-up closure, welded construction, and an ultralightweight outsole built for a technical runner profile.',
-        image: buildImgurImageUrl('zuylE1R'),
+        image: 'products/catalog/i-imgur-com-zuyle1r-f6af7b.png',
         images: [
-            buildImgurImageUrl('zuylE1R'),
-            buildImgurImageUrl('GkxxUEI'),
-            buildImgurImageUrl('KrtJ3kM'),
-            buildImgurImageUrl('1q1sLyi'),
-            buildImgurImageUrl('xAP8Dur')
+            'products/catalog/i-imgur-com-zuyle1r-f6af7b.png',
+            'products/catalog/i-imgur-com-gkxxuei-8abae5.png',
+            'products/catalog/i-imgur-com-krtj3km-f02c7c.png',
+            'products/catalog/i-imgur-com-1q1slyi-861329.png',
+            'products/catalog/i-imgur-com-xap8dur-5ab684.png'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -137,16 +257,16 @@ export const SEEDED_PRODUCTS = [
         category: 'Sneakers',
         colorway: 'White/Black/Varsity Maize',
         description: "The Nike Zoom Kobe 5 Protro 'Alternate Bruce Lee' flips the iconic Bruce Lee-inspired color blocking with a bold white and varsity maize upper, sharp black detailing, and red slash marks near the heel. The low-cut silhouette keeps the responsive Protro tooling and close-to-court feel that made the Kobe 5 a standout on and off the hardwood.",
-        image: 'https://slamdunk.shop/wp-content/uploads/2020/10/Nike-Zoom-Kobe-5-Protro-Alternate-Bruce-Lee.jpg',
+        image: 'products/catalog/slamdunk-shop-nike-zoom-kobe-5-protro-alternate-bruce-lee-75866b.jpg',
         images: [
-            'https://slamdunk.shop/wp-content/uploads/2020/10/Nike-Zoom-Kobe-5-Protro-Alternate-Bruce-Lee.jpg',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/656/original/639895_02.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/657/original/639895_03.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/659/original/639895_04.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/660/original/639895_05.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/662/original/639895_06.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/667/original/639895_07.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/084/266/668/original/639895_08.jpg.jpeg?action=crop&width=600'
+            'products/catalog/slamdunk-shop-nike-zoom-kobe-5-protro-alternate-bruce-lee-75866b.jpg',
+            'products/catalog/goat-com-639895-02-jpg-941330.webp',
+            'products/catalog/goat-com-639895-03-jpg-1f474d.webp',
+            'products/catalog/goat-com-639895-04-jpg-a33f2c.webp',
+            'products/catalog/goat-com-639895-05-jpg-47b858.webp',
+            'products/catalog/goat-com-639895-06-jpg-f21ef9.webp',
+            'products/catalog/goat-com-639895-07-jpg-cda1f3.webp',
+            'products/catalog/goat-com-639895-08-jpg-f2824e.webp'
         ],
         imageFit: 'contain',
         imagePosition: '50% 54%',
@@ -180,24 +300,24 @@ export const SEEDED_PRODUCTS = [
         name: "Nike Kobe 6 Protro 'ASG Hollywood 3D' (2026)",
         sku: 'KB6-ASG-3D',
         slug: 'nike-kobe-6-protro-asg-hollywood-3d-2026',
-        cardImage: buildImgurImageUrl('542ZtOL'),
+        cardImage: 'products/catalog/i-imgur-com-542ztol-5b5116.jpg',
         price: 220,
         brand: 'Nike',
         category: 'Sneakers',
         colorway: 'Dark Grey/Daring Red-Chlorine Blue',
         description: "The Nike Kobe 6 Protro 'ASG Hollywood 3D' returns in 2026, bringing back the iconic 3D graphic upper originally debuted during the 2011 All-Star Game in Los Angeles. The mismatched Chlorine Blue and Daring Red accents pop against the textured dark grey base, completing the classic anaglyph 3D aesthetic.",
-        image: buildImgurImageUrl('542ZtOL'),
+        image: 'products/catalog/i-imgur-com-542ztol-5b5116.jpg',
         images: [
-            buildImgurImageUrl('542ZtOL'),
-            buildImgurImageUrl('IZwwDuX'),
-            buildImgurImageUrl('7GNOHJu'),
-            buildImgurImageUrl('JsVXqd1'),
-            buildImgurImageUrl('ra2ZBs1'),
-            buildImgurImageUrl('WWrU9aP'),
-            buildImgurImageUrl('HaZcoi6'),
-            buildImgurImageUrl('93HJGu2'),
-            buildImgurImageUrl('pVQtloE'),
-            buildImgurImageUrl('F344KZK')
+            'products/catalog/i-imgur-com-542ztol-5b5116.jpg',
+            'products/catalog/i-imgur-com-izwwdux-5a982b.jpg',
+            'products/catalog/i-imgur-com-7gnohju-773fb8.jpg',
+            'products/catalog/i-imgur-com-jsvxqd1-31afbf.jpg',
+            'products/catalog/i-imgur-com-ra2zbs1-4a6c38.jpg',
+            'products/catalog/i-imgur-com-wwru9ap-ef9930.jpg',
+            'products/catalog/i-imgur-com-hazcoi6-686ee4.jpg',
+            'products/catalog/i-imgur-com-93hjgu2-4bc7c7.jpg',
+            'products/catalog/i-imgur-com-pvqtloe-5e34ee.jpg',
+            'products/catalog/i-imgur-com-f344kzk-ebff6f.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -218,24 +338,24 @@ export const SEEDED_PRODUCTS = [
         name: "Jordan 4 Retro 'Toro Bravo' (2026)",
         sku: 'J4-TORO-2026',
         slug: 'jordan-4-retro-toro-bravo-2026',
-        cardImage: buildImgurImageUrl('Ls3CLOC'),
+        cardImage: 'products/catalog/i-imgur-com-ls3cloc-806b24.jpg',
         price: 175,
         brand: 'Jordan',
         category: 'Sneakers',
         colorway: 'Fire Red/White-Black-Cement Grey',
         description: "The Air Jordan 4 Retro 'Toro Bravo' returns in 2026, bringing back the highly coveted all-red nubuck upper first seen in 2013. Black accents on the wings, midsole, and heel tab contrast sharply with the vibrant red base, while Cement Grey detailing appears on the eyelets, tongue tag, and outsole.",
-        image: buildImgurImageUrl('Ls3CLOC'),
+        image: 'products/catalog/i-imgur-com-ls3cloc-806b24.jpg',
         images: [
-            buildImgurImageUrl('Ls3CLOC'),
-            buildImgurImageUrl('K9Llix1'),
-            buildImgurImageUrl('SOJZOGy'),
-            buildImgurImageUrl('UBUUZZp'),
-            buildImgurImageUrl('NBl14B8'),
-            buildImgurImageUrl('fbKmhq7'),
-            buildImgurImageUrl('NgXzN0P'),
-            buildImgurImageUrl('BaQfz3Y'),
-            buildImgurImageUrl('yAA7Oen'),
-            buildImgurImageUrl('2ZsP4HT')
+            'products/catalog/i-imgur-com-ls3cloc-806b24.jpg',
+            'products/catalog/i-imgur-com-k9llix1-c0e847.jpg',
+            'products/catalog/i-imgur-com-sojzogy-7d00fb.jpg',
+            'products/catalog/i-imgur-com-ubuuzzp-62e0f8.jpg',
+            'products/catalog/i-imgur-com-nbl14b8-424b48.jpg',
+            'products/catalog/i-imgur-com-fbkmhq7-160388.jpg',
+            'products/catalog/i-imgur-com-ngxzn0p-75675b.jpg',
+            'products/catalog/i-imgur-com-baqfz3y-67683d.jpg',
+            'products/catalog/i-imgur-com-yaa7oen-bdfad5.jpg',
+            'products/catalog/i-imgur-com-2zsp4ht-468199.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -296,19 +416,19 @@ export const SEEDED_PRODUCTS = [
         name: "Prada America's Cup 'Burgundy/Silver'",
         sku: 'PRDA-AMC-001',
         slug: 'prada-americas-cup-burgundy-silver',
-        cardImage: buildImgurImageUrl('sRovUH4'),
+        cardImage: 'products/catalog/i-imgur-com-srovuh4-b6dba0.jpg',
         price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Burgundy/Silver',
         description: "The Prada America's Cup sneaker in Burgundy and Silver. Technical nylon and leather upper with the iconic Prada logo tape, rubber cupsole, and grippy outsole. A staple of the Prada sportswear lineage.",
-        image: buildImgurImageUrl('sRovUH4'),
+        image: 'products/catalog/i-imgur-com-srovuh4-b6dba0.jpg',
         images: [
-            buildImgurImageUrl('sRovUH4'),
-            buildImgurImageUrl('ohctVER'),
-            buildImgurImageUrl('fdIQWEt'),
-            buildImgurImageUrl('Grq1Nuu'),
-            buildImgurImageUrl('9aa0zDH')
+            'products/catalog/i-imgur-com-srovuh4-b6dba0.jpg',
+            'products/catalog/i-imgur-com-ohctver-90284f.jpg',
+            'products/catalog/i-imgur-com-fdiqwet-e1b148.jpg',
+            'products/catalog/i-imgur-com-grq1nuu-8789f8.jpg',
+            'products/catalog/i-imgur-com-9aa0zdh-58c425.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -329,19 +449,19 @@ export const SEEDED_PRODUCTS = [
         name: "Prada America's Cup 'Pearl/Silver'",
         sku: 'PRDA-AMC-002',
         slug: 'prada-americas-cup-pearl-silver',
-        cardImage: buildImgurImageUrl('wKQ1X0p'),
+        cardImage: 'products/catalog/i-imgur-com-wkq1x0p-e90985.jpg',
         price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Pearl/Silver',
         description: "Patent leather and technical fabric Prada America's Cup sneakers in pearl and silver.",
-        image: buildImgurImageUrl('wKQ1X0p'),
+        image: 'products/catalog/i-imgur-com-wkq1x0p-e90985.jpg',
         images: [
-            buildImgurImageUrl('wKQ1X0p'),
-            buildImgurImageUrl('J7CWvDY'),
-            buildImgurImageUrl('6UIokac'),
-            buildImgurImageUrl('HulQ6be'),
-            buildImgurImageUrl('BmZMMXZ')
+            'products/catalog/i-imgur-com-wkq1x0p-e90985.jpg',
+            'products/catalog/i-imgur-com-j7cwvdy-0ed753.jpg',
+            'products/catalog/i-imgur-com-6uiokac-0e25d4.jpg',
+            'products/catalog/i-imgur-com-hulq6be-2cf1e8.jpg',
+            'products/catalog/i-imgur-com-bmzmmxz-933df5.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -362,19 +482,19 @@ export const SEEDED_PRODUCTS = [
         name: "Prada America's Cup 'Green/Silver'",
         sku: 'PRDA-AMC-003',
         slug: 'prada-americas-cup-green-silver',
-        cardImage: buildImgurImageUrl('VP14puK'),
+        cardImage: 'products/catalog/i-imgur-com-vp14puk-ecbb12.jpg',
         price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Green/Silver',
         description: "Patent leather and technical fabric Prada America's Cup sneakers in green and silver.",
-        image: buildImgurImageUrl('VP14puK'),
+        image: 'products/catalog/i-imgur-com-vp14puk-ecbb12.jpg',
         images: [
-            buildImgurImageUrl('VP14puK'),
-            buildImgurImageUrl('ZHvnW3z'),
-            buildImgurImageUrl('HcABYp9'),
-            buildImgurImageUrl('ZU6HtQa'),
-            buildImgurImageUrl('o0zsq1G')
+            'products/catalog/i-imgur-com-vp14puk-ecbb12.jpg',
+            'products/catalog/i-imgur-com-zhvnw3z-6c7a5c.jpg',
+            'products/catalog/i-imgur-com-hcabyp9-a95b03.jpg',
+            'products/catalog/i-imgur-com-zu6htqa-1bdb45.jpg',
+            'products/catalog/i-imgur-com-o0zsq1g-26f3ab.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -395,20 +515,20 @@ export const SEEDED_PRODUCTS = [
         name: "Prada America's Cup 'Red/Silver'",
         sku: 'PRDA-AMC-004',
         slug: 'prada-americas-cup-red-silver',
-        cardImage: buildImgurImageUrl('BU2UBWf'),
+        cardImage: 'products/catalog/i-imgur-com-bu2ubwf-a122e6.jpg',
         price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Red/Silver',
         description: "The Prada America's Cup sneaker in Red and Silver. Technical nylon and leather upper with the iconic Prada logo tape, rubber cupsole, and grippy outsole. A staple of the Prada sportswear lineage.",
-        image: buildImgurImageUrl('BU2UBWf'),
+        image: 'products/catalog/i-imgur-com-bu2ubwf-a122e6.jpg',
         images: [
-            buildImgurImageUrl('BU2UBWf'),
-            buildImgurImageUrl('hriT299'),
-            buildImgurImageUrl('jSw7uOJ'),
-            buildImgurImageUrl('btnfnok'),
-            buildImgurImageUrl('8Oqi7Zf'),
-            buildImgurImageUrl('ryElfZm')
+            'products/catalog/i-imgur-com-bu2ubwf-a122e6.jpg',
+            'products/catalog/i-imgur-com-hrit299-1f9a66.jpg',
+            'products/catalog/i-imgur-com-jsw7uoj-a0ff59.jpg',
+            'products/catalog/i-imgur-com-btnfnok-921c2b.jpg',
+            'products/catalog/i-imgur-com-8oqi7zf-61551e.jpg',
+            'products/catalog/i-imgur-com-ryelfzm-ef495f.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -429,20 +549,20 @@ export const SEEDED_PRODUCTS = [
         name: "Prada America's Cup 'Sunny Yellow/Silver'",
         sku: 'PRDA-AMC-005',
         slug: 'prada-americas-cup-yellow-silver',
-        cardImage: buildImgurImageUrl('mNJWyDX'),
+        cardImage: 'products/catalog/i-imgur-com-mnjwydx-cd758f.jpg',
         price: 547,
         brand: 'Prada',
         category: 'Sneakers',
         colorway: 'Sunny Yellow/Silver',
         description: "The Prada America's Cup sneaker in Sunny Yellow and Silver. Technical nylon and leather upper with the iconic Prada logo tape, rubber cupsole, and grippy outsole. A staple of the Prada sportswear lineage.",
-        image: buildImgurImageUrl('mNJWyDX'),
+        image: 'products/catalog/i-imgur-com-mnjwydx-cd758f.jpg',
         images: [
-            buildImgurImageUrl('mNJWyDX'),
-            buildImgurImageUrl('GbffweV'),
-            buildImgurImageUrl('IbeS8Kp'),
-            buildImgurImageUrl('LOIvZJM'),
-            buildImgurImageUrl('Sl2Mk0O'),
-            buildImgurImageUrl('xQYETKD')
+            'products/catalog/i-imgur-com-mnjwydx-cd758f.jpg',
+            'products/catalog/i-imgur-com-gbffwev-9a1bfb.jpg',
+            'products/catalog/i-imgur-com-ibes8kp-4be537.jpg',
+            'products/catalog/i-imgur-com-loivzjm-0cf4f8.jpg',
+            'products/catalog/i-imgur-com-sl2mk0o-900b7b.jpg',
+            'products/catalog/i-imgur-com-xqyetkd-d7a1b4.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -463,18 +583,18 @@ export const SEEDED_PRODUCTS = [
         name: "Gucci Cotton Jersey T-Shirt with Embroidery",
         sku: '854394 XJHN0 3254',
         slug: 'gucci-cotton-jersey-tshirt-forest-green',
-        cardImage: buildImgurImageUrl('bMJpkUt'),
+        cardImage: 'products/catalog/i-imgur-com-bmjpkut-1f9655.png',
         price: 550,
         retailPrice: 690,
         brand: 'Gucci',
         category: 'Apparel',
         colorway: 'Forest green',
         description: "Silhouettes, fabrics, and craftsmanship draw from the House codes and speaks to the present without losing sight of the heritage. This medium cotton jersey T-shirt is complete with an Interlocking G embroidery.\n\nProduct Details\nForest green medium cotton jersey\nInterlocking G embroidery\nCrewneck\nShort sleeves\nLength: 28.1\" based on a size S\nFabric: 100% Cotton\nEmbroidery: 100% Polyester",
-        image: buildImgurImageUrl('bMJpkUt'),
+        image: 'products/catalog/i-imgur-com-bmjpkut-1f9655.png',
         images: [
-            buildImgurImageUrl('bMJpkUt'),
-            buildImgurImageUrl('jLxsojK'),
-            buildImgurImageUrl('cWemGLK')
+            'products/catalog/i-imgur-com-bmjpkut-1f9655.png',
+            'products/catalog/i-imgur-com-jlxsojk-50fa2a.png',
+            'products/catalog/i-imgur-com-cwemglk-408338.png'
         ],
         imageFit: 'cover',
         imagePosition: '50% 50%',
@@ -495,7 +615,7 @@ export const SEEDED_PRODUCTS = [
         name: 'LOEWE Logo-Embroidered Cotton-Jersey T-Shirt',
         sku: 'LOEWE-LOGO-TEE-001',
         slug: 'loewe-logo-embroidered-cotton-jersey-t-shirt',
-        cardImage: buildImgurImageUrl('GlgWRVT'),
+        cardImage: 'products/catalog/i-imgur-com-glgwrvt-6998c4.png',
         price: 249.99,
         retailPrice: 450,
         addedAt: '2026-05-19T00:51:00-04:00',
@@ -503,10 +623,10 @@ export const SEEDED_PRODUCTS = [
         category: 'Apparel',
         colorway: 'White',
         description: 'LOEWE logo-embroidered cotton-jersey T-shirt with a clean crewneck profile, short sleeves, and signature front logo detailing. A premium everyday tee built from soft cotton jersey.',
-        image: buildImgurImageUrl('GlgWRVT'),
+        image: 'products/catalog/i-imgur-com-glgwrvt-6998c4.png',
         images: [
-            buildImgurImageUrl('GlgWRVT'),
-            buildImgurImageUrl('zgnwMeg')
+            'products/catalog/i-imgur-com-glgwrvt-6998c4.png',
+            'products/catalog/i-imgur-com-zgnwmeg-acd588.jpg'
         ],
         imageFit: 'cover',
         imagePosition: '50% 50%',
@@ -527,7 +647,7 @@ export const SEEDED_PRODUCTS = [
         name: "LOEWE Logo-Embroidered Cotton-Jersey T-Shirt 'White'",
         sku: 'LOEWE-LOGO-TEE-WHT-001',
         slug: 'loewe-logo-embroidered-cotton-jersey-t-shirt-white',
-        cardImage: buildImgurImageUrl('ZtPjsgZ'),
+        cardImage: 'products/catalog/i-imgur-com-ztpjsgz-db23b7.png',
         price: 249.99,
         retailPrice: 450,
         addedAt: '2026-05-19T00:54:00-04:00',
@@ -535,10 +655,10 @@ export const SEEDED_PRODUCTS = [
         category: 'Apparel',
         colorway: 'White',
         description: 'White LOEWE logo-embroidered cotton-jersey T-shirt with a clean crewneck profile, short sleeves, and signature logo detailing. A premium everyday tee built from soft cotton jersey.',
-        image: buildImgurImageUrl('ZtPjsgZ'),
+        image: 'products/catalog/i-imgur-com-ztpjsgz-db23b7.png',
         images: [
-            buildImgurImageUrl('ZtPjsgZ'),
-            buildImgurImageUrl('vqSkGyF')
+            'products/catalog/i-imgur-com-ztpjsgz-db23b7.png',
+            'products/catalog/i-imgur-com-vqskgyf-429aff.png'
         ],
         imageFit: 'cover',
         imagePosition: '50% 50%',
@@ -559,7 +679,7 @@ export const SEEDED_PRODUCTS = [
         name: "LOEWE Logo-Embroidered Cotton-Jersey T-Shirt 'Navy'",
         sku: 'LOEWE-LOGO-TEE-NVY-001',
         slug: 'loewe-logo-embroidered-cotton-jersey-t-shirt-navy',
-        cardImage: buildImgurImageUrl('4vxxaTO'),
+        cardImage: 'products/catalog/i-imgur-com-4vxxato-e60f22.png',
         price: 249.99,
         retailPrice: 450,
         addedAt: '2026-05-19T01:01:00-04:00',
@@ -567,10 +687,10 @@ export const SEEDED_PRODUCTS = [
         category: 'Apparel',
         colorway: 'Navy',
         description: 'Navy LOEWE logo-embroidered cotton-jersey T-shirt with a clean crewneck profile, short sleeves, and signature logo detailing. A premium everyday tee built from soft cotton jersey.',
-        image: buildImgurImageUrl('4vxxaTO'),
+        image: 'products/catalog/i-imgur-com-4vxxato-e60f22.png',
         images: [
-            buildImgurImageUrl('4vxxaTO'),
-            buildImgurImageUrl('ro83Of4')
+            'products/catalog/i-imgur-com-4vxxato-e60f22.png',
+            'products/catalog/i-imgur-com-ro83of4-36e60f.jpg'
         ],
         imageFit: 'cover',
         imagePosition: '50% 50%',
@@ -591,21 +711,21 @@ export const SEEDED_PRODUCTS = [
         name: "Burberry Logo-Embroidered T-Shirt 'Beige'",
         sku: 'KW2664',
         slug: 'burberry-logo-embroidered-t-shirt-beige',
-        cardImage: buildImgurImageUrl('sEBwTSp', 'jpeg'),
+        cardImage: 'products/catalog/i-imgur-com-sebwtsp-61bc3f.jpg',
         price: 300,
         addedAt: '2026-06-30T04:30:00-04:00',
         brand: 'Burberry',
         category: 'Apparel',
         colorway: 'Beige/Blue',
         description: 'Burberry logo-embroidered cotton T-shirt in beige with blue cord embroidery. A clean short-sleeve crewneck profile with premium everyday styling.',
-        image: buildImgurImageUrl('sEBwTSp', 'jpeg'),
+        image: 'products/catalog/i-imgur-com-sebwtsp-61bc3f.jpg',
         images: [
-            buildImgurImageUrl('sEBwTSp', 'jpeg'),
-            buildImgurImageUrl('VvcLvzZ', 'jpeg'),
-            buildImgurImageUrl('bSEMN1X', 'jpeg'),
-            buildImgurImageUrl('bhLlBdF', 'jpeg'),
-            buildImgurImageUrl('pHWUsJi', 'jpeg'),
-            buildImgurImageUrl('rU9xb0C', 'jpeg')
+            'products/catalog/i-imgur-com-sebwtsp-61bc3f.jpg',
+            'products/catalog/i-imgur-com-vvclvzz-b78ae7.jpg',
+            'products/catalog/i-imgur-com-bsemn1x-f686bb.jpg',
+            'products/catalog/i-imgur-com-bhllbdf-453366.jpg',
+            'products/catalog/i-imgur-com-phwusji-e4db8a.jpg',
+            'products/catalog/i-imgur-com-ru9xb0c-4e2c68.jpg'
         ],
         imageFit: 'cover',
         imagePosition: '50% 50%',
@@ -627,24 +747,24 @@ export const SEEDED_PRODUCTS = [
         name: 'Moncler Logo-Patch Cargo Shorts',
         sku: 'KW2673',
         slug: 'moncler-logo-patch-cargo-shorts-black',
-        cardImage: buildImgurImageUrl('fnNx2eq', 'png'),
+        cardImage: 'products/catalog/i-imgur-com-fnnx2eq-542ca0.png',
         price: 350,
         addedAt: '2026-06-30T12:20:00-04:00',
         brand: 'Moncler',
         category: 'Apparel',
         colorway: 'Black',
         description: 'Moncler logo-patch cargo shorts in black with a utility pocket layout, relaxed casual profile, and signature logo patch detailing.',
-        image: buildImgurImageUrl('fnNx2eq', 'png'),
+        image: 'products/catalog/i-imgur-com-fnnx2eq-542ca0.png',
         images: [
-            buildImgurImageUrl('fnNx2eq', 'png'),
-            buildImgurImageUrl('5uTrLDt', 'png'),
-            buildImgurImageUrl('SjBAfvc', 'png'),
-            buildImgurImageUrl('IEFBf8Y', 'png'),
-            buildImgurImageUrl('5iZTCId', 'png'),
-            buildImgurImageUrl('PGvS3Mf', 'jpeg'),
-            buildImgurImageUrl('Z1Ea3sH', 'jpeg'),
-            buildImgurImageUrl('P0ipzDF', 'jpeg'),
-            buildImgurImageUrl('IDPOPNT', 'jpeg')
+            'products/catalog/i-imgur-com-fnnx2eq-542ca0.png',
+            'products/catalog/i-imgur-com-5utrldt-a0d3b6.png',
+            'products/catalog/i-imgur-com-sjbafvc-ffb0ca.png',
+            'products/catalog/i-imgur-com-iefbf8y-24ee37.png',
+            'products/catalog/i-imgur-com-5iztcid-1c2313.png',
+            'products/catalog/i-imgur-com-pgvs3mf-aabfd7.jpg',
+            'products/catalog/i-imgur-com-z1ea3sh-3e28d9.jpg',
+            'products/catalog/i-imgur-com-p0ipzdf-54cf92.jpg',
+            'products/catalog/i-imgur-com-idpopnt-e574fb.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -667,18 +787,18 @@ export const SEEDED_PRODUCTS = [
         name: "Fendi Teddy Bear Plush Toy T-Shirt 'White'",
         sku: 'KW2672',
         slug: 'fendi-teddy-bear-plush-toy-t-shirt-white',
-        cardImage: buildImgurImageUrl('0R0mmrx', 'png'),
+        cardImage: 'products/catalog/i-imgur-com-0r0mmrx-0919f2.png',
         price: 400,
         addedAt: '2026-06-30T12:35:00-04:00',
         brand: 'Fendi',
         category: 'Apparel',
         colorway: 'White/Multicolor',
         description: 'Regular-fit short-sleeved crewneck Fendi T-shirt in white cotton with a multicolor teddy bear plush toy maxi print on the chest. Part of the Silvia and The Baguette capsule collection designed in collaboration with Japanese artist TAROUT. Made in Italy from 100% cotton.',
-        image: buildImgurImageUrl('0R0mmrx', 'png'),
+        image: 'products/catalog/i-imgur-com-0r0mmrx-0919f2.png',
         images: [
-            buildImgurImageUrl('0R0mmrx', 'png'),
-            buildImgurImageUrl('jSrif7J', 'png'),
-            buildImgurImageUrl('ZM04Xdh', 'png')
+            'products/catalog/i-imgur-com-0r0mmrx-0919f2.png',
+            'products/catalog/i-imgur-com-jsrif7j-bb0708.png',
+            'products/catalog/i-imgur-com-zm04xdh-43442b.png'
         ],
         imageFit: 'contain',
         imagePosition: '50% 50%',
@@ -705,14 +825,14 @@ export const SEEDED_PRODUCTS = [
         category: 'Shoes',
         colorway: 'Onyx/Onyx/Onyx',
         description: 'First revealed in February 2022 at the Donda 2 listening event in Miami, the adidas Yeezy Slide Onyx features an all-black foam construction with a soft footbed for comfort. At the base, a grooved outsole adds stability and responsiveness.\n\nThe adidas Yeezy Slide Onyx released in March 2022 and retailed for $60.',
-        image: 'https://th.bing.com/th/id/R.c356107b2c0e982d8d644ea915405af3?rik=0GDK68hC3SC07g&riu=http%3a%2f%2fsneakerdogg.com%2fcdn%2fshop%2ffiles%2fadidas-Yeezy-Slide-Onyx-_2022-2023_-_HQ6448_1200x1200.png%3fv%3d1707820786&ehk=50xxt8sQQtiCFjIfgcQWRSEPxUMxygKuIjml0alOtiw%3d&risl=&pid=ImgRaw&r=0',
-        cardImage: 'https://th.bing.com/th/id/R.c356107b2c0e982d8d644ea915405af3?rik=0GDK68hC3SC07g&riu=http%3a%2f%2fsneakerdogg.com%2fcdn%2fshop%2ffiles%2fadidas-Yeezy-Slide-Onyx-_2022-2023_-_HQ6448_1200x1200.png%3fv%3d1707820786&ehk=50xxt8sQQtiCFjIfgcQWRSEPxUMxygKuIjml0alOtiw%3d&risl=&pid=ImgRaw&r=0',
+        image: 'products/catalog/th-bing-com-r-c356107b2c0e982d8d644ea915405af3-2ac8a6.png',
+        cardImage: 'products/catalog/th-bing-com-r-c356107b2c0e982d8d644ea915405af3-2ac8a6.png',
         images: [
-            'https://th.bing.com/th/id/R.c356107b2c0e982d8d644ea915405af3?rik=0GDK68hC3SC07g&riu=http%3a%2f%2fsneakerdogg.com%2fcdn%2fshop%2ffiles%2fadidas-Yeezy-Slide-Onyx-_2022-2023_-_HQ6448_1200x1200.png%3fv%3d1707820786&ehk=50xxt8sQQtiCFjIfgcQWRSEPxUMxygKuIjml0alOtiw%3d&risl=&pid=ImgRaw&r=0',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/072/273/667/original/884794_01.jpg.jpeg?action=crop&width=750',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/072/273/660/original/884794_04.jpg.jpeg?action=crop&width=750',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/072/273/670/original/884794_02.jpg.jpeg?action=crop&width=750',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/072/273/659/original/884794_03.jpg.jpeg?action=crop&width=750'
+            'products/catalog/th-bing-com-r-c356107b2c0e982d8d644ea915405af3-2ac8a6.png',
+            'products/catalog/goat-com-884794-01-jpg-e9b266.webp',
+            'products/catalog/goat-com-884794-04-jpg-546d5a.webp',
+            'products/catalog/goat-com-884794-02-jpg-ac14ea.webp',
+            'products/catalog/goat-com-884794-03-jpg-d2f01b.webp'
         ],
         imageFit: 'contain',
         imagePosition: '50% 62%',
@@ -751,19 +871,19 @@ export const SEEDED_PRODUCTS = [
         category: 'Sneakers',
         colorway: 'Velvet Brown/Black',
         description: "The Travis Scott x Air Jordan 1 Retro Low OG SP 'Velvet Brown' showcases Scott's signature reverse Swoosh on the black tumbled leather and brown suede upper. A woven Nike Air tag sits atop the brown nylon tongue, while mismatched Cactus Jack and Jordan Wings branding adorns the back tab of each shoe. Anchoring the sneaker is a brown rubber cupsole with stitched sidewall construction and an encapsulated Air-sole unit in the heel.",
-        image: buildImgurImageUrl('ZOrZEnt'),
+        image: 'products/catalog/i-imgur-com-zorzent-eb9bce.png',
         images: [
-            buildImgurImageUrl('ZOrZEnt'),
-            buildImgurImageUrl('rAHE2Iv'),
-            buildImgurImageUrl('TkQdpuE'),
-            buildImgurImageUrl('4pdSP5S'),
-            buildImgurImageUrl('QfIJ0PC'),
-            buildImgurImageUrl('YZfxHKh'),
-            buildImgurImageUrl('iDo2IAJ'),
-            buildImgurImageUrl('IHVvC6S'),
-            buildImgurImageUrl('gU63WYa'),
-            buildImgurImageUrl('tr5UsUI'),
-            buildImgurImageUrl('PYEiLrz')
+            'products/catalog/i-imgur-com-zorzent-eb9bce.png',
+            'products/catalog/i-imgur-com-rahe2iv-00ddc6.png',
+            'products/catalog/i-imgur-com-tkqdpue-a961fe.png',
+            'products/catalog/i-imgur-com-4pdsp5s-1f9f8b.png',
+            'products/catalog/i-imgur-com-qfij0pc-d934cb.png',
+            'products/catalog/i-imgur-com-yzfxhkh-88cf7a.png',
+            'products/catalog/i-imgur-com-ido2iaj-691a22.png',
+            'products/catalog/i-imgur-com-ihvvc6s-eac20e.png',
+            'products/catalog/i-imgur-com-gu63wya-aabe88.png',
+            'products/catalog/i-imgur-com-tr5usui-a7ed3e.png',
+            'products/catalog/i-imgur-com-pyeilrz-4763cd.png'
         ],
         imageFit: 'contain',
         imagePosition: '50% 58%',
@@ -795,22 +915,20 @@ export const SEEDED_PRODUCTS = [
     },
     {
         id: 'seed-off-white-industrial-belt-yellow-black',
-        name: 'OFF-WHITE Industrial Belt',
+        name: 'Off-White Industrial Belt',
         sku: 'OW-IND-BELT-YB-SS19',
         price: 90,
-        brand: 'OFF-WHITE',
+        brand: 'Off-White',
         category: 'Accessories',
         colorway: 'Yellow/Black',
         season: 'SS19',
         retailPrice: 225,
         description: "The Off-White Industrial Belt is potentially the most well-recognized and popular item the brand has ever made. The yellow and black version is the most classic iteration of the belt and features Off-White branding as well as red stitching down the middle. This belt has been seen on celebrities both inside and outside of Virgil Abloh's direct circle, from Lil Uzi Vert to Tan France. This particular Off-White Industrial Belt retailed for $225 USD but has primarily resold on StockX for below retail.",
-        image: 'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/083/103/227/original/654066_01.jpg.jpeg?width=750',
-        cardImage: 'https://images.stockx.com/images/Off-White-Classic-Industrial-Belt-Yellow-Black.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1666885806',
+        image: 'products/catalog/goat-com-654066-01-jpg-d6bbf0.webp',
+        cardImage: 'products/catalog/stockx-com-off-white-classic-industrial-belt-yellow-black-57729c.avif',
         images: [
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/083/103/227/original/654066_01.jpg.jpeg?width=750',
-            'https://images.stockx.com/images/Off-White-Classic-Industrial-Belt-Yellow-Black.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1666885806',
-            'https://tse3.mm.bing.net/th/id/OIP.nE5vDaPkpCUPwzOqWhL_VgHaNA?rs=1&pid=ImgDetMain&o=7&rm=3',
-            'https://tse2.mm.bing.net/th/id/OIP.MzpTNm0tD1jlpmx1sxMxAQHaLW?rs=1&pid=ImgDetMain&o=7&rm=3'
+            'products/catalog/goat-com-654066-01-jpg-d6bbf0.webp',
+            'products/catalog/stockx-com-off-white-classic-industrial-belt-yellow-black-57729c.avif'
         ],
         imageFit: 'contain',
         imagePosition: '50% 52%',
@@ -837,17 +955,17 @@ export const SEEDED_PRODUCTS = [
         category: 'Sneakers',
         colorway: 'Black/Phantom/University Red',
         description: "The Travis Scott x Air Jordan 1 Retro Low OG SP 'Black Phantom' brings La Flame's signature reverse Swoosh to a stealthy black suede build with contrast white stitching throughout. A woven Nike Air tag lands on the tongue, while mismatched Cactus Jack and Jordan Wings branding finish the heel tabs. University Red detailing adds a subtle hit of color to the monochrome low-top.",
-        image: 'https://tse1.mm.bing.net/th/id/OIP.rOgfg8KHJ4brBJSX81xQXAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3',
+        // The Bing thumbnail this seed originally used is gone; the GOAT angle set is live.
+        image: 'products/catalog/goat-com-1006990-01-jpg-b9e145.webp',
         images: [
-            'https://tse1.mm.bing.net/th/id/OIP.rOgfg8KHJ4brBJSX81xQXAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/983/original/1006990_01.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/986/original/1006990_02.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/985/original/1006990_03.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/987/original/1006990_04.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/988/original/1006990_05.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/990/original/1006990_06.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/991/original/1006990_07.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/011/992/original/1006990_08.jpg.jpeg?action=crop&width=600'
+            'products/catalog/goat-com-1006990-01-jpg-b9e145.webp',
+            'products/catalog/goat-com-1006990-02-jpg-28f02c.webp',
+            'products/catalog/goat-com-1006990-03-jpg-560c9f.webp',
+            'products/catalog/goat-com-1006990-04-jpg-8ed30e.webp',
+            'products/catalog/goat-com-1006990-05-jpg-0e5339.webp',
+            'products/catalog/goat-com-1006990-06-jpg-c6221b.webp',
+            'products/catalog/goat-com-1006990-07-jpg-68e62d.webp',
+            'products/catalog/goat-com-1006990-08-jpg-324d88.webp'
         ],
         imageFit: 'contain',
         imagePosition: '50% 60%',
@@ -874,17 +992,17 @@ export const SEEDED_PRODUCTS = [
         category: 'Sneakers',
         colorway: 'Sea Salt/White',
         description: "The New Balance 2002R 'Sea Salt' is taken from the three-piece 'Protection Pack,' conceived by New Balance designer Yue Wu as a visual representation of sneakers that last a lifetime. The upper is crafted from white leather with eroded suede overlays throughout the forefoot, quarter panel and heel. Details include a tonal 'N' logo, exposed foam tongue and 2002R branding in red and blue. The sneaker rides on a distressed ABZORB midsole, supported underfoot by a durable N-ergy outsole.",
-        image: 'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/647/original/793106_01.jpg.jpeg?action=crop&width=600',
-        cardImage: 'https://www.picclickimg.com/O20AAOSwSJdigd~g/New-Balance-2002R-Protection-Pack-Sea-Salt-Sneakers.webp',
+        image: 'products/catalog/goat-com-793106-01-jpg-cb2d2c.webp',
+        cardImage: 'products/catalog/picclickimg-com-new-balance-2002r-protection-pack-sea-salt-sneakers-874ec7.webp',
         images: [
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/647/original/793106_01.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/653/original/793106_02.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/645/original/793106_03.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/644/original/793106_04.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/652/original/793106_05.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/643/original/793106_06.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/642/original/793106_07.jpg.jpeg?action=crop&width=600',
-            'https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/112/723/649/original/793106_08.jpg.jpeg?action=crop&width=600'
+            'products/catalog/goat-com-793106-01-jpg-cb2d2c.webp',
+            'products/catalog/goat-com-793106-02-jpg-f7384a.webp',
+            'products/catalog/goat-com-793106-03-jpg-5ba7a8.webp',
+            'products/catalog/goat-com-793106-04-jpg-e0d82b.webp',
+            'products/catalog/goat-com-793106-05-jpg-5d59c8.webp',
+            'products/catalog/goat-com-793106-06-jpg-c7eaae.webp',
+            'products/catalog/goat-com-793106-07-jpg-df7db1.webp',
+            'products/catalog/goat-com-793106-08-jpg-54b429.webp'
         ],
         imageFit: 'cover',
         imagePosition: '50% 56%',
@@ -926,14 +1044,14 @@ export const SEEDED_PRODUCTS = [
         category: 'Kids',
         colorway: 'Black/Black',
         description: "Offered in little kid sizing, the Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom' combines a sleek finish with La Flame's signature touches. The low-top sports an all-black nubuck and suede upper with contrast white stitching throughout. Scott's backward Swoosh decorates the lateral side, while woven Nike tags embellish each tongue. Mismatched heel tabs display a Jordan Wings logo on the right shoe and a bee graphic on the left. Anchoring the sneaker is a black rubber cupsole with stitched sidewall construction.",
-        image: buildImgurImageUrl('30H5NyD'),
+        image: 'products/catalog/i-imgur-com-30h5nyd-59c491.jpg',
         images: [
-            buildImgurImageUrl('30H5NyD'),
-            buildImgurImageUrl('UutZVxq'),
-            buildImgurImageUrl('israMgv'),
-            buildImgurImageUrl('FXy3W3z'),
-            buildImgurImageUrl('bG5UpTh'),
-            buildImgurImageUrl('PNAbX10')
+            'products/catalog/i-imgur-com-30h5nyd-59c491.jpg',
+            'products/catalog/i-imgur-com-uutzvxq-3d8449.jpg',
+            'products/catalog/i-imgur-com-isramgv-b051d6.jpg',
+            'products/catalog/i-imgur-com-fxy3w3z-69e415.jpg',
+            'products/catalog/i-imgur-com-bg5upth-7df132.jpg',
+            'products/catalog/i-imgur-com-pnabx10-1d1133.jpg'
         ],
         imageFit: 'contain',
         imagePosition: 'center center',
@@ -947,7 +1065,7 @@ export const SEEDED_PRODUCTS = [
         isFeatured: false,
         seeded: true,
         createdAt: { seconds: 0 }
-    }
+    },
 ];
 
 
@@ -969,6 +1087,15 @@ function matchesVelvetBrown(product) {
     const id = String(product?.id || '').toLowerCase();
     const name = String(product?.name || '').toLowerCase();
     return id === 'seed-men-travis-velvet-brown' || (name.includes('travis scott') && name.includes('velvet brown'));
+}
+
+function matchesOffWhiteAf1Ten(product) {
+    const id = String(product?.id || '').toLowerCase();
+    const name = String(product?.name || '').toLowerCase();
+    if (id === 'seed-off-white-nike-air-force-1-low-the-ten') return true;
+    return name.includes('air force 1')
+        && (name.includes('off-white') || name.includes('off white'))
+        && name.includes('the ten');
 }
 
 function clamp(value, min, max) {
@@ -1009,6 +1136,9 @@ function isPradaSneaker(product) {
     );
 }
 
+// Third-party catalogue URLs mirrored into the repo resolve to a local file;
+// anything still remote and unmirrored falls back to a local placeholder. See
+// products/catalog/localize-image.mjs for the rules.
 export function applyProductOverrides(product) {
     if (!product) return product;
 
@@ -1017,11 +1147,27 @@ export function applyProductOverrides(product) {
         price: Number(product.price) || 0
     };
 
+    nextProduct.image = localizeCatalogImage(nextProduct.image);
+    nextProduct.cardImage = localizeCatalogImage(nextProduct.cardImage);
+    if (Array.isArray(nextProduct.images)) {
+        nextProduct.images = nextProduct.images.map(localizeCatalogImage);
+    }
+
+    // Normalize brand + category to canonical taxonomy (read-time, no Firestore rewrite)
+    if (nextProduct.brand) nextProduct.brand = normalizeBrand(nextProduct.brand);
+    if (nextProduct.category) nextProduct.category = normalizeCategory(nextProduct.category);
+
     // Auto-correct brand for any Prada product mislabeled as another brand
     const productId = String(nextProduct.id || '').toLowerCase();
     const productName = String(nextProduct.name || '').toLowerCase();
     if ((productId.includes('prada') || productName.includes("prada")) && nextProduct.brand !== 'Prada') {
         nextProduct.brand = 'Prada';
+    }
+    if ((productId.includes('off-white') || productId.includes('offwhite') || productName.includes('off-white') || productName.includes('off white')) && nextProduct.brand !== 'Off-White') {
+        nextProduct.brand = 'Off-White';
+    }
+    if ((productId.includes('true-religion') || productId.includes('truereligion') || productName.includes('true religion')) && nextProduct.brand !== 'True Religion') {
+        nextProduct.brand = 'True Religion';
     }
 
     if (isPradaSneaker(nextProduct)) {
@@ -1040,6 +1186,15 @@ export function applyProductOverrides(product) {
     if (isFootwearProduct(nextProduct) && nextProduct.allowBackorder !== false) {
         nextProduct.allowBackorder = true;
         nextProduct.backorderLeadTime = nextProduct.backorderLeadTime || 'Ships in 1.5-2 weeks';
+    }
+
+    // Seed the full mirrored GOAT gallery for the Off-White AF1 'The Ten' at
+    // read time — its Firestore record only holds a single (re-sourced) cover.
+    if (matchesOffWhiteAf1Ten(nextProduct)) {
+        nextProduct.image = OFF_WHITE_AF1_TEN_IMAGES[0];
+        nextProduct.cardImage = OFF_WHITE_AF1_TEN_IMAGES[0];
+        nextProduct.images = [...OFF_WHITE_AF1_TEN_IMAGES];
+        nextProduct.imageFit = nextProduct.imageFit || 'contain';
     }
 
     if (matchesBlackCat(nextProduct)) {

@@ -51,7 +51,7 @@
         } else {
             itemsContainer.innerHTML = cart.map((item, index) => `
                 <div style="display:flex; gap:1rem; border-bottom:1px solid #eee; padding:0.5rem 0;">
-                    <img src="${item.image || ''}" alt="" style="width:60px; height:60px; object-fit:cover; border-radius:4px;">
+                    <img src="${item.image || ''}" alt="" onerror="catalogImageFallback(this)" style="width:60px; height:60px; object-fit:cover; border-radius:4px;">
                     <div style="flex:1;">
                         <strong>${item.name}</strong><br>
                         <small>Size: ${item.size}</small><br>

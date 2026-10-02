@@ -469,6 +469,39 @@ node server.js   # Express at http://localhost:5001
 
 `server.js` exposes `POST /api/products` which accepts a multipart image upload, slugifies the name, then writes the product record directly into `app.js`, `admin.js`, `checkout.js`, and `accounts.js` (auto-injected before the closing array bracket), and `git add/commit/push` — handy for one-off product uploads from the local Admin auto-deploy flow.
 
+### Local product image uploads (mirror pipeline)
+
+The mirror tool doubles as a local upload server. It serves the site *and* accepts image uploads, storing them in `products/catalog/` — the same directory the mirror manages — instead of a third-party CDN:
+
+```bash
+node scripts/mirror-catalog-images.js --serve          # serves the site on port 5180
+# then open /admin.html from that origin and upload as usual
+```
+
+Uploaded files are named `<slug>-<content-hash><ext>` (identical bytes dedupe to one file) and recorded in `products/catalog/uploads.json`, which also keeps `--prune` from deleting them. The admin prefers this endpoint when it is reachable and silently falls back to Cloudinary on the deployed static site, where nothing can write into the repo. Commit the new `products/catalog/` files as part of the product change.
+
+Writes are gated by a shared token so an unrelated page running on localhost cannot drop files into the repo. The server mints one per run (override with `--token <value>` or `CATALOG_UPLOAD_TOKEN`), prints it on startup, and injects it into the HTML it serves, so the same-origin admin keeps working without configuration. A client must send it as the `X-Catalog-Token` header (or `?token=`); requests without it get `401`.
+
+Add `--commit` to have the server commit each newly stored image (plus its `uploads.json` entry) as you upload, with a message like `Add catalogue image <file>`. Only those paths are committed, so anything else staged or in progress in your working tree is left untouched. A deduped re-upload has nothing new to commit and is skipped.
+
+Keep the mirror current with the live store in one command:
+
+```bash
+npm run mirror:catalog   # pull image URLs from Firestore, mirror new ones, rewrite the alias map
+```
+
+It reads the catalogue read-only with the project's public web API key (`FIRESTORE_PROJECT` / `FIREBASE_API_KEY` override the defaults), downloads anything not yet mirrored, regenerates `products/catalog/aliases.mjs`, and reports dead sources.
+
+Fix a single dead image without hand-editing JSON:
+
+```bash
+node scripts/mirror-catalog-images.js --re-source \
+  --broken "<dead image URL>" \
+  --replacement "<working image URL, or an existing local repo path>"
+```
+
+It mirrors the replacement into `products/catalog/`, points the broken URL at it in `products/catalog/aliases.manual.json`, regenerates the alias module, and drops the URL from the dead-source record. Add `--dry-run` to preview, or `--name "..."` to name a mirrored replacement. Commit the new `products/catalog/` files.
+
 ### Required environment variables (Netlify)
 
 These are read by both checkout helpers and the admin SDK. The repo intentionally does **not** commit these.

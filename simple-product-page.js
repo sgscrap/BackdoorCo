@@ -96,7 +96,7 @@ async function loadProduct() {
     if (productImages.length > 0) {
         mainImg.src = productImages[0];
         thumbGallery.innerHTML = productImages.map((img, i) => 
-            `<img src="${img}" alt="Thumbnail" style="width: 60px; height: 60px; object-fit: cover; border: ${i===0?'2px solid black':'1px solid #ccc'}; cursor:pointer;" onclick="document.getElementById('main-product-image').src='${img}'; document.querySelectorAll('#thumbnail-gallery img').forEach((el,idx)=>el.style.border=idx===i?'2px solid black':'1px solid #ccc')">`
+            `<img src="${img}" alt="Thumbnail" style="width: 60px; height: 60px; object-fit: cover; border: ${i===0?'2px solid black':'1px solid #ccc'}; cursor:pointer;" onerror="catalogImageFallback(this)" onclick="document.getElementById('main-product-image').src='${img}'; document.querySelectorAll('#thumbnail-gallery img').forEach((el,idx)=>el.style.border=idx===i?'2px solid black':'1px solid #ccc')">`
         ).join('');
     }
 

@@ -368,7 +368,7 @@ function renderLowStock() {
 
         list.innerHTML = lowStock.slice(0, 4).map(s => `
         <button type="button" class="inventory-item" onclick="openProductModal(${products.find(p => p.name === s.name).id})">
-            <div class="shoe-thumb"><img src="../${s.img}" alt=""></div>
+            <div class="shoe-thumb"><img src="../${s.img}" alt="" onerror="catalogImageFallback(this)"></div>
             <div class="shoe-info">
                 <div class="shoe-name">${s.name} (${s.size})</div>
                 <div class="shoe-brand">${s.brand}</div>
@@ -391,7 +391,7 @@ function renderProducts() {
         const totalStock = p.sizes.reduce((sum, s) => sum + s.stock, 0);
         return `
       <tr>
-        <td><div class="shoe-thumb"><img src="../${p.image}" alt=""></div></td>
+        <td><div class="shoe-thumb"><img src="../${p.image}" alt="" onerror="catalogImageFallback(this)"></div></td>
         <td><strong>${p.name}</strong></td>
         <td><code>${p.sku}</code></td>
         <td>$${p.price.toFixed(2)}</td>
@@ -815,7 +815,7 @@ function renderImporterPreviewItem(i) {
     const el = document.getElementById(`prevItem_${i}`);
     if (!el) return;
     if (item.status === 'loaded') {
-        el.innerHTML = `<img src="${item.resolved}"><div class="preview-badge-advanced">${i + 1}</div>`;
+        el.innerHTML = `<img src="${item.resolved}" onerror="catalogImageFallback(this)"><div class="preview-badge-advanced">${i + 1}</div>`;
     } else {
         el.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--accent-red)"><i class="fa-solid fa-circle-exclamation"></i></div>`;
     }

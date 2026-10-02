@@ -184,7 +184,7 @@ function renderMostWanted() {
                          referrerpolicy="no-referrer"
                          loading="${i < 2 ? 'eager' : 'lazy'}"
                          style="${getProductCardImageStyle(p)}"
-                         onerror="this.style.display='none'">
+                         onerror="catalogImageFallback(this)">
                 
                 </div>
 
@@ -416,7 +416,7 @@ function updateCartUI() {
         <div class="cart-item">
             <div class="cart-item-thumb">
                 ${item.image
-                    ? `<img src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                    ? `<img src="${item.image}" alt="${item.name}" onerror="catalogImageFallback(this)">`
                     : ''}
                 <span class="cart-item-fallback" ${item.image ? 'style="display:none"' : ''}><i class="fa-solid fa-shoe-prints"></i></span>
             </div>

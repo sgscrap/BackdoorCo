@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspect QA | Backdoor</title>
+    <!-- Real storefront styles so the harness exercises shipping CSS, not a copy -->
+    <link rel="stylesheet" href="../store.css">
+    <link rel="stylesheet" href="../shop-all.css">
+    <style>
+        html,
+        body.qa-body {
+            display: block;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .qa-shell {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 28px 20px 72px;
+        }
+
+        .qa-title {
+            font-family: 'Bebas Neue', Impact, sans-serif;
+            font-size: 40px;
+            letter-spacing: 0.04em;
+            margin: 0 0 4px;
+        }
+
+        .qa-sub {
+            color: #8a8a8a;
+            font-size: 13px;
+            margin: 0 0 20px;
+        }
+
+        .qa-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border: 1px solid #222;
+            border-radius: 14px;
+            background: #121212;
+            margin-bottom: 18px;
+        }
+
+        .qa-bar label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9a9a9a;
+        }
+
+        .qa-bar select,
+        .qa-bar button {
+            background: #1b1b1b;
+            border: 1px solid #2c2c2c;
+            border-radius: 9px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 12.5px;
+            padding: 8px 13px;
+            cursor: pointer;
+        }
+
+        .qa-bar button:hover,
+        .qa-bar select:hover {
+            border-color: #c8f65d;
+        }
+
+        .qa-bar .qa-primary {
+            background: rgba(200, 246, 93, 0.14);
+            border-color: rgba(200, 246, 93, 0.4);
+            color: #c8f65d;
+            font-weight: 600;
+        }
+
+        .qa-pill {
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            border: 1px solid #2c2c2c;
+            background: #1b1b1b;
+        }
+
+        .qa-pill.is-pass {
+            color: #c8f65d;
+            border-color: rgba(200, 246, 93, 0.4);
+            background: rgba(200, 246, 93, 0.1);
+        }
+
+        .qa-pill.is-warn {
+            color: #facc15;
+            border-color: rgba(250, 204, 21, 0.4);
+            background: rgba(250, 204, 21, 0.1);
+        }
+
+        .qa-pill.is-fail {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.45);
+            background: rgba(248, 113, 113, 0.12);
+        }
+
+        .qa-group-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #9a9a9a;
+            margin: 26px 0 10px;
+        }
+
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        @media (max-width: 1180px) {
+            .qa-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 720px) {
+            .qa-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .qa-cell {
+            position: relative;
+        }
+
+        .qa-chip {
+            display: inline-block;
+            margin-bottom: 8px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border: 1px solid #2c2c2c;
+            background: #1b1b1b;
+            color: #9a9a9a;
+        }
+
+        .qa-chip.is-pass {
+            color: #c8f65d;
+            border-color: rgba(200, 246, 93, 0.4);
+        }
+
+        .qa-chip.is-warn {
+            color: #facc15;
+            border-color: rgba(250, 204, 21, 0.4);
+        }
+
+        .qa-chip.is-fail {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.45);
+        }
+
+        .qa-meta {
+            margin-top: 8px;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #8a8a8a;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        .qa-table-wrap {
+            margin-top: 32px;
+            border: 1px solid #222;
+            border-radius: 14px;
+            overflow: auto;
+            background: #101010;
+        }
+
+        table.qa-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            min-width: 900px;
+        }
+
+        table.qa-table th,
+        table.qa-table td {
+            text-align: left;
+            padding: 9px 12px;
+            border-bottom: 1px solid #1d1d1d;
+            white-space: nowrap;
+        }
+
+        table.qa-table th {
+            position: sticky;
+            top: 0;
+            background: #161616;
+            color: #9a9a9a;
+            font-size: 10.5px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        table.qa-table td.qa-pass {
+            color: #c8f65d;
+        }
+
+        table.qa-table td.qa-warn {
+            color: #facc15;
+        }
+
+        table.qa-table td.qa-fail {
+            color: #f87171;
+            font-weight: 700;
+        }
+
+        .qa-note {
+            margin-top: 14px;
+            font-size: 12px;
+            color: #7d7d7d;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body class="qa-body">
+    <div class="qa-shell">
+        <h1 class="qa-title">CARD ASPECT QA</h1>
+        <p class="qa-sub">
+            Renders the real <code>shop-card</code> markup with the real
+            <code>getProductCardClass()</code> / <code>getProductCardImageStyle()</code> helpers against the shipping
+            <code>shop-all.css</code>, then measures every card. Any red row means a product's framing will look wrong
+            on the storefront.
+        </p>
+
+        <div class="qa-bar">
+            <label for="qaAspectFilter">Aspect</label>
+            <select id="qaAspectFilter">
+                <option value="all">Full matrix</option>
+                <option value="auto">Auto only</option>
+                <option value="square">Square only</option>
+                <option value="portrait">Portrait only</option>
+                <option value="landscape">Landscape only</option>
+                <option value="wide">Wide only</option>
+            </select>
+            <button type="button" class="qa-primary" id="qaRerun">Re-run checks</button>
+            <button type="button" id="qaToggleMeta">Hide measurements</button>
+            <button type="button" id="qaCopyReport">Copy report</button>
+            <span class="qa-pill" id="qaPassPill">pass 0</span>
+            <span class="qa-pill" id="qaWarnPill">warn 0</span>
+            <span class="qa-pill" id="qaFailPill">fail 0</span>
+        </div>
+
+        <div id="qaMount"></div>
+
+        <div class="qa-table-wrap">
+            <table class="qa-table" id="qaTable">
+                <thead>
+                    <tr>
+                        <th>Fixture</th>
+                        <th>Aspect</th>
+                        <th>Status</th>
+                        <th>Card ratio</th>
+                        <th>object-fit</th>
+                        <th>Padding</th>
+                        <th>Source</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="qaTableBody"></tbody>
+            </table>
+        </div>
+
+        <p class="qa-note" id="qaNotes"></p>
+    </div>
+
+    <script type="module">
+        import {
+            getProductCardClass,
+            getProductCardImageStyle,
+            getProductImageFit,
+            getProductCardImagePadding
+        } from '../product-data.js';
+
+        const ASPECT_RATIOS = {
+            square: 1,
+            portrait: 3 / 4,
+            landscape: 4 / 3,
+            wide: 16 / 9
+        };
+
+        const ASPECTS = ['', 'square', 'portrait', 'landscape', 'wide'];
+        const AUTO_HEIGHT_PX = 200; // .shop-card-img default height in shop-all.css
+        const RATIO_TOLERANCE = 0.02;
+
+        // Deterministic offline test art: a dashed inset border + centre crosshair makes
+        // cropping and letterboxing obvious at a glance.
+        function makeTestImage(width, height, label, hue) {
+            const fontSize = Math.round(Math.min(width, height) / 9);
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+                <defs>
+                    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="hsl(${hue}, 68%, 44%)"/>
+                        <stop offset="1" stop-color="hsl(${hue}, 68%, 20%)"/>
+                    </linearGradient>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#g)"/>
+                <rect x="7" y="7" width="${width - 14}" height="${height - 14}" fill="none"
+                    stroke="rgba(255,255,255,0.75)" stroke-width="5" stroke-dasharray="20 14"/>
+                <line x1="${width / 2}" y1="0" x2="${width / 2}" y2="${height}" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <line x1="0" y1="${height / 2}" x2="${width}" y2="${height / 2}" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="#ffffff"
+                    font-family="monospace" font-size="${fontSize}" font-weight="700">${label}</text>
+                <text x="50%" y="${height - Math.round(fontSize * 0.7)}" text-anchor="middle" fill="rgba(255,255,255,0.85)"
+                    font-family="monospace" font-size="${Math.round(fontSize * 0.45)}">${width}x${height}</text>
+            </svg>`;
+            return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        }
+
+        // One fixture per framing path the storefront supports.
+        const FIXTURES = [
+            {
+                key: 'sneaker-contain',
+                label: 'Sneaker (contain, natural 1:1)',
+                image: makeTestImage(1200, 1200, 'SNEAKER', 160),
+                product: {
+                    name: 'Test Runner Low',
+                    brand: 'Nike',
+                    category: 'Sneakers',
+                    price: 240,
+                    imageFit: 'contain',
+                    imagePosition: '50% 50%',
+                    imageScale: 1.08
+                }
+            },
+            {
+                key: 'apparel-cover',
+                label: 'Apparel (cover, 3:4 source)',
+                image: makeTestImage(900, 1200, 'HOODIE', 28),
+                product: {
+                    name: 'Test Horseshoe Hoodie',
+                    brand: 'True Religion',
+                    category: 'Apparel',
+                    price: 139,
+                    imageFit: 'cover',
+                    imagePadding: 0,
+                    imageScale: 1
+                }
+            },
+            {
+                key: 'accessory-contain-pad',
+                label: 'Accessory (contain + 8px pad, 16:9 source)',
+                image: makeTestImage(1600, 900, 'BEANIE', 205),
+                product: {
+                    name: 'Test Patch Beanie',
+                    brand: 'Off-White',
+                    category: 'Accessories',
+                    price: 45,
+                    imageFit: 'contain',
+                    imagePadding: 8,
+                    imageScale: 1.06
+                }
+            },
+            {
+                key: 'cover-offset',
+                label: 'Cover + shifted focus',
+                image: makeTestImage(1200, 1600, 'FLAP JEAN', 275),
+                product: {
+                    name: 'Test Ricky Flap Jean',
+                    brand: 'True Religion',
+                    category: 'Apparel',
+                    price: 185,
+                    imageFit: 'cover',
+                    imageOffsetX: 28,
+                    imageOffsetY: 72,
+                    imageScale: 1
+                }
+            },
+            {
+                key: 'contain-zoom',
+                label: 'Contain + max zoom',
+                image: makeTestImage(1400, 1000, 'BELT', 95),
+                product: {
+                    name: 'Test Industrial Belt',
+                    brand: 'Off-White',
+                    category: 'Accessories',
+                    price: 90,
+                    imageFit: 'contain',
+                    imagePadding: 2,
+                    imageScale: 1.4
+                }
+            }
+        ];
+
+        const mount = document.getElementById('qaMount');
+        const tableBody = document.getElementById('qaTableBody');
+        const notes = document.getElementById('qaNotes');
+        let showMeta = true;
+
+        function cardMarkup(product, image, aspect) {
+            return `
+                <div class="qa-cell" data-fixture="${product.name}" data-aspect="${aspect || 'auto'}">
+                    <a class="shop-card${getProductCardClass(product)}"
+                        href="#"
+                        onclick="return false"
+                        aria-label="${product.name}">
+                        <div class="shop-card-img">
+                            <img src="${image}" alt="" referrerpolicy="no-referrer"
+                                style="${getProductCardImageStyle(product)}">
+                        </div>
+                        <div class="shop-card-info">
+                            <p class="shop-card-brand">${product.brand}</p>
+                            <h3 class="shop-card-name">${product.name}</h3>
+                            <p class="shop-card-cat">${(product.category || '').toUpperCase()}</p>
+                            <div class="shop-card-bottom">
+                                <div>
+                                    <p class="shop-card-label">Card aspect</p>
+                                    <p class="shop-card-price">${aspect || 'auto'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        }
+
+        function expectedRatioFor(aspect) {
+            return aspect ? (ASPECT_RATIOS[aspect] ?? null) : null;
+        }
+
+        function measure(cell) {
+            const product = cell._product;
+            const aspect = cell.dataset.aspect === 'auto' ? '' : cell.dataset.aspect;
+            const box = cell.querySelector('.shop-card-img');
+            const img = cell.querySelector('img');
+            const styles = getComputedStyle(img);
+            const boxW = box.getBoundingClientRect().width;
+            const boxH = box.getBoundingClientRect().height;
+            const measuredRatio = boxH > 0 ? boxW / boxH : 0;
+            const expectedRatio = expectedRatioFor(aspect);
+            const expectedFit = getProductImageFit(product);
+            const expectedPadding = getProductCardImagePadding(product);
+            const actualPadding = Number.parseFloat(styles.paddingTop) || 0;
+            const expectedPaddingPx = Number.parseFloat(expectedPadding) || 0;
+            const checks = [];
+
+            if (expectedRatio === null) {
+                checks.push({
+                    name: 'aspect',
+                    status: Math.abs(boxH - AUTO_HEIGHT_PX) < 1.5 ? 'pass' : 'fail',
+                    detail: `auto -> ${boxW.toFixed(0)}x${boxH.toFixed(0)} (expect ${AUTO_HEIGHT_PX}px tall)`
+                });
+            } else {
+                const delta = Math.abs(measuredRatio - expectedRatio);
+                checks.push({
+                    name: 'aspect',
+                    status: delta < RATIO_TOLERANCE ? 'pass' : 'fail',
+                    detail: `measured ${measuredRatio.toFixed(3)} vs css ${expectedRatio.toFixed(3)}`
+                });
+            }
+
+            checks.push({
+                name: 'object-fit',
+                status: styles.objectFit === expectedFit ? 'pass' : 'fail',
+                detail: `${styles.objectFit} (expect ${expectedFit})`
+            });
+
+            checks.push({
+                name: 'padding',
+                status: Math.abs(actualPadding - expectedPaddingPx) < 0.6 ? 'pass' : 'fail',
+                detail: `${actualPadding}px (expect ${expectedPadding})`
+            });
+
+            const loaded = img.naturalWidth > 0;
+            const naturalRatio = loaded ? img.naturalWidth / img.naturalHeight : 0;
+
+            checks.push({
+                name: 'image',
+                status: loaded ? 'pass' : 'fail',
+                detail: loaded ? `${img.naturalWidth}x${img.naturalHeight}` : 'source did not load'
+            });
+
+            // Informational: what the fit mode does to this source/box pairing.
+            // `relative` > 1 means the source is wider than the frame.
+            let note = '';
+            if (loaded && (expectedRatio || measuredRatio)) {
+                const frameRatio = expectedRatio || measuredRatio;
+                const relative = naturalRatio / frameRatio;
+                const lossPct = Math.round(Math.max(0, 1 - Math.min(relative, 1 / relative)) * 100);
+                const sourceWider = relative > 1;
+                const prefix = expectedRatio ? '' : 'auto frame: ';
+                if (lossPct < 2) {
+                    note = `${prefix}${expectedFit === 'contain' ? 'fills the frame exactly' : 'no crop'}`;
+                } else if (expectedFit === 'contain') {
+                    note = `${prefix}fits inside -- ${lossPct}% of the frame ${sourceWider
+                        ? 'height stays empty above/below'
+                        : 'width stays empty left/right'}`;
+                } else {
+                    note = `${prefix}crops ${lossPct}% off the source ${sourceWider ? 'left/right' : 'top/bottom'}`;
+                }
+                if (!expectedRatio) note += ' (no aspect set, so the card is a fixed 200px tall)';
+            }
+
+            const failures = checks.filter((check) => check.status === 'fail');
+            const status = failures.length ? 'fail' : 'pass';
+
+            return {
+                fixture: product.name,
+                aspect: aspect || 'auto',
+                status,
+                measuredRatio,
+                expectedRatio,
+                checks,
+                note,
+                natural: loaded ? `${img.naturalWidth}x${img.naturalHeight}` : '--'
+            };
+        }
+
+        function chipClass(status) {
+            return status === 'fail' ? 'is-fail' : status === 'warn' ? 'is-warn' : 'is-pass';
+        }
+
+        function renderMatrix(filter = 'all') {
+            const aspects = filter === 'all' ? ASPECTS : [filter === 'auto' ? '' : filter];
+
+            mount.innerHTML = FIXTURES.map((fixture) => {
+                const cards = aspects.map((aspect) => {
+                    const product = useMemoAspect(fixture.product, aspect);
+                    return cardMarkup(product, fixture.image, aspect);
+                }).join('');
+                return `
+                    <div class="qa-group-title">${fixture.label}</div>
+                    <div class="qa-grid" data-fixture-key="${fixture.key}">${cards}</div>
+                `;
+            }).join('');
+
+            // Attach the exact product object each cell was rendered from so checks read
+            // real helper output rather than reverse-engineering the DOM.
+            mount.querySelectorAll('.qa-cell').forEach((cell) => {
+                const fixtureKey = cell.closest('.qa-grid').dataset.fixtureKey;
+                const fixture = FIXTURES.find((entry) => entry.key === fixtureKey);
+                const aspect = cell.dataset.aspect === 'auto' ? '' : cell.dataset.aspect;
+                cell._product = useMemoAspect(fixture.product, aspect);
+            });
+        }
+
+        function useMemoAspect(product, aspect) {
+            return { ...product, imageAspect: aspect || undefined };
+        }
+
+        function runChecks() {
+            const results = [...mount.querySelectorAll('.qa-cell')].map(measure);
+            renderReport(results);
+            return results;
+        }
+
+        function renderReport(results) {
+            const counts = { pass: 0, fail: 0, warn: 0 };
+            results.forEach((result) => { counts[result.status] += 1; });
+
+            document.getElementById('qaPassPill').textContent = `pass ${counts.pass}`;
+            document.getElementById('qaPassPill').className = `qa-pill ${counts.fail ? '' : 'is-pass'}`;
+            document.getElementById('qaWarnPill').textContent = `warn ${counts.warn}`;
+            document.getElementById('qaWarnPill').className = 'qa-pill is-warn';
+            document.getElementById('qaFailPill').textContent = `fail ${counts.fail}`;
+            document.getElementById('qaFailPill').className = `qa-pill ${counts.fail ? 'is-fail' : ''}`;
+
+            tableBody.innerHTML = results.map((result) => {
+                const aspectCheck = result.checks.find((check) => check.name === 'aspect');
+                const fitCheck = result.checks.find((check) => check.name === 'object-fit');
+                const padCheck = result.checks.find((check) => check.name === 'padding');
+                const imgCheck = result.checks.find((check) => check.name === 'image');
+                const cellClass = (check) => check.status === 'fail' ? 'qa-fail' : 'qa-pass';
+
+                return `
+                    <tr>
+                        <td>${result.fixture}</td>
+                        <td>${result.aspect}</td>
+                        <td class="${result.status === 'fail' ? 'qa-fail' : 'qa-pass'}">${result.status}</td>
+                        <td class="${cellClass(aspectCheck)}">${aspectCheck.detail}</td>
+                        <td class="${cellClass(fitCheck)}">${fitCheck.detail}</td>
+                        <td class="${cellClass(padCheck)}">${padCheck.detail}</td>
+                        <td class="${cellClass(imgCheck)}">${result.natural}</td>
+                        <td>${result.note || '--'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            mount.querySelectorAll('.qa-cell').forEach((cell) => {
+                const existing = cell.querySelector('.qa-chip');
+                if (existing) existing.remove();
+            });
+
+            [...mount.querySelectorAll('.qa-cell')].forEach((cell, index) => {
+                const result = results[index];
+                const chip = document.createElement('div');
+                chip.className = `qa-chip ${chipClass(result.status)}`;
+                chip.textContent = result.status === 'fail'
+                    ? `fail: ${result.checks.filter((check) => check.status === 'fail').map((check) => check.name).join(', ')}`
+                    : 'pass';
+                cell.prepend(chip);
+
+                const meta = document.createElement('div');
+                meta.className = 'qa-meta';
+                meta.dataset.role = 'meta';
+                meta.textContent = result.checks.map((check) => `${check.name} ${check.status === 'fail' ? 'x' : 'ok'}`).join(' | ')
+                    + (result.note ? `\n${result.note}` : '');
+                cell.appendChild(meta);
+                if (!showMeta) meta.style.display = 'none';
+            });
+
+            notes.textContent = counts.fail
+                ? `${counts.fail} check group(s) failed. A failing aspect row means the card container no longer matches the ratio the storefront promises.`
+                : 'All aspect, object-fit, padding and image checks passed.';
+
+            window.__qaReport = { counts, results };
+            console.table(results.map((result) => ({
+                fixture: result.fixture,
+                aspect: result.aspect,
+                status: result.status,
+                measured: Number(result.measuredRatio.toFixed(3)),
+                expected: result.expectedRatio ? Number(result.expectedRatio.toFixed(3)) : 'auto',
+                note: result.note
+            })));
+
+            return counts;
+        }
+
+        function rerun() {
+            const filter = document.getElementById('qaAspectFilter').value;
+            renderMatrix(filter);
+            // Let the browser resolve layout + data-URI images before measuring.
+            requestAnimationFrame(() => requestAnimationFrame(() => runChecks()));
+        }
+
+        document.getElementById('qaRerun').addEventListener('click', rerun);
+        document.getElementById('qaAspectFilter').addEventListener('change', rerun);
+        document.getElementById('qaToggleMeta').addEventListener('click', (event) => {
+            showMeta = !showMeta;
+            event.target.textContent = showMeta ? 'Hide measurements' : 'Show measurements';
+            mount.querySelectorAll('[data-role="meta"]').forEach((el) => {
+                el.style.display = showMeta ? '' : 'none';
+            });
+        });
+        document.getElementById('qaCopyReport').addEventListener('click', async () => {
+            const report = window.__qaReport;
+            if (!report) return;
+            const lines = report.results.map((result) => [
+                result.status.toUpperCase(),
+                result.aspect,
+                result.fixture,
+                result.checks.map((check) => `${check.name}:${check.detail}`).join(' | '),
+                result.note
+            ].join(' :: '));
+            const text = [...lines, `pass=${report.counts.pass} warn=${report.counts.warn} fail=${report.counts.fail}`].join('\n');
+            try {
+                await navigator.clipboard.writeText(text);
+                document.getElementById('qaCopyReport').textContent = 'Copied';
+                setTimeout(() => { document.getElementById('qaCopyReport').textContent = 'Copy report'; }, 1500);
+            } catch (error) {
+                console.warn('Clipboard unavailable', error);
+            }
+        });
+
+        window.qaRun = rerun;
+        window.qaResults = () => window.__qaReport;
+
+        rerun();
+        // Re-measure once webfonts settle so the label metrics do not shift layout checks.
+        document.fonts?.ready.then(() => runChecks());
+    </script>
+</body>
+
+</html>

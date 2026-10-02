@@ -14,7 +14,8 @@ import {
   onAuthStateChanged,
   signOut,
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { cloudifyUpload as uploadImage } from "./cloudify.js";
+import { uploadCatalogImage as uploadImage } from "./catalog-upload.mjs";
+import { uploadFileFor, applyUploadedImage, buildProductImageFields } from "./product-image-upload.mjs";
 
 const SITE_ORIGIN = window.location.origin || "https://backdoorco.vercel.app";
 
@@ -44,6 +45,97 @@ let currentFilter = "all";
 let currentSort = "name";
 let editingId = null;
 let deleteId = null;
+let currentPreviewDataUrl = null;
+let pendingCroppedBlob = null;
+// Object URL backing the pending-crop preview; revoked whenever it is replaced.
+let pendingCropPreviewUrl = null;
+// The shared drag-to-position cropper (admin/crop-studio.js). Reached through
+// window because that file is a classic script, not an importable module.
+let cropStudio = null;
+// Set when "Frame subject" found nothing to frame; consumed by the next crop
+// status so the fall-back to a centred box is explained rather than silent.
+let cropFrameMissed = false;
+
+function setCropStatus(message, kind = '') {
+  const el = document.getElementById('cropStatus');
+  if (!el) return;
+  el.textContent = message || '';
+  el.classList.toggle('is-ok', kind === 'ok');
+  el.classList.toggle('is-error', kind === 'error');
+  el.classList.toggle('is-busy', kind === 'busy');
+}
+
+function releaseCropPreviewUrl() {
+  if (pendingCropPreviewUrl) URL.revokeObjectURL(pendingCropPreviewUrl);
+  pendingCropPreviewUrl = null;
+}
+
+function currentCropRatio() {
+  const engine = window.CropStudio;
+  if (!engine) return null;
+  return engine.parseAspectValue(document.getElementById('imageAspectSelect')?.value);
+}
+
+function getCropStudio() {
+  if (cropStudio) return cropStudio;
+  const engine = window.CropStudio;
+  if (!engine) {
+    console.warn('CropStudio failed to load — image cropping is unavailable.');
+    return null;
+  }
+  cropStudio = engine.create({
+    stage: document.getElementById('imageCropStage'),
+    viewport: document.getElementById('imageCropViewport'),
+    image: document.getElementById('imageCropImage'),
+    marquee: document.getElementById('imageCropMarquee'),
+    readout: document.getElementById('imageCropDimensions'),
+    ratio: currentCropRatio(),
+    maxSide: engine.DEFAULT_MAX_SIDE,
+    onRendering: () => setCropStatus('Rendering crop...', 'busy'),
+    onError: (message) => setCropStatus(`Crop failed: ${message}`, 'error'),
+    onCropChange: handleCropChange,
+  });
+  return cropStudio;
+}
+
+function renderUploadPreview(src) {
+  const preview = document.getElementById('imagePreview');
+  if (!preview) return;
+  preview.innerHTML = `<img src="${src}" alt="Preview" onerror="catalogImageFallback(this)" style="width:100%;height:200px;object-fit:cover;">`;
+  preview.style.padding = '0';
+  updateImageDisplayPreview(src);
+}
+
+// Fired by the shared engine whenever the crop settles. Everything product-page
+// specific lives here: the pending upload blob and the upload-tab preview.
+function handleCropChange({ region, width, height, isFull, blob, autoFramed }) {
+  if (!currentPreviewDataUrl) return;
+
+  // Say where the box came from: subject detection, a manual drag, or a
+  // "Frame subject" click that found nothing to latch onto.
+  const framingNote = autoFramed
+    ? 'Auto-framed on the subject · '
+    : cropFrameMissed
+      ? 'No clear subject found · '
+      : '';
+  cropFrameMissed = false;
+
+  // Untouched marquee: upload the original file rather than a re-encode.
+  if (isFull) {
+    pendingCroppedBlob = null;
+    releaseCropPreviewUrl();
+    renderUploadPreview(currentPreviewDataUrl);
+    setCropStatus(`${framingNote}Full image — the original uploads untouched (${width}×${height}px).`, 'ok');
+    return;
+  }
+  if (!blob) return;
+
+  pendingCroppedBlob = blob;
+  releaseCropPreviewUrl();
+  pendingCropPreviewUrl = URL.createObjectURL(blob);
+  renderUploadPreview(pendingCropPreviewUrl);
+  setCropStatus(`${framingNote}Crop ${region.sw}×${region.sh}px (${(blob.size / 1024).toFixed(0)}KB PNG) — Save to upload.`, 'ok');
+}
 
 function formatMoney(value) {
   const amount = Number(value) || 0;
@@ -125,7 +217,7 @@ function renderProductImage(product) {
         referrerpolicy="no-referrer"
         class="product-thumb"
         loading="lazy"
-        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+        onerror="catalogImageFallback(this)"
       />
       ${fallback}
     </div>`;
@@ -378,11 +470,20 @@ window.editProduct = async (id) => {
     document.getElementById("productSizes").value = p.sizes || "";
     document.getElementById("productColor").value = p.colorway || "";
     document.getElementById("productBrand").value = p.brand || "";
-    document.getElementById("productFeatured").checked = !!p.featured;
+    document.getElementById("productFeatured").checked = !!p.featured || !!p.isFeatured;
     document.getElementById("productReorderUrl").value = getReorderUrl(p);
     document.getElementById("productReorderCost").value = getReorderCost(p) || "";
     document.getElementById("productReorderNote").value = p.reorderNote || "";
-    document.getElementById("imageUrl").value = p.image || "";
+    // Primary image: prefer image/cardImage; gallery falls back to images[]
+    const primaryImage = p.image || p.cardImage || "";
+    document.getElementById("imageUrl").value = primaryImage;
+    const galleryFromDoc = Array.isArray(p.images) && p.images.length ? p.images : [];
+    document.getElementById("imageGallery").value = galleryFromDoc.join("\n");
+    currentPreviewDataUrl = null;
+    pendingCroppedBlob = null;
+    releaseCropPreviewUrl();
+    getCropStudio()?.clear();
+    setCropStatus('');
 
     // Load image display settings
     const fitToggle = document.getElementById('imageFitToggle');
@@ -399,11 +500,12 @@ window.editProduct = async (id) => {
     document.getElementById('imagePaddingInput').value = parseInt(p.imagePadding) || 4;
     document.getElementById('imageAspectRatio').value = typeof p.imageAspect === 'string' ? p.imageAspect : '';
 
-    updateImageDisplayPreview(p.image || '');
-
-    if (p.image) {
+    // Drive the upload-tab preview + live framing card from the real primary
+    const editPrimary = primaryImage || '';
+    updateImageDisplayPreview(editPrimary);
+    if (editPrimary) {
       document.getElementById("imagePreview").innerHTML =
-        `<img src="${p.image}" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
+        `<img src="${editPrimary}" alt="Preview" onerror="catalogImageFallback(this)" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`;
     }
 
     openModal();
@@ -442,68 +544,95 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   btn.innerHTML = "<span>Saving...</span>";
   btn.disabled = true;
 
-  let imageUrl = document.getElementById("imageUrl").value;
+  let imageUrl = document.getElementById("imageUrl").value.trim();
+  let galleryUrls = normalizeGalleryInput(document.getElementById("imageGallery")?.value || "");
   const imageFile = document.getElementById("imageInput").files[0];
 
-  // Upload image if file selected
+  // If a file is selected (optionally cropped), upload it and use that URL
   if (imageFile) {
+    // A pending crop (a PNG/WebP/JPEG blob) wins over the raw input file; the
+    // helper names it after its real type so Cloudinary keeps it lossless.
+    const fileToUpload = uploadFileFor(imageFile, pendingCroppedBlob);
     try {
-      // Show progress
       if (progressBar) {
         progressBar.classList.remove("hidden");
-        progressBar.innerHTML = `
-          <div class="progress-inner">
-            <div class="progress-bar-fill uploading"></div>
-            <span>Uploading image...</span>
-          </div>`;
+        progressBar.innerHTML = `<div class="progress-inner"><div class="progress-bar-fill uploading"></div><span>Uploading image...</span></div>`;
       }
-
-      imageUrl = await uploadImage(imageFile);
-
-      // Success state
+      const uploaded = await uploadImage(fileToUpload);
+      ({ imageUrl, gallery: galleryUrls } = applyUploadedImage(uploaded, { currentUrl: imageUrl, gallery: galleryUrls }));
       if (progressBar) {
-        progressBar.innerHTML = `
-                    <div class="progress-inner success">
-                        <span>✓ Image uploaded</span>
-                    </div>`;
+        progressBar.innerHTML = `<div class="progress-inner success"><span>✓ Image uploaded</span></div>`;
       }
     } catch (err) {
       if (progressBar) {
-        progressBar.innerHTML = `
-                    <div class="progress-inner error">
-                        <span>
-                            ✗ Upload failed — 
-                            using URL instead
-                        </span>
-                    </div>`;
+        progressBar.innerHTML = `<div class="progress-inner error"><span>✗ Upload failed — using URL instead</span></div>`;
       }
       console.error("Upload error:", err);
     }
+  } else if (pendingCroppedBlob) {
+    // Cropped but no file input (edge case: user picked file then cleared input)
+    try {
+      if (progressBar) {
+        progressBar.classList.remove("hidden");
+        progressBar.innerHTML = `<div class="progress-inner"><div class="progress-bar-fill uploading"></div><span>Uploading cropped image...</span></div>`;
+      }
+      const file = uploadFileFor(null, pendingCroppedBlob);
+      const uploaded = await uploadImage(file);
+      ({ imageUrl, gallery: galleryUrls } = applyUploadedImage(uploaded, { currentUrl: imageUrl, gallery: galleryUrls }));
+      if (progressBar) progressBar.innerHTML = `<div class="progress-inner success"><span>✓ Cropped image uploaded</span></div>`;
+    } catch (err) {
+      console.error('Cropped upload error', err);
+      if (progressBar) progressBar.innerHTML = `<div class="progress-inner error"><span>✗ Cropped upload failed</span></div>`;
+    }
   }
 
+  // If still no primary image, fall back to first gallery URL
+  if (!imageUrl && galleryUrls.length) imageUrl = galleryUrls[0];
+
+  // Validate: need at least one image
+  if (!imageUrl) {
+    showToast('Add an image (upload or URL) before saving.', true);
+    btn.innerHTML = `<span>Save Product</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+    btn.disabled = false;
+    return;
+  }
+
+  const imageFields = buildProductImageFields(imageUrl, galleryUrls);
+
+  const rawImageFit = document.getElementById('imageFitToggle')?.checked ? 'cover' : 'contain';
+  const rawOffsetX = clampFallback(parseInt(document.getElementById('imagePosX')?.value), 50, 0, 100);
+  const rawOffsetY = clampFallback(parseInt(document.getElementById('imagePosY')?.value), 50, 0, 100);
+  const rawScale = clampFallback((parseInt(document.getElementById('imageScaleSlider')?.value) || 100) / 100, 1, 0.8, 1.5);
+  const rawPaddingInt = parseInt(document.getElementById('imagePaddingInput')?.value);
+  const rawAspect = String(document.getElementById('imageAspectRatio')?.value || '').trim().toLowerCase();
+  const VALID_ASPECTS = new Set(['square','portrait','landscape','wide']);
+
   const productData = {
-    name: document.getElementById("productName").value || "",
-    sku: document.getElementById("productSku").value || "",
+    name: document.getElementById("productName").value.trim() || "",
+    sku: document.getElementById("productSku").value.trim() || "",
     price: parseFloat(document.getElementById("productPrice").value) || 0,
     stock: parseInt(document.getElementById("productStock").value) || 0,
-    category:
-      document.getElementById("productCategory").value || "Uncategorized",
+    category: document.getElementById("productCategory").value || "Uncategorized",
     status: document.getElementById("productStatus").value || "active",
     desc: document.getElementById("productDesc").value || "",
     sizes: document.getElementById("productSizes").value || "",
     colorway: document.getElementById("productColor").value || "",
     brand: document.getElementById("productBrand").value || "",
     featured: document.getElementById("productFeatured").checked,
+    isFeatured: document.getElementById("productFeatured").checked,
     reorderUrl: document.getElementById("productReorderUrl").value.trim() || "",
     reorderCost: parseFloat(document.getElementById("productReorderCost").value) || 0,
     reorderNote: document.getElementById("productReorderNote").value || "",
-    image: imageUrl || "",
-    imageFit: document.getElementById('imageFitToggle').checked ? 'cover' : 'contain',
-    imageOffsetX: parseInt(document.getElementById('imagePosX').value) || 50,
-    imageOffsetY: parseInt(document.getElementById('imagePosY').value) || 50,
-    imageScale: (parseInt(document.getElementById('imageScaleSlider').value) || 100) / 100,
-    imagePadding: (() => { const pv = parseInt(document.getElementById('imagePaddingInput').value); return isNaN(pv) ? 4 : pv; })(),
-    imageAspect: document.getElementById('imageAspectRatio')?.value || '',
+    image: imageFields.image,
+    cardImage: imageFields.cardImage,
+    images: imageFields.images,
+    imageFit: rawImageFit,
+    imagePosition: `${rawOffsetX}% ${rawOffsetY}%`,
+    imageOffsetX: rawOffsetX,
+    imageOffsetY: rawOffsetY,
+    imageScale: rawScale,
+    imagePadding: Number.isFinite(rawPaddingInt) ? clampFallback(rawPaddingInt, 4, 0, 40) : 4,
+    imageAspect: VALID_ASPECTS.has(rawAspect) ? rawAspect : '',
     updatedAt: new Date(),
   };
 
@@ -584,12 +713,9 @@ function initImageUI() {
   const urlPreviewImg = document.getElementById("urlPreviewImg");
   const clearUrl = document.getElementById("clearUrl");
   const aspectSelect = document.getElementById('imageAspectSelect');
-  const applyCropBtn = document.getElementById('applyCropBtn');
-  const cropStatus = document.getElementById('cropStatus');
-
-  // internal state for cropping
-  let currentPreviewDataUrl = null;
-  let croppedBlob = null;
+  const frameSubjectBtn = document.getElementById('frameSubjectBtn');
+  const resetCropBtn = document.getElementById('resetCropBtn');
+  const galleryInput = document.getElementById('imageGallery');
 
   // Tab switcher
   document.querySelectorAll(".img-tab").forEach((tab) => {
@@ -632,29 +758,20 @@ function initImageUI() {
     if (file) handleFilePreview(file);
   });
 
-  // Apply crop button
-  applyCropBtn?.addEventListener('click', async () => {
-    const sel = aspectSelect?.value || 'original';
-    if (!currentPreviewDataUrl) return;
-    if (sel === 'original') {
-      cropStatus.textContent = 'No crop applied';
-      croppedBlob = null;
-      return;
-    }
-    cropStatus.textContent = 'Cropping...';
-    try {
-      const ratio = parseAspect(sel);
-      const blob = await cropDataUrlToRatio(currentPreviewDataUrl, ratio, 1200);
-      croppedBlob = blob;
-      // update preview to show cropped result
-      const url = URL.createObjectURL(blob);
-      const preview = document.getElementById('imagePreview');
-      preview.innerHTML = `<img src="${url}" style="width:100%;height:200px;object-fit:cover;" alt="Preview">`;
-      cropStatus.textContent = 'Cropped';
-    } catch (err) {
-      console.error('Crop error', err);
-      cropStatus.textContent = 'Crop failed';
-    }
+  // The shared studio crops live as you drag — there is no apply step, exactly
+  // like the main Admin Center. These controls only re-lock the aspect, re-frame
+  // on the detected subject, or re-centre the box.
+  getCropStudio();
+  aspectSelect?.addEventListener('change', () => {
+    getCropStudio()?.setRatio(currentCropRatio());
+  });
+  frameSubjectBtn?.addEventListener('click', () => {
+    const studio = getCropStudio();
+    if (!studio) return;
+    cropFrameMissed = !studio.frameSubject();
+  });
+  resetCropBtn?.addEventListener('click', () => {
+    getCropStudio()?.resetRegion();
   });
 
   // URL input preview (debounced)
@@ -679,20 +796,32 @@ function initImageUI() {
     urlInput.value = "";
     urlPreview.classList.add("hidden");
     urlPreviewImg.src = "";
+    updateImageDisplayPreview(galleryInput?.value?.trim()?.split(/\r?\n/)[0] || '');
+  });
+
+  // Gallery live-sync: first line drives the framing preview when no upload/file preview is active
+  galleryInput?.addEventListener('input', () => {
+    if (fileInput?.files?.length || urlInput?.value?.trim()) return;
+    const first = String(galleryInput.value || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean)[0] || '';
+    if (first) updateImageDisplayPreview(first);
   });
 }
 
-// File preview helper
+// File preview helper — hands the pick to the shared crop studio, which frames
+// the marquee on the detected subject (or centres it when there is none) and
+// reports the first crop back through handleCropChange.
 function handleFilePreview(file) {
   const reader = new FileReader();
   reader.onload = (ev) => {
-    const preview = document.getElementById("imagePreview");
-    preview.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:200px;object-fit:cover;" alt="Preview">`;
-    preview.style.padding = "0";
     currentPreviewDataUrl = ev.target.result;
-    croppedBlob = null;
-    cropStatus.textContent = '';
-    updateImageDisplayPreview(ev.target.result);
+    pendingCroppedBlob = null;
+    cropFrameMissed = false;
+    releaseCropPreviewUrl();
+    setCropStatus('');
+    renderUploadPreview(currentPreviewDataUrl);
+    const studio = getCropStudio();
+    studio?.setRatio(currentCropRatio());
+    studio?.setImage(currentPreviewDataUrl);
   };
   reader.readAsDataURL(file);
 }
@@ -747,14 +876,6 @@ function updateImageDisplayPreview(src) {
   apply();
 }
 
-function parseAspect(value) {
-  if (typeof value === 'number') return Number(value);
-  if (value === '1') return 1;
-  const parts = String(value).split('/').map(Number).filter(Boolean);
-  if (parts.length === 2 && parts[1] !== 0) return parts[0] / parts[1];
-  return null;
-}
-
 function dataURLToBlob(dataURL) {
   const parts = dataURL.split(',');
   const meta = parts[0];
@@ -764,57 +885,6 @@ function dataURLToBlob(dataURL) {
   const arr = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
   return new Blob([arr], { type: mime });
-}
-
-function cropDataUrlToRatio(dataUrl, ratio, maxSide = 1200) {
-  return new Promise((resolve, reject) => {
-    try {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const iw = img.naturalWidth;
-        const ih = img.naturalHeight;
-
-        // determine crop area centered
-        const srcRatio = iw / ih;
-        let sx = 0, sy = 0, sw = iw, sh = ih;
-        if (srcRatio > ratio) {
-          // image is wider -> crop width
-          sh = ih;
-          sw = Math.round(ih * ratio);
-          sx = Math.round((iw - sw) / 2);
-        } else {
-          // image is taller -> crop height
-          sw = iw;
-          sh = Math.round(iw / ratio);
-          sy = Math.round((ih - sh) / 2);
-        }
-
-        // scale output to max side
-        let outW = sw;
-        let outH = sh;
-        if (Math.max(sw, sh) > maxSide) {
-          const scale = maxSide / Math.max(sw, sh);
-          outW = Math.round(sw * scale);
-          outH = Math.round(sh * scale);
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = outW;
-        canvas.height = outH;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob);
-          else reject(new Error('Canvas toBlob failed'));
-        }, 'image/jpeg', 0.92);
-      };
-      img.onerror = reject;
-      img.src = dataUrl;
-    } catch (e) {
-      reject(e);
-    }
-  });
 }
 
 // Init on load
@@ -828,10 +898,26 @@ function openModal() {
   document.body.style.overflow = "hidden";
 }
 
+function normalizeGalleryInput(raw) {
+  return String(raw || '').split(/\r?\n|[\n,]+/).map(s => s.trim()).filter(Boolean).filter(v => /^https?:\/\//i.test(v));
+}
+
+function clampFallback(value, fallback, min, max) {
+  if (!Number.isFinite(value)) return fallback;
+  return Math.max(min, Math.min(max, value));
+}
+
 function closeModal() {
   document.getElementById("productModal").classList.remove("open");
   document.body.style.overflow = "";
   document.getElementById("productForm").reset();
+  currentPreviewDataUrl = null;
+  pendingCroppedBlob = null;
+  releaseCropPreviewUrl();
+  getCropStudio()?.clear();
+  setCropStatus('');
+  const galleryEl = document.getElementById('imageGallery');
+  if (galleryEl) galleryEl.value = '';
   document.getElementById("imagePreview").innerHTML = `
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -880,8 +966,15 @@ function closeDeleteModal() {
 
 document.getElementById("addProductBtn").addEventListener("click", () => {
   editingId = null;
+  currentPreviewDataUrl = null;
+  pendingCroppedBlob = null;
+  releaseCropPreviewUrl();
+  getCropStudio()?.clear();
   document.getElementById("modalTitle").textContent = "Add Product";
   document.getElementById("productForm").reset();
+  setCropStatus('');
+  const g0 = document.getElementById('imageGallery');
+  if (g0) g0.value = '';
   document.getElementById('imageDisplaySection').style.display = 'none';
   openModal();
 });

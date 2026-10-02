@@ -147,12 +147,12 @@ function updatePreview() {
         productsHtml = `
             <div class="email-product-grid">
                 <div class="product-item">
-                    <img src="products/jordan-1-ow-alaska.png" class="product-img">
+                    <img src="products/jordan-1-ow-alaska.png" class="product-img" onerror="catalogImageFallback(this)">
                     <div class="product-name">OW x Air Jordan 1 "Alaska"</div>
                     <div class="product-price">$1,647</div>
                 </div>
                 <div class="product-item">
-                    <img src="products/godspeed-surf-day.png" class="product-img">
+                    <img src="products/godspeed-surf-day.png" class="product-img" onerror="catalogImageFallback(this)">
                     <div class="product-name">Godspeed Surf Day T-Shirt</div>
                     <div class="product-price">$100</div>
                 </div>

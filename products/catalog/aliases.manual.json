@@ -1,0 +1,6 @@
+{
+  "_README": "Hand-maintained remote->local overrides for catalogue images that cannot be mirrored (dead 404 or hotlink-blocked). scripts/mirror-catalog-images.js merges these over the generated aliases.mjs, so a storefront card still holding the original URL renders the re-sourced local file instead. Keys beginning with _ are metadata. Verify targets exist; missing ones are skipped with a warning.",
+  "_lastReviewed": "2026-09-30",
+  "https://tse1.mm.bing.net/th/id/OIP.rOgfg8KHJ4brBJSX81xQXAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3": "products/catalog/goat-com-1006990-01-jpg-b9e145.webp",
+  "https://mysportsshoe.com/wp-content/uploads/2018/06/802491_01.jpg": "products/catalog/goat-com-246778-00-png-a39cf8.png"
+}
