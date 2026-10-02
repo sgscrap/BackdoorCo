@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <script src="image-fallback.js?v=1"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop All | Backdoor</title>
@@ -19,13 +20,15 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
+  <meta name="theme-color" content="#0a0a0a" />
   <!-- Open Graph -->
   <meta property="og:title" content="Shop All — Backdoor" />
   <meta property="og:description" content="Browse every authenticated sneaker and streetwear drop on Backdoor. Filter by brand, size, and price. New York curated." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://backdoorco.xyz/accessories.html" />
+  <meta property="og:url" content="https://backdoorco.xyz/shop-all.html" />
   <meta property="og:image" content="https://backdoorco.xyz/og-image.png" />
-  <link rel="canonical" href="https://backdoorco.xyz/accessories.html" />
+  <link rel="canonical" href="https://backdoorco.xyz/shop-all.html" />
   <meta property="og:site_name" content="Backdoor" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Shop All — Backdoor" />
@@ -53,18 +56,21 @@
         BACK<span>DOOR</span>
     </a>
     <div class="nav-center">
-        <a class="nav-link " href="shop-all.html">Shop</a>
+        <a class="nav-link active" href="shop-all.html">Shop</a>
         <div class="nav-dropdown">
             <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
             <div class="nav-dropdown-menu">
                 <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
                 <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+                <a href="shop-all.html?filter=Off-White" class="current-cat-link">Off-White</a>
+                <a href="shop-all.html?filter=True%20Religion" class="current-cat-link">True Religion</a>
                 <a href="shop-all.html?filter=Prada" class="current-cat-link">Prada</a>
                 <a href="shop-all.html?filter=Dior" class="current-cat-link">Dior</a>
                 <a href="shop-all.html?filter=LOEWE" class="current-cat-link">LOEWE</a>
                 <a href="shop-all.html?filter=Burberry" class="current-cat-link">Burberry</a>
                 <a href="shop-all.html?filter=Moncler" class="current-cat-link">Moncler</a>
                 <a href="shop-all.html?filter=Fendi" class="current-cat-link">Fendi</a>
+                <a href="shop-all.html?filter=Gucci" class="current-cat-link">Gucci</a>
                 <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
                 <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
                 <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
@@ -82,12 +88,12 @@
         <div class="nav-icons-group">
             <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
                 <i class="fa-regular fa-heart"></i>
-                <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
+                <span class="nav-badge hide-initial" id="wishlistCountBadge">0</span>
             </a>
             <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
                 <i class="fa-solid fa-bag-shopping"></i>
                 <span>Cart</span>
-                <span class="cart-badge" id="cartCount" style="display: none;">0</span>
+                <span class="cart-badge hide-initial" id="cartCount">0</span>
             </button>
         </div>
         <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
@@ -100,12 +106,15 @@
     <p class="nav-mobile-section">Brands</p>
     <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
     <a class="nav-link" href="shop-all.html?filter=Nike">Nike</a>
+    <a class="nav-link" href="shop-all.html?filter=Off-White">Off-White</a>
+    <a class="nav-link" href="shop-all.html?filter=True%20Religion">True Religion</a>
     <a class="nav-link" href="shop-all.html?filter=Prada">Prada</a>
     <a class="nav-link" href="shop-all.html?filter=Dior">Dior</a>
     <a class="nav-link" href="shop-all.html?filter=LOEWE">LOEWE</a>
     <a class="nav-link" href="shop-all.html?filter=Burberry">Burberry</a>
     <a class="nav-link" href="shop-all.html?filter=Moncler">Moncler</a>
     <a class="nav-link" href="shop-all.html?filter=Fendi">Fendi</a>
+    <a class="nav-link" href="shop-all.html?filter=Gucci">Gucci</a>
     <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
     <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
     <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
@@ -152,23 +161,14 @@
                     <button class="shop-filter-tab active" data-filter="all">
                         All <span class="tab-count" id="count-all">(0)</span>
                     </button>
-                    <button class="shop-filter-tab" data-filter="Apparel">
-                        Apparel <span class="tab-count" id="count-Apparel">(0)</span>
-                    </button>
                     <button class="shop-filter-tab" data-filter="Sneakers">
                         Sneakers <span class="tab-count" id="count-Sneakers">(0)</span>
                     </button>
+                    <button class="shop-filter-tab" data-filter="Apparel">
+                        Apparel <span class="tab-count" id="count-Apparel">(0)</span>
+                    </button>
                     <button class="shop-filter-tab" data-filter="Accessories">
                         Accessories <span class="tab-count" id="count-Accessories">(0)</span>
-                    </button>
-                    <button class="shop-filter-tab" data-filter="Shoes">
-                        Shoes <span class="tab-count" id="count-Shoes">(0)</span>
-                    </button>
-                    <button class="shop-filter-tab" data-filter="Electronics">
-                        Electronics <span class="tab-count" id="count-Electronics">(0)</span>
-                    </button>
-                    <button class="shop-filter-tab" data-filter="Collectibles">
-                        Collectibles <span class="tab-count" id="count-Collectibles">(0)</span>
                     </button>
                 </div>
             </div>
@@ -182,6 +182,15 @@
                 <div class="accordion-content shop-filter-tabs">
                     <button class="shop-filter-tab" data-filter="Jordan">
                         Jordan <span class="tab-count" id="count-Jordan">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Nike">
+                        Nike <span class="tab-count" id="count-Nike">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Off-White">
+                        Off-White <span class="tab-count" id="count-Off-White">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="True Religion">
+                        True Religion <span class="tab-count" id="count-True-Religion">(0)</span>
                     </button>
                     <button class="shop-filter-tab" data-filter="Prada">
                         Prada <span class="tab-count" id="count-Prada">(0)</span>
@@ -201,11 +210,17 @@
                     <button class="shop-filter-tab" data-filter="Fendi">
                         Fendi <span class="tab-count" id="count-Fendi">(0)</span>
                     </button>
-                    <button class="shop-filter-tab" data-filter="Nike">
-                        Nike <span class="tab-count" id="count-Nike">(0)</span>
+                    <button class="shop-filter-tab" data-filter="Gucci">
+                        Gucci <span class="tab-count" id="count-Gucci">(0)</span>
                     </button>
                     <button class="shop-filter-tab" data-filter="Adidas">
                         Adidas <span class="tab-count" id="count-Adidas">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="New Balance">
+                        New Balance <span class="tab-count" id="count-New Balance">(0)</span>
+                    </button>
+                    <button class="shop-filter-tab" data-filter="Yeezy">
+                        Yeezy <span class="tab-count" id="count-Yeezy">(0)</span>
                     </button>
                 </div>
             </div>
@@ -308,7 +323,7 @@
                 <div class="modal-badge-container">
                     <span id="modalBadge" class="modal-badge"></span>
                 </div>
-                <img src="" alt="Product Image" class="modal-image" id="modalImage" />
+                <img src="" alt="Product Image" class="modal-image" id="modalImage" onerror="catalogImageFallback(this)" />
                 <div class="modal-details">
                     <div class="modal-category" id="modalCategory">Sneakers</div>
                     <h2 class="modal-name" id="modalTitle"></h2>

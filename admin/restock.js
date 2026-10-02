@@ -178,7 +178,7 @@ function renderSelectedProduct() {
   selectedStatus.textContent = getStatusLabel(record.restockStatus);
 
   selectedProduct.innerHTML = `
-    <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name || "Product")}" referrerpolicy="no-referrer" onerror="this.style.display='none';" />
+    <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name || "Product")}" referrerpolicy="no-referrer" onerror="catalogImageFallback(this);" />
     <div>
       <div class="selected-title">${escapeHtml(product.name || "Untitled product")}</div>
       <div class="selected-meta">${escapeHtml(product.brand || "Backdoor")} / ${escapeHtml(product.category || "Product")} / ${formatMoney(product.price)}</div>
@@ -218,7 +218,7 @@ function renderTable() {
       <tr>
         <td>
           <div class="restock-product-cell">
-            <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name || "Product")}" referrerpolicy="no-referrer" onerror="this.style.display='none';" />
+            <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name || "Product")}" referrerpolicy="no-referrer" onerror="catalogImageFallback(this);" />
             <div>
               <div class="product-name">${escapeHtml(product.name || "Untitled product")}</div>
               <div class="product-meta">${escapeHtml(product.brand || "Backdoor")} / ${escapeHtml(product.sku || "No SKU")}</div>

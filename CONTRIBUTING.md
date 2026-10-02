@@ -94,6 +94,11 @@ cp .env.local.example .env.local   # if missing, create from the table further d
 npx serve .                       # static-only: open HTML files in a browser
 npx netlify dev                   # full: hits /.netlify/functions locally
 node server.js                    # optional Express helper (port 5001) for sample product uploads
+node scripts/mirror-catalog-images.js --serve   # serve the site + store admin image uploads in products/catalog/ (port 5180; token gated, see startup banner)
+node scripts/mirror-catalog-images.js --serve --commit   # same, but commit each newly stored image as it lands
+npm run mirror:catalog            # pull the live Firestore catalogue images into products/catalog/ + regenerate aliases
+# re-source one dead image: mirrors the replacement and appends the manual alias
+node scripts/mirror-catalog-images.js --re-source --broken "<dead URL>" --replacement "<new URL or local path>"
 
 # 5. Log in to the admin
 #    In your browser, navigate to /admin/ (or /admin/index.html) and sign in.

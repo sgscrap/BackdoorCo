@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="image-fallback.js?v=1"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Detail</title>
@@ -16,7 +17,7 @@
       <!-- Image Gallery -->
       <div style="flex: 1;">
         <div id="main-image-container">
-          <img id="main-product-image" src="" alt="Product" style="width: 100%; border-radius: 8px;">
+          <img id="main-product-image" src="" alt="Product" onerror="catalogImageFallback(this)" style="width: 100%; border-radius: 8px;">
         </div>
         <div id="thumbnail-gallery" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;"></div>
       </div>

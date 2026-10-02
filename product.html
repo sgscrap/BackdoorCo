@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <script src="image-fallback.js?v=1"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Detail | Backdoor</title>
@@ -129,7 +130,7 @@
                         <button class="product-gallery-nav product-gallery-nav--prev" id="productPrevImage" type="button" aria-label="Previous image">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
-                        <img id="productMainImage" src="" alt="Product preview" oncontextmenu="return false;" draggable="false" class="product-img-preview">
+                        <img id="productMainImage" src="" alt="Product preview" oncontextmenu="return false;" draggable="false" onerror="catalogImageFallback(this)" class="product-img-preview">
                         <button class="product-gallery-nav product-gallery-nav--next" id="productNextImage" type="button" aria-label="Next image">
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
@@ -423,7 +424,7 @@
                 return `
                 <a class="rv-card" href="${href}">
                     <div class="rv-card-img">
-                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'">
+                        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="catalogImageFallback(this)">
                     </div>
                     <div class="rv-card-info">
                         <div class="rv-card-brand">${p.brand}</div>

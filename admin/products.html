@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Products | Backdoor Admin</title>
   <link rel="stylesheet" href="admin.css?v=2.2" />
+  <link rel="stylesheet" href="crop-studio.css" />
 </head>
 
 <body class="admin-body">
@@ -278,16 +279,41 @@
               </div>
               <input type="file" id="imageInput" accept="image/*" class="hidden" aria-label="Upload product image" />
             </div>
-            <div class="image-crop-controls" style="margin-top:12px;display:flex;gap:8px;align-items:center">
-              <label style="font-size:13px;color:var(--muted)">Aspect</label>
-              <select id="imageAspectSelect" aria-label="Image aspect ratio">
-                <option value="original">Original</option>
-                <option value="1">1:1 (Square)</option>
-                <option value="4/3">4:3</option>
-                <option value="16/9">16:9</option>
+            <div class="image-crop-row">
+              <label for="imageAspectSelect">Crop</label>
+              <select id="imageAspectSelect" class="form-select" aria-label="Image aspect ratio">
+                <option value="original">Free-form</option>
+                <option value="1">1:1 Square</option>
+                <option value="4/3">4:3 Landscape</option>
+                <option value="3/4">3:4 Portrait</option>
+                <option value="16/9">16:9 Wide</option>
               </select>
-              <button type="button" class="btn-small" id="applyCropBtn">Apply Crop</button>
-              <span id="cropStatus" style="font-size:13px;color:var(--muted);margin-left:8px"></span>
+              <button type="button" class="image-crop-button" id="frameSubjectBtn">Frame subject</button>
+              <button type="button" class="image-crop-button" id="resetCropBtn">Reset Crop</button>
+              <span id="cropStatus" class="image-upload-status" role="status"></span>
+            </div>
+
+            <div class="image-crop-stage hidden" id="imageCropStage">
+              <div class="image-crop-viewport" id="imageCropViewport">
+                <img id="imageCropImage" class="image-crop-source" alt="" draggable="false" />
+                <div class="image-crop-marquee" id="imageCropMarquee" tabindex="0" role="application"
+                  aria-label="Crop area. Arrow keys move the box, Shift plus arrow keys resize it.">
+                  <span class="image-crop-grid" aria-hidden="true"></span>
+                  <span class="image-crop-handle" data-handle="nw"></span>
+                  <span class="image-crop-handle" data-handle="n"></span>
+                  <span class="image-crop-handle" data-handle="ne"></span>
+                  <span class="image-crop-handle" data-handle="e"></span>
+                  <span class="image-crop-handle" data-handle="se"></span>
+                  <span class="image-crop-handle" data-handle="s"></span>
+                  <span class="image-crop-handle" data-handle="sw"></span>
+                  <span class="image-crop-handle" data-handle="w"></span>
+                </div>
+              </div>
+              <div class="image-crop-readout">
+                <span class="image-crop-dims" id="imageCropDimensions">Full image</span>
+                <span class="image-crop-hint">Drag to reposition, drag a handle to resize. Crops export as
+                  lossless PNG.</span>
+              </div>
             </div>
           </div>
 
@@ -308,7 +334,7 @@
 
         <!-- Image Display Controls (crop / position / scale) -->
         <div class="form-group full-width" id="imageDisplaySection" style="display:none">
-          <label>IMAGE DISPLAY</label>
+          <label>IMAGE DISPLAY — live card framing (updates storefront instantly on save)</label>
           <div class="image-display-grid">
             <!-- Live preview -->
             <div class="img-display-preview">
@@ -328,6 +354,7 @@
                     <span class="toggle-label" id="imageFitLabel">Contain</span>
                   </label>
                 </label>
+                <span style="font-size:11px;color:var(--text-muted)">Contain = show whole shoe · Cover = fill card</span>
               </div>
               <div class="form-row" style="grid-template-columns:1fr 1fr;gap:12px">
                 <div class="form-group" style="margin-bottom:14px">
@@ -361,6 +388,12 @@
           </div>
         </div>
 
+        <div class="form-group full-width">
+          <label>Gallery Image URLs <span style="font-weight:400;color:var(--text-muted);font-size:12px">— one per line, first is cover + card image</span></label>
+          <textarea id="imageGallery" rows="3" placeholder="https://i.imgur.com/...jpg&#10;https://...&#10;(optional)"></textarea>
+          <span style="font-size:11px;color:var(--text-muted)">Leave blank to use only the primary image. Order matters for product page carousel.</span>
+        </div>
+
         <!-- Brand + Featured Row -->
         <div class="form-row">
           <div class="form-group">
@@ -369,6 +402,8 @@
               <option value="">Select brand</option>
               <option value="Jordan">Jordan</option>
               <option value="Nike">Nike</option>
+              <option value="Off-White">Off-White</option>
+              <option value="True Religion">True Religion</option>
               <option value="Adidas">Adidas</option>
               <option value="Prada">Prada</option>
               <option value="Dior">Dior</option>
@@ -376,6 +411,9 @@
               <option value="Burberry">Burberry</option>
               <option value="Moncler">Moncler</option>
               <option value="Fendi">Fendi</option>
+              <option value="Gucci">Gucci</option>
+              <option value="New Balance">New Balance</option>
+              <option value="Yeezy">Yeezy</option>
               <option value="Acne Studios">Acne Studios</option>
               <option value="Godspeed">Godspeed</option>
               <option value="NOCTA">NOCTA</option>
@@ -435,9 +473,6 @@
               <option value="Sneakers">Sneakers</option>
               <option value="Apparel">Apparel</option>
               <option value="Accessories">Accessories</option>
-              <option value="Shoes">Shoes</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Collectibles">Collectibles</option>
             </select>
           </div>
           <div class="form-group">
@@ -524,6 +559,9 @@
     <span id="toastMsg">Product saved successfully!</span>
   </div>
 
+  <!-- Classic script on purpose: products.js is an ES module and the shared crop
+       engine has to be loadable by the non-module Admin Center too. -->
+  <script src="crop-studio.js"></script>
   <script type="module" src="products.js"></script>
 </body>
 

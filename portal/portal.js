@@ -113,7 +113,7 @@
     const marginPct = (marginAbs != null && retailPrice > 0) ? Math.round((marginAbs / retailPrice) * 100) : null;
 
     const img = image
-      ? '<img src="' + escapeHtml(image) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.textContent=\'No image\';">'
+      ? '<img src="' + escapeHtml(image) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="catalogImageFallback(this);">'
       : 'No image yet';
 
     return (

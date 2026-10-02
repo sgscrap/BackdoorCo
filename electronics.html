@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <script src="image-fallback.js?v=1"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop All | Backdoor</title>
@@ -308,7 +309,7 @@
                 <div class="modal-badge-container">
                     <span id="modalBadge" class="modal-badge"></span>
                 </div>
-                <img src="" alt="Product Image" class="modal-image" id="modalImage" />
+                <img src="" alt="Product Image" class="modal-image" id="modalImage" onerror="catalogImageFallback(this)" />
                 <div class="modal-details">
                     <div class="modal-category" id="modalCategory">Sneakers</div>
                     <h2 class="modal-name" id="modalTitle"></h2>

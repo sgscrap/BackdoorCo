@@ -2,14 +2,14 @@ const fs = require('fs');
 const path = require('path');
 
 const categories = [
-    { name: 'Men', file: 'men.html' },
-    { name: 'Women', file: 'women.html' },
-    { name: 'Kids', file: 'kids.html' },
-    { name: 'Shoes', file: 'shoes.html' },
+    { name: 'Sneakers', file: 'sneakers.html' },
     { name: 'Apparel', file: 'apparel.html' },
     { name: 'Accessories', file: 'accessories.html' },
-    { name: 'Electronics', file: 'electronics.html' }
+    // keep legacy shoes alias pointing to Sneakers taxonomy
+    { name: 'Sneakers', file: 'shoes.html' },
 ];
+
+const CANONICAL = new Set(['sneakers.html','apparel.html','accessories.html']);
 
 const basePath = path.join(__dirname, 'shop-all.html');
 const baseHtml = fs.readFileSync(basePath, 'utf8');

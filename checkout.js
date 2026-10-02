@@ -237,7 +237,7 @@ function renderCartDrawer() {
         <div class="cart-item">
             <div class="cart-item-img">
                 ${item.image
-                    ? `<img src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none;font-size:2rem">👟</span>`
+                    ? `<img src="${item.image}" alt="${item.name}" onerror="catalogImageFallback(this)"><span style="display:none;font-size:2rem">👟</span>`
                     : '<span style="font-size:2rem">👟</span>'}
             </div>
             <div class="cart-item-info">
@@ -471,7 +471,7 @@ function updateCheckoutSummary() {
         <div class="summary-item">
             <div class="summary-img">
                 ${item.image
-                    ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:6px" onerror="this.parentElement.innerHTML='<span style=&quot;font-size:1.8rem&quot;>👟</span>'">`
+                    ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:6px" onerror="catalogImageFallback(this)">`
                     : '<span style="font-size:1.8rem">👟</span>'}
                 ${item.qty > 1 ? `<span class="summary-qty-badge">${item.qty}</span>` : ''}
             </div>

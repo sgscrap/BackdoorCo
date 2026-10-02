@@ -1,0 +1,233 @@
+/* ============================================================
+   Crop Studio — shared styles for the drag-to-position cropper
+   ------------------------------------------------------------
+   Linked by BOTH /admin.html and /admin/products.html so the two
+   studios cannot drift apart. Every custom property carries a
+   fallback because the two pages load different admin stylesheets
+   (admin.css vs admin/admin.css); the variable names match today,
+   but the fallbacks keep this file self-sufficient if that changes.
+   ============================================================ */
+
+/* ── Control row ── */
+
+.image-crop-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.image-crop-row > label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary, #888888);
+}
+
+.image-crop-row .form-select {
+    width: auto;
+    min-width: 150px;
+    padding: 9px 14px;
+}
+
+.image-crop-button {
+    appearance: none;
+    border: 1px solid var(--border, #222222);
+    background: var(--bg-primary, #0a0a0a);
+    color: var(--text-secondary, #888888);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.image-crop-button:hover {
+    border-color: rgba(198, 255, 76, 0.4);
+    color: var(--text-primary, #ffffff);
+    transform: translateY(-1px);
+}
+
+.image-crop-button:focus-visible {
+    outline: 2px solid var(--accent, #c8f65d);
+    outline-offset: 2px;
+}
+
+.image-crop-button[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ── Status line ── */
+
+.image-upload-status {
+    font-size: 12px;
+    color: var(--text-secondary, #888888);
+}
+
+.image-upload-status.is-ok {
+    color: var(--accent, #c8f65d);
+}
+
+.image-upload-status.is-error {
+    color: var(--accent-red, #ff4d4d);
+}
+
+.image-upload-status.is-busy {
+    color: var(--accent-dark, #a8d94a);
+}
+
+/* ── Crop stage ── */
+
+.image-crop-stage {
+    margin-top: 14px;
+}
+
+.image-crop-viewport {
+    position: relative;
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    line-height: 0;
+    border: 1px solid var(--border, #222222);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0d0d0d;
+    touch-action: none;
+}
+
+.image-crop-source {
+    display: block;
+    max-width: 100%;
+    max-height: 380px;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.image-crop-marquee {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid rgba(200, 246, 93, 0.95);
+    /* Dims everything outside the crop without a second overlay element. */
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.58);
+    cursor: move;
+    touch-action: none;
+    outline: none;
+}
+
+.image-crop-marquee.is-dragging {
+    cursor: grabbing;
+    border-color: #ffffff;
+}
+
+.image-crop-marquee:focus-visible {
+    border-color: #ffffff;
+    border-width: 2px;
+}
+
+.image-crop-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.image-crop-grid::before,
+.image-crop-grid::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+}
+
+.image-crop-grid::before {
+    background:
+        linear-gradient(to right, transparent calc(33.333% - 0.5px), rgba(255, 255, 255, 0.22) calc(33.333% - 0.5px), rgba(255, 255, 255, 0.22) calc(33.333% + 0.5px), transparent calc(33.333% + 0.5px)),
+        linear-gradient(to right, transparent calc(66.666% - 0.5px), rgba(255, 255, 255, 0.22) calc(66.666% - 0.5px), rgba(255, 255, 255, 0.22) calc(66.666% + 0.5px), transparent calc(66.666% + 0.5px));
+}
+
+.image-crop-grid::after {
+    background:
+        linear-gradient(to bottom, transparent calc(33.333% - 0.5px), rgba(255, 255, 255, 0.22) calc(33.333% - 0.5px), rgba(255, 255, 255, 0.22) calc(33.333% + 0.5px), transparent calc(33.333% + 0.5px)),
+        linear-gradient(to bottom, transparent calc(66.666% - 0.5px), rgba(255, 255, 255, 0.22) calc(66.666% - 0.5px), rgba(255, 255, 255, 0.22) calc(66.666% + 0.5px), transparent calc(66.666% + 0.5px));
+}
+
+.image-crop-handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    background: var(--accent, #c8f65d);
+    border: 1px solid #0a0a0a;
+    border-radius: 3px;
+}
+
+.image-crop-handle[data-handle="nw"] {
+    left: 0;
+    top: 0;
+    cursor: nwse-resize;
+}
+
+.image-crop-handle[data-handle="n"] {
+    left: 50%;
+    top: 0;
+    cursor: ns-resize;
+}
+
+.image-crop-handle[data-handle="ne"] {
+    left: 100%;
+    top: 0;
+    cursor: nesw-resize;
+}
+
+.image-crop-handle[data-handle="e"] {
+    left: 100%;
+    top: 50%;
+    cursor: ew-resize;
+}
+
+.image-crop-handle[data-handle="se"] {
+    left: 100%;
+    top: 100%;
+    cursor: nwse-resize;
+}
+
+.image-crop-handle[data-handle="s"] {
+    left: 50%;
+    top: 100%;
+    cursor: ns-resize;
+}
+
+.image-crop-handle[data-handle="sw"] {
+    left: 0;
+    top: 100%;
+    cursor: nesw-resize;
+}
+
+.image-crop-handle[data-handle="w"] {
+    left: 0;
+    top: 50%;
+    cursor: ew-resize;
+}
+
+.image-crop-readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: baseline;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.image-crop-dims {
+    color: var(--accent, #c8f65d);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.image-crop-hint {
+    color: var(--text-muted, #444444);
+}

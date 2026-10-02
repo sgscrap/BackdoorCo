@@ -598,7 +598,7 @@ function renderProductReviews(reviews) {
             <div class="product-review-gallery">
                 ${review.images.map((image, index) => `
                     <div class="product-review-thumb" style="cursor: default;">
-                        <img src="${escapeHtml(image)}" alt="${escapeHtml(review.name)} review image ${index + 1}" onerror="this.closest('.product-review-thumb').style.display='none';" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
+                        <img src="${escapeHtml(image)}" alt="${escapeHtml(review.name)} review image ${index + 1}" onerror="catalogImageFallback(this);" oncontextmenu="return false;" draggable="false" style="pointer-events: none;">
                     </div>
                 `).join('')}
             </div>
@@ -659,7 +659,7 @@ function renderGalleryControls() {
                 onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); selectProductImage(this); }"
                 aria-label="View image ${index + 1}"
             >
-                <img src="${src}" alt="View ${index + 1}" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display='none'">
+                <img src="${src}" alt="View ${index + 1}" referrerpolicy="no-referrer" loading="lazy" onerror="catalogImageFallback(this)">
             </button>
         `).join('');
         dots.style.display = hasMultiple ? 'flex' : 'none';
@@ -810,7 +810,7 @@ function updateCartUI() {
         <div class="cart-item">
             <div class="cart-item-thumb">
                 ${item.image
-                    ? `<img src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                    ? `<img src="${item.image}" alt="${item.name}" onerror="catalogImageFallback(this)">`
                     : ''}
                 <span class="cart-item-fallback" ${item.image ? 'style="display:none"' : ''}><i class="fa-solid fa-shoe-prints"></i></span>
             </div>

@@ -17,6 +17,8 @@
     "brand-logos/",
     "css/",
     "products/",
+    "products/catalog/uploads.json",
+    "restock_ideas/",
     "_shared/",
     "netlify/functions/",
     "scripts/",
@@ -40,6 +42,8 @@
     "brand-logos/": "Future folder; not yet committed but referenced in README",
     "css/": "Header in the directory layout that lists css files individually",
     "products/": "Future folder; image uploads go to server.js but the dir is populated at runtime",
+    "products/catalog/uploads.json": "Registry written by the local mirror upload server (--serve) on the first upload",
+    "restock_ideas/": "Firestore collection name from the Restock Desk section, not a path",
     "_shared/": "Inside netlify/functions/, the script tries the bare reference then falls back via RESOLUTION_PREFIXES",
     ".github/": "Workflow folder; the script surfaces .github/workflows/codeql*.yml directly",
     "public/ / paypal-checkout-public/": "Firebase public-only mirror used by paypal-checkout.js, not a project path"

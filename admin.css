@@ -2566,3 +2566,100 @@ body {
     color: #f87171;
 }
 
+
+/* ── PRODUCT IMAGE UPLOAD STUDIO ── */
+
+.img-input-tabs {
+    display: flex;
+    width: fit-content;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.img-tab {
+    padding: 8px 18px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.img-tab:hover {
+    color: var(--text-primary);
+}
+
+.img-tab.active {
+    background: rgba(200, 246, 93, 0.12);
+    color: var(--accent);
+}
+
+.img-tab-content {
+    display: none;
+}
+
+.img-tab-content.active {
+    display: block;
+}
+
+.image-drop-zone {
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-light);
+    border-radius: 14px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.image-drop-zone:hover {
+    border-color: rgba(200, 246, 93, 0.45);
+}
+
+.image-drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(200, 246, 93, 0.06);
+}
+
+.image-drop-zone:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.image-preview {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.image-preview img {
+    width: 100%;
+    max-height: 260px;
+    object-fit: contain;
+    display: block;
+    border-radius: 8px;
+}
+
+.drop-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.drop-subtext {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* The crop-row, status and crop-studio styles live in
+   admin/crop-studio.css, shared with admin/products.html so the two
+   croppers cannot drift apart. */
+

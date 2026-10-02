@@ -45,6 +45,20 @@ let importerSelectedSizes = [];
 let generatedReviews = [];
 let activeProductPreviewIndex = 0;
 let currentMarketSnapshot = null;
+let pendingProductImageFile = null;
+let pendingProductImageBlob = null;
+let productImageSourceDataUrl = null;
+let productImagePreviewOverride = null;
+let productImageStudioBound = false;
+// The drag-to-position cropper lives in admin/crop-studio.js and is shared with
+// admin/products.html; this page only owns the product-specific glue around it.
+let productImageCropStudio = null;
+// Set when "Frame subject" found nothing to frame; consumed by the next crop
+// status so the fall-back to a centred box is explained rather than silent.
+let productImageCropFrameMissed = false;
+const MARKET_AUTO_REFRESH_STALE_MS = 6 * 60 * 60 * 1000;
+const MARKET_AUTO_REFRESH_SESSION_MS = 10 * 60 * 1000;
+const marketAutoRefreshLog = new Map();
 
 const REVIEW_FIRST_NAMES = ['Mason', 'Jada', 'Chris', 'Avery', 'Jordan', 'Cam', 'Tiana', 'Malik', 'Ari', 'Noah', 'Nia', 'Jay', 'Kayla', 'Andre', 'Zoe', 'Micah', 'Savannah', 'Bryson', 'Laila', 'Darius', 'Jasmine', 'Ethan', 'Sofia', 'Tyrese', 'Mila', 'Zay', 'Kendall', 'Isaiah', 'Amaya', 'Luca', 'Brielle', 'Kobe', 'Nyla', 'Tristan', 'Aaliyah', 'Devin', 'Maya', 'Roman', 'Leah', 'Jalen'];
 const REVIEW_LAST_INITIALS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -56,6 +70,16 @@ const LEGACY_IMAGE_POSITIONS = {
     'left center': [24, 50],
     'right center': [76, 50]
 };
+const VALID_IMAGE_ASPECTS = new Set(['square', 'portrait', 'landscape', 'wide']);
+const IMAGE_ASPECT_RATIO_MAP = { square: '1 / 1', portrait: '3 / 4', landscape: '4 / 3', wide: '16 / 9' };
+function clampFallback(value, fallback, min, max) {
+    if (!Number.isFinite(value)) return fallback;
+    return clamp(value, min, max);
+}
+function normalizeImageAspect(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+    return VALID_IMAGE_ASPECTS.has(normalized) ? normalized : '';
+}
 const SEEDED_ADMIN_PRODUCTS = [
     {
         id: 'seed-men-travis-velvet-brown',
@@ -66,19 +90,19 @@ const SEEDED_ADMIN_PRODUCTS = [
         category: 'Sneakers',
         colorway: 'Velvet Brown/Black',
         description: "The Travis Scott x Air Jordan 1 Retro Low OG SP 'Velvet Brown' showcases Scott's signature reverse Swoosh on the black tumbled leather and brown suede upper. A woven Nike Air tag sits atop the brown nylon tongue, while mismatched Cactus Jack and Jordan Wings branding adorns the back tab of each shoe. Anchoring the sneaker is a brown rubber cupsole with stitched sidewall construction and an encapsulated Air-sole unit in the heel.",
-        image: 'https://i.imgur.com/ZOrZEnt.jpg',
+        image: 'products/catalog/i-imgur-com-zorzent-eb9bce.png',
         images: [
-            'https://i.imgur.com/ZOrZEnt.jpg',
-            'https://i.imgur.com/rAHE2Iv.jpg',
-            'https://i.imgur.com/TkQdpuE.jpg',
-            'https://i.imgur.com/4pdSP5S.jpg',
-            'https://i.imgur.com/QfIJ0PC.jpg',
-            'https://i.imgur.com/YZfxHKh.jpg',
-            'https://i.imgur.com/iDo2IAJ.jpg',
-            'https://i.imgur.com/IHVvC6S.jpg',
-            'https://i.imgur.com/gU63WYa.jpg',
-            'https://i.imgur.com/tr5UsUI.jpg',
-            'https://i.imgur.com/PYEiLrz.jpg'
+            'products/catalog/i-imgur-com-zorzent-eb9bce.png',
+            'products/catalog/i-imgur-com-rahe2iv-00ddc6.png',
+            'products/catalog/i-imgur-com-tkqdpue-a961fe.png',
+            'products/catalog/i-imgur-com-4pdsp5s-1f9f8b.png',
+            'products/catalog/i-imgur-com-qfij0pc-d934cb.png',
+            'products/catalog/i-imgur-com-yzfxhkh-88cf7a.png',
+            'products/catalog/i-imgur-com-ido2iaj-691a22.png',
+            'products/catalog/i-imgur-com-ihvvc6s-eac20e.png',
+            'products/catalog/i-imgur-com-gu63wya-aabe88.png',
+            'products/catalog/i-imgur-com-tr5usui-a7ed3e.png',
+            'products/catalog/i-imgur-com-pyeilrz-4763cd.png'
         ],
         imageFit: 'contain',
         imagePosition: '50% 52%',
@@ -103,14 +127,14 @@ const SEEDED_ADMIN_PRODUCTS = [
         category: 'Kids',
         colorway: 'Black/Black',
         description: "Offered in little kid sizing, the Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom' combines a sleek finish with La Flame's signature touches. The low-top sports an all-black nubuck and suede upper with contrast white stitching throughout. Scott's backward Swoosh decorates the lateral side, while woven Nike tags embellish each tongue. Mismatched heel tabs display a Jordan Wings logo on the right shoe and a bee graphic on the left. Anchoring the sneaker is a black rubber cupsole with stitched sidewall construction.",
-        image: 'https://i.imgur.com/30H5NyD.jpg',
+        image: 'products/catalog/i-imgur-com-30h5nyd-59c491.jpg',
         images: [
-            'https://i.imgur.com/30H5NyD.jpg',
-            'https://i.imgur.com/UutZVxq.jpg',
-            'https://i.imgur.com/israMgv.jpg',
-            'https://i.imgur.com/FXy3W3z.jpg',
-            'https://i.imgur.com/bG5UpTh.jpg',
-            'https://i.imgur.com/PNAbX10.jpg'
+            'products/catalog/i-imgur-com-30h5nyd-59c491.jpg',
+            'products/catalog/i-imgur-com-uutzvxq-3d8449.jpg',
+            'products/catalog/i-imgur-com-isramgv-b051d6.jpg',
+            'products/catalog/i-imgur-com-fxy3w3z-69e415.jpg',
+            'products/catalog/i-imgur-com-bg5upth-7df132.jpg',
+            'products/catalog/i-imgur-com-pnabx10-1d1133.jpg'
         ],
         imageFit: 'contain',
         imagePosition: '50% 52%',
@@ -322,6 +346,13 @@ function getImageOffsetsFromProduct(product = null) {
 }
 
 function getProductImagePadding(product, containPadding = 6) {
+    const explicitRaw = product?.imagePadding;
+    if (explicitRaw !== undefined && explicitRaw !== null && String(explicitRaw).trim() !== '') {
+        const explicitStr = String(explicitRaw).trim();
+        if (/^\d{1,2}(?:\.\d+)?(?:px|%)$/.test(explicitStr)) return explicitStr;
+        const numeric = Number(explicitRaw);
+        if (Number.isFinite(numeric)) return `${clamp(numeric, 0, 40)}px`;
+    }
     if (normalizeImageFit(product?.imageFit, product) === 'cover') return '0';
     if (matchesBlackCatProduct(product)) return `${Math.max(0, containPadding - 4)}px`;
     return isFootwearProduct(product) ? `${Math.max(0, containPadding - 2)}px` : `${containPadding}px`;
@@ -506,17 +537,20 @@ function updateMarketPricingPanel() {
     document.getElementById('applyMarketSmartBtn').disabled = !snapshot?.suggestions?.smart;
 }
 
-async function refreshMarketPricing() {
+async function refreshMarketPricing(options = {}) {
+    const silent = options?.silent === true;
     const sources = readMarketSourceInputs();
     if (!Object.values(sources).some(Boolean)) {
-        showToast('Add at least one StockX, GOAT, or eBay link first.', 'error');
-        return;
+        if (!silent) showToast('Add at least one StockX, GOAT, or eBay link first.', 'error');
+        return false;
     }
 
     const button = document.getElementById('refreshMarketPricingBtn');
-    const originalText = button.textContent;
-    button.disabled = true;
-    button.textContent = 'Refreshing...';
+    const originalText = button?.textContent || 'Refresh Comps';
+    if (button) {
+        button.disabled = true;
+        button.textContent = 'Refreshing...';
+    }
 
     try {
         const response = await fetch('/.netlify/functions/market-price-snapshot', {
@@ -535,16 +569,69 @@ async function refreshMarketPricing() {
         }
 
         setMarketSnapshot(payload);
-        showToast(payload?.benchmarkPrice
-            ? `Market pricing updated from ${payload.sourceCount || 0} source${payload.sourceCount === 1 ? '' : 's'}.`
-            : 'Links saved, but no usable prices were detected.', payload?.benchmarkPrice ? 'info' : 'warn');
+        if (!silent) {
+            showToast(payload?.benchmarkPrice
+                ? `Market pricing updated from ${payload.sourceCount || 0} source${payload.sourceCount === 1 ? '' : 's'}.`
+                : 'Links saved, but no usable prices were detected.', payload?.benchmarkPrice ? 'info' : 'warn');
+        }
+        return Boolean(payload?.benchmarkPrice);
     } catch (error) {
         console.error(error);
-        showToast(`Market pricing failed: ${error.message}`, 'error');
+        if (silent) {
+            const status = document.getElementById('marketPricingStatus');
+            if (status) status.textContent = `Auto-refresh unavailable (${error.message}). Use Refresh Comps.`;
+        } else {
+            showToast(`Market pricing failed: ${error.message}`, 'error');
+        }
+        return false;
     } finally {
-        button.disabled = false;
-        button.textContent = originalText;
+        if (button) {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
     }
+}
+
+// ── Auto-pricing ──
+// Pull live comps the moment a product with tracked sources opens, then seed the
+// price field when it is still empty so the modal can be saved without a second pass.
+function hasTrackedMarketSources() {
+    return Object.values(readMarketSourceInputs()).some(Boolean);
+}
+
+function marketSnapshotIsStale(snapshot) {
+    if (!snapshot?.benchmarkPrice) return true;
+    const refreshedAt = Date.parse(snapshot.refreshedAt || '');
+    if (!Number.isFinite(refreshedAt)) return true;
+    return (Date.now() - refreshedAt) > MARKET_AUTO_REFRESH_STALE_MS;
+}
+
+async function maybeAutoRefreshMarketPricing() {
+    if (!hasTrackedMarketSources()) return;
+
+    const cacheKey = currentProduct?.id || 'new-product';
+    const lastAttempt = marketAutoRefreshLog.get(cacheKey) || 0;
+    if ((Date.now() - lastAttempt) < MARKET_AUTO_REFRESH_SESSION_MS) return;
+    if (!marketSnapshotIsStale(currentMarketSnapshot)) return;
+
+    marketAutoRefreshLog.set(cacheKey, Date.now());
+    const status = document.getElementById('marketPricingStatus');
+    if (status) status.textContent = 'Auto-refreshing comps from your tracked sources...';
+
+    const refreshed = await refreshMarketPricing({ silent: true });
+    if (!refreshed) return;
+
+    const smart = Number(currentMarketSnapshot?.suggestions?.smart) || 0;
+    const priceInput = document.getElementById('productPrice');
+    const currentPrice = Math.max(0, Number(priceInput?.value) || 0);
+
+    if (smart > 0 && currentPrice <= 0 && priceInput) {
+        priceInput.value = smart.toFixed(2);
+        showToast(`Auto-priced at ${formatCurrency(smart)} from live comps. Save it, or hit Use Base Price to push it to every size.`, 'info');
+        return;
+    }
+
+    showToast(`Comps refreshed — benchmark ${formatCurrency(currentMarketSnapshot?.benchmarkPrice)}.`, 'info');
 }
 
 function applyMarketSuggestedPrice(mode) {
@@ -622,15 +709,29 @@ function getReviewImages(review) {
 function normalizeProduct(product) {
     const sizes = getProductSizes(product);
     const [imageOffsetX, imageOffsetY] = getImageOffsetsFromProduct(product);
+    const rawPadding = product?.imagePadding;
+    const normalizedPadding = (() => {
+        if (rawPadding === undefined || rawPadding === null || String(rawPadding).trim() === '') return undefined;
+        const str = String(rawPadding).trim();
+        if (/^\d{1,2}(?:\.\d+)?(?:px|%)$/.test(str)) return str;
+        const num = Number(rawPadding);
+        if (Number.isFinite(num)) return clamp(num, 0, 40);
+        return undefined;
+    })();
+    const normalizedAspect = normalizeImageAspect(product?.imageAspect);
     return {
         ...product,
         price: Number(product?.price) || 0,
         image: product?.image || '',
+        cardImage: String(product?.cardImage || product?.image || '').trim(),
+        images: Array.isArray(product?.images) && product.images.length ? product.images : (product?.image ? [product.image] : []),
         imageFit: normalizeImageFit(product?.imageFit, product),
         imagePosition: normalizeImagePosition(product?.imagePosition),
         imageOffsetX,
         imageOffsetY,
         imageScale: normalizeImageScale(product?.imageScale, product),
+        ...(normalizedPadding !== undefined ? { imagePadding: normalizedPadding } : {}),
+        imageAspect: normalizedAspect,
         sizes,
         releaseDate: normalizeReleaseDate(product?.releaseDate),
         allowBackorder: Boolean(product?.allowBackorder),
@@ -849,6 +950,9 @@ function setupEventListeners() {
     document.getElementById('productImageScale')?.addEventListener('input', updateProductImagePreview);
     document.getElementById('productImageOffsetX')?.addEventListener('input', updateProductImagePreview);
     document.getElementById('productImageOffsetY')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productImagePadding')?.addEventListener('input', updateProductImagePreview);
+    document.getElementById('productImageAspect')?.addEventListener('change', updateProductImagePreview);
+    initProductImageStudio();
     document.getElementById('productName')?.addEventListener('input', updateProductImagePreview);
     document.getElementById('productSKU')?.addEventListener('input', updateProductImagePreview);
     document.getElementById('productBrand')?.addEventListener('change', updateProductImagePreview);
@@ -1131,6 +1235,7 @@ function openProductModal(id = null) {
     form.reset();
     activeProductPreviewIndex = 0;
     currentMarketSnapshot = null;
+    resetProductImageStudio();
 
     document.getElementById('productHidden').checked = currentProduct ? isProductHidden(currentProduct) : false;
     document.getElementById('productOutOfStock').checked = currentProduct ? Boolean(currentProduct.isOutOfStock) : false;
@@ -1156,6 +1261,12 @@ function openProductModal(id = null) {
         document.getElementById('productImageOffsetX').value = String(offsetX);
         document.getElementById('productImageOffsetY').value = String(offsetY);
         document.getElementById('productImageScale').value = String(normalizeImageScale(currentProduct.imageScale, currentProduct));
+        const rawPad = currentProduct.imagePadding;
+        const numPad = Number(rawPad);
+        const strPad = String(rawPad ?? '').trim();
+        const parsedPad = /^\d+(?:\.\d+)?(?:px|%)$/.test(strPad) ? parseInt(strPad, 10) : (Number.isFinite(numPad) ? numPad : null);
+        document.getElementById('productImagePadding').value = String(parsedPad !== null ? clamp(parsedPad, 0, 40) : 4);
+        document.getElementById('productImageAspect').value = normalizeImageAspect(currentProduct.imageAspect);
         renderSizeGrid(currentProduct.sizes, currentProduct);
         setMarketSnapshot(currentProduct.marketSnapshot);
     } else {
@@ -1164,15 +1275,19 @@ function openProductModal(id = null) {
         document.getElementById('productImageOffsetX').value = '50';
         document.getElementById('productImageOffsetY').value = '50';
         document.getElementById('productImageScale').value = '1';
+        document.getElementById('productImagePadding').value = '4';
+        document.getElementById('productImageAspect').value = '';
         document.getElementById('productBackorderLeadTime').value = 'Ships in 1.5-2 weeks';
         renderSizeGrid();
         setMarketSnapshot(null);
     }
 
     syncProductImageFitButtons();
+    setProductImageTab(currentProduct?.image ? 'url' : 'upload');
     updateProductImagePreview();
     updateMarketPricingPanel();
     modal.classList.add('open');
+    void maybeAutoRefreshMarketPricing();
 }
 
 function renderSizeGrid(existingSizes = [], contextProduct = currentProduct || {}) {
@@ -1223,6 +1338,37 @@ async function handleProductSubmit(event) {
     const productId = currentProduct ? currentProduct.id : Date.now().toString();
     const productName = document.getElementById('productName').value.trim();
     const productSku = document.getElementById('productSKU').value.trim();
+
+    // A picked/cropped file becomes the cover image: upload it first, then let the
+    // normal URL draft flow take over so framing + gallery stay in sync.
+    if (pendingProductImageBlob || pendingProductImageFile) {
+        try {
+            const uploadedUrl = await uploadPendingProductImage();
+            const galleryField = document.getElementById('productImageGallery');
+            const existingGallery = galleryField.value.trim();
+            galleryField.value = existingGallery ? `${uploadedUrl}\n${existingGallery}` : uploadedUrl;
+            document.getElementById('productImage').value = uploadedUrl;
+            // Uploaded already — don't re-upload if the Firestore write needs a retry.
+            pendingProductImageFile = null;
+            pendingProductImageBlob = null;
+            productImageSourceDataUrl = null;
+            releaseProductImagePreviewOverride();
+            renderProductImageDropPreview(uploadedUrl);
+            updateProductImagePreview();
+            setProductImageUploadStatus(
+                String(uploadedUrl).startsWith('products/') ? 'Stored locally in products/catalog ✓' : 'Uploaded to Cloudinary ✓',
+                'ok'
+            );
+        } catch (error) {
+            console.error(error);
+            setProductImageUploadStatus(`Upload failed: ${error.message}`, 'error');
+            showToast(`Image upload failed: ${error.message}`, 'error');
+            button.disabled = false;
+            button.textContent = originalText;
+            return;
+        }
+    }
+
     const imageDraft = collectProductImageDraft();
     if (imageDraft.urls.length === 0) {
         showToast('Add at least one valid image URL.', 'error');
@@ -1237,6 +1383,10 @@ async function handleProductSubmit(event) {
         name: productName,
         sku: productSku
     });
+    const rawPadding = document.getElementById('productImagePadding')?.value;
+    const numPadding = Number(rawPadding);
+    const imagePadding = Number.isFinite(numPadding) ? clamp(numPadding, 0, 40) : 4;
+    const imageAspect = normalizeImageAspect(document.getElementById('productImageAspect')?.value);
     const productData = {
         name: productName,
         brand: document.getElementById('productBrand').value,
@@ -1246,6 +1396,7 @@ async function handleProductSubmit(event) {
         releaseDate: normalizeReleaseDate(document.getElementById('productReleaseDate').value) || 'TBD',
         description: document.getElementById('productDescription').value.trim(),
         image: imageDraft.urls[0],
+        cardImage: imageDraft.urls[0],
         images: imageDraft.urls,
         imageFit,
         imagePosition: `${imageOffsetX}% ${imageOffsetY}%`,
@@ -1258,6 +1409,8 @@ async function handleProductSubmit(event) {
             category: document.getElementById('productCategory').value,
             brand: document.getElementById('productBrand').value
         }),
+        imagePadding,
+        imageAspect,
         sizes: sizeEntries,
         allowBackorder,
         backorderLeadTime,
@@ -1316,6 +1469,281 @@ function collectProductImageDraft() {
     });
 
     return { urls, invalid };
+}
+
+// ── Upload studio (file pick + crop + Cloudinary) ──
+const PRODUCT_IMAGE_DROP_PROMPT = `
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <polyline points="21 15 16 10 5 21" />
+    </svg>
+    <span class="drop-text">Drop image here or click to upload</span>
+    <span class="drop-subtext">PNG, JPG or WEBP up to 10MB</span>
+`;
+
+const CROP_CARD_ASPECTS = [
+    { ratio: 1, aspect: 'square', label: '1:1 Square' },
+    { ratio: 4 / 3, aspect: 'landscape', label: '4:3 Landscape' },
+    { ratio: 3 / 4, aspect: 'portrait', label: '3:4 Portrait' },
+    { ratio: 16 / 9, aspect: 'wide', label: '16:9 Wide' }
+];
+
+function setProductImageUploadStatus(message, kind = '') {
+    const el = document.getElementById('productImageUploadStatus');
+    if (!el) return;
+    el.textContent = message || '';
+    el.classList.toggle('is-ok', kind === 'ok');
+    el.classList.toggle('is-error', kind === 'error');
+    el.classList.toggle('is-busy', kind === 'busy');
+}
+
+function setProductImageTab(tab = 'upload') {
+    const target = tab === 'url' ? 'url' : 'upload';
+    document.querySelectorAll('#productImageTabs .img-tab').forEach((button) => {
+        button.classList.toggle('active', button.dataset.imgTab === target);
+    });
+    document.getElementById('productImageUploadTab')?.classList.toggle('active', target === 'upload');
+    document.getElementById('productImageUrlTab')?.classList.toggle('active', target === 'url');
+}
+
+function renderProductImageDropPreview(src) {
+    const preview = document.getElementById('productImageDropPreview');
+    if (!preview) return;
+    preview.innerHTML = src
+        ? `<img src="${src}" alt="Selected product image preview">`
+        : PRODUCT_IMAGE_DROP_PROMPT;
+}
+
+function releaseProductImagePreviewOverride() {
+    if (productImagePreviewOverride && productImagePreviewOverride.startsWith('blob:')) {
+        URL.revokeObjectURL(productImagePreviewOverride);
+    }
+    productImagePreviewOverride = null;
+}
+
+function resetProductImageStudio({ keepTab = false } = {}) {
+    pendingProductImageFile = null;
+    pendingProductImageBlob = null;
+    productImageSourceDataUrl = null;
+    productImageCropFrameMissed = false;
+    releaseProductImagePreviewOverride();
+
+    productImageCropStudio?.clear();
+
+    const fileInput = document.getElementById('productImageFile');
+    if (fileInput) fileInput.value = '';
+    const cropSelect = document.getElementById('productImageCropAspect');
+    if (cropSelect) cropSelect.value = 'original';
+
+    renderProductImageDropPreview('');
+    setProductImageUploadStatus('');
+    if (!keepTab) setProductImageTab('upload');
+}
+
+function handleProductImageFile(file) {
+    if (!file) return;
+    if (!String(file.type || '').startsWith('image/')) {
+        setProductImageUploadStatus('That file is not an image.', 'error');
+        return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+        setProductImageUploadStatus('Image must be 10MB or smaller.', 'error');
+        return;
+    }
+
+    pendingProductImageFile = file;
+    pendingProductImageBlob = null;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        productImageSourceDataUrl = String(event.target?.result || '');
+        const cropSelect = document.getElementById('productImageCropAspect');
+        if (cropSelect) cropSelect.value = 'original';
+        renderProductImageDropPreview(productImageSourceDataUrl);
+        const studio = getProductImageCropStudio();
+        studio?.setRatio(getProductImageCropRatio());
+        studio?.setImage(productImageSourceDataUrl);
+        setProductImageUploadStatus('Drag the crop box to frame the card, or save to upload the original.', 'ok');
+    };
+    reader.onerror = () => setProductImageUploadStatus('Could not read that image.', 'error');
+    reader.readAsDataURL(file);
+}
+
+// Admin Center is a non-module page, so the engine arrives as a global from
+// admin/crop-studio.js. Resolved through window so a failed load degrades to
+// "no cropper" instead of throwing on an undeclared identifier.
+function getCropStudioEngine() {
+    return window.CropStudio || null;
+}
+
+// The engine parses the aspect values; this reads the modal's select through it so
+// there is exactly one place that knows what "4/3" means.
+function getProductImageCropRatio() {
+    const engine = getCropStudioEngine();
+    if (!engine) return null;
+    return engine.parseAspectValue(document.getElementById('productImageCropAspect')?.value);
+}
+
+function getProductImageCropStudio() {
+    if (!productImageCropStudio) productImageCropStudio = createProductImageCropStudio();
+    return productImageCropStudio;
+}
+
+function createProductImageCropStudio() {
+    const engine = getCropStudioEngine();
+    if (!engine) {
+        console.warn('CropStudio failed to load — image cropping is unavailable.');
+        return null;
+    }
+
+    return engine.create({
+        stage: document.getElementById('productImageCropStage'),
+        viewport: document.getElementById('productImageCropViewport'),
+        image: document.getElementById('productImageCropImage'),
+        marquee: document.getElementById('productImageCropMarquee'),
+        readout: document.getElementById('productImageCropDimensions'),
+        ratio: getProductImageCropRatio(),
+        maxSide: engine.DEFAULT_MAX_SIDE,
+        onRendering: () => setProductImageUploadStatus('Rendering crop...', 'busy'),
+        onError: (message) => setProductImageUploadStatus(`Crop failed: ${message}`, 'error'),
+        onCropChange: handleProductImageCropChange
+    });
+}
+
+// Snaps the storefront card to the closest supported frame so the saved card matches
+// the proof, including for free-form crops that match no preset exactly.
+function applyCropToCardFraming(region) {
+    const cropRatio = region.sw / region.sh;
+    const engine = getCropStudioEngine();
+    const snap = engine ? engine.nearestPreset(cropRatio, CROP_CARD_ASPECTS) : null;
+
+    const aspectSelect = document.getElementById('productImageAspect');
+    if (aspectSelect && snap) aspectSelect.value = snap.aspect;
+    const fitInput = document.getElementById('productImageFit');
+    if (fitInput) fitInput.value = 'cover';
+    const paddingInput = document.getElementById('productImagePadding');
+    if (paddingInput) paddingInput.value = '0';
+
+    return snap;
+}
+
+// Fired by the shared engine whenever the crop settles. Everything product-specific
+// happens here: the pending upload blob, the live card preview and its framing.
+function handleProductImageCropChange({ region, width, height, isFull, blob, autoFramed }) {
+    if (!productImageSourceDataUrl) return;
+
+    // Say where the box came from: subject detection, a manual drag, or a
+    // "Frame subject" click that found nothing to latch onto.
+    const framingNote = autoFramed
+        ? 'Auto-framed on the subject · '
+        : productImageCropFrameMissed
+            ? 'No clear subject found · '
+            : '';
+    productImageCropFrameMissed = false;
+
+    // Untouched marquee: hand the uploader the original bytes rather than a re-encode.
+    if (isFull) {
+        pendingProductImageBlob = null;
+        releaseProductImagePreviewOverride();
+        renderProductImageDropPreview(productImageSourceDataUrl);
+        setProductImageUploadStatus(
+            `${framingNote}Full image — the original file uploads unchanged (${width}×${height}px).`,
+            'ok'
+        );
+        updateProductImagePreview();
+        return;
+    }
+    if (!blob) return;
+
+    pendingProductImageBlob = blob;
+    releaseProductImagePreviewOverride();
+    productImagePreviewOverride = URL.createObjectURL(blob);
+    renderProductImageDropPreview(productImagePreviewOverride);
+
+    const cardAspect = applyCropToCardFraming(region);
+    activeProductPreviewIndex = 0;
+    syncProductImageFitButtons();
+    updateProductImagePreview();
+
+    setProductImageUploadStatus(
+        `${framingNote}Crop ${region.sw}×${region.sh}px (${(blob.size / 1024).toFixed(0)}KB PNG) — card framing set to ${cardAspect?.aspect || 'cover'}. Save to upload.`,
+        'ok'
+    );
+}
+
+async function uploadPendingProductImage() {
+    if (!pendingProductImageBlob && !pendingProductImageFile) return '';
+
+    // Prefer the local mirror uploader (stores into products/catalog/); it falls
+    // back to Cloudinary on its own when no local server is reachable.
+    const uploader = window.catalogUploadImage || window.cloudifyUpload;
+    if (typeof uploader !== 'function') {
+        throw new Error('Image uploader unavailable — paste an image URL instead.');
+    }
+
+    const baseName = String(pendingProductImageFile?.name || 'product-image').replace(/\.[^.]+$/, '') || 'product-image';
+    // Name the uploaded file after the blob's real type so a PNG crop stays a PNG
+    // instead of being advertised as a JPEG.
+    const cropType = String(pendingProductImageBlob?.type || 'image/png');
+    const cropExtension = cropType === 'image/png' ? 'png' : cropType === 'image/webp' ? 'webp' : 'jpg';
+    const file = pendingProductImageBlob
+        ? new File([pendingProductImageBlob], `${baseName}-crop.${cropExtension}`, { type: cropType })
+        : pendingProductImageFile;
+
+    setProductImageUploadStatus('Uploading image...', 'busy');
+    const url = await uploader(file);
+    if (!url) throw new Error('The uploader did not return an image URL.');
+    return url;
+}
+
+function initProductImageStudio() {
+    if (productImageStudioBound) return;
+    productImageStudioBound = true;
+
+    const dropZone = document.getElementById('productImageDropZone');
+    const fileInput = document.getElementById('productImageFile');
+
+    document.querySelectorAll('#productImageTabs .img-tab').forEach((button) => {
+        button.addEventListener('click', () => setProductImageTab(button.dataset.imgTab));
+    });
+
+    dropZone?.addEventListener('click', () => fileInput?.click());
+    dropZone?.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            fileInput?.click();
+        }
+    });
+    dropZone?.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone?.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropZone.classList.remove('dragover');
+        handleProductImageFile(event.dataTransfer?.files?.[0]);
+    });
+
+    fileInput?.addEventListener('change', (event) => handleProductImageFile(event.target.files?.[0]));
+    document.getElementById('productImageClearBtn')?.addEventListener('click', () => {
+        resetProductImageStudio();
+        updateProductImagePreview();
+    });
+    // The shared studio owns the marquee, its handles and keyboard nudging.
+    getProductImageCropStudio();
+    document.getElementById('productImageCropFrameBtn')?.addEventListener('click', () => {
+        const studio = productImageCropStudio;
+        if (!studio) return;
+        productImageCropFrameMissed = !studio.frameSubject();
+    });
+    document.getElementById('productImageCropResetBtn')?.addEventListener('click', () => {
+        productImageCropStudio?.resetRegion();
+    });
+    document.getElementById('productImageCropAspect')?.addEventListener('change', () => {
+        productImageCropStudio?.setRatio(getProductImageCropRatio());
+    });
 }
 
 function syncProductImageFitButtons() {
@@ -1382,6 +1810,8 @@ function applyProductImageShoePreset() {
     document.getElementById('productImageScale').value = '1.1';
     document.getElementById('productImageOffsetX').value = '50';
     document.getElementById('productImageOffsetY').value = '52';
+    if (document.getElementById('productImagePadding')) document.getElementById('productImagePadding').value = '4';
+    if (document.getElementById('productImageAspect')) document.getElementById('productImageAspect').value = '';
     setProductImageFit('contain');
 }
 
@@ -1394,6 +1824,8 @@ function resetProductImageEditor() {
     };
     const fit = normalizeImageFit('', contextProduct);
     document.getElementById('productImageScale').value = String(normalizeImageScale('', contextProduct));
+    if (document.getElementById('productImagePadding')) document.getElementById('productImagePadding').value = '4';
+    if (document.getElementById('productImageAspect')) document.getElementById('productImageAspect').value = '';
     document.getElementById('productImageOffsetX').value = '50';
     document.getElementById('productImageOffsetY').value = '50';
     setProductImageFit(fit);
@@ -2290,7 +2722,7 @@ function renderProductImagePreviewThumbs(urls) {
 function updateProductImagePreview() {
     const image = document.getElementById('productImagePreview');
     const draft = collectProductImageDraft();
-    const previewUrls = draft.urls;
+    const previewUrls = productImagePreviewOverride ? [productImagePreviewOverride] : draft.urls;
     if (activeProductPreviewIndex >= previewUrls.length) {
         activeProductPreviewIndex = 0;
     }
@@ -2310,8 +2742,12 @@ function updateProductImagePreview() {
     });
     const offsetX = clamp(Number(document.getElementById('productImageOffsetX')?.value || 50), 0, 100);
     const offsetY = clamp(Number(document.getElementById('productImageOffsetY')?.value || 50), 0, 100);
+    const paddingRaw = Number(document.getElementById('productImagePadding')?.value);
+    const imagePaddingValue = Number.isFinite(paddingRaw) ? clamp(paddingRaw, 0, 40) : 4;
+    const imageAspectValue = normalizeImageAspect(document.getElementById('productImageAspect')?.value);
     const padding = getProductImagePadding({
         imageFit: fit,
+        imagePadding: imagePaddingValue,
         category: document.getElementById('productCategory')?.value,
         brand: document.getElementById('productBrand')?.value,
         name: document.getElementById('productName')?.value,
@@ -2322,13 +2758,21 @@ function updateProductImagePreview() {
     document.getElementById('productImageScaleValue').textContent = `${Math.round(scale * 100)}%`;
     document.getElementById('productImageOffsetXValue').textContent = `${Math.round(offsetX)}%`;
     document.getElementById('productImageOffsetYValue').textContent = `${Math.round(offsetY)}%`;
-    document.getElementById('productImagePreviewSummary').textContent = `${fit === 'contain' ? 'Contain' : 'Cover'} · ${Math.round(scale * 100)}%`;
+    const padEl = document.getElementById('productImagePaddingValue');
+    if (padEl) padEl.textContent = `${imagePaddingValue}px`;
+    const previewCard = document.getElementById('productImagePreview')?.closest('.product-media-preview-card') || document.querySelector('.product-media-preview-card');
+    if (previewCard) {
+        previewCard.style.aspectRatio = imageAspectValue ? (IMAGE_ASPECT_RATIO_MAP[imageAspectValue] || 'auto') : 'auto';
+    }
+    document.getElementById('productImagePreviewSummary').textContent = `${fit === 'contain' ? 'Contain' : 'Cover'} · ${Math.round(scale * 100)}%${imageAspectValue ? ' · ' + imageAspectValue : ''}`;
 
     renderProductImagePreviewThumbs(previewUrls);
 
     const previewStatus = document.getElementById('productImagePreviewStatus');
     if (previewStatus) {
-        if (draft.invalid.length > 0) {
+        if (productImagePreviewOverride) {
+            previewStatus.textContent = 'Previewing your pending upload — save to publish it to the storefront.';
+        } else if (draft.invalid.length > 0) {
             previewStatus.textContent = 'Some links could not be previewed. Use direct image links or single-image Imgur pages.';
         } else if (previewUrls.length > 1) {
             previewStatus.textContent = `Previewing image ${activeProductPreviewIndex + 1} of ${previewUrls.length}. Click a thumbnail to switch.`;

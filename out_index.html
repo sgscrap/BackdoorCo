@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <script src="image-fallback.js?v=1"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
@@ -148,7 +149,7 @@
         </div>
         <button type="button" class="hero-shoe-card" onclick="openProductModal('AA3834-100')">
           <div class="shoe-card-badge"><i class="fa-solid fa-fire"></i> EXCLUSIVE DROP</div>
-          <img src="products/jordan-1-ow-alaska.png" alt="Off-White x Air Jordan 1 Alaska" class="hero-shoe-img-real" />
+          <img src="products/jordan-1-ow-alaska.png" alt="Off-White x Air Jordan 1 Alaska" class="hero-shoe-img-real" onerror="catalogImageFallback(this)" />
           <div class="shoe-card-info">
             <h2>OFF-WHITE X AJ1 "ALASKA"</h2>
             <p>Jordan · White/White · Deadstock</p>
@@ -287,32 +288,32 @@
     </div>
     <div class="brands-grid">
       <button type="button" class="brand-card" onclick="filterByBrandClick('Jordan')" aria-pressed="false">
-        <img src="products/jordan-4-black-cat.jpg" alt="Jordan" class="brand-card-img" />
+        <img src="products/jordan-4-black-cat.jpg" alt="Jordan" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">Jordan</div>
         <div class="brand-count">8 items</div>
       </button>
       <button type="button" class="brand-card" onclick="filterByBrandClick('Nike')" aria-pressed="false">
-        <img src="products/kobe-6-reverse-grinch.jpg" alt="Nike" class="brand-card-img" />
+        <img src="products/kobe-6-reverse-grinch.jpg" alt="Nike" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">Nike</div>
         <div class="brand-count">5 items</div>
       </button>
       <button type="button" class="brand-card" onclick="filterByBrandClick('Adidas')" aria-pressed="false">
-        <img src="products/pharrell-jellyfish-blue.jpg" alt="Adidas" class="brand-card-img" />
+        <img src="products/pharrell-jellyfish-blue.jpg" alt="Adidas" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">Adidas</div>
         <div class="brand-count">2 items</div>
       </button>
       <button type="button" class="brand-card" onclick="filterByBrandClick('Godspeed')" aria-pressed="false">
-        <img src="products/godspeed-surf-day.png" alt="Godspeed" class="brand-card-img" />
+        <img src="products/godspeed-surf-day.png" alt="Godspeed" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">Godspeed</div>
         <div class="brand-count">1 item</div>
       </button>
       <button type="button" class="brand-card" onclick="filterByBrandClick('Nike')" aria-pressed="false">
-        <img src="products/nocta-sunset-jacket.jpg" alt="NOCTA" class="brand-card-img" />
+        <img src="products/nocta-sunset-jacket.jpg" alt="NOCTA" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">NOCTA</div>
         <div class="brand-count">1 item</div>
       </button>
       <button type="button" class="brand-card" onclick="filterByBrandClick('Jordan')" aria-pressed="false">
-        <img src="products/jordan-1-fragment-travis.jpg" alt="Travis Scott" class="brand-card-img" />
+        <img src="products/jordan-1-fragment-travis.jpg" alt="Travis Scott" class="brand-card-img" onerror="catalogImageFallback(this)" />
         <div class="brand-name">Travis Scott</div>
         <div class="brand-count">1 item</div>
       </button>
@@ -351,7 +352,7 @@
       </div>
       <div class="drop-right">
         <img src="products/jordan-1-fragment-travis.jpg" alt="Fragment x Travis Scott Jordan 1"
-          class="drop-right-img" />
+          class="drop-right-img" onerror="catalogImageFallback(this)" />
       </div>
     </button>
   </div>
@@ -470,7 +471,7 @@
         <div class="modal-badge-container">
           <span id="modalBadge" class="modal-badge"></span>
         </div>
-        <img src="" alt="Product Image" class="modal-image" id="modalImage" />
+        <img src="" alt="Product Image" class="modal-image" id="modalImage" onerror="catalogImageFallback(this)" />
         <div class="modal-details">
           <div class="modal-category" id="modalCategory">Sneakers</div>
           <h2 class="modal-name" id="modalTitle"></h2>
