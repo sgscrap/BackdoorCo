@@ -58,10 +58,15 @@ function cloneManifest() {
   });
 
   await test('the committed prepared file matches a fresh --write (no drift)', () => {
-    const before = fs.readFileSync(PREPARED, 'utf8');
+    // Compare line-ending-normalized text: the committed blob is LF, but a
+    // checkout with core.autocrlf (or core.eol=crlf) rewrites it to CRLF, and
+    // the regenerated file is always LF. Normalizing keeps this check
+    // independent of the developer's git config.
+    const normalize = (text) => text.replace(/\r\n/g, '\n');
+    const before = normalize(fs.readFileSync(PREPARED, 'utf8'));
     const run = runRollout(['--write']);
     assert.equal(run.status, 0, `expected exit 0, got ${run.status}\n${run.stdout}${run.stderr}`);
-    const after = fs.readFileSync(PREPARED, 'utf8');
+    const after = normalize(fs.readFileSync(PREPARED, 'utf8'));
     assert.equal(after, before, 'admin/instagram-rollout.prepared.json is stale; re-run `npm run prepare:instagram`');
   });
 
