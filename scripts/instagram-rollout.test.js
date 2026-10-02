@@ -50,6 +50,22 @@ function cloneManifest() {
   const copyLib = await import(pathToFileURL(path.join(ROOT, 'admin', 'social-copy.mjs')).href);
   const baseManifest = cloneManifest();
 
+  // The studio always has an active product selected, so a product-less template
+  // (e.g. collage) is named by the top catalogue product. Mirror that here.
+  const topProductName = await (async () => {
+    const tmp = path.join(ROOT, '.product-data.naming-tmp.mjs');
+    fs.copyFileSync(path.join(ROOT, 'product-data.js'), tmp);
+    try {
+      const pd = await import(pathToFileURL(tmp).href);
+      const catalogue = pd.mergeCatalogProducts([])
+        .filter((product) => !pd.isHidden(product) && product.status !== 'inactive')
+        .sort((a, b) => pd.getProductSortTimestamp(b) - pd.getProductSortTimestamp(a));
+      return catalogue[0]?.name || 'asset';
+    } finally {
+      fs.rmSync(tmp, { force: true });
+    }
+  })();
+
   // ── manifest + prepared output ──────────────────────────────────────────
   await test('the shipped manifest validates', () => {
     const run = runRollout([]);
@@ -161,6 +177,17 @@ function cloneManifest() {
       fs.writeFileSync(file, JSON.stringify(baseManifest, null, 2));
       const run = runRollout(['--manifest', file]);
       assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
+    });
+
+    await test('a product-less template is named by the active product, like the studio', () => {
+      const file = writeTmp((m) => {
+        m.assets = [m.assets.find((a) => a.id === 'launch-collage-top4')];
+        delete m.assets[0].filename;
+      });
+      const run = runRollout(['--manifest', file, '--json']);
+      assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
+      const { prepared } = JSON.parse(run.stdout);
+      assert.equal(prepared.assets[0].filename, `backdoor_collage_${copyLib.slugify(topProductName)}.png`);
     });
 
     await rejects('unknown template is rejected', (m) => { m.assets[0].template = 'banner'; }, /unknown template "banner"/);
