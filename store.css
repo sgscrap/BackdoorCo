@@ -2037,6 +2037,26 @@ body {
         display: none;
     }
 
+    /* The countdown strip and the 48px padding used to exceed a phone viewport,
+       blowing the drop grid open past the page edge. */
+    .drop-left {
+        padding: 32px 24px;
+    }
+
+    .drop-title {
+        font-size: 36px;
+    }
+
+    .countdown {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .count-block {
+        min-width: 0;
+        padding: 10px 12px;
+    }
+
     .section {
         padding: 48px 20px;
     }
@@ -2058,6 +2078,43 @@ body {
 
     .stats-inner {
         grid-template-columns: 1fr 1fr;
+    }
+
+    /* Phones: the footer grid and the fixed-width signup form used to push the
+       page wider than the viewport. */
+    .footer {
+        padding: 0 20px 32px;
+    }
+
+    .footer-top {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .footer-signup-form {
+        min-width: 0;
+        flex: 1 1 100%;
+    }
+
+    .footer-signup-form input {
+        min-width: 0;
+    }
+
+    .stat-block {
+        padding: 18px 10px;
+    }
+
+    .stat-num {
+        font-size: 38px;
+    }
+
+    .newsletter-form {
+        flex-wrap: wrap;
+    }
+
+    .newsletter-input {
+        min-width: 0;
+        flex: 1 1 160px;
     }
 }
 
@@ -3033,6 +3090,18 @@ body {
 .product-page-empty p {
     color: var(--text2);
     margin-bottom: 20px;
+}
+
+/* The "product unavailable" card's 48px padding used to poke past a phone
+   viewport. Placed after the base rule so it wins at source order. */
+@media (max-width: 480px) {
+    .product-page-empty {
+        padding: 28px 20px;
+    }
+
+    .product-page-empty h1 {
+        font-size: 36px;
+    }
 }
 
 .product-review-section {

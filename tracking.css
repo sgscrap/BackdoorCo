@@ -1730,5 +1730,16 @@ body {
     .p-step-label {
         font-size: 9px;
     }
+
+    /* The lookup input can't shrink below its intrinsic width, which used to
+       push the button off the right edge; let the row wrap instead. */
+    .lookup-input-wrap {
+        flex-wrap: wrap;
+    }
+
+    .lookup-input {
+        min-width: 0;
+        flex: 1 1 160px;
+    }
 }
 

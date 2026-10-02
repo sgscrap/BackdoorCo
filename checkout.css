@@ -1368,6 +1368,59 @@ body {
     .form-row-3 {
         grid-template-columns: 1fr;
     }
+
+    /* Phones: the one-off navbar drops the shipping hint and shrinks its gaps
+       so the cart button stays on screen, and the checkout grid is allowed to
+       shrink instead of being forced open by the non-wrapping step row. */
+    .navbar {
+        padding: 0 14px;
+        gap: 8px;
+    }
+
+    .navbar .free-ship-bar {
+        display: none;
+    }
+
+    .cart-btn {
+        padding: 9px 12px;
+        font-size: 13px;
+    }
+
+    .checkout-inner {
+        padding: 24px 16px;
+    }
+
+    .checkout-inner > * {
+        min-width: 0;
+    }
+
+    .checkout-steps {
+        flex-wrap: wrap;
+        row-gap: 10px;
+    }
+
+    .checkout-section,
+    .order-summary {
+        padding: 20px 16px;
+    }
+
+    .wizard-nav {
+        flex-wrap: wrap;
+    }
+
+    .wizard-continue-btn {
+        padding: 14px 20px;
+        font-size: 14px;
+    }
+
+    .c-step-line {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .promo-input {
+        min-width: 0;
+    }
 }
 
 
