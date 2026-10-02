@@ -211,7 +211,33 @@ The page-specific stylesheets keep only their genuine divergences (e.g. `checkou
 
 ### Storefront smoke test
 
-**`npm run test:smoke`** loads every storefront page in a real headless Chrome and fails if any page throws an uncaught JavaScript exception — the fastest way to catch a shared script that breaks on the one page that does not render an element it assumes exists. It adds no dependencies: it drives Chrome over the DevTools protocol and serves the repo from a temporary local server. Set `CHROME_PATH` to point at a specific browser, `SMOKE_BASE_URL` to target an already-running server, or `SMOKE_PAGES=index.html,about.html` to smoke a subset. If no Chrome/Chromium is found it prints a note and exits 0. Unhandled promise rejections and third-party network noise are reported as warnings rather than failures.
+**`npm run test:smoke`** loads every storefront page in a real headless Chrome and fails if any page throws an uncaught JavaScript exception — the fastest way to catch a shared script that breaks on the one page that does not render an element it assumes exists. It adds no dependencies: it drives Chrome over the DevTools protocol and serves the repo from a temporary local server.
+
+It also **exercises the shared chrome on every page** with real mouse input, since that is where the pages diverge:
+
+| Interaction | Driven by | Asserts |
+| --- | --- | --- |
+| Mobile menu | tapping `#navHamburger` at each phone width (320, 360, 390, 430) | the hamburger is reachable at that width, `#navMobileMenu` gains `.open` and displays, then closes again |
+| Brands dropdown | hovering `.nav-dropdown-toggle` at desktop width | `.nav-dropdown-menu` becomes displayed (it is revealed by CSS `:hover`) |
+| Cart drawer | clicking `#cartButton`, or checkout's own `.cart-btn` | the drawer slides into view, then closes via its close button |
+
+Each interaction is capability-driven: a page without a navbar or without a cart drawer reports that interaction as *n/a* rather than failing. Triggers are only clicked after a hit test proves a real user could reach them, so a hidden or covered control can never produce a false pass. The mobile menu is measured at every phone width rather than one, because the navbar's phone layout is a set of breakpoints — a regression can make the hamburger unreachable at 320px while 430px still looks fine, and a single-width probe would miss it. Findings are graded — a broken interaction fails the run, while a finding that is not this test's business (an unreachable-by-design control) is reported once as a warning and does not fail the build.
+
+It also **asserts the shape of every page** on the settled DOM, using the same `build-chrome` tables that drive **`npm run check:chrome`**, so a page that drifted from its partials or lost an asset fails the run:
+
+| Assertion | Checks |
+| --- | --- |
+| One navbar and footer | exactly one shared `#navbar` on every page whose table entry says it has one, and never more than one navbar or footer anywhere |
+| Chrome markers | every `<!-- @@chrome:<region>:start -->` has a matching `:end`, a page carries exactly the regions its table entry lists, and no `%%nav:…%%` token is left unresolved |
+| Stylesheets and images resolve | no same-origin stylesheet or image answers with HTTP ≥ 400, and no same-origin stylesheet loads but defines zero rules |
+
+The asset assertion reads real network responses with the cache disabled, so a broken image that `image-fallback.js` silently swaps for a placeholder is still caught, and a cached 200 can never hide a missing file. Third-party requests (Google Fonts, Firebase) are ignored — they are network noise and cannot be asserted offline.
+
+`product-detail.html` is the legacy product shell: without an `?id=` its script sends the browser straight home, so it used to be smoked as whatever page it bounced to. Its script reads only `products/<id>` from Firestore (never the seeded catalogue), so before the run the smoke test **discovers a live product id from the storefront itself** — it imports the site's own Firebase config in page context and queries the active products the shop sells, so its own structure is asserted against a product that actually exists. A hand-written id would rot silently whenever the catalogue changed; discovery keeps the coverage real. `SMOKE_PRODUCT_ID=<firestore id>` pins an id and skips discovery, and if the catalogue is unreachable the test falls back to a built-in id. Either way, if the document behind the id is removed the page redirects and the run degrades to a warning with its assertions skipped, rather than asserting against the wrong page.
+
+Set `CHROME_PATH` to point at a specific browser, `SMOKE_BASE_URL` to target an already-running server, `SMOKE_PAGES=index.html,about.html` to smoke a subset, `SMOKE_PRODUCT_ID=<firestore id>` to pin the id `product-detail.html` is loaded with instead of discovering one, or `SMOKE_VERBOSE=1` to list every interaction, structural check and ignored warning. If no Chrome/Chromium is found it prints a note and exits 0. Unhandled promise rejections and third-party network noise are reported as warnings rather than failures.
+
+> **Fixed:** the mobile menu used to be unreachable on phones. The navbar's desktop layout is roughly 500px wide, but `chrome.css`'s phone compaction was being overridden by later page stylesheets — `accounts.css` re-showed the search box and `email.css`/`tracking.css` restyled `.navbar`/`.nav-logo` at every width — so below about 500px the hamburger sat outside the viewport and `body { overflow-x: hidden }` made it unscrollable. The shared phone layout now wins: page-level navbar skins are scoped to `min-width: 769px`, and under 480px the logo shrinks to fit. The smoke test now taps the hamburger at 320, 360, 390 and 430px and fails if it is unreachable at any of them, so this regression cannot creep back at a width the old 390px-only probe ignored.
 
 The navbar links to:
 
@@ -633,7 +659,7 @@ Works for Lyst, Farfetch, END., SSENSE, Mr Porter, Nordstrom, Net-A-Porter. JS-o
 | Change the site colour tokens               | Edit `tokens.css`                                                                                                 |
 | Add a new admin page                        | Drop the HTML+JS pair in `admin/`, mirror the sidebar nav (`<p class="nav-label">TOOLS</p>` etc.) + add an entry in every existing admin nav |
 | Set image crop/aspect ratio per product      | Edit product → Image Display section: Fit Mode toggle, Position X/Y sliders, Scale, Padding, Aspect Ratio dropdown (Auto / 1:1 Square / 3:4 Portrait / 4:3 Landscape / 16:9 Widescreen) |
-| Smoke-test every storefront page            | `npm run test:smoke` (headless Chrome, fails on uncaught JS exceptions)                                          |
+| Smoke-test every storefront page            | `npm run test:smoke` (headless Chrome: page loads, structural assertions, mobile menu, dropdown, cart drawer)    |
 
 ---
 
