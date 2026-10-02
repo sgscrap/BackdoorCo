@@ -1,0 +1,220 @@
+{
+  "brand": "Backdoor",
+  "handle": "@backdoorco",
+  "siteOrigin": "https://backdoorco.vercel.app",
+  "campaign": "Weekly Drop",
+  "generatedBy": "scripts/generate-instagram-rollout.js",
+  "defaults": {
+    "font": "space-grotesk",
+    "fontWeight": "900",
+    "imageFilter": "none",
+    "blur": false,
+    "watermark": false,
+    "grain": 16
+  },
+  "assets": [
+    {
+      "id": "gen-story-off-white-be-right-back-sneakers-light-grey-caramel",
+      "preset": "story",
+      "productRef": "seed-off-white-be-right-back-sneakers-light-grey-caramel",
+      "copy": {
+        "headline": "Off-White 'Be Right Back' Sneakers",
+        "body": "Off-White / LIGHT GREY - CARAMEL. Tap to shop."
+      },
+      "filename": "backdoor_story_off-white-be-right-back-sneakers-light-grey-caramel.png",
+      "schedule": {
+        "order": 1,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-drop-off-white-be-right-back-sneakers-light-grey-caramel",
+      "preset": "drop",
+      "productRef": "seed-off-white-be-right-back-sneakers-light-grey-caramel",
+      "copy": {
+        "headline": "Off-White 'Be Right Back' Sneakers",
+        "body": "Off-White / LIGHT GREY - CARAMEL. Available now at Backdoor."
+      },
+      "filename": "backdoor_drop_off-white-be-right-back-sneakers-light-grey-caramel.png",
+      "schedule": {
+        "order": 2,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-drop-kobe-6-protro-kay-yow-think-pink-2021",
+      "preset": "drop",
+      "productRef": "seed-kobe-6-protro-kay-yow-think-pink-2021",
+      "copy": {
+        "headline": "Nike Kobe 6 Protro 'Kay Yow Think Pink' (2021)",
+        "body": "Nike / Pinkfire/White-Metallic Silver. Available now at Backdoor."
+      },
+      "filename": "backdoor_drop_kobe-6-protro-kay-yow-think-pink-2021.png",
+      "schedule": {
+        "order": 3,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-drop-fendi-teddy-bear-plush-toy-tshirt-white",
+      "preset": "drop",
+      "productRef": "seed-fendi-teddy-bear-plush-toy-tshirt-white",
+      "copy": {
+        "headline": "Fendi Teddy Bear Plush Toy T-Shirt 'White'",
+        "body": "Fendi / White/Multicolor. Available now at Backdoor."
+      },
+      "filename": "backdoor_drop_fendi-teddy-bear-plush-toy-tshirt-white.png",
+      "schedule": {
+        "order": 4,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-drop-moncler-logo-patch-cargo-shorts-black",
+      "preset": "drop",
+      "productRef": "seed-moncler-logo-patch-cargo-shorts-black",
+      "copy": {
+        "headline": "Moncler Logo-Patch Cargo Shorts",
+        "body": "Moncler / Black. Available now at Backdoor."
+      },
+      "filename": "backdoor_drop_moncler-logo-patch-cargo-shorts-black.png",
+      "schedule": {
+        "order": 5,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-sale-off-white-industrial-belt-yellow-black",
+      "preset": "sale",
+      "productRef": "seed-off-white-industrial-belt-yellow-black",
+      "copy": {
+        "headline": "Off-White Industrial Belt",
+        "body": "Off-White / Yellow/Black. Marked down 60% while stock lasts.",
+        "promo": "DROP60"
+      },
+      "filename": "backdoor_sale_off-white-industrial-belt-yellow-black.png",
+      "schedule": {
+        "order": 6,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-sale-dior-b30-countdown-tech-white-gray-green",
+      "preset": "sale",
+      "productRef": "seed-dior-b30-countdown-tech-white-gray-green",
+      "copy": {
+        "headline": "B30 Countdown Tech Sneaker — White/Gray/Green",
+        "body": "Dior / White/Gray/Green. Marked down 50% while stock lasts.",
+        "promo": "DROP50"
+      },
+      "filename": "backdoor_sale_dior-b30-countdown-tech-white-gray-green.png",
+      "schedule": {
+        "order": 7,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-sale-dior-b30-countdown-tech-beige-brown-orange",
+      "preset": "sale",
+      "productRef": "seed-dior-b30-countdown-tech-beige-brown-orange",
+      "copy": {
+        "headline": "B30 Countdown Tech Sneaker — Beige/Brown/Orange/Gray",
+        "body": "Dior / Beige/Brown/Orange/Gray. Marked down 50% while stock lasts.",
+        "promo": "DROP50"
+      },
+      "filename": "backdoor_sale_dior-b30-countdown-tech-beige-brown-orange.png",
+      "schedule": {
+        "order": 8,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-restock-kids-travis-black-phantom-ps",
+      "preset": "restock",
+      "productRef": "seed-kids-travis-black-phantom-ps",
+      "copy": {
+        "headline": "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+        "body": "Jordan / Black/Black. Back on the shelf — 1 left."
+      },
+      "filename": "backdoor_restock_kids-travis-black-phantom-ps.png",
+      "schedule": {
+        "order": 9,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-restock-burberry-logo-embroidered-tshirt-beige",
+      "preset": "restock",
+      "productRef": "seed-burberry-logo-embroidered-tshirt-beige",
+      "copy": {
+        "headline": "Burberry Logo-Embroidered T-Shirt 'Beige'",
+        "body": "Burberry / Beige/Blue. Back on the shelf — 4 left."
+      },
+      "filename": "backdoor_restock_burberry-logo-embroidered-tshirt-beige.png",
+      "schedule": {
+        "order": 10,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-collage-new-arrivals",
+      "preset": "collage",
+      "copy": {
+        "headline": "New Arrivals",
+        "body": "The 4 newest pairs on the shelf right now."
+      },
+      "filename": "backdoor_collage_new_arrivals.png",
+      "schedule": {
+        "order": 11,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-carousel-cover",
+      "preset": "collage",
+      "copy": {
+        "headline": "This Week At Backdoor",
+        "body": "Swipe this week's lineup — 3 slides deep.",
+        "badge": "1 / 3"
+      },
+      "carouselGroup": "weekly-lineup",
+      "filename": "backdoor_collage_weekly_lineup.png",
+      "schedule": {
+        "order": 12,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-carousel-nigel-sylvester-air-jordan-4-retro-og-sail",
+      "preset": "drop",
+      "productRef": "seed-nigel-sylvester-air-jordan-4-retro-og-sail",
+      "copy": {
+        "headline": "Nigel Sylvester x Air Jordan 4 Retro OG 'Sail'",
+        "body": "Jordan / Sail. Slide 2 of 3 in this week's lineup.",
+        "badge": "2 / 3"
+      },
+      "carouselGroup": "weekly-lineup",
+      "filename": "backdoor_carousel_nigel-sylvester-air-jordan-4-retro-og-sail.png",
+      "schedule": {
+        "order": 13,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-carousel-loewe-logo-embroidered-cotton-jersey-tshirt-navy",
+      "preset": "drop",
+      "productRef": "seed-loewe-logo-embroidered-cotton-jersey-tshirt-navy",
+      "copy": {
+        "headline": "LOEWE Logo-Embroidered Cotton-Jersey T-Shirt 'Navy'",
+        "body": "LOEWE / Navy. Slide 3 of 3 in this week's lineup.",
+        "badge": "3 / 3"
+      },
+      "carouselGroup": "weekly-lineup",
+      "filename": "backdoor_carousel_loewe-logo-embroidered-cotton-jersey-tshirt-navy.png",
+      "schedule": {
+        "order": 14,
+        "postAt": null
+      }
+    }
+  ]
+}

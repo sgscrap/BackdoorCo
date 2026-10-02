@@ -83,6 +83,17 @@ jobs:
           npm run prepare:instagram
           git diff --exit-code -- admin/instagram-rollout.prepared.json
 
+      # The generated rollout manifest is built from the seeded catalogue, fully
+      # offline, so it is deterministic: validate it and fail if the committed
+      # file is stale (regenerate then check nothing changed).
+      - name: Generated Instagram assets are valid (offline)
+        run: npm run check:instagram:generated
+
+      - name: Generated Instagram assets are up to date
+        run: |
+          npm run generate:instagram
+          git diff --exit-code -- admin/instagram-rollout.generated.json
+
   # ── 2. Vercel preview deploy (step-guarded on secrets) ────
   vercel-deploy-check:
     name: Vercel preview build
