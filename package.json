@@ -23,6 +23,7 @@
     "prepare:instagram": "node scripts/prepare-instagram-rollout.js --write --offline",
     "check:instagram": "node scripts/prepare-instagram-rollout.js --offline",
     "generate:instagram": "node scripts/generate-instagram-rollout.js --write --offline",
+    "prepare:instagram:generated": "node scripts/prepare-instagram-rollout.js --offline --manifest admin/instagram-rollout.generated.json --out admin/instagram-rollout.generated.prepared.json --write",
     "check:instagram:generated": "node scripts/prepare-instagram-rollout.js --offline --manifest admin/instagram-rollout.generated.json",
     "test:instagram-rollout": "node scripts/instagram-rollout.test.js",
     "test:rollout-import": "node scripts/rollout-import.test.js",

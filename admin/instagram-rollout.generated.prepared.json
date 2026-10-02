@@ -1,0 +1,829 @@
+{
+  "brand": "Backdoor",
+  "handle": "@backdoorco",
+  "siteOrigin": "https://backdoorco.vercel.app",
+  "campaign": "Weekly Drop",
+  "defaults": {
+    "font": "space-grotesk",
+    "fontWeight": "900",
+    "imageFilter": "none",
+    "blur": false,
+    "watermark": false,
+    "grain": 16
+  },
+  "counts": {
+    "assets": 14,
+    "templates": [
+      "collage",
+      "drop",
+      "restock",
+      "sale",
+      "story"
+    ],
+    "carousels": [
+      "weekly-lineup"
+    ]
+  },
+  "assets": [
+    {
+      "id": "gen-story-off-white-be-right-back-sneakers-light-grey-caramel",
+      "order": 1,
+      "preset": "story",
+      "carouselGroup": null,
+      "template": "story",
+      "ratio": "9-16",
+      "theme": "backdoor",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1920
+      },
+      "product": {
+        "id": "seed-off-white-be-right-back-sneakers-light-grey-caramel",
+        "name": "Off-White 'Be Right Back' Sneakers",
+        "brand": "Off-White",
+        "category": "Sneakers",
+        "price": 350
+      },
+      "copy": {
+        "kicker": "BACKDOOR DROP",
+        "headline": "Off-White 'Be Right Back' Sneakers",
+        "body": "Off-White / LIGHT GREY - CARAMEL. Tap to shop.",
+        "badge": "TAP TO SHOP",
+        "cta": "SHOP NOW",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": true,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/off-white-be-right-back-01.jpg",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-off-white-be-right-back-sneakers-light-grey-caramel&slug=off-white-be-right-back-sneakers",
+      "caption": "Off-White 'Be Right Back' Sneakers\nOff-White / LIGHT GREY - CARAMEL. Tap to shop.\n\nSHOP NOW: https://backdoorco.vercel.app/product.html?id=seed-off-white-be-right-back-sneakers-light-grey-caramel&slug=off-white-be-right-back-sneakers\n@backdoorco\n\n#Backdoor #BackdoorCo #NewDrop #OffWhite #Sneakers",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#NewDrop",
+        "#OffWhite",
+        "#Sneakers"
+      ],
+      "filename": "backdoor_story_off-white-be-right-back-sneakers-light-grey-caramel.png",
+      "schedule": {
+        "order": 1,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-drop-off-white-be-right-back-sneakers-light-grey-caramel",
+      "order": 2,
+      "preset": "drop",
+      "carouselGroup": null,
+      "template": "drop",
+      "ratio": "1-1",
+      "theme": "backdoor",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-off-white-be-right-back-sneakers-light-grey-caramel",
+        "name": "Off-White 'Be Right Back' Sneakers",
+        "brand": "Off-White",
+        "category": "Sneakers",
+        "price": 350
+      },
+      "copy": {
+        "kicker": "NEW DROP",
+        "headline": "Off-White 'Be Right Back' Sneakers",
+        "body": "Off-White / LIGHT GREY - CARAMEL. Available now at Backdoor.",
+        "badge": "AVAILABLE NOW",
+        "cta": "SHOP BACKDOOR",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": true,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/off-white-be-right-back-01.jpg",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-off-white-be-right-back-sneakers-light-grey-caramel&slug=off-white-be-right-back-sneakers",
+      "caption": "Off-White 'Be Right Back' Sneakers\nOff-White / LIGHT GREY - CARAMEL. Available now at Backdoor.\n\nSHOP BACKDOOR: https://backdoorco.vercel.app/product.html?id=seed-off-white-be-right-back-sneakers-light-grey-caramel&slug=off-white-be-right-back-sneakers\n@backdoorco\n\n#Backdoor #BackdoorCo #NewDrop #OffWhite #Sneakers",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#NewDrop",
+        "#OffWhite",
+        "#Sneakers"
+      ],
+      "filename": "backdoor_drop_off-white-be-right-back-sneakers-light-grey-caramel.png",
+      "schedule": {
+        "order": 2,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-drop-kobe-6-protro-kay-yow-think-pink-2021",
+      "order": 3,
+      "preset": "drop",
+      "carouselGroup": null,
+      "template": "drop",
+      "ratio": "1-1",
+      "theme": "backdoor",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-kobe-6-protro-kay-yow-think-pink-2021",
+        "name": "Nike Kobe 6 Protro 'Kay Yow Think Pink' (2021)",
+        "brand": "Nike",
+        "category": "Sneakers",
+        "price": 650
+      },
+      "copy": {
+        "kicker": "NEW DROP",
+        "headline": "Nike Kobe 6 Protro 'Kay Yow Think Pink' (2021)",
+        "body": "Nike / Pinkfire/White-Metallic Silver. Available now at Backdoor.",
+        "badge": "AVAILABLE NOW",
+        "cta": "SHOP BACKDOOR",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": true,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/kobe-6-kay-yow-think-pink-01.webp",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-kobe-6-protro-kay-yow-think-pink-2021&slug=nike-kobe-6-protro-kay-yow-think-pink-2021",
+      "caption": "Nike Kobe 6 Protro 'Kay Yow Think Pink' (2021)\nNike / Pinkfire/White-Metallic Silver. Available now at Backdoor.\n\nSHOP BACKDOOR: https://backdoorco.vercel.app/product.html?id=seed-kobe-6-protro-kay-yow-think-pink-2021&slug=nike-kobe-6-protro-kay-yow-think-pink-2021\n@backdoorco\n\n#Backdoor #BackdoorCo #NewDrop #Nike #Sneakers",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#NewDrop",
+        "#Nike",
+        "#Sneakers"
+      ],
+      "filename": "backdoor_drop_kobe-6-protro-kay-yow-think-pink-2021.png",
+      "schedule": {
+        "order": 3,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-drop-fendi-teddy-bear-plush-toy-tshirt-white",
+      "order": 4,
+      "preset": "drop",
+      "carouselGroup": null,
+      "template": "drop",
+      "ratio": "1-1",
+      "theme": "backdoor",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-fendi-teddy-bear-plush-toy-tshirt-white",
+        "name": "Fendi Teddy Bear Plush Toy T-Shirt 'White'",
+        "brand": "Fendi",
+        "category": "Apparel",
+        "price": 400
+      },
+      "copy": {
+        "kicker": "NEW DROP",
+        "headline": "Fendi Teddy Bear Plush Toy T-Shirt 'White'",
+        "body": "Fendi / White/Multicolor. Available now at Backdoor.",
+        "badge": "AVAILABLE NOW",
+        "cta": "SHOP BACKDOOR",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": true,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/catalog/i-imgur-com-0r0mmrx-0919f2.png",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-fendi-teddy-bear-plush-toy-tshirt-white&slug=fendi-teddy-bear-plush-toy-t-shirt-white",
+      "caption": "Fendi Teddy Bear Plush Toy T-Shirt 'White'\nFendi / White/Multicolor. Available now at Backdoor.\n\nSHOP BACKDOOR: https://backdoorco.vercel.app/product.html?id=seed-fendi-teddy-bear-plush-toy-tshirt-white&slug=fendi-teddy-bear-plush-toy-t-shirt-white\n@backdoorco\n\n#Backdoor #BackdoorCo #NewDrop #Fendi #Apparel",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#NewDrop",
+        "#Fendi",
+        "#Apparel"
+      ],
+      "filename": "backdoor_drop_fendi-teddy-bear-plush-toy-tshirt-white.png",
+      "schedule": {
+        "order": 4,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-drop-moncler-logo-patch-cargo-shorts-black",
+      "order": 5,
+      "preset": "drop",
+      "carouselGroup": null,
+      "template": "drop",
+      "ratio": "1-1",
+      "theme": "backdoor",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-moncler-logo-patch-cargo-shorts-black",
+        "name": "Moncler Logo-Patch Cargo Shorts",
+        "brand": "Moncler",
+        "category": "Apparel",
+        "price": 350
+      },
+      "copy": {
+        "kicker": "NEW DROP",
+        "headline": "Moncler Logo-Patch Cargo Shorts",
+        "body": "Moncler / Black. Available now at Backdoor.",
+        "badge": "AVAILABLE NOW",
+        "cta": "SHOP BACKDOOR",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": true,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/catalog/i-imgur-com-fnnx2eq-542ca0.png",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-moncler-logo-patch-cargo-shorts-black&slug=moncler-logo-patch-cargo-shorts",
+      "caption": "Moncler Logo-Patch Cargo Shorts\nMoncler / Black. Available now at Backdoor.\n\nSHOP BACKDOOR: https://backdoorco.vercel.app/product.html?id=seed-moncler-logo-patch-cargo-shorts-black&slug=moncler-logo-patch-cargo-shorts\n@backdoorco\n\n#Backdoor #BackdoorCo #NewDrop #Moncler #Apparel",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#NewDrop",
+        "#Moncler",
+        "#Apparel"
+      ],
+      "filename": "backdoor_drop_moncler-logo-patch-cargo-shorts-black.png",
+      "schedule": {
+        "order": 5,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-sale-off-white-industrial-belt-yellow-black",
+      "order": 6,
+      "preset": "sale",
+      "carouselGroup": null,
+      "template": "sale",
+      "ratio": "1-1",
+      "theme": "red",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-off-white-industrial-belt-yellow-black",
+        "name": "Off-White Industrial Belt",
+        "brand": "Off-White",
+        "category": "Accessories",
+        "price": 90
+      },
+      "copy": {
+        "kicker": "LIMITED OFFER",
+        "headline": "Off-White Industrial Belt",
+        "body": "Off-White / Yellow/Black. Marked down 60% while stock lasts.",
+        "badge": "PRICE DROP",
+        "cta": "SHOP THE SALE",
+        "promo": "DROP60"
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": false,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/catalog/stockx-com-off-white-classic-industrial-belt-yellow-black-57729c.avif",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-off-white-industrial-belt-yellow-black&slug=off-white-industrial-belt",
+      "caption": "Off-White Industrial Belt\nOff-White / Yellow/Black. Marked down 60% while stock lasts.\nCode: DROP60\n\nSHOP THE SALE: https://backdoorco.vercel.app/product.html?id=seed-off-white-industrial-belt-yellow-black&slug=off-white-industrial-belt\n@backdoorco\n\n#Backdoor #BackdoorCo #Sale #OffWhite #Accessories",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#Sale",
+        "#OffWhite",
+        "#Accessories"
+      ],
+      "filename": "backdoor_sale_off-white-industrial-belt-yellow-black.png",
+      "schedule": {
+        "order": 6,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-sale-dior-b30-countdown-tech-white-gray-green",
+      "order": 7,
+      "preset": "sale",
+      "carouselGroup": null,
+      "template": "sale",
+      "ratio": "1-1",
+      "theme": "red",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-dior-b30-countdown-tech-white-gray-green",
+        "name": "B30 Countdown Tech Sneaker",
+        "brand": "Dior",
+        "category": "Sneakers",
+        "price": 625
+      },
+      "copy": {
+        "kicker": "LIMITED OFFER",
+        "headline": "B30 Countdown Tech Sneaker — White/Gray/Green",
+        "body": "Dior / White/Gray/Green. Marked down 50% while stock lasts.",
+        "badge": "PRICE DROP",
+        "cta": "SHOP THE SALE",
+        "promo": "DROP50"
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": false,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/catalog/i-imgur-com-zuyle1r-f6af7b.png",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-dior-b30-countdown-tech-white-gray-green&slug=b30-countdown-tech-sneaker",
+      "caption": "B30 Countdown Tech Sneaker — White/Gray/Green\nDior / White/Gray/Green. Marked down 50% while stock lasts.\nCode: DROP50\n\nSHOP THE SALE: https://backdoorco.vercel.app/product.html?id=seed-dior-b30-countdown-tech-white-gray-green&slug=b30-countdown-tech-sneaker\n@backdoorco\n\n#Backdoor #BackdoorCo #Sale #Dior #Sneakers",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#Sale",
+        "#Dior",
+        "#Sneakers"
+      ],
+      "filename": "backdoor_sale_dior-b30-countdown-tech-white-gray-green.png",
+      "schedule": {
+        "order": 7,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-sale-dior-b30-countdown-tech-beige-brown-orange",
+      "order": 8,
+      "preset": "sale",
+      "carouselGroup": null,
+      "template": "sale",
+      "ratio": "1-1",
+      "theme": "red",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-dior-b30-countdown-tech-beige-brown-orange",
+        "name": "B30 Countdown Tech Sneaker",
+        "brand": "Dior",
+        "category": "Sneakers",
+        "price": 625
+      },
+      "copy": {
+        "kicker": "LIMITED OFFER",
+        "headline": "B30 Countdown Tech Sneaker — Beige/Brown/Orange/Gray",
+        "body": "Dior / Beige/Brown/Orange/Gray. Marked down 50% while stock lasts.",
+        "badge": "PRICE DROP",
+        "cta": "SHOP THE SALE",
+        "promo": "DROP50"
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": false,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/catalog/i-imgur-com-bd6lkro-db35ac.png",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-dior-b30-countdown-tech-beige-brown-orange&slug=b30-countdown-tech-sneaker",
+      "caption": "B30 Countdown Tech Sneaker — Beige/Brown/Orange/Gray\nDior / Beige/Brown/Orange/Gray. Marked down 50% while stock lasts.\nCode: DROP50\n\nSHOP THE SALE: https://backdoorco.vercel.app/product.html?id=seed-dior-b30-countdown-tech-beige-brown-orange&slug=b30-countdown-tech-sneaker\n@backdoorco\n\n#Backdoor #BackdoorCo #Sale #Dior #Sneakers",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#Sale",
+        "#Dior",
+        "#Sneakers"
+      ],
+      "filename": "backdoor_sale_dior-b30-countdown-tech-beige-brown-orange.png",
+      "schedule": {
+        "order": 8,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-restock-kids-travis-black-phantom-ps",
+      "order": 9,
+      "preset": "restock",
+      "carouselGroup": null,
+      "template": "restock",
+      "ratio": "1-1",
+      "theme": "mono",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-kids-travis-black-phantom-ps",
+        "name": "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+        "brand": "Jordan",
+        "category": "Sneakers",
+        "price": 180
+      },
+      "copy": {
+        "kicker": "RESTOCK ALERT",
+        "headline": "Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'",
+        "body": "Jordan / Black/Black. Back on the shelf — 1 left.",
+        "badge": "BACK IN",
+        "cta": "SECURE YOUR SIZE",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": true,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/catalog/i-imgur-com-30h5nyd-59c491.jpg",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-kids-travis-black-phantom-ps&slug=travis-scott-x-air-jordan-1-retro-low-og-sp-ps-black-phantom",
+      "caption": "Restock alert: Travis Scott x Air Jordan 1 Retro Low OG SP PS 'Black Phantom'\nJordan / Black/Black. Back on the shelf — 1 left.\n\nSECURE YOUR SIZE: https://backdoorco.vercel.app/product.html?id=seed-kids-travis-black-phantom-ps&slug=travis-scott-x-air-jordan-1-retro-low-og-sp-ps-black-phantom\n@backdoorco\n\n#Backdoor #BackdoorCo #Restock #Jordan #SneakerRestock",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#Restock",
+        "#Jordan",
+        "#SneakerRestock"
+      ],
+      "filename": "backdoor_restock_kids-travis-black-phantom-ps.png",
+      "schedule": {
+        "order": 9,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-restock-burberry-logo-embroidered-tshirt-beige",
+      "order": 10,
+      "preset": "restock",
+      "carouselGroup": null,
+      "template": "restock",
+      "ratio": "1-1",
+      "theme": "mono",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-burberry-logo-embroidered-tshirt-beige",
+        "name": "Burberry Logo-Embroidered T-Shirt 'Beige'",
+        "brand": "Burberry",
+        "category": "Apparel",
+        "price": 300
+      },
+      "copy": {
+        "kicker": "RESTOCK ALERT",
+        "headline": "Burberry Logo-Embroidered T-Shirt 'Beige'",
+        "body": "Burberry / Beige/Blue. Back on the shelf — 4 left.",
+        "badge": "BACK IN",
+        "cta": "SECURE YOUR SIZE",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": true,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/catalog/i-imgur-com-sebwtsp-61bc3f.jpg",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-burberry-logo-embroidered-tshirt-beige&slug=burberry-logo-embroidered-t-shirt-beige",
+      "caption": "Restock alert: Burberry Logo-Embroidered T-Shirt 'Beige'\nBurberry / Beige/Blue. Back on the shelf — 4 left.\n\nSECURE YOUR SIZE: https://backdoorco.vercel.app/product.html?id=seed-burberry-logo-embroidered-tshirt-beige&slug=burberry-logo-embroidered-t-shirt-beige\n@backdoorco\n\n#Backdoor #BackdoorCo #Restock #Burberry #SneakerRestock",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#Restock",
+        "#Burberry",
+        "#SneakerRestock"
+      ],
+      "filename": "backdoor_restock_burberry-logo-embroidered-tshirt-beige.png",
+      "schedule": {
+        "order": 10,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-collage-new-arrivals",
+      "order": 11,
+      "preset": "collage",
+      "carouselGroup": null,
+      "template": "collage",
+      "ratio": "1-1",
+      "theme": "white",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": null,
+      "copy": {
+        "kicker": "NEW ARRIVALS",
+        "headline": "New Arrivals",
+        "body": "The 4 newest pairs on the shelf right now.",
+        "badge": "TOP 4",
+        "cta": "SHOP THE DROP",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": false,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app",
+      "caption": "Backdoor new arrivals\n\n1. Off-White 'Be Right Back' Sneakers - $350\n2. Nike Kobe 6 Protro 'Kay Yow Think Pink' (2021) - $650\n3. Fendi Teddy Bear Plush Toy T-Shirt 'White' - $400\n4. Moncler Logo-Patch Cargo Shorts - $350\n\nSHOP THE DROP: https://backdoorco.vercel.app/shop-all\n@backdoorco\n\n#Backdoor #BackdoorCo #NewDrops #Streetwear #SneakerDrops",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#NewDrops",
+        "#Streetwear",
+        "#SneakerDrops"
+      ],
+      "filename": "backdoor_collage_new_arrivals.png",
+      "schedule": {
+        "order": 11,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-carousel-cover",
+      "order": 12,
+      "preset": "collage",
+      "carouselGroup": "weekly-lineup",
+      "template": "collage",
+      "ratio": "1-1",
+      "theme": "white",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": null,
+      "copy": {
+        "kicker": "NEW ARRIVALS",
+        "headline": "This Week At Backdoor",
+        "body": "Swipe this week's lineup — 3 slides deep.",
+        "badge": "1 / 3",
+        "cta": "SHOP THE DROP",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": false,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app",
+      "caption": "Backdoor new arrivals\n\n1. Off-White 'Be Right Back' Sneakers - $350\n2. Nike Kobe 6 Protro 'Kay Yow Think Pink' (2021) - $650\n3. Fendi Teddy Bear Plush Toy T-Shirt 'White' - $400\n4. Moncler Logo-Patch Cargo Shorts - $350\n\nSHOP THE DROP: https://backdoorco.vercel.app/shop-all\n@backdoorco\n\n#Backdoor #BackdoorCo #NewDrops #Streetwear #SneakerDrops",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#NewDrops",
+        "#Streetwear",
+        "#SneakerDrops"
+      ],
+      "filename": "backdoor_collage_weekly_lineup.png",
+      "schedule": {
+        "order": 12,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-carousel-nigel-sylvester-air-jordan-4-retro-og-sail",
+      "order": 13,
+      "preset": "drop",
+      "carouselGroup": "weekly-lineup",
+      "template": "drop",
+      "ratio": "1-1",
+      "theme": "backdoor",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-nigel-sylvester-air-jordan-4-retro-og-sail",
+        "name": "Nigel Sylvester x Air Jordan 4 Retro OG 'Sail'",
+        "brand": "Jordan",
+        "category": "Sneakers",
+        "price": 320
+      },
+      "copy": {
+        "kicker": "NEW DROP",
+        "headline": "Nigel Sylvester x Air Jordan 4 Retro OG 'Sail'",
+        "body": "Jordan / Sail. Slide 2 of 3 in this week's lineup.",
+        "badge": "2 / 3",
+        "cta": "SHOP BACKDOOR",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": true,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/catalog/i-imgur-com-6u61ao2-e98625.jpg",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-nigel-sylvester-air-jordan-4-retro-og-sail&slug=nigel-sylvester-x-air-jordan-4-retro-og-sail",
+      "caption": "Nigel Sylvester x Air Jordan 4 Retro OG 'Sail'\nJordan / Sail. Slide 2 of 3 in this week's lineup.\n\nSHOP BACKDOOR: https://backdoorco.vercel.app/product.html?id=seed-nigel-sylvester-air-jordan-4-retro-og-sail&slug=nigel-sylvester-x-air-jordan-4-retro-og-sail\n@backdoorco\n\n#Backdoor #BackdoorCo #NewDrop #Jordan #Sneakers",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#NewDrop",
+        "#Jordan",
+        "#Sneakers"
+      ],
+      "filename": "backdoor_carousel_nigel-sylvester-air-jordan-4-retro-og-sail.png",
+      "schedule": {
+        "order": 13,
+        "postAt": null
+      }
+    },
+    {
+      "id": "gen-carousel-loewe-logo-embroidered-cotton-jersey-tshirt-navy",
+      "order": 14,
+      "preset": "drop",
+      "carouselGroup": "weekly-lineup",
+      "template": "drop",
+      "ratio": "1-1",
+      "theme": "backdoor",
+      "font": "space-grotesk",
+      "fontWeight": "900",
+      "dimensions": {
+        "width": 1080,
+        "height": 1080
+      },
+      "product": {
+        "id": "seed-loewe-logo-embroidered-cotton-jersey-tshirt-navy",
+        "name": "LOEWE Logo-Embroidered Cotton-Jersey T-Shirt 'Navy'",
+        "brand": "LOEWE",
+        "category": "Apparel",
+        "price": 249.99
+      },
+      "copy": {
+        "kicker": "NEW DROP",
+        "headline": "LOEWE Logo-Embroidered Cotton-Jersey T-Shirt 'Navy'",
+        "body": "LOEWE / Navy. Slide 3 of 3 in this week's lineup.",
+        "badge": "3 / 3",
+        "cta": "SHOP BACKDOOR",
+        "promo": ""
+      },
+      "toggles": {
+        "showPrice": true,
+        "showSizes": true,
+        "visitSite": false,
+        "visitSiteUrl": ""
+      },
+      "effects": {
+        "imageFilter": "none",
+        "blur": false,
+        "watermark": false,
+        "grain": 16
+      },
+      "imageUrl": "products/catalog/i-imgur-com-4vxxato-e60f22.png",
+      "imageOverride": "",
+      "productUrl": "https://backdoorco.vercel.app/product.html?id=seed-loewe-logo-embroidered-cotton-jersey-tshirt-navy&slug=loewe-logo-embroidered-cotton-jersey-t-shirt-navy",
+      "caption": "LOEWE Logo-Embroidered Cotton-Jersey T-Shirt 'Navy'\nLOEWE / Navy. Slide 3 of 3 in this week's lineup.\n\nSHOP BACKDOOR: https://backdoorco.vercel.app/product.html?id=seed-loewe-logo-embroidered-cotton-jersey-tshirt-navy&slug=loewe-logo-embroidered-cotton-jersey-t-shirt-navy\n@backdoorco\n\n#Backdoor #BackdoorCo #NewDrop #LOEWE #Apparel",
+      "hashtags": [
+        "#Backdoor",
+        "#BackdoorCo",
+        "#NewDrop",
+        "#LOEWE",
+        "#Apparel"
+      ],
+      "filename": "backdoor_carousel_loewe-logo-embroidered-cotton-jersey-tshirt-navy.png",
+      "schedule": {
+        "order": 14,
+        "postAt": null
+      }
+    }
+  ]
+}

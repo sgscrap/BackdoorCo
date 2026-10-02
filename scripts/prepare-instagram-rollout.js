@@ -13,6 +13,11 @@
 //   node scripts/prepare-instagram-rollout.js --json     # machine-readable report
 //   node scripts/prepare-instagram-rollout.js --offline  # seeded catalogue only (deterministic)
 //   node scripts/prepare-instagram-rollout.js --manifest <path>  # validate a different manifest
+//   node scripts/prepare-instagram-rollout.js --out <path>  # write the prepared file elsewhere
+//
+// --out keeps a prepared file alongside its manifest instead of overwriting
+// admin/instagram-rollout.prepared.json — e.g. preparing the generated rollout
+// for preview in the studio without disturbing the curated launch campaign.
 //
 // Exits 1 when any asset fails validation, so it can gate a build.
 //
@@ -35,7 +40,7 @@ function argValue(flag) {
 }
 
 const MANIFEST_PATH = path.resolve(ROOT, argValue('--manifest') || path.join('admin', 'instagram-rollout.json'));
-const PREPARED_PATH = path.join(ROOT, 'admin', 'instagram-rollout.prepared.json');
+const PREPARED_PATH = path.resolve(ROOT, argValue('--out') || path.join('admin', 'instagram-rollout.prepared.json'));
 const CATALOG_DIR = path.join(ROOT, 'products', 'catalog');
 
 const FIRESTORE_PROJECT = process.env.FIRESTORE_PROJECT || 'coalition-aec44';

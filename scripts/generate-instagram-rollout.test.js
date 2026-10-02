@@ -185,6 +185,29 @@ function generatedJson(args = ['--json']) {
     assert.equal(after, before, 'admin/instagram-rollout.generated.json is stale; re-run `npm run generate:instagram`');
   });
 
+  await test('the committed generated rollout is prepared and not stale', () => {
+    const prepared = path.join(ROOT, 'admin', 'instagram-rollout.generated.prepared.json');
+    const normalize = (text) => text.replace(/\r\n/g, '\n');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'generate-prepared-'));
+    const file = path.join(dir, 'fresh.prepared.json');
+    try {
+      const run = runPrepare(['--manifest', 'admin/instagram-rollout.generated.json', '--out', file, '--write']);
+      assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
+      assert.equal(
+        normalize(fs.readFileSync(prepared, 'utf8')),
+        normalize(fs.readFileSync(file, 'utf8')),
+        'admin/instagram-rollout.generated.prepared.json is stale; re-run `npm run prepare:instagram:generated`'
+      );
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  await test('the studio resolves the rollout URL from the query string', () => {
+    const source = fs.readFileSync(path.join(ROOT, 'admin', 'social.js'), 'utf8');
+    assert.match(source, /resolveRolloutUrl\(window\.location\.search\)/, 'social.js should honor ?rollout=');
+  });
+
   // ── options ─────────────────────────────────────────────────────────────
   await test('--new controls how many arrivals are selected', () => {
     const two = generatedJson(['--json', '--new', '2']);

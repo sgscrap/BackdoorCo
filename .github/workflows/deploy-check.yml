@@ -94,6 +94,11 @@ jobs:
           npm run generate:instagram
           git diff --exit-code -- admin/instagram-rollout.generated.json
 
+      - name: Generated Instagram rollout is prepared (not stale)
+        run: |
+          npm run prepare:instagram:generated
+          git diff --exit-code -- admin/instagram-rollout.generated.prepared.json
+
   # ── 2. Vercel preview deploy (step-guarded on secrets) ────
   vercel-deploy-check:
     name: Vercel preview build
