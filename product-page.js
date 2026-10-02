@@ -326,6 +326,11 @@ function subscribeToProductQuery(productQuery, fallbackProduct, missingMessage =
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Only the real product-page shell has this container. The legacy
+    // product-detail.html also loads this module, so bail out instead of
+    // throwing on the elements it doesn't render.
+    if (!document.getElementById('productPageLayout')) return;
+
     initShell();
     updateCartUI();
 
@@ -416,7 +421,9 @@ window.updateWishlistBtnUI = function() {
 }
 
 function renderMissingProduct(message = 'Product not found.') {
-    document.getElementById('productPageLayout').innerHTML = `
+    const layout = document.getElementById('productPageLayout');
+    if (!layout) return;
+    layout.innerHTML = `
         <div class="product-page-empty">
             <h1>Product unavailable</h1>
             <p>${message}</p>

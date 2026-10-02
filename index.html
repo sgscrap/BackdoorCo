@@ -12,6 +12,10 @@
     href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- @@chrome:headcss:start -->
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="chrome.css" />
+  <!-- @@chrome:headcss:end -->
   <link rel="stylesheet" href="store.css" />
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -570,30 +574,10 @@
     function filterByBrandClick(brand) {
       window.location.href = 'shop-all.html?filter=' + encodeURIComponent(brand);
     }
-    // Footer email signup
-    function handleFooterSignup(e) {
-      e.preventDefault();
-      var input = document.getElementById('footerEmailInput');
-      if (input && input.value) {
-        input.value = '';
-        input.placeholder = "You're in. Welcome to the back.";
-        input.disabled = true;
-      }
-    }
-    // Announcement bar
-    function closeAnnounce() {
-      document.getElementById('announceBar').style.display = 'none';
-      document.getElementById('navbar').classList.remove('announce-offset');
-      document.querySelector('.hero').classList.remove('announce-offset-section');
-    }
     // Scroll to shop
     function scrollToShop() {
       window.location.href = 'shop-all.html?sort=price-high';
     }
-    // Navbar scroll effect
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 80);
-    });
     // Toast system
     function showToast(msg, type) {
       type = type || 'info';
@@ -619,6 +603,7 @@
     })();
   </script>
 
+  <!-- @@chrome:scripts:start -->
   <!-- Firebase SDKs & Global Auth -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -634,6 +619,37 @@
       };
   </script>
   <script src="auth.js"></script>
+
+  <!-- Shared storefront helpers -->
+  <script>
+      // Dismiss the announcement bar and its offsets.
+      function closeAnnounce() {
+          var bar = document.getElementById('announceBar');
+          var nav = document.getElementById('navbar');
+          if (bar) bar.style.display = 'none';
+          if (nav) nav.classList.remove('announce-offset');
+          var hero = document.querySelector('.hero');
+          if (hero) hero.classList.remove('announce-offset-section');
+      }
+
+      // Footer newsletter signup (forms call handleFooterSignup on submit).
+      function handleFooterSignup(e) {
+          e.preventDefault();
+          var input = document.getElementById('footerEmailInput');
+          if (input && input.value) {
+              input.value = '';
+              input.placeholder = "You're in. Welcome to the back.";
+              input.disabled = true;
+          }
+      }
+
+      // Collapse the navbar once the page is scrolled.
+      window.addEventListener('scroll', function () {
+          var nav = document.getElementById('navbar');
+          if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+      });
+  </script>
+  <!-- @@chrome:scripts:end -->
 
 </body>
 

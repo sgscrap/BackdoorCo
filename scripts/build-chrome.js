@@ -82,11 +82,74 @@ const FOOTER_PAGES = {
   'women.html': 'compact',
 };
 
+// Pages that carry the shared global script block — the Firebase SDKs and
+// config, auth.js, and the small storefront helpers (announcement bar +
+// footer signup). 404, checkout and product-detail deliberately load a
+// different script profile and are excluded.
+const SCRIPT_PAGES = new Set([
+  'about.html',
+  'accessories.html',
+  'accounts.html',
+  'apparel.html',
+  'contact.html',
+  'electronics.html',
+  'email.html',
+  'faq.html',
+  'index.html',
+  'kids.html',
+  'men.html',
+  'pricing.html',
+  'privacy.html',
+  'product.html',
+  'returns.html',
+  'reviews.html',
+  'shipping.html',
+  'shoes.html',
+  'shop-all.html',
+  'sneakers.html',
+  'terms.html',
+  'tracking.html',
+  'women.html',
+]);
+
+// Pages that link the shared design tokens + chrome stylesheets. This is
+// every storefront page, injected just before the page's own stylesheets.
+const HEADCSS_PAGES = new Set([
+  '404.html',
+  'about.html',
+  'accessories.html',
+  'accounts.html',
+  'apparel.html',
+  'checkout.html',
+  'contact.html',
+  'electronics.html',
+  'email.html',
+  'faq.html',
+  'index.html',
+  'kids.html',
+  'men.html',
+  'pricing.html',
+  'privacy.html',
+  'product-detail.html',
+  'product.html',
+  'returns.html',
+  'reviews.html',
+  'shipping.html',
+  'shoes.html',
+  'shop-all.html',
+  'sneakers.html',
+  'terms.html',
+  'tracking.html',
+  'women.html',
+]);
+
 const NAV_PARTIAL = 'nav.html';
 const FOOTER_PARTIALS = {
   compact: 'footer-compact.html',
   full: 'footer-full.html',
 };
+const SCRIPTS_PARTIAL = 'global-scripts.html';
+const HEADCSS_PARTIAL = 'head-css.html';
 
 function readPartial(name) {
   return fs.readFileSync(path.join(PARTIALS, name), 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '');
@@ -112,6 +175,17 @@ function locate(src, markerName, legacyKind) {
     const mj = src.indexOf(endMarker, mi + startMarker.length);
     if (mj < 0) throw new Error(`found ${markerName} start marker but no end marker`);
     return { anchor: mi, end: mj + endMarker.length };
+  }
+  if (legacyKind === 'scripts') {
+    const s = src.indexOf('firebasejs/9.23.0/firebase-app-compat.js');
+    if (s < 0) return null;
+    let start = lineStartOf(src, s);
+    const comment = src.lastIndexOf('<!-- Firebase SDKs', start);
+    if (comment >= 0 && start - comment < 240) start = lineStartOf(src, comment);
+    const authTag = 'src="auth.js"></script>';
+    const a = src.indexOf(authTag, s);
+    if (a < 0) return null;
+    return { anchor: start, end: a + authTag.length };
   }
   if (legacyKind === 'nav') {
     const s = src.indexOf('<nav class="navbar" id="navbar">');
@@ -143,6 +217,41 @@ function renderRegion(src, markerName, body, kindForLegacy) {
   return src.slice(0, start) + block + src.slice(found.end);
 }
 
+// The shared stylesheet links sit in <head> rather than inside the body, so
+// they get their own insert-before-the-first-page-stylesheet routine instead
+// of the replace-a-block logic used by nav/footer/scripts.
+function renderHeadCss(src, body) {
+  const startMarker = '<!-- @@chrome:headcss:start -->';
+  const endMarker = '<!-- @@chrome:headcss:end -->';
+  const eol = src.includes('\r\n') ? '\r\n' : '\n';
+
+  // Drop any previous region so the links can be re-placed correctly.
+  const mi = src.indexOf(startMarker);
+  if (mi >= 0) {
+    const mj = src.indexOf(endMarker, mi);
+    if (mj < 0) throw new Error('found headcss start marker but no end marker');
+    const cutStart = lineStartOf(src, mi);
+    let cutEnd = mj + endMarker.length;
+    const nl = /^[ \t]*\r?\n/.exec(src.slice(cutEnd));
+    if (nl) cutEnd += nl[0].length;
+    src = src.slice(0, cutStart) + src.slice(cutEnd);
+  }
+
+  // Insert immediately before store.css when the page loads it (so chrome.css
+  // keeps the same cascade position store.css's old rules had), else before
+  // the page's first local stylesheet.
+  let m = /<link\b[^>]*href="store\.css[^"]*"[^>]*>/.exec(src);
+  if (!m) m = /<link\b[^>]*href="((?!https?:|\/\/)[^"]+\.css[^"]*)"[^>]*>/.exec(src);
+  if (!m) return null;
+
+  const start = lineStartOf(src, m.index);
+  const indent = (src.slice(start).match(/^[ \t]*/) || [''])[0];
+  const lines = [indent + startMarker];
+  for (const line of body.split('\n')) lines.push(line ? indent + line : '');
+  lines.push(indent + endMarker);
+  return src.slice(0, start) + lines.join(eol) + eol + src.slice(start);
+}
+
 function buildPage(rel) {
   const file = path.join(ROOT, rel);
   if (!fs.existsSync(file)) throw new Error(`missing page: ${rel}`);
@@ -162,12 +271,25 @@ function buildPage(rel) {
     if (next === null) throw new Error(`${rel}: could not find a ${variant} footer block to replace`);
     src = next;
   }
+
+  if (HEADCSS_PAGES.has(rel)) {
+    const next = renderHeadCss(src, readPartial(HEADCSS_PARTIAL));
+    if (next === null) throw new Error(`${rel}: could not find a local stylesheet link to insert before`);
+    src = next;
+  }
+
+  if (SCRIPT_PAGES.has(rel)) {
+    const body = readPartial(SCRIPTS_PARTIAL);
+    const next = renderRegion(src, 'scripts', body, 'scripts');
+    if (next === null) throw new Error(`${rel}: could not find a global scripts block to replace`);
+    src = next;
+  }
   return src;
 }
 
 function main() {
   const check = process.argv.includes('--check');
-  const pages = new Set([...Object.keys(NAV_PAGES), ...Object.keys(FOOTER_PAGES)]);
+  const pages = new Set([...Object.keys(NAV_PAGES), ...Object.keys(FOOTER_PAGES), ...SCRIPT_PAGES, ...HEADCSS_PAGES]);
   const drifted = [];
   let written = 0;
 
@@ -198,4 +320,6 @@ function main() {
   console.log(`✓ Shared chrome built — ${written} page(s) updated, ${pages.size - written} already in sync.`);
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { NAV_PAGES, FOOTER_PAGES, SCRIPT_PAGES, HEADCSS_PAGES };

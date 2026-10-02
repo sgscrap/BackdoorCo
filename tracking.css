@@ -1,32 +1,4 @@
-/* ══════════════════════════════════════════
-   BACKDOOR — ORDER TRACKING STYLES
-══════════════════════════════════════════ */
 
-*,
-*::before,
-*::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-:root {
-    --bg: #0a0a0a;
-    --bg2: #111111;
-    --bg3: #161616;
-    --bg4: #1e1e1e;
-    --accent: #c8f65d;
-    --red: #ff4d4d;
-    --blue: #4d9fff;
-    --orange: #ff8c42;
-    --purple: #a855f7;
-    --green: #22c55e;
-    --text: #ffffff;
-    --text2: #888888;
-    --text3: #444444;
-    --border: #222222;
-    --border2: #2a2a2a;
-}
 
 body {
     font-family: 'Space Grotesk', sans-serif;
@@ -105,10 +77,6 @@ body {
     color: var(--text);
     cursor: pointer;
     text-decoration: none;
-}
-
-.nav-logo span {
-    color: var(--accent);
 }
 
 .nav-links {
@@ -1700,18 +1668,6 @@ body {
     min-width: 280px;
 }
 
-.toast.error {
-    border-left-color: var(--red);
-}
-
-.toast.info {
-    border-left-color: var(--blue);
-}
-
-.toast.warn {
-    border-left-color: var(--orange);
-}
-
 .spinner {
     width: 20px;
     height: 20px;
@@ -1738,9 +1694,8 @@ body {
     to {
         transform: rotate(360deg);
     }
-}
+}@media (max-width: 900px) {
 
-@media (max-width: 900px) {
     .order-meta-grid {
         grid-template-columns: 1fr 1fr;
     }
@@ -1753,8 +1708,8 @@ body {
         grid-template-columns: repeat(3, 1fr);
     }
 }
-
 @media (max-width: 600px) {
+
     .order-meta-grid {
         grid-template-columns: 1fr;
     }
@@ -1771,3 +1726,4 @@ body {
         font-size: 9px;
     }
 }
+

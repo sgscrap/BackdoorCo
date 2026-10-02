@@ -77,6 +77,12 @@ jobs:
       - name: Shared chrome is up to date
         run: npm run check:chrome
 
+      # Loads every storefront page in a real headless Chrome and fails on any
+      # uncaught JavaScript exception. The Ubuntu runner ships Google Chrome;
+      # the script exits 0 with a note if no browser binary can be found.
+      - name: Storefront pages load without console exceptions
+        run: npm run test:smoke
+
       # Validates admin/instagram-rollout.json against the studio vocabulary and
       # the seeded catalogue. Fully offline, so it is deterministic.
       - name: Instagram rollout assets are valid (offline)
