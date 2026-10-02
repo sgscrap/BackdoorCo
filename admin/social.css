@@ -384,6 +384,36 @@
   color: var(--text-muted);
 }
 
+.rollout-item-active {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.rollout-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.rollout-actions .copy-caption-btn {
+  margin-top: 0;
+  font-size: 0.68rem;
+}
+
+.rollout-status {
+  margin: 6px 0 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.rollout-status.is-dirty,
+.rollout-status.is-flash {
+  color: var(--accent);
+}
+
 .asset-stage {
   display: flex;
   flex-direction: column;

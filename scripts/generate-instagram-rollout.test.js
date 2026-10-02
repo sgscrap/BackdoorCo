@@ -208,6 +208,16 @@ function generatedJson(args = ['--json']) {
     assert.match(source, /resolveRolloutUrl\(window\.location\.search\)/, 'social.js should honor ?rollout=');
   });
 
+  await test('the studio wires the capture and download rollout actions', () => {
+    const source = fs.readFileSync(path.join(ROOT, 'admin', 'social.js'), 'utf8');
+    const html = fs.readFileSync(path.join(ROOT, 'admin', 'social.html'), 'utf8');
+    assert.match(source, /captureStudioControls\(state\.rollout\.assets\[index\]/, 'social.js should capture studio edits into the rollout');
+    assert.match(source, /serializeRollout\(state\.rollout\)/, 'social.js should serialize the rollout for download');
+    assert.match(html, /id="rolloutCaptureBtn"/);
+    assert.match(html, /id="rolloutDownloadBtn"/);
+    assert.match(html, /id="rolloutStatus"/);
+  });
+
   // ── options ─────────────────────────────────────────────────────────────
   await test('--new controls how many arrivals are selected', () => {
     const two = generatedJson(['--json', '--new', '2']);

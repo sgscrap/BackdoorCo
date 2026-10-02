@@ -217,6 +217,11 @@
             <input type="file" id="rolloutFileInput" accept="application/json,.json" />
           </div>
           <div class="rollout-list" id="rolloutList"></div>
+          <div class="rollout-actions">
+            <button type="button" class="copy-caption-btn" id="rolloutCaptureBtn" disabled>💾 Save to Rollout</button>
+            <button type="button" class="copy-caption-btn" id="rolloutDownloadBtn" disabled>⬇ Download Rollout JSON</button>
+          </div>
+          <p class="rollout-status" id="rolloutStatus"></p>
           <button type="button" class="copy-caption-btn batch-export-btn" id="rolloutExportBtn" style="background:rgba(108,92,231,0.2);border-color:rgba(108,92,231,0.4);color:#b8acf6" disabled>📦 Export Rollout as ZIP</button>
           <div class="batch-progress" id="rolloutProgress" style="width:100%;height:4px;background:var(--border-light);border-radius:999px;margin-top:8px;overflow:hidden;display:none"><div style="height:100%;background:var(--accent);border-radius:999px;transition:width .3s ease;width:0"></div></div>
           <button type="button" class="copy-caption-btn" id="rolloutClearBtn" style="margin-top:4px;font-size:0.68rem;display:none">Clear Rollout</button>

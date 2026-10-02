@@ -25,13 +25,16 @@ import {
 } from "../product-data.js";
 import {
   buildCaption,
+  captionTags,
   formatMoney,
   slugify,
 } from "./social-copy.mjs";
 import {
+  captureStudioControls,
   carouselGroups,
   parseRollout,
   resolveRolloutUrl,
+  serializeRollout,
   studioControlsFor,
 } from "./rollout-import.mjs";
 
@@ -96,6 +99,9 @@ const rolloutClearBtn = document.getElementById("rolloutClearBtn");
 const rolloutList = document.getElementById("rolloutList");
 const rolloutCount = document.getElementById("rolloutCount");
 const rolloutProgress = document.getElementById("rolloutProgress");
+const rolloutCaptureBtn = document.getElementById("rolloutCaptureBtn");
+const rolloutDownloadBtn = document.getElementById("rolloutDownloadBtn");
+const rolloutStatus = document.getElementById("rolloutStatus");
 
 const state = {
   products: [],
@@ -113,6 +119,8 @@ const state = {
   customImageSrc: "",
   queue: [],
   rollout: null,
+  rolloutAssetId: null,
+  rolloutDirty: false,
 };
 
 const presets = {
@@ -1188,8 +1196,41 @@ function loadRollout(payload) {
     return null;
   }
   state.rollout = rollout;
+  state.rolloutAssetId = null;
+  state.rolloutDirty = false;
   renderRolloutUI();
   return rollout;
+}
+
+let rolloutMessageTimer = null;
+
+// The status line reflects unsaved edits / the selected asset, unless a recent
+// action flashed its own message.
+function updateRolloutStatus() {
+  if (!rolloutStatus) return;
+  const assets = state.rollout?.assets || [];
+  if (!assets.length) {
+    rolloutStatus.textContent = "";
+  } else if (state.rolloutDirty) {
+    rolloutStatus.textContent = "Unsaved edits — download to keep them";
+  } else if (state.rolloutAssetId) {
+    const index = assets.findIndex((entry) => entry.id === state.rolloutAssetId);
+    rolloutStatus.textContent = `Editing ${state.rolloutAssetId} (${index + 1}/${assets.length})`;
+  } else {
+    rolloutStatus.textContent = "Select an asset to edit it";
+  }
+  rolloutStatus.classList.toggle("is-dirty", Boolean(state.rolloutDirty));
+}
+
+function flashRolloutStatus(message) {
+  if (!rolloutStatus) return;
+  rolloutStatus.textContent = message;
+  rolloutStatus.classList.add("is-flash");
+  clearTimeout(rolloutMessageTimer);
+  rolloutMessageTimer = setTimeout(() => {
+    rolloutStatus.classList.remove("is-flash");
+    updateRolloutStatus();
+  }, 2400);
 }
 
 function renderRolloutUI() {
@@ -1197,9 +1238,12 @@ function renderRolloutUI() {
   rolloutCount.textContent = `${assets.length} asset${assets.length === 1 ? "" : "s"}`;
   rolloutExportBtn.disabled = !assets.length;
   rolloutClearBtn.style.display = assets.length ? "" : "none";
+  if (rolloutCaptureBtn) rolloutCaptureBtn.disabled = !state.rolloutAssetId;
+  if (rolloutDownloadBtn) rolloutDownloadBtn.disabled = !assets.length;
 
   if (!assets.length) {
     rolloutList.innerHTML = "";
+    updateRolloutStatus();
     return;
   }
 
@@ -1208,7 +1252,7 @@ function renderRolloutUI() {
       ? `<div class="rollout-group-label">Carousel · ${escapeHtml(entry.group)}</div>`
       : "";
     const items = entry.assets.map((asset) => `
-      <button type="button" class="rollout-item" data-rollout="${escapeHtml(asset.id)}">
+      <button type="button" class="rollout-item${asset.id === state.rolloutAssetId ? " rollout-item-active" : ""}" data-rollout="${escapeHtml(asset.id)}">
         <span class="rollout-item-id">${escapeHtml(asset.id)}</span>
         <span class="rollout-item-meta">${escapeHtml(asset.template)} · ${escapeHtml(asset.ratio)}</span>
       </button>
@@ -1219,16 +1263,78 @@ function renderRolloutUI() {
   rolloutList.querySelectorAll("[data-rollout]").forEach((button) => {
     button.addEventListener("click", () => applyRolloutAsset(button.dataset.rollout));
   });
+
+  updateRolloutStatus();
 }
 
 function applyRolloutAsset(assetId) {
   const asset = state.rollout?.assets.find((entry) => entry.id === assetId);
   if (!asset) return;
+  state.rolloutAssetId = assetId;
   applyStudioControls(studioControlsFor(asset, state.rollout));
+  renderRolloutUI();
+}
+
+// Fold the current studio controls back into the selected rollout asset, so
+// edits made while previewing survive instead of being lost.
+function captureRolloutAsset() {
+  if (!state.rollout || !state.rolloutAssetId) {
+    window.alert("Select a rollout asset first.");
+    return;
+  }
+  const index = state.rollout.assets.findIndex((entry) => entry.id === state.rolloutAssetId);
+  if (index < 0) return;
+
+  const controls = readStudioControls();
+  const product = getActiveProduct();
+  const productUrl = product ? `${SITE_ORIGIN}/${buildProductHref(product)}` : SITE_ORIGIN;
+  const captured = captureStudioControls(state.rollout.assets[index], controls);
+
+  // Refresh the copy artifacts the prepared file carries, using the same inputs
+  // the live caption preview does, so the saved rollout is never stale.
+  captured.caption = buildCaption({
+    template: captured.template,
+    fields: {
+      headline: controls.copy.headline,
+      body: controls.copy.body,
+      cta: controls.copy.cta,
+      promo: controls.copy.promo,
+    },
+    product,
+    origin: SITE_ORIGIN,
+    handle: controls.handle,
+    productUrl,
+    collage: getCollageProducts().map((entry) => ({ name: entry.name, price: entry.price })),
+  });
+  captured.hashtags = captionTags(captured.template, product);
+
+  state.rollout.assets[index] = captured;
+  state.rolloutDirty = true;
+  renderRolloutUI();
+  flashRolloutStatus(`Captured ${captured.id}`);
+}
+
+// Download the current rollout (including captured edits) as JSON that can be
+// re-imported here and prepared as a manifest.
+function downloadRollout() {
+  if (!state.rollout?.assets?.length) return;
+  const payload = serializeRollout(state.rollout);
+  const filename = `${ROLLOUT_URL.replace(/\.json$/i, "")}.edited.json`;
+  const blob = new Blob([JSON.stringify(payload, null, 2) + "\n"], { type: "application/json" });
+  const link = document.createElement("a");
+  link.download = filename;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  state.rolloutDirty = false;
+  renderRolloutUI();
+  flashRolloutStatus(`Downloaded ${filename}`);
 }
 
 function clearRollout() {
   state.rollout = null;
+  state.rolloutAssetId = null;
+  state.rolloutDirty = false;
   renderRolloutUI();
 }
 
@@ -1466,6 +1572,8 @@ clearQueueBtn.addEventListener("click", clearQueue);
 rolloutLoadBtn.addEventListener("click", loadPreparedRollout);
 rolloutExportBtn.addEventListener("click", exportRollout);
 rolloutClearBtn.addEventListener("click", clearRollout);
+if (rolloutCaptureBtn) rolloutCaptureBtn.addEventListener("click", captureRolloutAsset);
+if (rolloutDownloadBtn) rolloutDownloadBtn.addEventListener("click", downloadRollout);
 rolloutFileInput.addEventListener("change", () => {
   const file = rolloutFileInput.files?.[0];
   if (!file) return;

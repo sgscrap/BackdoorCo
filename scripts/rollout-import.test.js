@@ -32,9 +32,10 @@ const ROOT = path.join(__dirname, '..');
 const PREPARED = path.join(ROOT, 'admin', 'instagram-rollout.prepared.json');
 
 (async () => {
-  const { parseRollout, carouselGroups, resolveRolloutUrl, studioControlsFor, ROLLOUT_URL } = await import(
-    pathToFileURL(path.join(ROOT, 'admin', 'rollout-import.mjs')).href
-  );
+  const {
+    parseRollout, carouselGroups, captureStudioControls, serializeRollout,
+    resolveRolloutUrl, studioControlsFor, ROLLOUT_URL,
+  } = await import(pathToFileURL(path.join(ROOT, 'admin', 'rollout-import.mjs')).href);
 
   // ── the real prepared artifact ──────────────────────────────────────────
   await test('the delivered prepared rollout parses into every asset', () => {
@@ -111,6 +112,108 @@ const PREPARED = path.join(ROOT, 'admin', 'instagram-rollout.prepared.json');
     assert.equal(controls.showSizes, true);
     assert.equal(controls.visitSite, false);
     assert.equal(controls.handle, '@backdoorco');
+  });
+
+  // ── capture edits back into the rollout ────────────────────────────────
+  const sampleAsset = () => ({
+    id: 'gen-drop-x',
+    order: 3,
+    template: 'drop',
+    ratio: '1-1',
+    theme: 'backdoor',
+    font: 'space-grotesk',
+    fontWeight: '900',
+    productRef: 'seed-x',
+    carouselGroup: 'weekly-lineup',
+    filename: 'backdoor_drop_x.png',
+    caption: 'old caption',
+    hashtags: ['#Old'],
+    copy: { kicker: 'OLD', headline: 'Old', body: 'Old', badge: 'OLD', cta: 'OLD', promo: '' },
+    toggles: { showPrice: true, showSizes: true, visitSite: false, visitSiteUrl: '' },
+    effects: { imageFilter: 'none', blur: false, watermark: false, grain: 16 },
+    imageOverride: '',
+  });
+
+  const sampleControls = () => ({
+    productRef: 'seed-y',
+    template: 'sale',
+    ratio: '9-16',
+    theme: 'red',
+    font: 'poppins',
+    fontWeight: '700',
+    imageFilter: 'warm',
+    blur: true,
+    watermark: true,
+    grain: 40,
+    showPrice: false,
+    showSizes: true,
+    visitSite: true,
+    visitSiteUrl: 'https://x/shop',
+    imageOverride: 'products/catalog/x.jpg',
+    copy: { kicker: 'K', headline: 'H', body: 'B', badge: 'D', cta: 'C', promo: 'P' },
+  });
+
+  await test('captureStudioControls folds edits in while keeping the asset identity', () => {
+    const asset = sampleAsset();
+    const captured = captureStudioControls(asset, sampleControls());
+
+    assert.equal(captured.id, 'gen-drop-x');
+    assert.equal(captured.order, 3);
+    assert.equal(captured.carouselGroup, 'weekly-lineup');
+    assert.equal(captured.filename, 'backdoor_drop_x.png');
+    assert.equal(captured.caption, 'old caption');
+
+    assert.equal(captured.template, 'sale');
+    assert.equal(captured.ratio, '9-16');
+    assert.equal(captured.theme, 'red');
+    assert.equal(captured.font, 'poppins');
+    assert.equal(captured.fontWeight, '700');
+    assert.equal(captured.productRef, 'seed-y');
+    assert.deepEqual(captured.copy, { kicker: 'K', headline: 'H', body: 'B', badge: 'D', cta: 'C', promo: 'P' });
+    assert.deepEqual(captured.toggles, { showPrice: false, showSizes: true, visitSite: true, visitSiteUrl: 'https://x/shop' });
+    assert.deepEqual(captured.effects, { imageFilter: 'warm', blur: true, watermark: true, grain: 40 });
+    assert.equal(captured.imageOverride, 'products/catalog/x.jpg');
+
+    // Capture must not mutate the source asset.
+    assert.equal(asset.template, 'drop');
+    assert.equal(asset.copy.headline, 'Old');
+  });
+
+  await test('captureStudioControls falls back on unknown ratio/theme/filter', () => {
+    const captured = captureStudioControls(
+      { id: 'a', template: 'drop', ratio: '16-9', theme: 'mono' },
+      { ratio: '4-5', theme: 'neon', imageFilter: 'x' }
+    );
+    assert.equal(captured.ratio, '16-9');
+    assert.equal(captured.theme, 'mono');
+    assert.equal(captured.effects.imageFilter, 'none');
+    assert.equal(captured.copy.headline, '');
+    assert.equal(captured.toggles.showPrice, true);
+    assert.equal(captured.effects.grain, 16);
+  });
+
+  await test('serializeRollout round-trips through parseRollout', () => {
+    const rollout = parseRollout(JSON.parse(fs.readFileSync(PREPARED, 'utf8')));
+    const reparsed = parseRollout(JSON.parse(JSON.stringify(serializeRollout(rollout))));
+    assert.deepEqual(reparsed, rollout);
+  });
+
+  await test('serializeRollout orders assets and preserves carousel grouping', () => {
+    const out = serializeRollout({
+      campaign: 'Weekly Drop',
+      brand: 'Backdoor',
+      handle: '@backdoorco',
+      siteOrigin: 'https://x',
+      assets: [
+        { id: 'b', order: 2, template: 'sale', carouselGroup: null, filename: 'b.png' },
+        { id: 'a', order: 1, template: 'drop', carouselGroup: 'weekly-lineup', filename: 'a.png' },
+      ],
+    });
+    assert.deepEqual(out.assets.map((asset) => asset.id), ['a', 'b']);
+    assert.equal(out.assets[0].carouselGroup, 'weekly-lineup');
+    assert.equal(out.assets[1].carouselGroup, null);
+    assert.equal(out.campaign, 'Weekly Drop');
+    assert.equal(out.assets[1].schedule.postAt, null);
   });
 
   // ── rejection cases ────────────────────────────────────────────────────

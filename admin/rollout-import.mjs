@@ -29,6 +29,9 @@ export const RATIOS = ["1-1", "9-16", "16-9"];
 export const IMAGE_FILTERS = ["none", "grayscale", "sepia", "contrast", "warm", "cool"];
 
 const TEMPLATE_SET = new Set(TEMPLATES);
+const RATIO_SET = new Set(RATIOS);
+const THEME_SET = new Set(THEMES);
+const FILTER_SET = new Set(IMAGE_FILTERS);
 
 function text(value, fallback = "") {
   return value == null ? fallback : String(value);
@@ -111,6 +114,115 @@ export function parseRollout(payload) {
     handle: text(payload.handle, "@backdoorco"),
     siteOrigin: text(payload.siteOrigin),
     assets,
+  };
+}
+
+/**
+ * Fold the studio's current control values back into a rollout asset, so edits
+ * made while previewing can be kept instead of being lost. Identity fields
+ * (id, order, carouselGroup, filename, schedule) are preserved; everything the
+ * studio owns — template, ratio, theme, productRef, copy, toggles, effects — is
+ * replaced with what the controls now hold.
+ */
+export function captureStudioControls(asset = {}, controls = {}) {
+  const source = asset && typeof asset === "object" ? asset : {};
+  const copy = controls.copy && typeof controls.copy === "object" ? controls.copy : {};
+  const ratio = text(controls.ratio);
+  const theme = text(controls.theme);
+  const filter = text(controls.imageFilter);
+
+  return {
+    ...source,
+    template: text(controls.template, source.template || "drop"),
+    ratio: RATIO_SET.has(ratio) ? ratio : text(source.ratio, "1-1"),
+    theme: THEME_SET.has(theme) ? theme : text(source.theme, "backdoor"),
+    font: text(controls.font, text(source.font, "space-grotesk")),
+    fontWeight: text(controls.fontWeight, text(source.fontWeight, "900")),
+    productRef: text(controls.productRef),
+    copy: {
+      kicker: text(copy.kicker),
+      headline: text(copy.headline),
+      body: text(copy.body),
+      badge: text(copy.badge),
+      cta: text(copy.cta),
+      promo: text(copy.promo),
+    },
+    toggles: {
+      showPrice: controls.showPrice !== false,
+      showSizes: controls.showSizes !== false,
+      visitSite: Boolean(controls.visitSite),
+      visitSiteUrl: text(controls.visitSiteUrl),
+    },
+    effects: {
+      imageFilter: FILTER_SET.has(filter) ? filter : "none",
+      blur: Boolean(controls.blur),
+      watermark: Boolean(controls.watermark),
+      grain: Number.isFinite(controls.grain) ? controls.grain : 16,
+    },
+    imageOverride: text(controls.imageOverride),
+  };
+}
+
+/**
+ * Serialize a rollout back to the shape parseRollout() accepts, so a rollout
+ * edited in the studio can be downloaded, re-imported, and even prepared as a
+ * manifest. Assets are emitted in schedule order with normalized fields.
+ */
+export function serializeRollout(rollout = {}) {
+  const source = rollout && typeof rollout === "object" ? rollout : {};
+  const assets = Array.isArray(source.assets) ? [...source.assets] : [];
+  assets.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  return {
+    campaign: text(source.campaign),
+    brand: text(source.brand),
+    handle: text(source.handle, "@backdoorco"),
+    siteOrigin: text(source.siteOrigin),
+    assets: assets.map((asset, index) => {
+      const entry = asset && typeof asset === "object" ? asset : {};
+      const copy = entry.copy && typeof entry.copy === "object" ? entry.copy : {};
+      const toggles = entry.toggles && typeof entry.toggles === "object" ? entry.toggles : {};
+      const effects = entry.effects && typeof entry.effects === "object" ? entry.effects : {};
+      const order = Number.isFinite(entry.order) ? entry.order : index + 1;
+      return {
+        id: text(entry.id, `asset-${index + 1}`),
+        order,
+        template: text(entry.template),
+        ratio: text(entry.ratio, "1-1"),
+        theme: text(entry.theme, "backdoor"),
+        font: text(entry.font, "space-grotesk"),
+        fontWeight: text(entry.fontWeight, "900"),
+        productRef: text(entry.productRef || entry.product?.id),
+        carouselGroup: text(entry.carouselGroup) || null,
+        filename: text(entry.filename),
+        copy: {
+          kicker: text(copy.kicker),
+          headline: text(copy.headline),
+          body: text(copy.body),
+          badge: text(copy.badge),
+          cta: text(copy.cta),
+          promo: text(copy.promo),
+        },
+        toggles: {
+          showPrice: boolean(toggles.showPrice, true),
+          showSizes: boolean(toggles.showSizes, true),
+          visitSite: boolean(toggles.visitSite, false),
+          visitSiteUrl: text(toggles.visitSiteUrl),
+        },
+        effects: {
+          imageFilter: FILTER_SET.has(text(effects.imageFilter)) ? text(effects.imageFilter) : "none",
+          blur: boolean(effects.blur, false),
+          watermark: boolean(effects.watermark, false),
+          grain: Number.isFinite(effects.grain) ? effects.grain : 16,
+        },
+        imageOverride: text(entry.imageOverride),
+        caption: text(entry.caption),
+        hashtags: Array.isArray(entry.hashtags) ? entry.hashtags.map((tag) => text(tag)).filter(Boolean) : [],
+        schedule: entry.schedule && typeof entry.schedule === "object"
+          ? { order, postAt: entry.schedule.postAt ?? null }
+          : { order, postAt: null },
+      };
+    }),
   };
 }
 
