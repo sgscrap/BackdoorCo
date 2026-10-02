@@ -28,6 +28,12 @@ import {
   formatMoney,
   slugify,
 } from "./social-copy.mjs";
+import {
+  carouselGroups,
+  parseRollout,
+  ROLLOUT_URL,
+  studioControlsFor,
+} from "./rollout-import.mjs";
 
 const SITE_ORIGIN = "https://backdoorco.vercel.app";
 
@@ -80,6 +86,13 @@ const grainValue = document.getElementById("grainValue");
 const scheduleDateInput = document.getElementById("scheduleDateInput");
 const schedulePostBtn = document.getElementById("schedulePostBtn");
 const scheduledGrid = document.getElementById("scheduledGrid");
+const rolloutFileInput = document.getElementById("rolloutFileInput");
+const rolloutLoadBtn = document.getElementById("rolloutLoadBtn");
+const rolloutExportBtn = document.getElementById("rolloutExportBtn");
+const rolloutClearBtn = document.getElementById("rolloutClearBtn");
+const rolloutList = document.getElementById("rolloutList");
+const rolloutCount = document.getElementById("rolloutCount");
+const rolloutProgress = document.getElementById("rolloutProgress");
 
 const state = {
   products: [],
@@ -96,6 +109,7 @@ const state = {
   grainIntensity: 16,
   customImageSrc: "",
   queue: [],
+  rollout: null,
 };
 
 const presets = {
@@ -1074,6 +1088,207 @@ async function exportQueue() {
   alert("Batch export complete! " + ok + "/" + items.length + " files");
 }
 
+/* ─── Rollout import ─── */
+// Read the current studio controls so a rollout export can restore them.
+function readStudioControls() {
+  return {
+    productRef: state.productId,
+    template: state.template,
+    ratio: state.ratio,
+    theme: state.theme,
+    font: state.font,
+    fontWeight: state.fontWeight,
+    imageFilter: state.imageFilter,
+    blur: state.blurOn,
+    watermark: state.watermarkOn,
+    grain: state.grainIntensity,
+    showPrice: priceToggle.checked,
+    showSizes: sizesToggle.checked,
+    visitSite: priceVisitToggle.checked,
+    visitSiteUrl: visitSiteUrlInput.value,
+    imageOverride: imageUrlInput.value,
+    customImageSrc: state.customImageSrc,
+    handle: handleInput.value,
+    copy: {
+      kicker: kickerInput.value,
+      headline: headlineInput.value,
+      body: bodyInput.value,
+      badge: badgeInput.value,
+      cta: ctaInput.value,
+      promo: promoInput.value,
+    },
+  };
+}
+
+// Apply a set of control values to the studio and re-render.
+function applyStudioControls(controls) {
+  if (!controls) return;
+
+  if (controls.productRef && state.products.some((product) => product.id === controls.productRef)) {
+    productSearch.value = "";
+    populateProducts();
+    selectProduct(controls.productRef, false);
+  }
+
+  state.template = controls.template || "drop";
+  state.ratio = controls.ratio || "1-1";
+  state.theme = controls.theme || "backdoor";
+  state.font = controls.font || "space-grotesk";
+  state.imageFilter = controls.imageFilter || "none";
+  state.blurOn = Boolean(controls.blur);
+  state.watermarkOn = Boolean(controls.watermark);
+  state.grainIntensity = Number.isFinite(controls.grain) ? controls.grain : 16;
+  state.customImageSrc = controls.customImageSrc || "";
+
+  templateSelect.value = state.template;
+  themeSelect.value = state.theme;
+  fontSelect.value = state.font;
+  populateWeightOptions(state.font);
+  state.fontWeight = controls.fontWeight || weightSelect.value;
+  weightSelect.value = state.fontWeight;
+  filterSelect.value = state.imageFilter;
+  blurToggle.checked = state.blurOn;
+  watermarkToggle.checked = state.watermarkOn;
+  grainSlider.value = String(state.grainIntensity);
+
+  priceToggle.checked = controls.showPrice !== false;
+  priceVisitToggle.disabled = !priceToggle.checked;
+  priceVisitToggle.checked = priceToggle.checked ? Boolean(controls.visitSite) : false;
+  sizesToggle.checked = controls.showSizes !== false;
+  visitSiteUrlInput.value = controls.visitSiteUrl || "";
+  visitUrlGroup.style.display = priceVisitToggle.checked ? "" : "none";
+
+  imageUrlInput.value = controls.imageOverride || "";
+
+  const copy = controls.copy || {};
+  kickerInput.value = copy.kicker || "";
+  headlineInput.value = copy.headline || "";
+  bodyInput.value = copy.body || "";
+  badgeInput.value = copy.badge || "";
+  ctaInput.value = copy.cta || "";
+  promoInput.value = copy.promo || "";
+  if (controls.handle) handleInput.value = controls.handle;
+
+  document.querySelectorAll("#ratioGroup .segment").forEach((segment) => {
+    segment.classList.toggle("active", segment.dataset.ratio === state.ratio);
+  });
+
+  renderAll();
+}
+
+function loadRollout(payload) {
+  let rollout;
+  try {
+    rollout = parseRollout(payload);
+  } catch (error) {
+    window.alert(`Could not import rollout: ${error.message}`);
+    return null;
+  }
+  state.rollout = rollout;
+  renderRolloutUI();
+  return rollout;
+}
+
+function renderRolloutUI() {
+  const assets = state.rollout?.assets || [];
+  rolloutCount.textContent = `${assets.length} asset${assets.length === 1 ? "" : "s"}`;
+  rolloutExportBtn.disabled = !assets.length;
+  rolloutClearBtn.style.display = assets.length ? "" : "none";
+
+  if (!assets.length) {
+    rolloutList.innerHTML = "";
+    return;
+  }
+
+  rolloutList.innerHTML = carouselGroups(assets).map((entry) => {
+    const label = entry.group
+      ? `<div class="rollout-group-label">Carousel · ${escapeHtml(entry.group)}</div>`
+      : "";
+    const items = entry.assets.map((asset) => `
+      <button type="button" class="rollout-item" data-rollout="${escapeHtml(asset.id)}">
+        <span class="rollout-item-id">${escapeHtml(asset.id)}</span>
+        <span class="rollout-item-meta">${escapeHtml(asset.template)} · ${escapeHtml(asset.ratio)}</span>
+      </button>
+    `).join("");
+    return label + items;
+  }).join("");
+
+  rolloutList.querySelectorAll("[data-rollout]").forEach((button) => {
+    button.addEventListener("click", () => applyRolloutAsset(button.dataset.rollout));
+  });
+}
+
+function applyRolloutAsset(assetId) {
+  const asset = state.rollout?.assets.find((entry) => entry.id === assetId);
+  if (!asset) return;
+  applyStudioControls(studioControlsFor(asset, state.rollout));
+}
+
+function clearRollout() {
+  state.rollout = null;
+  renderRolloutUI();
+}
+
+async function loadPreparedRollout() {
+  try {
+    const response = await fetch(ROLLOUT_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    loadRollout(await response.json());
+  } catch (error) {
+    window.alert(`Could not load ${ROLLOUT_URL}: ${error.message}`);
+  }
+}
+
+async function exportRollout() {
+  if (!window.html2canvas || !window.JSZip) { window.alert("Export libraries still loading."); return; }
+  const assets = state.rollout?.assets || [];
+  if (!assets.length) return;
+
+  const saved = readStudioControls();
+  const origTransform = canvas.style.transform;
+  const origBtn = rolloutExportBtn.innerHTML;
+  rolloutExportBtn.disabled = true;
+  rolloutExportBtn.innerHTML = "Exporting...";
+  rolloutProgress.style.display = "block";
+  rolloutProgress.firstChild.style.width = "0%";
+
+  const zip = new window.JSZip();
+  let ok = 0;
+  for (let i = 0; i < assets.length; i++) {
+    const asset = assets[i];
+    try {
+      applyRolloutAsset(asset.id);
+      canvas.style.transform = "none";
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      const rendered = await window.html2canvas(canvas, {
+        useCORS: true, allowTaint: true, backgroundColor: null, scale: 2,
+        width: canvas.offsetWidth, height: canvas.offsetHeight,
+        windowWidth: canvas.offsetWidth, windowHeight: canvas.offsetHeight, logging: false,
+      });
+      zip.file(asset.filename, rendered.toDataURL("image/png").split(",")[1], { base64: true });
+      ok++;
+    } catch (error) {
+      console.error("Rollout export failed", asset.id, error);
+    }
+    rolloutProgress.firstChild.style.width = `${((i + 1) / assets.length) * 100}%`;
+  }
+
+  canvas.style.transform = origTransform;
+  rolloutProgress.style.display = "none";
+  rolloutExportBtn.disabled = false;
+  rolloutExportBtn.innerHTML = origBtn;
+  applyStudioControls(saved);
+
+  if (!ok) { window.alert("Rollout export failed. Check the console for details."); return; }
+  const blob = await zip.generateAsync({ type: "blob" });
+  const link = document.createElement("a");
+  link.download = `backdoor_rollout_${new Date().toISOString().slice(0, 10)}.zip`;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  window.alert(`Rollout export complete! ${ok}/${assets.length} files`);
+}
+
 productSearch.addEventListener("input", () => {
   populateProducts();
   renderAll();
@@ -1244,6 +1459,24 @@ window.addEventListener("resize", fitCanvas);
 addQueueBtn.addEventListener("click", addToQueue);
 batchExportBtn.addEventListener("click", exportQueue);
 clearQueueBtn.addEventListener("click", clearQueue);
+
+rolloutLoadBtn.addEventListener("click", loadPreparedRollout);
+rolloutExportBtn.addEventListener("click", exportRollout);
+rolloutClearBtn.addEventListener("click", clearRollout);
+rolloutFileInput.addEventListener("change", () => {
+  const file = rolloutFileInput.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      loadRollout(JSON.parse(String(event.target?.result || "")));
+    } catch (error) {
+      window.alert(`Could not parse rollout file: ${error.message}`);
+    }
+  };
+  reader.readAsText(file);
+  rolloutFileInput.value = "";
+});
 
 applyPreset("drop");
 populateWeightOptions(state.font);

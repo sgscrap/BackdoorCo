@@ -206,6 +206,22 @@
           <button type="button" class="copy-caption-btn" id="clearQueueBtn" style="margin-top:4px;font-size:0.68rem">Clear Queue</button>
         </div>
 
+        <div class="ctrl-section" id="rolloutSection">
+          <div class="ctrl-heading">
+            <h2>Rollout</h2>
+            <span id="rolloutCount">0 assets</span>
+          </div>
+          <button type="button" class="copy-caption-btn" id="rolloutLoadBtn" style="margin-top:0">Load Prepared Rollout</button>
+          <div class="form-group" style="margin-top:10px">
+            <label for="rolloutFileInput">Import Rollout File</label>
+            <input type="file" id="rolloutFileInput" accept="application/json,.json" />
+          </div>
+          <div class="rollout-list" id="rolloutList"></div>
+          <button type="button" class="copy-caption-btn batch-export-btn" id="rolloutExportBtn" style="background:rgba(108,92,231,0.2);border-color:rgba(108,92,231,0.4);color:#b8acf6" disabled>📦 Export Rollout as ZIP</button>
+          <div class="batch-progress" id="rolloutProgress" style="width:100%;height:4px;background:var(--border-light);border-radius:999px;margin-top:8px;overflow:hidden;display:none"><div style="height:100%;background:var(--accent);border-radius:999px;transition:width .3s ease;width:0"></div></div>
+          <button type="button" class="copy-caption-btn" id="rolloutClearBtn" style="margin-top:4px;font-size:0.68rem;display:none">Clear Rollout</button>
+        </div>
+
         <div class="ctrl-section">
           <div class="ctrl-heading">
             <h2>Format</h2>
