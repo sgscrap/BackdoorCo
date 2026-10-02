@@ -77,6 +77,14 @@ const cutoutToleranceValue = document.getElementById("cutoutToleranceValue");
 const cutoutFeather = document.getElementById("cutoutFeather");
 const cutoutFeatherValue = document.getElementById("cutoutFeatherValue");
 const cutoutStatus = document.getElementById("cutoutStatus");
+const groundingSection = document.getElementById("groundingSection");
+const groundingHint = document.getElementById("groundingHint");
+const shadowToggle = document.getElementById("shadowToggle");
+const shadowDepth = document.getElementById("shadowDepth");
+const shadowDepthValue = document.getElementById("shadowDepthValue");
+const rimToggle = document.getElementById("rimToggle");
+const rimStrength = document.getElementById("rimStrength");
+const rimStrengthValue = document.getElementById("rimStrengthValue");
 const captionOutput = document.getElementById("captionOutput");
 const copyCaptionBtn = document.getElementById("copyCaptionBtn");
 const downloadBtn = document.getElementById("downloadBtn");
@@ -126,6 +134,10 @@ const state = {
   grainIntensity: 16,
   customImageSrc: "",
   cutout: null,
+  shadowOn: true,
+  shadowDepth: 60,
+  rimOn: true,
+  rimStrength: 45,
   queue: [],
   rollout: null,
   rolloutAssetId: null,
@@ -904,6 +916,7 @@ function applyEffects() {
   updateWatermark();
   canvas.style.setProperty("--grain-opacity", state.grainIntensity / 100);
   grainValue.textContent = state.grainIntensity + "%";
+  updateGroundingControls();
 }
 
 function updateWatermark() {
@@ -1183,7 +1196,10 @@ async function applyBackgroundRemoval() {
       feather: Number(cutoutFeather.value),
     });
     context.putImageData(new ImageData(matte, width, height), 0, 0);
-    state.cutout = { source, src: canvas.toDataURL("image/png") };
+    const base = canvas.toDataURL("image/png");
+    state.cutout = { source, base, src: base };
+    // Bake the grounding in immediately so the preview matches the export.
+    state.cutout.src = await renderGroundedCutout(base);
     renderAll();
     setCutoutStatus(`Background removed · ${width}×${height}`, "ok");
   } catch (error) {
@@ -1204,6 +1220,85 @@ function restoreBackgroundRemoval() {
   renderAll();
   updateCutoutControls();
   setCutoutStatus("Using the original image", "ok");
+}
+
+/* ─── Grounding (cut-out shadow + edge light) ─── */
+// html2canvas does not support the CSS `filter` property, so a filter-based
+// shadow would appear in the studio but vanish from every export. The shadow
+// and rim are therefore rasterized into the cut-out's pixels with the canvas
+// `filter` option (which Chromium supports), which survives export intact.
+const clamp01 = (value) => Math.max(0, Math.min(1, Number(value) || 0));
+
+// The cut-out currently on screen, or null.
+function groundedCutout() {
+  const cutout = state.cutout;
+  if (!cutout) return null;
+  return cutout.source === getBaseImage(getActiveProduct()) ? cutout : null;
+}
+
+// Draw a transparent cut-out with its contact shadow and edge light baked in.
+// Each filtered pass also paints the product, so an unfiltered pass goes last.
+async function renderGroundedCutout(baseSrc) {
+  const image = await loadImageElement(baseSrc);
+  const width = image.naturalWidth || image.width || 1;
+  const height = image.naturalHeight || image.height || 1;
+
+  const depth = clamp01(state.shadowDepth / 100);
+  const rim = clamp01(state.rimStrength / 100);
+  const shadowY = state.shadowOn ? Math.round(2 + 22 * depth) : 0;
+  const shadowBlur = state.shadowOn ? Math.round(3 + 26 * depth) : 0;
+  const shadowAlpha = state.shadowOn ? (0.18 + 0.42 * depth).toFixed(2) : "0";
+  const contactAlpha = state.shadowOn ? (0.22 + 0.2 * depth).toFixed(2) : "0";
+  const rimBlur = state.rimOn && rim > 0 ? 1 + 3 * rim : 0;
+  const rimAlpha = state.rimOn && rim > 0 ? (0.2 + 0.55 * rim).toFixed(2) : "0";
+
+  const pad = Math.ceil(Math.max(shadowY + shadowBlur + 2, rimBlur, shadowBlur) + 4);
+  const canvas = document.createElement("canvas");
+  canvas.width = width + pad * 2;
+  canvas.height = height + pad * 2;
+  const context = canvas.getContext("2d");
+  const pass = (filter) => {
+    context.filter = filter;
+    context.drawImage(image, pad, pad);
+  };
+
+  if (state.shadowOn) {
+    pass(`drop-shadow(0 ${shadowY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowAlpha}))`);
+    // A tight, near-zero-offset pass reads as the product resting on a surface.
+    pass(`drop-shadow(0 1px 2px rgba(0, 0, 0, ${contactAlpha}))`);
+  }
+  if (rimBlur > 0) pass(`drop-shadow(0 0 ${rimBlur.toFixed(1)}px rgba(255, 255, 255, ${rimAlpha}))`);
+
+  pass("none");
+  context.filter = "none";
+  return canvas.toDataURL("image/png");
+}
+
+// Re-bake the grounded image after a shadow/edge-light change.
+async function refreshCutout() {
+  const cutout = groundedCutout();
+  if (!cutout || !cutout.base) return;
+  try {
+    cutout.src = await renderGroundedCutout(cutout.base);
+    renderAll();
+  } catch (error) {
+    console.error("Grounding failed", error);
+  }
+}
+
+function updateGroundingControls() {
+  const grounded = Boolean(groundedCutout());
+  for (const el of [shadowToggle, shadowDepth, rimToggle, rimStrength]) {
+    if (el) el.disabled = !grounded;
+  }
+  if (groundingSection) groundingSection.classList.toggle("is-inactive", !grounded);
+  if (shadowDepthValue) shadowDepthValue.textContent = `${state.shadowDepth}%`;
+  if (rimStrengthValue) rimStrengthValue.textContent = `${state.rimStrength}%`;
+  if (groundingHint) {
+    groundingHint.textContent = grounded
+      ? `${state.shadowOn ? `shadow ${state.shadowDepth}%` : "no shadow"} · ${state.rimOn ? `light ${state.rimStrength}%` : "no light"}`
+      : "Cut-out only";
+  }
 }
 
 /* ─── Rollout import ─── */
@@ -1597,6 +1692,27 @@ schedulePostBtn.addEventListener("click", schedulePost);
 });
 
 visitSiteUrlInput.addEventListener("input", renderAll);
+
+// Grounding changes re-bake the cut-out; the sliders only commit on release so
+// dragging stays responsive, while the labels track the live value.
+shadowToggle.addEventListener("change", () => {
+  state.shadowOn = shadowToggle.checked;
+  refreshCutout();
+});
+rimToggle.addEventListener("change", () => {
+  state.rimOn = rimToggle.checked;
+  refreshCutout();
+});
+shadowDepth.addEventListener("input", () => {
+  state.shadowDepth = Number(shadowDepth.value);
+  updateGroundingControls();
+});
+shadowDepth.addEventListener("change", refreshCutout);
+rimStrength.addEventListener("input", () => {
+  state.rimStrength = Number(rimStrength.value);
+  updateGroundingControls();
+});
+rimStrength.addEventListener("change", refreshCutout);
 
 removeBgBtn.addEventListener("click", applyBackgroundRemoval);
 restoreBgBtn.addEventListener("click", restoreBackgroundRemoval);
