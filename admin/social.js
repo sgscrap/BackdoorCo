@@ -29,7 +29,8 @@ import {
   formatMoney,
   slugify,
 } from "./social-copy.mjs";
-import { removeBackground } from "./background-removal.mjs";
+import { removeBackground, residualBackgroundFraction, shouldEscalateToAi } from "./background-removal.mjs";
+import { segmentWithAi } from "./ai-segmentation.mjs";
 import {
   captureStudioControls,
   carouselGroups,
@@ -85,6 +86,7 @@ const shadowDepthValue = document.getElementById("shadowDepthValue");
 const rimToggle = document.getElementById("rimToggle");
 const rimStrength = document.getElementById("rimStrength");
 const rimStrengthValue = document.getElementById("rimStrengthValue");
+const aiFallbackToggle = document.getElementById("aiFallbackToggle");
 const captionOutput = document.getElementById("captionOutput");
 const copyCaptionBtn = document.getElementById("copyCaptionBtn");
 const downloadBtn = document.getElementById("downloadBtn");
@@ -138,6 +140,7 @@ const state = {
   shadowDepth: 60,
   rimOn: true,
   rimStrength: 45,
+  aiFallback: true,
   queue: [],
   rollout: null,
   rolloutAssetId: null,
@@ -1196,12 +1199,39 @@ async function applyBackgroundRemoval() {
       feather: Number(cutoutFeather.value),
     });
     context.putImageData(new ImageData(matte, width, height), 0, 0);
-    const base = canvas.toDataURL("image/png");
-    state.cutout = { source, base, src: base };
+
+    let base = canvas.toDataURL("image/png");
+    let path = "matte";
+
+    // The offline matte only copes with a uniform background. When most of the
+    // border survives it, hand off to the AI model — opt-in, and downloaded
+    // only at this point, never on page load.
+    if (state.aiFallback) {
+      const residual = residualBackgroundFraction(matte, width, height);
+      if (shouldEscalateToAi(matte, width, height)) {
+        setCutoutStatus(`Background still ${Math.round(residual * 100)}% present — loading AI model…`);
+        try {
+          base = await segmentWithAi(source, {
+            onProgress: ({ key, current, total }) => {
+              if (total) setCutoutStatus(`Downloading ${key} ${Math.round((current / total) * 100)}%`);
+            },
+          });
+          path = "ai";
+        } catch (error) {
+          // Offline, blocked, or no WebGL: keep the matte rather than failing.
+          console.warn("AI segmentation unavailable; keeping the offline matte", error);
+        }
+      }
+    }
+
+    state.cutout = { source, base, src: base, path };
     // Bake the grounding in immediately so the preview matches the export.
     state.cutout.src = await renderGroundedCutout(base);
     renderAll();
-    setCutoutStatus(`Background removed · ${width}×${height}`, "ok");
+    setCutoutStatus(
+      `Background removed · ${path === "ai" ? "AI model" : "offline matte"} · ${width}×${height}`,
+      "ok"
+    );
   } catch (error) {
     console.error("Background removal failed", error);
     state.cutout = null;
@@ -1695,6 +1725,12 @@ visitSiteUrlInput.addEventListener("input", renderAll);
 
 // Grounding changes re-bake the cut-out; the sliders only commit on release so
 // dragging stays responsive, while the labels track the live value.
+if (aiFallbackToggle) {
+  aiFallbackToggle.addEventListener("change", () => {
+    state.aiFallback = aiFallbackToggle.checked;
+  });
+}
+
 shadowToggle.addEventListener("change", () => {
   state.shadowOn = shadowToggle.checked;
   refreshCutout();

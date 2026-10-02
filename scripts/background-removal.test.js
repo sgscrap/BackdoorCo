@@ -54,9 +54,10 @@ const rgbAt = (data, width, x, y) => {
 };
 
 (async () => {
-  const { colorDistance, medianBorderColor, removeBackground } = await import(
-    pathToFileURL(path.join(ROOT, 'admin', 'background-removal.mjs')).href
-  );
+  const {
+    colorDistance, medianBorderColor, removeBackground,
+    residualBackgroundFraction, shouldEscalateToAi,
+  } = await import(pathToFileURL(path.join(ROOT, 'admin', 'background-removal.mjs')).href);
 
   const WHITE = [255, 255, 255];
   const BLACK = [0, 0, 0];
@@ -181,15 +182,75 @@ const rgbAt = (data, width, x, y) => {
     assert.equal(removeBackground(one, 1, 1, { tolerance: 32 }).length, 4);
   });
 
+  // ── AI escalation signal ────────────────────────────────────────────────
+  await test('residualBackgroundFraction measures surviving border opacity', () => {
+    const clear = makeImage(8, 8, () => [0, 0, 0, 0]);
+    assert.equal(residualBackgroundFraction(clear, 8, 8), 0, 'a transparent border is fully removed');
+
+    const opaque = makeImage(8, 8, () => [10, 20, 30, 255]);
+    assert.equal(residualBackgroundFraction(opaque, 8, 8), 1, 'an opaque border is untouched');
+
+    const half = makeImage(8, 8, (x) => [10, 20, 30, x < 4 ? 255 : 0]);
+    assert.equal(residualBackgroundFraction(half, 8, 8), 0.5, 'half opaque is half');
+
+    assert.equal(residualBackgroundFraction(null, 0, 0), 0);
+  });
+
+  await test('residualBackgroundFraction honors the alpha threshold', () => {
+    const faint = makeImage(6, 6, () => [0, 0, 0, 5]);
+    assert.equal(residualBackgroundFraction(faint, 6, 6), 0, 'alpha 5 is below the default threshold');
+    assert.equal(residualBackgroundFraction(faint, 6, 6, { alphaThreshold: 1 }), 1);
+  });
+
+  await test('a good matte does not escalate; a failed one does', () => {
+    const width = 12;
+    const height = 12;
+    // Uniform studio background: the matte clears the border entirely.
+    const uniform = makeImage(width, height, (x, y) => (x >= 4 && x <= 7 && y >= 4 && y <= 7 ? [200, 20, 20] : WHITE));
+    const uniformMatte = removeBackground(uniform, width, height, { tolerance: 32 });
+    assert.equal(residualBackgroundFraction(uniformMatte, width, height), 0);
+    assert.equal(shouldEscalateToAi(uniformMatte, width, height), false);
+
+    // A busy per-pixel background resists the flood fill right up to the edge.
+    const busy = makeImage(width, height, (x, y) => [(x * 37) % 256, (y * 53) % 256, ((x + y) * 29) % 256]);
+    const busyMatte = removeBackground(busy, width, height, { tolerance: 32 });
+    assert.ok(residualBackgroundFraction(busyMatte, width, height) > 0.9, 'a busy background should survive');
+    assert.equal(shouldEscalateToAi(busyMatte, width, height), true);
+  });
+
+  await test('shouldEscalateToAi respects a custom cutoff', () => {
+    const half = makeImage(8, 8, (x) => [10, 20, 30, x < 4 ? 255 : 0]);
+    assert.equal(shouldEscalateToAi(half, 8, 8), true, '0.5 exceeds the default 0.4');
+    assert.equal(shouldEscalateToAi(half, 8, 8, { cutoff: 0.6 }), false);
+  });
+
+  // ── the AI module stays lazy ────────────────────────────────────────────
+  await test('ai-segmentation exports a lazy, pinned model loader', async () => {
+    const ai = await import(pathToFileURL(path.join(ROOT, 'admin', 'ai-segmentation.mjs')).href);
+    assert.equal(typeof ai.segmentWithAi, 'function');
+    assert.equal(typeof ai.warmUpAi, 'function');
+    assert.equal(typeof ai.isAiAvailable, 'function');
+    assert.match(ai.AI_MODEL.url, /^https:\/\/cdn\.jsdelivr\.net\/npm\/@imgly\/background-removal@\d/);
+    assert.match(ai.AI_MODEL.url, new RegExp(ai.AI_MODEL.version.replace(/\./g, '\\.')));
+    assert.equal(ai.AI_MODEL.model, 'isnet_quint8', 'the smallest network should be the default');
+    // Importing the module must not fetch anything.
+    assert.equal(typeof ai.segmentWithAi === 'function' && typeof ai.warmUpAi === 'function', true);
+  });
+
   // ── studio wiring ───────────────────────────────────────────────────────
   await test('the Social Desk imports the matte and exposes its controls', () => {
     const source = fs.readFileSync(path.join(ROOT, 'admin', 'social.js'), 'utf8');
     const html = fs.readFileSync(path.join(ROOT, 'admin', 'social.html'), 'utf8');
     assert.match(source, /from "\.\/background-removal\.mjs"/, 'social.js should import the matte module');
     assert.match(source, /removeBackground\(/, 'social.js should call removeBackground');
-    for (const id of ['removeBgBtn', 'restoreBgBtn', 'cutoutTolerance', 'cutoutFeather']) {
+    for (const id of ['removeBgBtn', 'restoreBgBtn', 'cutoutTolerance', 'cutoutFeather', 'aiFallbackToggle']) {
       assert.match(html, new RegExp(`id="${id}"`), `social.html is missing #${id}`);
     }
+    // The AI model must only be reached after the matte reports it failed.
+    assert.match(source, /shouldEscalateToAi\(/, 'social.js should decide whether to escalate');
+    assert.match(source, /await segmentWithAi\(/, 'social.js should call the AI path');
+    assert.match(source, /path === "ai" \? "AI model" : "offline matte"/, 'the status should report which path ran');
+    assert.match(html, /AGPL/, 'the licence should be visible next to the toggle');
   });
 
   await test('the Social Desk wires the cut-out grounding controls', () => {

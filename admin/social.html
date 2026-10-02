@@ -356,6 +356,12 @@
             <label for="cutoutFeather">Edge Softness <span id="cutoutFeatherValue">1px</span></label>
             <input type="range" id="cutoutFeather" min="0" max="6" value="1" />
           </div>
+          <div class="toggle-row">
+            <label title="Fetches a segmentation model only when the offline matte leaves too much background">
+              <input type="checkbox" id="aiFallbackToggle" checked /> AI fallback
+            </label>
+          </div>
+          <p class="rollout-status">AI model · @imgly/background-removal (AGPL) · ~40 MB, fetched only when needed</p>
           <div class="rollout-actions">
             <button type="button" class="copy-caption-btn" id="removeBgBtn">✂ Remove Background</button>
             <button type="button" class="copy-caption-btn" id="restoreBgBtn" disabled>↺ Restore</button>
