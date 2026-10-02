@@ -31,11 +31,14 @@ import {
 import {
   carouselGroups,
   parseRollout,
-  ROLLOUT_URL,
+  resolveRolloutUrl,
   studioControlsFor,
 } from "./rollout-import.mjs";
 
 const SITE_ORIGIN = "https://backdoorco.vercel.app";
+// The prepared rollout to load — defaults to the curated file, but a
+// ?rollout=<filename> query parameter lets a generated rollout be previewed.
+const ROLLOUT_URL = resolveRolloutUrl(window.location.search);
 
 const canvas = document.getElementById("assetCanvas");
 const templateRoot = document.getElementById("assetTemplateRoot");

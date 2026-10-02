@@ -32,7 +32,7 @@ const ROOT = path.join(__dirname, '..');
 const PREPARED = path.join(ROOT, 'admin', 'instagram-rollout.prepared.json');
 
 (async () => {
-  const { parseRollout, carouselGroups, studioControlsFor, ROLLOUT_URL } = await import(
+  const { parseRollout, carouselGroups, resolveRolloutUrl, studioControlsFor, ROLLOUT_URL } = await import(
     pathToFileURL(path.join(ROOT, 'admin', 'rollout-import.mjs')).href
   );
 
@@ -131,6 +131,34 @@ const PREPARED = path.join(ROOT, 'admin', 'instagram-rollout.prepared.json');
 
   await test('the default rollout URL is the prepared file', () => {
     assert.equal(ROLLOUT_URL, 'instagram-rollout.prepared.json');
+  });
+
+  // ── ?rollout= override (preview an alternate prepared file) ─────────────
+  await test('resolveRolloutUrl defaults to the curated prepared file', () => {
+    assert.equal(resolveRolloutUrl(''), 'instagram-rollout.prepared.json');
+    assert.equal(resolveRolloutUrl('?foo=bar'), 'instagram-rollout.prepared.json');
+    assert.equal(resolveRolloutUrl(undefined), 'instagram-rollout.prepared.json');
+  });
+
+  await test('resolveRolloutUrl accepts a bare prepared filename', () => {
+    assert.equal(
+      resolveRolloutUrl('?rollout=instagram-rollout.generated.prepared.json'),
+      'instagram-rollout.generated.prepared.json'
+    );
+  });
+
+  await test('resolveRolloutUrl ignores paths, schemes and traversal', () => {
+    const bad = [
+      '?rollout=../secret.json',
+      '?rollout=/etc/passwd.json',
+      '?rollout=https://evil.example/x.json',
+      '?rollout=sub/dir.json',
+      '?rollout=evil.txt',
+      '?rollout=',
+    ];
+    for (const search of bad) {
+      assert.equal(resolveRolloutUrl(search), 'instagram-rollout.prepared.json', `should ignore ${search}`);
+    }
   });
 
   console.log(`\n${passed} passed, ${failed} failed`);

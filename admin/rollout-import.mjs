@@ -7,6 +7,22 @@
 
 export const ROLLOUT_URL = "instagram-rollout.prepared.json";
 
+// A bare filename in the same directory: no scheme, no slashes, no traversal.
+const ROLLOUT_FILENAME = /^[a-z0-9][a-z0-9._-]*\.json$/i;
+
+/**
+ * Resolve which prepared file the studio should load.
+ *
+ * The default is ROLLOUT_URL; a `?rollout=<filename>` query parameter overrides
+ * it so a generated (or any alternate) prepared rollout can be previewed without
+ * disturbing the curated file. Anything that is not a bare relative .json
+ * filename is ignored, so the page can never be pointed at another origin.
+ */
+export function resolveRolloutUrl(search = "") {
+  const requested = String(new URLSearchParams(search).get("rollout") || "").trim();
+  return ROLLOUT_FILENAME.test(requested) ? requested : ROLLOUT_URL;
+}
+
 export const TEMPLATES = ["drop", "story", "sale", "restock", "collage", "holiday", "teaser", "flash"];
 export const THEMES = ["backdoor", "mono", "white", "volt", "red", "holiday", "teaser"];
 export const RATIOS = ["1-1", "9-16", "16-9"];

@@ -172,12 +172,23 @@ function cloneManifest() {
   };
 
   try {
-    await test('a valid manifest at an alternate path passes', () => {
-      const file = path.join(tmpDir, 'valid.json');
-      fs.writeFileSync(file, JSON.stringify(baseManifest, null, 2));
-      const run = runRollout(['--manifest', file]);
-      assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
-    });
+  await test('a valid manifest at an alternate path passes', () => {
+    const file = path.join(tmpDir, 'valid.json');
+    fs.writeFileSync(file, JSON.stringify(baseManifest, null, 2));
+    const run = runRollout(['--manifest', file]);
+    assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
+  });
+
+  await test('--out writes the prepared file without touching the canonical one', () => {
+    const before = fs.readFileSync(PREPARED, 'utf8');
+    const generated = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'instagram-rollout.generated.json'), 'utf8'));
+    const file = path.join(tmpDir, 'alt.prepared.json');
+    const run = runRollout(['--manifest', path.join(ROOT, 'admin', 'instagram-rollout.generated.json'), '--out', file, '--write']);
+    assert.equal(run.status, 0, `${run.stdout}${run.stderr}`);
+    const written = JSON.parse(fs.readFileSync(file, 'utf8'));
+    assert.equal(written.assets.length, generated.assets.length);
+    assert.equal(fs.readFileSync(PREPARED, 'utf8'), before, 'canonical prepared file must not change when --out is used');
+  });
 
     await test('a product-less template is named by the active product, like the studio', () => {
       const file = writeTmp((m) => {
