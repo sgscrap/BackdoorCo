@@ -90,7 +90,6 @@ Backdoor/
 ├── index.html               # Home: hero, Most Wanted, brands, drop, stats, newsletter
 ├── shop-all.html            # Full catalog with sidebar filters + grid
 ├── product.html             # PDP: gallery, sizes, offer modal, price history, reviews
-├── product-detail.html      # Older PDP variant (kept for fallback)
 ├── checkout.html            # 3-step Stripe / PayPal checkout
 ├── accounts.html            # Auth modal + customer dashboard (wishlist, loyalty, etc.)
 ├── tracking.html            # Order lookup + tracking detail + admin order management
@@ -147,9 +146,7 @@ Backdoor/
 │   └── price-monitor.SKILL.md  # Intern doc for the weekly price-monitor skill
 │
 ├── scripts / one-offs:
-│   ├── update_nav.py / update-acne.js / convert_utf8.py
-│   ├── fix-violet-prada.js / build-categories.js
-│   ├── check-*.js / test-browser.js  # Sanity / e2e checks
+│   ├── update_nav.py / convert_utf8.py
 │
 ├── server.js                # Optional Express helper for product image upload + auto commit
 ├── auth.js                  # Global Firebase auth + nav avatar + wishlist toggling
@@ -162,12 +159,11 @@ Backdoor/
 ├── cart.js                  # Shared cart helpers
 ├── tracking.js              # Tracking page module (lookup, timeline, filters)
 ├── analytics.js             # Tiny analytics chart helper + email/save tracker
-├── simple-product-page.js   # Lighter-weight fallback PDP module
 │
 ├── chrome.css               # Shared navbar / cart drawer / toast / announce styles
 ├── tokens.css               # Shared :root design tokens
 ├── css:  styles.css, store.css, checkout.css, accounts.css,
-│        shop-all.css, product.css, admin.css, pricing.css, email.css,
+│        shop-all.css, admin.css, pricing.css, email.css,
 │        tracking.css, social.css, restock.css
 │
 ├── .github/workflows/       # codeql.yml + codeql-analysis.yml
@@ -195,7 +191,7 @@ Each page's nav, footer, and global scripts are inlined from a partial in [`part
 | [`partials/nav.html`](partials/nav.html) | `nav` | every storefront page |
 | [`partials/footer-compact.html`](partials/footer-compact.html) | `footer` | all pages except `index.html` / `about.html` |
 | [`partials/footer-full.html`](partials/footer-full.html) | `footer` | `index.html`, `about.html` |
-| [`partials/global-scripts.html`](partials/global-scripts.html) | `scripts` | every page except `404.html`, `checkout.html`, `product-detail.html` |
+| [`partials/global-scripts.html`](partials/global-scripts.html) | `scripts` | every page except `404.html`, `checkout.html` |
 | [`partials/head-css.html`](partials/head-css.html) | `headcss` | every storefront page (inserted before `store.css`) |
 
 Run **`npm run build:chrome`** after editing a partial to regenerate every page, and **`npm run check:chrome`** (enforced in CI) to fail the build when a page drifts from its partial. Change the nav, footer, shared scripts, or shared CSS links once, in one file.
@@ -220,8 +216,11 @@ It also **exercises the shared chrome on every page** with real mouse input, sin
 | Mobile menu | tapping `#navHamburger` at each phone width (320, 360, 390, 430) | the hamburger is reachable at that width, `#navMobileMenu` gains `.open` and displays, then closes again |
 | Brands dropdown | hovering `.nav-dropdown-toggle` at desktop width | `.nav-dropdown-menu` becomes displayed (it is revealed by CSS `:hover`) |
 | Cart drawer | clicking `#cartButton`, or checkout's own `.cart-btn` | the drawer slides into view, then closes via its close button |
+| Shopping flow | picking a size and clicking `#productAddToCart` on the product page, or calling the page's own `addToCart` on the catalogue pages (their cards link to the product page, so they have no in-page control) | the item appears in the drawer, the drawer opens, a quantity `+` and `−` move the count, line total and stored bag together, and the remove button takes the item back out |
 
-Each interaction is capability-driven: a page without a navbar or without a cart drawer reports that interaction as *n/a* rather than failing. Triggers are only clicked after a hit test proves a real user could reach them, so a hidden or covered control can never produce a false pass. The mobile menu is measured at every phone width rather than one, because the navbar's phone layout is a set of breakpoints — a regression can make the hamburger unreachable at 320px while 430px still looks fine, and a single-width probe would miss it. Findings are graded — a broken interaction fails the run, while a finding that is not this test's business (an unreachable-by-design control) is reported once as a warning and does not fail the build.
+The shopping flow walks the whole errand a shopper walks, because the drawer's markup is inlined on every page while its `+` / `−` / remove handlers are implemented separately in `app.js` (catalogue pages) and `product-page.js` (the product page). Every control is clicked with a real mouse event, and a handler that throws is an uncaught exception that fails the page like any other. Its assertions are deltas against a snapshot taken before the add, and the item under test is marked in the DOM and added under a page-specific id, so an item that a page whose flow failed left behind in the shared `backdoor-cart` storage cannot make the next page look broken.
+
+Each interaction is capability-driven: a page without a navbar, without a cart drawer, or without a product to sell reports that interaction as *n/a* rather than failing. Triggers are only clicked after a hit test proves a real user could reach them, so a hidden or covered control can never produce a false pass. The mobile menu is measured at every phone width rather than one, because the navbar's phone layout is a set of breakpoints — a regression can make the hamburger unreachable at 320px while 430px still looks fine, and a single-width probe would miss it. Findings are graded — a broken interaction fails the run, while a finding that is not this test's business (an unreachable-by-design control) is reported once as a warning and does not fail the build.
 
 It also **asserts the shape of every page** on the settled DOM, using the same `build-chrome` tables that drive **`npm run check:chrome`**, so a page that drifted from its partials or lost an asset fails the run:
 
@@ -230,12 +229,15 @@ It also **asserts the shape of every page** on the settled DOM, using the same `
 | One navbar and footer | exactly one shared `#navbar` on every page whose table entry says it has one, and never more than one navbar or footer anywhere |
 | Chrome markers | every `<!-- @@chrome:<region>:start -->` has a matching `:end`, a page carries exactly the regions its table entry lists, and no `%%nav:…%%` token is left unresolved |
 | Stylesheets and images resolve | no same-origin stylesheet or image answers with HTTP ≥ 400, and no same-origin stylesheet loads but defines zero rules |
+| No horizontal overflow | at 320 / 390 / 430 / 768 / 1024 / 1440px, nothing visible spills past the viewport and the document never scrolls sideways |
 
 The asset assertion reads real network responses with the cache disabled, so a broken image that `image-fallback.js` silently swaps for a placeholder is still caught, and a cached 200 can never hide a missing file. Third-party requests (Google Fonts, Firebase) are ignored — they are network noise and cannot be asserted offline.
 
-`product-detail.html` is the legacy product shell: without an `?id=` its script sends the browser straight home, so it used to be smoked as whatever page it bounced to. Its script reads only `products/<id>` from Firestore (never the seeded catalogue), so before the run the smoke test **discovers a live product id from the storefront itself** — it imports the site's own Firebase config in page context and queries the active products the shop sells, so its own structure is asserted against a product that actually exists. A hand-written id would rot silently whenever the catalogue changed; discovery keeps the coverage real. `SMOKE_PRODUCT_ID=<firestore id>` pins an id and skips discovery, and if the catalogue is unreachable the test falls back to a built-in id. Either way, if the document behind the id is removed the page redirects and the run degrades to a warning with its assertions skipped, rather than asserting against the wrong page.
+The overflow assertion measures every visible element's box rather than only the document's scroll width, because `body { overflow-x: hidden }` suppresses a sideways scrollbar while still clipping chrome off-screen — the way the phone navbar used to lose its hamburger. Elements placed off-canvas on purpose (the closed cart drawer, a hero's own clipped blobs) are skipped.
 
-Set `CHROME_PATH` to point at a specific browser, `SMOKE_BASE_URL` to target an already-running server, `SMOKE_PAGES=index.html,about.html` to smoke a subset, `SMOKE_PRODUCT_ID=<firestore id>` to pin the id `product-detail.html` is loaded with instead of discovering one, or `SMOKE_VERBOSE=1` to list every interaction, structural check and ignored warning. If no Chrome/Chromium is found it prints a note and exits 0. Unhandled promise rejections and third-party network noise are reported as warnings rather than failures.
+The product page is loaded from the catalogue (`product.html?slug=…`, taken from the page's own `product-data.js`) instead of bare, so it renders a real product rather than its *Product unavailable* state — otherwise its add-to-cart button would never exist to be tested.
+
+Set `CHROME_PATH` to point at a specific browser, `SMOKE_BASE_URL` to target an already-running server, `SMOKE_PAGES=index.html,about.html` to smoke a subset, or `SMOKE_VERBOSE=1` to list every interaction, structural check and ignored warning. If no Chrome/Chromium is found it prints a note and exits 0. Unhandled promise rejections and third-party network noise are reported as warnings rather than failures.
 
 > **Fixed:** the mobile menu used to be unreachable on phones. The navbar's desktop layout is roughly 500px wide, but `chrome.css`'s phone compaction was being overridden by later page stylesheets — `accounts.css` re-showed the search box and `email.css`/`tracking.css` restyled `.navbar`/`.nav-logo` at every width — so below about 500px the hamburger sat outside the viewport and `body { overflow-x: hidden }` made it unscrollable. The shared phone layout now wins: page-level navbar skins are scoped to `min-width: 769px`, and under 480px the logo shrinks to fit. The smoke test now taps the hamburger at 320, 360, 390 and 430px and fails if it is unreachable at any of them, so this regression cannot creep back at a width the old 390px-only probe ignored.
 
@@ -612,8 +614,7 @@ The frontend is deployed to **Vercel** (project `backdoorco`); the serverless fu
 
 - **`skills/price-monitor.SKILL.md`** — Internal design doc for the weekly price-monitor + offer-system skill. Outlines runway: SKU-first product matching, GOAT/StockX/eBay/Prada source adapters, configurable price policy (delta or % under market), alert channels, and an `AUTO_UPDATE_MODE` toggle (`off | recommend | auto`).
 - **Local helper scripts** (root, safe to delete without affecting prod):
-  - `update_nav.py`, `update-acne.js`, `fix-violet-prada.js`, `convert_utf8.py`, `build-categories.js` — one-off data hygiene patches.
-  - `check-prada.js`, `check-shop-page.js`, `check-homepage.js`, `test-browser.js` — sanity scripts.
+  - `update_nav.py`, `convert_utf8.py` — one-off data hygiene patches.
   - `seed-products.js` plus the per-product `admin/seed-*.html` — used to seed the initial Jordan 4 "Toro", Kobe 6 "ASG 3D", Prada America's Cup line, etc.
 - **`deploy.ps1`** — PowerShell helper for the local autodeploy workflow.
 
@@ -659,7 +660,7 @@ Works for Lyst, Farfetch, END., SSENSE, Mr Porter, Nordstrom, Net-A-Porter. JS-o
 | Change the site colour tokens               | Edit `tokens.css`                                                                                                 |
 | Add a new admin page                        | Drop the HTML+JS pair in `admin/`, mirror the sidebar nav (`<p class="nav-label">TOOLS</p>` etc.) + add an entry in every existing admin nav |
 | Set image crop/aspect ratio per product      | Edit product → Image Display section: Fit Mode toggle, Position X/Y sliders, Scale, Padding, Aspect Ratio dropdown (Auto / 1:1 Square / 3:4 Portrait / 4:3 Landscape / 16:9 Widescreen) |
-| Smoke-test every storefront page            | `npm run test:smoke` (headless Chrome: page loads, structural assertions, mobile menu, dropdown, cart drawer)    |
+| Smoke-test every storefront page            | `npm run test:smoke` (headless Chrome: page loads, structural assertions, mobile menu, dropdown, cart drawer, shopping flow) |
 
 ---
 

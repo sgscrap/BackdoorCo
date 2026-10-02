@@ -41,47 +41,6 @@ const PAGES = (process.env.SMOKE_PAGES
   ? process.env.SMOKE_PAGES.split(',').map((p) => p.trim()).filter(Boolean)
   : [...HEADCSS_PAGES].sort());
 
-// product-detail.html is the legacy product shell: without an ?id= its script
-// sends you straight home, so it used to be smoked as whatever page it bounced
-// to. It needs a *live* Firestore id (its script reads only `products/<id>`, not
-// the seeded catalogue), and a hand-written id rots the moment that document is
-// renamed — the page then degrades to a "redirected away" warning and looks
-// covered while asserting nothing. So main() asks the live storefront for an id
-// first; this constant is the fallback when the catalogue is unreachable, and
-// SMOKE_PRODUCT_ID pins a specific id and skips discovery.
-const FALLBACK_PRODUCT_ID = process.env.SMOKE_PRODUCT_ID || '6ND5OkYAlwqKKkJsOHdk';
-
-// Runs in page context on a real storefront page: it imports the storefront's
-// own Firebase config and queries the exact collection the shop queries, so the
-// id it returns is a product customers can actually open. Falls back to the
-// product links the page already rendered (those come from the same collection,
-// minus the local `seed-…` catalogue, which Firestore does not contain).
-const DISCOVER_PRODUCT_ID = `(async () => {
-  try {
-    const { db } = await import('/admin/firebase-config.js');
-    const { collection, getDocs, limit, query, where } = await import(
-      'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js'
-    );
-    const snapshot = await getDocs(query(
-      collection(db, 'products'),
-      where('status', '==', 'active'),
-      limit(1)
-    ));
-    if (!snapshot.empty) return snapshot.docs[0].id;
-  } catch {
-    /* an unreachable catalogue must not fail the run */
-  }
-  for (const link of document.querySelectorAll('a[href*="product.html?id="]')) {
-    try {
-      const id = new URL(link.getAttribute('href'), location.origin).searchParams.get('id');
-      if (id && !id.startsWith('seed-')) return id;
-    } catch {
-      /* skip malformed links */
-    }
-  }
-  return null;
-})()`;
-
 // Settle time after `load` so deferred scripts and DOMContentLoaded
 // handlers get a chance to run (and throw) before we move on.
 const SETTLE_MS = 800;
@@ -357,6 +316,29 @@ const INTERACTION_MS = 500; // the longest chrome transition is 0.35s
 const CART_TRIGGERS = ['#cartButton', '.cart-btn']; // shared navbar button, then checkout's own
 const CART_CLOSES = ['#cartClose', '.cart-close'];
 
+// The shopping flow clicks the drawer's own controls. Before each click the item
+// under test is marked, and addToCart appends, so the newest item is the last
+// one — an item an earlier page left behind can never be mistaken for this
+// page's own. The marker not surviving a click is itself evidence the page
+// re-rendered the drawer, because that render replaces the markup wholesale.
+const FLOW_ITEM_ATTR = 'data-smoke-item';
+const FLOW_ITEM = `[${FLOW_ITEM_ATTR}]`;
+const FLOW_SIZE_ATTR = 'data-smoke-size';
+const FLOW_SIZE = `[${FLOW_SIZE_ATTR}]`;
+const FLOW_ADD_BUTTON = '#productAddToCart';
+const FLOW_QTY_UP = `${FLOW_ITEM} .qty-control .qty-btn:last-child`;
+const FLOW_QTY_DOWN = `${FLOW_ITEM} .qty-control .qty-btn:first-child`;
+const FLOW_REMOVE = `${FLOW_ITEM} .cart-item-remove`;
+// The flow clicks controls that may sit below the fold, and a cramped window
+// would make a healthy button look unreachable, so it gets a roomy viewport.
+const FLOW_VIEWPORT = { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false };
+// The catalogue pages render their cards as links to the product page, so they
+// have no in-page add control to click; the page's own addToCart is driven
+// instead. It is only ever asked to carry one throwaway item (removed again by
+// the end of the flow), and its empty image is what exercises the drawer's
+// fallback thumbnail.
+const FLOW_API_ITEM = { id: 'smoke-flow-item', name: 'Smoke Flow Item', price: 1, image: '', size: 'One Size' };
+
 // ── Structural assertions ────────────────────────────────────
 // The interactions above prove the chrome *works*; these prove it is all
 // actually there. Every page is built by inlining the partials between marker
@@ -366,6 +348,24 @@ const CART_CLOSES = ['#cartClose', '.cart-close'];
 // stylesheet/image link that 404s. All of it is checked against the live DOM
 // and the real network, not the source files.
 const CHROME_REGIONS = ['nav', 'footer', 'scripts', 'headcss'];
+
+// Layout widths the overflow guard measures: the smallest phone through a wide
+// desktop. The phone navbar once sat off-screen because a page stylesheet
+// outranked the shared phone layout, and body{overflow-x:hidden} hid the
+// symptom — so this measures every visible element's box at each width rather
+// than trusting the document's scrollWidth, which stays put when overflow is
+// hidden.
+const OVERFLOW_VIEWPORTS = [
+  { label: '320px phone', width: 320, height: 640 },
+  { label: '390px phone', width: 390, height: 844 },
+  { label: '430px phone', width: 430, height: 932 },
+  { label: '768px tablet', width: 768, height: 1024 },
+  { label: '1024px tablet', width: 1024, height: 768 },
+  { label: '1440px desktop', width: 1440, height: 900 },
+];
+const OVERFLOW_SETTLE_MS = 200;
+// Sub-pixel layout noise, not real overflow.
+const OVERFLOW_TOLERANCE = 1;
 
 // Everything the structural pass needs, gathered in one round trip.
 const STRUCTURE_PROBE = `(() => {
@@ -404,6 +404,59 @@ const STRUCTURE_PROBE = `(() => {
     sheets,
     images,
   };
+})()`;
+
+// Runs while the viewport is resized: reports the document's own horizontal
+// scroll plus every visible element whose box spills past the viewport edge.
+// Elements placed off-canvas by a transform (the closed cart drawer, the toast)
+// are deliberate, and children of an overflow-x scroll region are reachable, so
+// both are skipped. Everything else that pokes past the edge is chrome a user
+// cannot reach, which is exactly the failure this guards against.
+const OVERFLOW_PROBE = `(() => {
+  const vw = document.documentElement.clientWidth;
+  const vh = document.documentElement.clientHeight;
+  const describe = (el) => {
+    let name = el.tagName.toLowerCase();
+    if (el.id) name += '#' + el.id;
+    const cls = el.getAttribute('class');
+    if (cls) name += '.' + cls.trim().split(/\\s+/).slice(0, 2).join('.');
+    return name;
+  };
+  const offCanvas = (el) => {
+    // A transform (the closed cart drawer, the toast), a scroll region (a filter
+    // rail) or a clipping wrapper (a hero containing its own blurred blobs)
+    // places content off the viewport on purpose, so it is not overflow.
+    // The body element is deliberately not walked: its overflow-x:hidden
+    // propagates to the viewport and does not clip fixed chrome, which is
+    // exactly what this guard is for.
+    for (let p = el; p && p !== document.body; p = p.parentElement) {
+      const cs = getComputedStyle(p);
+      if (cs.transform && cs.transform !== 'none') return true;
+      const ox = cs.overflowX;
+      if (ox === 'auto' || ox === 'scroll' || ox === 'hidden' || ox === 'clip') return true;
+    }
+    return false;
+  };
+  const offenders = [];
+  const seen = new Set();
+  for (const el of document.body.querySelectorAll('*')) {
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+    if (parseFloat(cs.opacity || '1') === 0) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width <= 0 || r.height <= 0) continue;
+    if (r.bottom <= 0 || r.top >= vh) continue;
+    const over = Math.max(r.right - vw, -r.left);
+    if (over <= 1) continue;
+    if (offCanvas(el)) continue;
+    const name = describe(el);
+    const key = name + '@' + Math.round(over);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    offenders.push({ element: name, overflow: Math.round(over) });
+  }
+  const doc = document.documentElement;
+  return { viewport: vw, offenders, scroll: doc.scrollWidth - doc.clientWidth };
 })()`;
 
 async function evaluateIn(cdp, sessionId, expression) {
@@ -473,6 +526,57 @@ async function firstReachable(cdp, sessionId, selectors) {
   return null;
 }
 
+// Marks the newest item in the drawer, which is the one addToCart just appended.
+async function markLastCartItem(cdp, sessionId) {
+  return evaluateIn(cdp, sessionId, `(() => {
+    const items = document.querySelectorAll('#cartItems .cart-item');
+    const last = items[items.length - 1];
+    if (!last) return false;
+    last.setAttribute(${JSON.stringify(FLOW_ITEM_ATTR)}, '1');
+    return true;
+  })()`);
+}
+
+// Marks the first size a shopper could actually pick: the product page renders
+// sold-out sizes as disabled buttons, and its add button stays disabled until a
+// size is chosen.
+async function markPickableSize(cdp, sessionId) {
+  return evaluateIn(cdp, sessionId, `(() => {
+    const options = [...document.querySelectorAll('#productSizeOptions .size-option, .size-option')];
+    const pick = options.find((option) => !option.disabled);
+    if (!pick) return false;
+    pick.setAttribute(${JSON.stringify(FLOW_SIZE_ATTR)}, '1');
+    return true;
+  })()`);
+}
+
+// A hit test only passes on what is inside the viewport, so scroll the target
+// into view first — the flow clicks the same controls a shopper would scroll to.
+// The scroll is forced to be instant: the site sets scroll-behavior:smooth, and
+// an animated scroll would still be in flight when the click is measured.
+async function scrollTo(cdp, sessionId, selector) {
+  return evaluateIn(cdp, sessionId, `(() => {
+    const el = document.querySelector(${JSON.stringify(selector)});
+    if (!el) return false;
+    el.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
+    return true;
+  })()`);
+}
+
+// Scrolls, waits for the hit test to pass — layout can still be settling after
+// the scroll — and only then clicks, so a control is never clicked from a
+// half-scrolled page.
+async function scrollAndClick(cdp, sessionId, selector) {
+  await scrollTo(cdp, sessionId, selector);
+  let probe = await evaluateIn(cdp, sessionId, probeExpression(selector));
+  for (let attempt = 0; probe && probe.state !== 'ok' && attempt < 6; attempt += 1) {
+    await sleep(150);
+    probe = await evaluateIn(cdp, sessionId, probeExpression(selector));
+  }
+  if (!probe || probe.state !== 'ok') return probe || { state: 'missing' };
+  return clickSelector(cdp, sessionId, selector);
+}
+
 const MOBILE_MENU_STATE = `(() => {
   const menu = document.getElementById('navMobileMenu');
   if (!menu) return { present: false };
@@ -506,6 +610,48 @@ const CART_STATE = `(() => {
   };
 })()`;
 
+// What the drawer is showing, read next to what is actually stored. Every
+// assertion in the shopping flow is a delta, so an item one page leaves behind
+// cannot make the next page look broken.
+const CART_FLOW_STATE = `(() => {
+  const container = document.getElementById('cartItems');
+  const items = container ? [...container.querySelectorAll('.cart-item')] : [];
+  const badge = document.getElementById('cartCount');
+  const sidebar = document.getElementById('cartSidebar') || document.getElementById('cartDrawer');
+  const r = sidebar ? sidebar.getBoundingClientRect() : null;
+  const vw = document.documentElement.clientWidth;
+  const visible = r ? Math.max(0, Math.min(r.right, vw) - Math.max(r.left, 0)) : 0;
+  let stored = null;
+  try {
+    const raw = JSON.parse(localStorage.getItem('backdoor-cart') || '[]');
+    stored = Array.isArray(raw)
+      ? raw.reduce((total, item) => total + (Number(item.qty ?? item.quantity) || 0), 0)
+      : null;
+  } catch { stored = null; }
+  return {
+    drawer: container ? 'present' : 'missing',
+    id: sidebar ? sidebar.id : null,
+    items: items.length,
+    badge: badge ? String(badge.textContent || '').trim() : null,
+    open: !!(sidebar && r && r.width > 0 && visible / r.width > 0.5),
+    stored,
+  };
+})()`;
+
+// The marked item's own numbers, so the quantity and line-total assertions read
+// the item this page added rather than whatever happens to be first.
+const FLOW_ITEM_STATE = `(() => {
+  const item = document.querySelector(${JSON.stringify(FLOW_ITEM)});
+  if (!item) return { present: false };
+  const qty = item.querySelector('.qty-val');
+  const price = item.querySelector('.cart-item-price');
+  return {
+    present: true,
+    qty: qty ? Number(String(qty.textContent || '').trim()) || 0 : null,
+    price: price ? Number(String(price.textContent || '').replace(/[^0-9.]/g, '')) || 0 : null,
+  };
+})()`;
+
 function describe(probe) {
   if (!probe) return 'missing';
   if (probe.state === 'missing') return 'not present on this page';
@@ -513,6 +659,213 @@ function describe(probe) {
   if (probe.state === 'offscreen') return 'present but outside the viewport';
   if (probe.state === 'obscured') return 'present but covered by another element';
   return probe.state;
+}
+
+// ── The shopping flow ────────────────────────────────────────
+// The cart drawer interaction proves the drawer opens; this proves the bag
+// inside it still works. The drawer markup and its qty/remove handlers are
+// rendered by page script (app.js on the catalogue pages, product-page.js on
+// the product page) over one shared localStorage key, so the flow walks the
+// whole errand: add an item, watch it land in the drawer, raise its quantity,
+// lower it again, then remove it. Every control is clicked with a real mouse
+// event, and anything a handler throws is an uncaught exception that fails the
+// page like any other — there is no try/catch in here that could hide one.
+async function runShoppingFlow(cdp, sessionId, page) {
+  const out = [];
+  const record = (name, outcome, detail) => out.push({ name, outcome, detail });
+  const state = () => evaluateIn(cdp, sessionId, CART_FLOW_STATE);
+  // Every page shares one localStorage key, and addToCart keys a new item on
+  // id + size: a page-specific id is what stops this item merging with one a
+  // page whose flow failed left behind, which would leave the item count
+  // unchanged and read as a defect on a healthy page.
+  const apiItem = { ...FLOW_API_ITEM, id: `${FLOW_API_ITEM.id}:${page}` };
+
+  const before = await state();
+  if (before.drawer !== 'present') {
+    record('shopping flow', 'skipped', 'no cart drawer on this page');
+    return out;
+  }
+  const hasButton = await evaluateIn(cdp, sessionId, `!!document.querySelector(${JSON.stringify(FLOW_ADD_BUTTON)})`);
+  const hasApi = await evaluateIn(cdp, sessionId, "typeof window.addToCart === 'function'");
+  if (!hasButton && !hasApi) {
+    record('shopping flow', 'skipped', 'the drawer has no add-to-cart control or API to fill it');
+    return out;
+  }
+
+  await cdp.send('Emulation.setDeviceMetricsOverride', FLOW_VIEWPORT, sessionId);
+  try {
+    // ── Add ── the product page has a real button, behind a size choice; the
+    // catalogue pages render their cards as links to it, so a shopper there has
+    // no in-page control and the page's own addToCart is driven instead, which
+    // still runs that page's own save/render/open-the-drawer code.
+    let via = null;
+    let failure = null;
+    if (hasButton) {
+      if (!(await markPickableSize(cdp, sessionId))) {
+        // No purchasable size means the page has nothing to sell (its product
+        // never rendered, or every size is sold out) — a missing product, not
+        // broken cart wiring, so it is reported rather than failed.
+        const sizes = await evaluateIn(
+          cdp,
+          sessionId,
+          `document.querySelectorAll('#productSizeOptions .size-option, .size-option').length`
+        );
+        record('shopping flow', 'skipped', sizes ? 'every size is sold out' : 'the page rendered no product to add');
+        return out;
+      }
+      const size = await scrollAndClick(cdp, sessionId, FLOW_SIZE);
+      await sleep(INTERACTION_MS);
+      if (size.state !== 'ok') failure = `the first pickable size is ${describe(size)}`;
+      if (!failure) {
+        const click = await scrollAndClick(cdp, sessionId, FLOW_ADD_BUTTON);
+        if (click.state !== 'ok') failure = `${FLOW_ADD_BUTTON} is ${describe(click)}`;
+        else via = `clicked a size, then ${FLOW_ADD_BUTTON}`;
+      }
+    } else {
+      await evaluateIn(
+        cdp,
+        sessionId,
+        `(() => {
+          window.addToCart(${JSON.stringify(apiItem)}, ${JSON.stringify(apiItem.size)});
+          return true;
+        })()`
+      );
+      via = 'called the page addToCart API';
+    }
+    if (failure) {
+      record('add to cart', 'failed', failure);
+      return out;
+    }
+    await sleep(INTERACTION_MS);
+    const added = await state();
+    // Deltas, not absolutes: whatever an earlier page left in the shared
+    // storage is not this page's business, but the new item must show up in
+    // both the drawer and the badge.
+    const badge = (snapshot) => (snapshot.badge === null ? null : Number(snapshot.badge));
+    const grewItem = added.items === before.items + 1;
+    // `stored` is the total quantity in localStorage, so one added item raises
+    // it by exactly one.
+    const grewStored = before.stored === null || added.stored === null || added.stored === before.stored + 1;
+    const grewBadge = badge(before) === null || badge(added) === null || badge(added) === badge(before) + 1;
+    if (!grewItem || !grewBadge || !grewStored) {
+      record(
+        'add to cart',
+        'failed',
+        `${via}, but the drawer went from ${before.items} to ${added.items} item(s), the badge from ${before.badge} to ${added.badge} and the stored bag from ${before.stored} to ${added.stored}`
+      );
+      return out;
+    }
+    record('add to cart', 'passed', `${via} — the drawer now shows ${added.items} item(s), badge ${added.badge}`);
+
+    // ── Open ── the add opens the drawer itself, so this asserts that it did
+    // (and falls back to the shared trigger if a page ever stops doing it).
+    let opened = added;
+    let how = 'the add';
+    if (!opened.open) {
+      const trigger = await firstReachable(cdp, sessionId, CART_TRIGGERS);
+      if (!trigger || trigger.probe.state !== 'ok') {
+        record(
+          'open cart drawer',
+          'failed',
+          `the add left ${added.id} closed and ${trigger ? `${trigger.selector} is ${describe(trigger.probe)}` : 'no trigger is present'}`
+        );
+        return out;
+      }
+      await clickSelector(cdp, sessionId, trigger.selector);
+      await sleep(INTERACTION_MS);
+      opened = await state();
+      how = `clicking ${trigger.selector}`;
+    }
+    if (!opened.open) {
+      record('open cart drawer', 'failed', `${how} left ${opened.id} closed`);
+      return out;
+    }
+    record('open cart drawer', 'passed', `${how} opened ${opened.id} with the new item inside it`);
+
+    // ── Quantity ── the marked item's own + and −, so a leftover item is never
+    // the one that changes. Every click re-renders the drawer, which drops the
+    // marker, so re-marking it is also how this step proves the render ran.
+    const markFailure = 'the item this page just added is not in #cartItems';
+    if (!(await markLastCartItem(cdp, sessionId))) {
+      record('change cart quantity', 'failed', markFailure);
+      return out;
+    }
+    const one = await evaluateIn(cdp, sessionId, FLOW_ITEM_STATE);
+    const up = await scrollAndClick(cdp, sessionId, FLOW_QTY_UP);
+    if (up.state !== 'ok') {
+      record('change cart quantity', 'failed', `the quantity's + button is ${describe(up)}`);
+      return out;
+    }
+    await sleep(INTERACTION_MS);
+    if (!(await markLastCartItem(cdp, sessionId))) {
+      record('change cart quantity', 'failed', 'the item disappeared after raising its quantity');
+      return out;
+    }
+    const two = await evaluateIn(cdp, sessionId, FLOW_ITEM_STATE);
+    const reraised = await state();
+    // The marker is still on the item (nothing has re-rendered since), so the −
+    // click below lands on the same item the + did.
+    const down = await scrollAndClick(cdp, sessionId, FLOW_QTY_DOWN);
+    if (down.state !== 'ok') {
+      record('change cart quantity', 'failed', `the quantity's − button is ${describe(down)}`);
+      return out;
+    }
+    await sleep(INTERACTION_MS);
+    if (!(await markLastCartItem(cdp, sessionId))) {
+      record('change cart quantity', 'failed', 'the item disappeared after lowering its quantity');
+      return out;
+    }
+    const back = await evaluateIn(cdp, sessionId, FLOW_ITEM_STATE);
+    const qtyProblems = [];
+    if (two.qty !== one.qty + 1) qtyProblems.push(`+ left the count at ${two.qty}, expected ${one.qty + 1}`);
+    if (back.qty !== one.qty) qtyProblems.push(`− left the count at ${back.qty}, expected ${one.qty}`);
+    if (one.qty && one.price !== null && two.price !== null) {
+      const each = one.price / one.qty;
+      if (Math.abs(two.price - each * two.qty) > 0.01) {
+        qtyProblems.push(`the line total read $${two.price} at quantity ${two.qty}`);
+      }
+    }
+    // One more for the extra unit, on top of the one the add already stored.
+    if (reraised.stored !== null && added.stored !== null && reraised.stored !== added.stored + 1) {
+      qtyProblems.push(
+        `the stored bag held ${reraised.stored} unit(s) at quantity ${two.qty}, expected ${added.stored + 1}`
+      );
+    }
+    if (qtyProblems.length) {
+      record('change cart quantity', 'failed', qtyProblems.join('; '));
+      return out;
+    }
+    record('change cart quantity', 'passed', `+ took the item from ${one.qty} to ${two.qty} and − took it back`);
+
+    // ── Remove ── and the bag ends the flow exactly as it started, which is
+    // what keeps the shared storage from leaking into the next page.
+    const remove = await scrollAndClick(cdp, sessionId, FLOW_REMOVE);
+    if (remove.state !== 'ok') {
+      record('remove from cart', 'failed', `the item's remove button is ${describe(remove)}`);
+      return out;
+    }
+    await sleep(INTERACTION_MS);
+    const after = await state();
+    const unmarked = await evaluateIn(cdp, sessionId, `!document.querySelector(${JSON.stringify(FLOW_ITEM)})`);
+    const removeProblems = [];
+    if (after.items !== before.items) {
+      removeProblems.push(`the drawer still shows ${after.items} item(s) where it started with ${before.items}`);
+    }
+    if (after.stored !== null && before.stored !== null && after.stored !== before.stored) {
+      removeProblems.push(`the stored bag still holds ${after.stored} unit(s) where it started with ${before.stored}`);
+    }
+    if (!unmarked) removeProblems.push('the removed item is still in the drawer markup');
+    if (removeProblems.length) {
+      record('remove from cart', 'failed', removeProblems.join('; '));
+      return out;
+    }
+    record('remove from cart', 'passed', `the remove button took the item back out — ${after.items} item(s), badge ${after.badge}`);
+  } finally {
+    await cdp.send('Emulation.clearDeviceMetricsOverride', {}, sessionId);
+    await sleep(150);
+  }
+
+  return out;
 }
 
 async function runInteractions(cdp, sessionId, page) {
@@ -635,14 +988,18 @@ async function runInteractions(cdp, sessionId, page) {
     }
   }
 
+  // ── 4. Shopping flow ── add an item, open the drawer, change its quantity,
+  // remove it again. See runShoppingFlow.
+  out.push(...(await runShoppingFlow(cdp, sessionId, page)));
+
   return out;
 }
 
 // Which chrome regions a page is built with comes straight from build-chrome's
 // tables, so the expectation can never drift from the builder. Pages that
-// deliberately carry no shared navbar (404, checkout, pricing, product-detail)
-// expect zero; checkout.html renders its own one-off navbar, which is why the
-// duplicate guard counts nav.navbar separately from the shared nav#navbar.
+// deliberately carry no shared navbar (404, checkout, pricing) expect zero;
+// checkout.html renders its own one-off navbar, which is why the duplicate
+// guard counts nav.navbar separately from the shared nav#navbar.
 function expectedChrome(page) {
   return {
     nav: Object.prototype.hasOwnProperty.call(NAV_PAGES, page),
@@ -742,22 +1099,70 @@ async function runStructure(cdp, sessionId, page, network) {
     );
   }
 
+  // 4. Nothing spills past the viewport at any phone, tablet or desktop width.
+  // The phone navbar once sat off-screen because page stylesheets outranked the
+  // shared phone layout, and body{overflow-x:hidden} hid the symptom — so this
+  // resizes through the widths above and measures the real element boxes.
+  const overflowProblems = [];
+  try {
+    for (const viewport of OVERFLOW_VIEWPORTS) {
+      await cdp.send(
+        'Emulation.setDeviceMetricsOverride',
+        { width: viewport.width, height: viewport.height, deviceScaleFactor: 1, mobile: false },
+        sessionId
+      );
+      await sleep(OVERFLOW_SETTLE_MS);
+      const layout = await evaluateIn(cdp, sessionId, OVERFLOW_PROBE);
+      const issues = [];
+      if (layout.scroll > OVERFLOW_TOLERANCE) {
+        issues.push(`the document scrolls sideways by ${layout.scroll}px`);
+      }
+      for (const offender of layout.offenders) {
+        issues.push(`${offender.element} spills ${offender.overflow}px past the viewport`);
+      }
+      if (issues.length) overflowProblems.push(`at ${viewport.label}: ${issues.join('; ')}`);
+    }
+  } finally {
+    await cdp.send('Emulation.clearDeviceMetricsOverride', {}, sessionId);
+    await sleep(OVERFLOW_SETTLE_MS);
+  }
+  if (overflowProblems.length) {
+    record('no horizontal overflow', 'failed', overflowProblems.join(' | '));
+  } else {
+    record(
+      'no horizontal overflow',
+      'passed',
+      `nothing overflows at ${OVERFLOW_VIEWPORTS.length} widths (320px–1440px)`
+    );
+  }
+
   return out;
 }
 
-// Asks a freshly loaded storefront page for a live product id. Best-effort:
-// navigation, evaluation or network failures all return null, and the caller
-// keeps its fallback.
-async function discoverProductId(cdp, sessionId, baseUrl, firstPage) {
+// product.html renders its "Product unavailable" state unless it is asked for a
+// product, which would leave the whole page (its add-to-cart button included)
+// untested. So the harness asks for one the way a shopper arrives: through the
+// catalogue. The slug is read from the page's own product-data.js rather than
+// hardcoded, so it cannot rot when the catalogue changes, and a failure here
+// just leaves the page as it would be without a query.
+async function resolveProductQuery(cdp, sessionId, baseUrl) {
+  if (!PAGES.includes('product.html')) return '';
   try {
     const loaded = cdp.waitFor('Page.loadEventFired', NAV_TIMEOUT_MS);
-    await cdp.send('Page.navigate', { url: `${baseUrl}/${firstPage || 'index.html'}` }, sessionId);
+    await cdp.send('Page.navigate', { url: `${baseUrl}/product.html` }, sessionId);
     await loaded;
-    await sleep(SETTLE_MS);
-    const id = await evaluateIn(cdp, sessionId, DISCOVER_PRODUCT_ID);
-    return typeof id === 'string' && id ? id : null;
+    const slug = await evaluateIn(
+      cdp,
+      sessionId,
+      `(async () => {
+        const catalog = await import('./product-data.js');
+        const first = catalog.getSeededProducts()[0];
+        return first ? first.slug || first.id : null;
+      })()`
+    );
+    return slug ? `?slug=${encodeURIComponent(slug)}` : '';
   } catch {
-    return null;
+    return '';
   }
 }
 
@@ -799,31 +1204,11 @@ async function main() {
     // disabled so a cached 200 can never hide a file that is missing.
     await cdp.send('Network.enable', {}, sessionId);
     await cdp.send('Network.setCacheDisabled', { cacheDisabled: true }, sessionId);
-    // A blocking alert() (e.g. product-detail's "Product not found" if the
-    // catalogue id ever goes stale) would freeze the renderer and hang the run,
-    // so dialogs are accepted and dismissed the moment they open.
+    // A blocking alert() would freeze the renderer and hang the run, so dialogs
+    // are accepted and dismissed the moment they open.
     cdp.on('Page.javascriptDialogOpening', () => {
       cdp.send('Page.handleJavaScriptDialog', { accept: true }, sessionId).catch(() => {});
     });
-
-    // Discover a real product id from the live storefront before asserting
-    // anything, so product-detail.html is always loaded against a product the
-    // shop currently sells. Discovery needs a real document origin, so it
-    // borrows the first page in the run (the loop reloads it below). An explicit
-    // SMOKE_PRODUCT_ID wins and skips the network entirely; a failure just keeps
-    // the fallback id, because a missing catalogue must not fail the run.
-    const pinned = process.env.SMOKE_PRODUCT_ID;
-    const discovered = pinned ? null : await discoverProductId(cdp, sessionId, baseUrl, PAGES[0]);
-    const PRODUCT_ID = pinned || discovered || FALLBACK_PRODUCT_ID;
-    const PAGE_QUERY = { 'product-detail.html': `?id=${encodeURIComponent(PRODUCT_ID)}` };
-    if (VERBOSE) {
-      const source = pinned
-        ? 'pinned via SMOKE_PRODUCT_ID'
-        : discovered
-          ? 'discovered on the live storefront'
-          : 'fallback (no live catalogue id found)';
-      console.log(`  product-detail.html id: ${PRODUCT_ID} (${source})`);
-    }
 
     let current = null;
     const classify = (text, match) => {
@@ -861,9 +1246,16 @@ async function main() {
       classify(`console.error: ${text.split('\n')[0]}`);
     });
 
+    // Asked once, so product.html is inspected as the page a shopper sees
+    // rather than as its "Product unavailable" fallback.
+    const productQuery = await resolveProductQuery(cdp, sessionId, baseUrl);
+    if (VERBOSE && productQuery) {
+      console.log(`· product page loaded from the catalogue as product.html${productQuery}`);
+    }
+
     for (const page of PAGES) {
       current = { page, messages: [], network: [] };
-      const url = `${baseUrl}/${page}${PAGE_QUERY[page] || ''}`;
+      const url = `${baseUrl}/${page}${page === 'product.html' ? productQuery : ''}`;
       const loaded = cdp.waitFor('Page.loadEventFired', NAV_TIMEOUT_MS);
       let navError = null;
       try {
@@ -875,10 +1267,10 @@ async function main() {
       await loaded;
       await sleep(SETTLE_MS);
 
-      // A page can redirect itself away before we ever see it — product-detail.html
-      // sends you home when it has no ?id=. Asserting against whatever document
-      // we ended up on would be checking the wrong page, so detect that instead
-      // of pretending the assertions ran.
+      // A page can redirect itself away before we ever see it (e.g. a shell that
+      // bounces home without a required query param). Asserting against whatever
+      // document we ended up on would be checking the wrong page, so detect that
+      // instead of pretending the assertions ran.
       let landed = null;
       try {
         landed = await evaluateIn(cdp, sessionId, 'location.pathname.slice(1) + location.search');
