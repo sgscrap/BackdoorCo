@@ -29,6 +29,7 @@ import {
   formatMoney,
   slugify,
 } from "./social-copy.mjs";
+import { removeBackground } from "./background-removal.mjs";
 import {
   captureStudioControls,
   carouselGroups,
@@ -69,6 +70,13 @@ const visitUrlGroup = document.getElementById("visitUrlGroup");
 const sizesToggle = document.getElementById("sizesToggle");
 const imageUrlInput = document.getElementById("imageUrlInput");
 const imageUploadInput = document.getElementById("imageUploadInput");
+const removeBgBtn = document.getElementById("removeBgBtn");
+const restoreBgBtn = document.getElementById("restoreBgBtn");
+const cutoutTolerance = document.getElementById("cutoutTolerance");
+const cutoutToleranceValue = document.getElementById("cutoutToleranceValue");
+const cutoutFeather = document.getElementById("cutoutFeather");
+const cutoutFeatherValue = document.getElementById("cutoutFeatherValue");
+const cutoutStatus = document.getElementById("cutoutStatus");
 const captionOutput = document.getElementById("captionOutput");
 const copyCaptionBtn = document.getElementById("copyCaptionBtn");
 const downloadBtn = document.getElementById("downloadBtn");
@@ -117,6 +125,7 @@ const state = {
   watermarkOn: false,
   grainIntensity: 16,
   customImageSrc: "",
+  cutout: null,
   queue: [],
   rollout: null,
   rolloutAssetId: null,
@@ -350,6 +359,9 @@ function applyPreset(name) {
 }
 
 function renderAll() {
+  // A cutout only belongs to the image it was cut from; drop it when the source
+  // changes so the Restore button never lies about what is on screen.
+  if (state.cutout && state.cutout.source !== getBaseImage(getActiveProduct())) state.cutout = null;
   renderProductSnapshot();
   renderCanvas();
   updateFont();
@@ -358,6 +370,7 @@ function renderAll() {
   updateStageMeta();
   fitCanvas();
   renderQueueUI();
+  updateCutoutControls();
 }
 
 function renderProductSnapshot() {
@@ -633,11 +646,20 @@ function priceAndSizesMarkup(product) {
   return `<div>${price}${sizes}</div>`;
 }
 
-function getSelectedImage(product) {
+// The image the studio would show before any background removal.
+function getBaseImage(product) {
   const override = imageUrlInput.value.trim();
   if (override) return resolveAssetUrl(override);
   if (state.customImageSrc) return state.customImageSrc;
   return resolveAssetUrl(getProductCardImage(product) || getProductImages(product)[0]);
+}
+
+// A cutout is only valid for the image it was cut from, so changing the source
+// (override / upload / product) silently drops it.
+function getSelectedImage(product) {
+  const base = getBaseImage(product);
+  if (state.cutout && state.cutout.source === base) return state.cutout.src;
+  return base;
 }
 
 function getSizesText(product) {
@@ -1099,6 +1121,91 @@ async function exportQueue() {
   alert("Batch export complete! " + ok + "/" + items.length + " files");
 }
 
+/* ─── Background removal ─── */
+// Large uploads are downscaled before matting: the cutout is only ever shown
+// inside a canvas that is at most ~1920px, and the flood fill is O(pixels).
+const MAX_CUTOUT_DIMENSION = 1600;
+
+function loadImageElement(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    if (/^https?:/i.test(src)) image.crossOrigin = "anonymous";
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("image failed to load"));
+    image.src = src;
+  });
+}
+
+function imageToCanvas(image) {
+  const scale = Math.min(1, MAX_CUTOUT_DIMENSION / Math.max(image.naturalWidth || 1, image.naturalHeight || 1));
+  const width = Math.max(1, Math.round((image.naturalWidth || 1) * scale));
+  const height = Math.max(1, Math.round((image.naturalHeight || 1) * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  context.drawImage(image, 0, 0, width, height);
+  return { canvas, context, width, height };
+}
+
+function setCutoutStatus(message, tone = "") {
+  if (!cutoutStatus) return;
+  cutoutStatus.textContent = message || "";
+  cutoutStatus.classList.toggle("is-flash", tone === "ok");
+  cutoutStatus.classList.toggle("is-dirty", tone === "warn");
+}
+
+function updateCutoutControls() {
+  if (restoreBgBtn) restoreBgBtn.disabled = !state.cutout;
+  if (!state.cutout) setCutoutStatus("");
+}
+
+async function applyBackgroundRemoval() {
+  const product = getActiveProduct();
+  const source = getBaseImage(product);
+  if (!source) {
+    window.alert("Select a product or upload an image first.");
+    return;
+  }
+  if (removeBgBtn.disabled) return;
+
+  const originalLabel = removeBgBtn.innerHTML;
+  removeBgBtn.disabled = true;
+  removeBgBtn.innerHTML = "Removing…";
+  setCutoutStatus("Removing background…");
+
+  try {
+    const image = await loadImageElement(source);
+    const { canvas, context, width, height } = imageToCanvas(image);
+    const frame = context.getImageData(0, 0, width, height);
+    const matte = removeBackground(frame.data, width, height, {
+      tolerance: Number(cutoutTolerance.value),
+      feather: Number(cutoutFeather.value),
+    });
+    context.putImageData(new ImageData(matte, width, height), 0, 0);
+    state.cutout = { source, src: canvas.toDataURL("image/png") };
+    renderAll();
+    setCutoutStatus(`Background removed · ${width}×${height}`, "ok");
+  } catch (error) {
+    console.error("Background removal failed", error);
+    state.cutout = null;
+    window.alert("Could not remove the background. A cross-origin image can block canvas access — upload the file or use a local image instead.");
+    setCutoutStatus("Background removal failed", "warn");
+  } finally {
+    removeBgBtn.disabled = false;
+    removeBgBtn.innerHTML = originalLabel;
+    updateCutoutControls();
+  }
+}
+
+function restoreBackgroundRemoval() {
+  if (!state.cutout) return;
+  state.cutout = null;
+  renderAll();
+  updateCutoutControls();
+  setCutoutStatus("Using the original image", "ok");
+}
+
 /* ─── Rollout import ─── */
 // Read the current studio controls so a rollout export can restore them.
 function readStudioControls() {
@@ -1490,6 +1597,23 @@ schedulePostBtn.addEventListener("click", schedulePost);
 });
 
 visitSiteUrlInput.addEventListener("input", renderAll);
+
+removeBgBtn.addEventListener("click", applyBackgroundRemoval);
+restoreBgBtn.addEventListener("click", restoreBackgroundRemoval);
+
+cutoutTolerance.addEventListener("input", () => {
+  cutoutToleranceValue.textContent = cutoutTolerance.value;
+});
+cutoutFeather.addEventListener("input", () => {
+  cutoutFeatherValue.textContent = `${cutoutFeather.value}px`;
+});
+// Re-cut once the slider is released, so the matte can be tuned by dragging.
+cutoutTolerance.addEventListener("change", () => {
+  if (state.cutout) applyBackgroundRemoval();
+});
+cutoutFeather.addEventListener("change", () => {
+  if (state.cutout) applyBackgroundRemoval();
+});
 
 imageUploadInput.addEventListener("change", () => {
   const file = imageUploadInput.files?.[0];

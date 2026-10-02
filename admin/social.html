@@ -348,6 +348,19 @@
             <label for="imageUploadInput">Upload Image</label>
             <input type="file" id="imageUploadInput" accept="image/*" />
           </div>
+          <div class="form-group">
+            <label for="cutoutTolerance">Background Removal · Match <span id="cutoutToleranceValue">32</span></label>
+            <input type="range" id="cutoutTolerance" min="0" max="120" value="32" />
+          </div>
+          <div class="form-group">
+            <label for="cutoutFeather">Edge Softness <span id="cutoutFeatherValue">1px</span></label>
+            <input type="range" id="cutoutFeather" min="0" max="6" value="1" />
+          </div>
+          <div class="rollout-actions">
+            <button type="button" class="copy-caption-btn" id="removeBgBtn">✂ Remove Background</button>
+            <button type="button" class="copy-caption-btn" id="restoreBgBtn" disabled>↺ Restore</button>
+          </div>
+          <p class="rollout-status" id="cutoutStatus"></p>
         </div>
 
         <div class="ctrl-section">
