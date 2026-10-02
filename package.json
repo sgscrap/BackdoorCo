@@ -6,8 +6,23 @@
   "scripts": {
     "verify:readme": "node scripts/verify-readme.js",
     "verify:readme:json": "node scripts/verify-readme.js --json",
-    "test": "node scripts/price-monitor-retail.test.js",
-    "test:price-monitor": "node scripts/price-monitor-retail.test.js"
+    "test": "node scripts/price-monitor-retail.test.js && node scripts/crop-studio.test.js && node scripts/localize-catalog-image.test.js && node scripts/apply-product-overrides.test.js && node scripts/catalog-upload-fallback.test.js && node scripts/catalog-upload-server.test.js && node scripts/product-image-upload.test.js && node scripts/instagram-rollout.test.js && node scripts/check-image-hotlinks.js",
+    "check:hotlinks": "node scripts/check-image-hotlinks.js",
+    "report:placeholders": "node scripts/report-placeholder-images.js",
+    "check:catalog-images": "node scripts/report-placeholder-images.js --strict",
+    "check:hotlinks:live": "node scripts/check-image-hotlinks.js --live",
+    "fix:hotlinks": "node scripts/check-image-hotlinks.js --fix",
+    "install:hooks": "node scripts/install-git-hooks.js",
+    "mirror:catalog": "node scripts/mirror-catalog-images.js --firestore",
+    "re-source": "node scripts/mirror-catalog-images.js --re-source",
+    "test:price-monitor": "node scripts/price-monitor-retail.test.js",
+    "test:catalog-upload": "node scripts/catalog-upload-fallback.test.js",
+    "test:catalog-upload-server": "node scripts/catalog-upload-server.test.js",
+    "test:product-image": "node scripts/product-image-upload.test.js",
+    "test:product-overrides": "node scripts/apply-product-overrides.test.js",
+    "prepare:instagram": "node scripts/prepare-instagram-rollout.js --write --offline",
+    "check:instagram": "node scripts/prepare-instagram-rollout.js --offline",
+    "test:instagram-rollout": "node scripts/instagram-rollout.test.js"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,266 @@
+{
+  "brand": "Backdoor",
+  "handle": "@backdoorco",
+  "siteOrigin": "https://backdoorco.vercel.app",
+  "campaign": "Launch",
+  "defaults": {
+    "font": "space-grotesk",
+    "fontWeight": "900",
+    "imageFilter": "none",
+    "blur": false,
+    "watermark": false,
+    "grain": 16
+  },
+  "assets": [
+    {
+      "id": "launch-drop-hero",
+      "preset": "drop",
+      "template": "drop",
+      "ratio": "1-1",
+      "theme": "backdoor",
+      "productRef": "seed-kobe-6-protro-asg-hollywood-3d-2026",
+      "copy": {
+        "kicker": "NEW DROP",
+        "headline": "Kobe 6 Protro ASG Hollywood",
+        "body": "Nike / Hollywood 3D. Available now at Backdoor.",
+        "badge": "AVAILABLE NOW",
+        "cta": "SHOP BACKDOOR",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": true, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 1, "postAt": "2026-10-03T11:00:00-04:00" }
+    },
+    {
+      "id": "launch-drop-secondary",
+      "preset": "drop",
+      "template": "drop",
+      "ratio": "1-1",
+      "theme": "backdoor",
+      "productRef": "seed-jordan-4-retro-toro-bravo-2026",
+      "copy": {
+        "kicker": "NEW DROP",
+        "headline": "Air Jordan 4 Retro Toro Bravo",
+        "body": "Jordan / Toro Bravo. Available now at Backdoor.",
+        "badge": "AVAILABLE NOW",
+        "cta": "SHOP BACKDOOR",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": true, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 2, "postAt": "2026-10-04T11:00:00-04:00" }
+    },
+    {
+      "id": "launch-story-hero",
+      "preset": "story",
+      "template": "story",
+      "ratio": "9-16",
+      "theme": "backdoor",
+      "productRef": "seed-kobe-6-protro-asg-hollywood-3d-2026",
+      "copy": {
+        "kicker": "BACKDOOR DROP",
+        "headline": "Kobe 6 Protro ASG Hollywood",
+        "body": "Nike / Hollywood 3D. Tap to shop.",
+        "badge": "TAP TO SHOP",
+        "cta": "SHOP NOW",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": true, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 3, "postAt": "2026-10-05T18:00:00-04:00" }
+    },
+    {
+      "id": "launch-collage-top4",
+      "preset": "collage",
+      "template": "collage",
+      "ratio": "1-1",
+      "theme": "white",
+      "copy": {
+        "kicker": "NEW ARRIVALS",
+        "headline": "Top 4 This Week",
+        "body": "The four most-wanted pairs on the shelf right now.",
+        "badge": "TOP 4",
+        "cta": "SHOP THE DROP",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": false, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "filename": "backdoor_collage_top4.png",
+      "schedule": { "order": 4, "postAt": "2026-10-06T11:00:00-04:00" }
+    },
+    {
+      "id": "launch-sale-push",
+      "preset": "sale",
+      "template": "sale",
+      "ratio": "1-1",
+      "theme": "red",
+      "productRef": "seed-prada-americas-cup-burgundy-silver",
+      "copy": {
+        "kicker": "LIMITED OFFER",
+        "headline": "Prada America's Cup",
+        "body": "Prada / Burgundy Silver. Marked down for the launch week only.",
+        "badge": "PRICE DROP",
+        "cta": "SHOP THE SALE",
+        "promo": "LAUNCH10"
+      },
+      "toggles": { "showPrice": true, "showSizes": false, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 5, "postAt": "2026-10-07T11:00:00-04:00" }
+    },
+    {
+      "id": "launch-restock",
+      "preset": "restock",
+      "template": "restock",
+      "ratio": "1-1",
+      "theme": "mono",
+      "productRef": "seed-yeezy-slide-onyx",
+      "copy": {
+        "kicker": "RESTOCK ALERT",
+        "headline": "Yeezy Slide Onyx",
+        "body": "Back on the shelf in core sizes. Move fast.",
+        "badge": "BACK IN",
+        "cta": "SECURE YOUR SIZE",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": true, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 6, "postAt": "2026-10-08T11:00:00-04:00" }
+    },
+    {
+      "id": "launch-teaser",
+      "preset": "teaser",
+      "template": "teaser",
+      "ratio": "1-1",
+      "theme": "teaser",
+      "productRef": "seed-men-travis-velvet-brown",
+      "copy": {
+        "kicker": "COMING SOON",
+        "headline": "Travis Velvet Brown",
+        "body": "Travis Scott / Velvet Brown. Locking in a launch date now.",
+        "badge": "COLLAB",
+        "cta": "SIGN UP",
+        "promo": ""
+      },
+      "toggles": { "showPrice": false, "showSizes": false, "visitSite": true, "visitSiteUrl": "https://backdoorco.vercel.app/shop-all" },
+      "imageOverride": "",
+      "schedule": { "order": 7, "postAt": "2026-10-09T18:00:00-04:00" }
+    },
+    {
+      "id": "launch-flash",
+      "preset": "flash",
+      "template": "flash",
+      "ratio": "1-1",
+      "theme": "red",
+      "productRef": "seed-moncler-logo-patch-cargo-shorts-black",
+      "copy": {
+        "kicker": "FLASH SALE",
+        "headline": "Moncler Cargo Shorts",
+        "body": "Moncler / Logo Patch Cargo Shorts Black. One day only.",
+        "badge": "24H ONLY",
+        "cta": "SHOP NOW",
+        "promo": "FLASH24"
+      },
+      "toggles": { "showPrice": true, "showSizes": false, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 8, "postAt": "2026-10-10T10:00:00-04:00" }
+    },
+    {
+      "id": "launch-holiday",
+      "preset": "holiday",
+      "template": "holiday",
+      "ratio": "1-1",
+      "theme": "holiday",
+      "productRef": "seed-fendi-teddy-bear-plush-toy-tshirt-white",
+      "copy": {
+        "kicker": "HOLIDAY DROP",
+        "headline": "Fendi Teddy Bear Tee",
+        "body": "Fendi / Teddy Bear Plush Toy T-Shirt White. Gift-ready.",
+        "badge": "LIMITED",
+        "cta": "SHOP THE SEASON",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": true, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 9, "postAt": "2026-10-11T11:00:00-04:00" }
+    },
+    {
+      "id": "launch-marketplace-16x9",
+      "preset": "drop",
+      "template": "drop",
+      "ratio": "16-9",
+      "theme": "mono",
+      "productRef": "seed-nb-2002r-protection-pack-sea-salt",
+      "copy": {
+        "kicker": "NEW DROP",
+        "headline": "New Balance 2002R Sea Salt",
+        "body": "New Balance / Protection Pack Sea Salt. Marketplace-ready wide card.",
+        "badge": "AVAILABLE NOW",
+        "cta": "SHOP BACKDOOR",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": true, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 10, "postAt": "2026-10-12T11:00:00-04:00" }
+    },
+    {
+      "id": "launch-carousel-1",
+      "preset": "collage",
+      "template": "collage",
+      "ratio": "1-1",
+      "theme": "white",
+      "carouselGroup": "launch-carousel",
+      "copy": {
+        "kicker": "LAUNCH CAROUSEL",
+        "headline": "Four Pairs, One Drop",
+        "body": "Swipe through the launch lineup.",
+        "badge": "1 / 3",
+        "cta": "SWIPE TO SHOP",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": false, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "filename": "backdoor_collage_launch_carousel.png",
+      "schedule": { "order": 11, "postAt": "2026-10-13T11:00:00-04:00" }
+    },
+    {
+      "id": "launch-carousel-2",
+      "preset": "drop",
+      "template": "drop",
+      "ratio": "1-1",
+      "theme": "backdoor",
+      "carouselGroup": "launch-carousel",
+      "productRef": "seed-nigel-sylvester-air-jordan-4-retro-og-sail",
+      "copy": {
+        "kicker": "LAUNCH CAROUSEL",
+        "headline": "Nigel Sylvester AJ4 Sail",
+        "body": "Jordan / Sail. Slide 2 of the launch lineup.",
+        "badge": "2 / 3",
+        "cta": "SWIPE TO SHOP",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": true, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 12, "postAt": "2026-10-13T11:05:00-04:00" }
+    },
+    {
+      "id": "launch-carousel-3",
+      "preset": "sale",
+      "template": "sale",
+      "ratio": "1-1",
+      "theme": "red",
+      "carouselGroup": "launch-carousel",
+      "productRef": "seed-off-white-be-right-back-sneakers-light-grey-caramel",
+      "copy": {
+        "kicker": "LAUNCH CAROUSEL",
+        "headline": "Off-White Be Right Back",
+        "body": "Off-White / Light Grey Caramel. Final slide, shop the full drop.",
+        "badge": "3 / 3",
+        "cta": "SHOP THE DROP",
+        "promo": ""
+      },
+      "toggles": { "showPrice": true, "showSizes": false, "visitSite": false, "visitSiteUrl": "" },
+      "imageOverride": "",
+      "schedule": { "order": 13, "postAt": "2026-10-13T11:10:00-04:00" }
+    }
+  ]
+}

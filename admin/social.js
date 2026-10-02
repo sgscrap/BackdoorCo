@@ -23,6 +23,11 @@ import {
   getProductSortTimestamp,
   mergeCatalogProducts,
 } from "../product-data.js";
+import {
+  buildCaption,
+  formatMoney,
+  slugify,
+} from "./social-copy.mjs";
 
 const SITE_ORIGIN = "https://backdoorco.vercel.app";
 
@@ -340,7 +345,7 @@ function renderProductSnapshot() {
   const image = resolveAssetUrl(getProductCardImage(product));
   const sizes = getSizesText(product);
   productSnapshot.innerHTML = `
-    <img class="snapshot-img" src="${escapeHtml(image)}" alt="${escapeHtml(product.name || "Product")}" onerror="this.style.display='none';" />
+    <img class="snapshot-img" src="${escapeHtml(image)}" alt="${escapeHtml(product.name || "Product")}" onerror="catalogImageFallback(this);" />
     <div>
       <div class="snapshot-name">${escapeHtml(product.name || "Untitled product")}</div>
       <div class="snapshot-meta">${escapeHtml(product.brand || "Backdoor")} / ${escapeHtml(product.category || "Product")} / ${formatMoney(product.price)}</div>
@@ -469,7 +474,7 @@ function renderCollageTemplate() {
     const image = resolveAssetUrl(getProductCardImage(product));
     return `
       <div class="collage-card">
-        <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name || "Product")}" crossorigin="anonymous" onerror="this.style.display='none';" />
+        <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name || "Product")}" crossorigin="anonymous" onerror="catalogImageFallback(this);" />
         <div>
           <div class="collage-name">${escapeHtml(product.name || "Backdoor Product")}</div>
           <div class="collage-price">${priceToggle.checked ? (priceVisitToggle.checked ? '<span class="canvas-price--visit">Visit site for price' + (visitSiteUrlInput.value.trim() ? '<div class="canvas-visit-url">' + escapeHtml(visitSiteUrlInput.value.trim().replace(/^https?:\/\//, '')) + '</div>' : '') + '</span>' : escapeHtml(formatMoney(product.price))) : ''}</div>
@@ -563,7 +568,7 @@ function productMedia(product) {
   return `
     <div class="product-media">
       <div class="media-plate"></div>
-      <img src="${escapeHtml(image)}" alt="${escapeHtml(product?.name || "Product")}" crossorigin="anonymous" onerror="this.style.display='none';" />
+      <img src="${escapeHtml(image)}" alt="${escapeHtml(product?.name || "Product")}" crossorigin="anonymous" onerror="catalogImageFallback(this);" />
     </div>
   `;
 }
@@ -628,34 +633,23 @@ function buildDefaultBody(product) {
 
 function updateCaption() {
   const product = getActiveProduct();
-  const headline = headlineInput.value || product?.name || "Backdoor Drop";
-  const body = bodyInput.value || "";
-  const cta = ctaInput.value || "SHOP BACKDOOR";
-  const handle = handleInput.value || "@backdoorco";
-  const brandTag = hashtag(product?.brand || "Backdoor");
-  const categoryTag = hashtag(product?.category || "Streetwear");
   const productUrl = product ? `${SITE_ORIGIN}/${buildProductHref(product)}` : SITE_ORIGIN;
-  const promoLine = promoInput.value ? `Code: ${promoInput.value}\n` : "";
-  let caption;
+  const collage = getCollageProducts().map((entry) => ({ name: entry.name, price: entry.price }));
 
-  if (state.template === "collage") {
-    const list = getCollageProducts().map((entry, index) => `${index + 1}. ${entry.name} - ${formatMoney(entry.price)}`).join("\n");
-    caption = `Backdoor new arrivals\n\n${list}\n\n${cta}: ${SITE_ORIGIN}/shop-all\n${handle}\n\n#Backdoor #BackdoorCo #NewDrops #Streetwear #SneakerDrops`;
-  } else if (state.template === "sale") {
-    caption = `${headline}\n${body}\n${promoLine}\n${cta}: ${productUrl}\n${handle}\n\n#Backdoor #BackdoorCo #Sale #${brandTag} #${categoryTag}`;
-  } else if (state.template === "restock") {
-    caption = `Restock alert: ${headline}\n${body}\n\n${cta}: ${productUrl}\n${handle}\n\n#Backdoor #BackdoorCo #Restock #${brandTag} #SneakerRestock`;
-  } else if (state.template === "holiday") {
-    caption = `🎄 ${headline}\n${body}\n\n${cta}: ${productUrl}\n${handle}\n\n#Backdoor #BackdoorCo #HolidayDrop #${brandTag} #SneakerSeason`;
-  } else if (state.template === "teaser") {
-    caption = `👀 ${headline}\n${body}\n\n${cta}: ${SITE_ORIGIN}/shop-all\n${handle}\n\n#Backdoor #BackdoorCo #ComingSoon #${brandTag} #Collab`;
-  } else if (state.template === "flash") {
-    caption = `⚡ ${headline}\n${body}\n${promoLine}\n\n${cta}: ${productUrl}\n${handle}\n\n#Backdoor #BackdoorCo #FlashSale #${brandTag} #LimitedTime`;
-  } else {
-    caption = `${headline}\n${body}\n\n${cta}: ${productUrl}\n${handle}\n\n#Backdoor #BackdoorCo #NewDrop #${brandTag} #${categoryTag}`;
-  }
-
-  captionOutput.value = caption.replace(/\n{3,}/g, "\n\n").trim();
+  captionOutput.value = buildCaption({
+    template: state.template,
+    fields: {
+      headline: headlineInput.value,
+      body: bodyInput.value,
+      cta: ctaInput.value,
+      promo: promoInput.value,
+    },
+    product,
+    origin: SITE_ORIGIN,
+    handle: handleInput.value,
+    productUrl,
+    collage,
+  });
 }
 
 function updateStageMeta() {
@@ -983,27 +977,6 @@ function resolveAssetUrl(value) {
   if (/^(https?:|data:|blob:)/i.test(raw)) return raw;
   if (raw.startsWith("/")) return raw;
   return `../${raw.replace(/^\.?\//, "")}`;
-}
-
-function formatMoney(value) {
-  const amount = Number(value) || 0;
-  return amount.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: amount % 1 ? 2 : 0,
-    maximumFractionDigits: 2,
-  });
-}
-
-function hashtag(value) {
-  return String(value || "Backdoor").replace(/[^a-z0-9]/gi, "");
-}
-
-function slugify(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
 }
 
 function escapeHtml(value) {
