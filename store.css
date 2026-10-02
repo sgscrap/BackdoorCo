@@ -604,30 +604,6 @@ body {
     color: #000;
 }
 
-.btn-signin-nav {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: var(--accent);
-    color: #000;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 13px;
-    text-decoration: none;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-signin-nav:hover {
-    background: #a8d94a;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(200, 246, 93, 0.2);
-}
-
-.btn-signin-nav i {
-    font-size: 15px;
-}
-
 /* ═══ HERO ═══ */
 .hero {
     min-height: 100vh;

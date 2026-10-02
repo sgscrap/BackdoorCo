@@ -19,8 +19,6 @@ body {
 .mb-0 {
     margin-bottom: 0 !important;
 }
-.nav-link:hover { color: var(--text); }
-.nav-link.active { color: var(--accent); }
 .nav-dropdown-menu {
     position: absolute;
     top: calc(100% + 10px);
@@ -41,24 +39,29 @@ body {
     background: rgba(255,255,255,0.05);
 }
 
-.nav-search-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    transition: border-color 0.2s;
-}
-.nav-search-wrap input {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'Space Grotesk', sans-serif;
-    width: 160px;
+/* Desktop-only: chrome.css hides the search box under 768px, but this file
+   loads later, so an unscoped rule here would win and push the hamburger
+   off screen on phones. Keep the local skin inside a min-width query. */
+@media (min-width: 769px) {
+    .nav-search-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        transition: border-color 0.2s;
+    }
+    .nav-search-wrap input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text);
+        font-size: 13px;
+        font-family: 'Space Grotesk', sans-serif;
+        width: 160px;
+    }
 }
 
 .nav-icons-group {
@@ -98,54 +101,6 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0 3px;
-}
-
-/* Hamburger — hidden on desktop, shown on mobile */
-.nav-hamburger { display: none; }
-
-/* Mobile drawer — hidden by default */
-.nav-mobile-menu { display: none; }
-.nav-mobile-menu.open {
-    display: flex;
-    position: fixed;
-    top: 68px;
-    left: 0;
-    right: 0;
-    background: rgba(10,10,10,0.98);
-    -webkit-backdrop-filter: blur(24px);
-    backdrop-filter: blur(24px);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 24px 28px;
-    z-index: 1090;
-    flex-direction: column;
-    gap: 6px;
-}@media (max-width: 768px) {
-
-    .nav-hamburger {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 5px;
-        width: 40px;
-        height: 40px;
-        background: transparent;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        cursor: pointer;
-        flex-shrink: 0;
-    }
-    .nav-hamburger span {
-        display: block;
-        width: 18px;
-        height: 2px;
-        background: var(--text2);
-        border-radius: 2px;
-        transition: all 0.3s ease;
-    }
-    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
-    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 }
 
 
