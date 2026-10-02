@@ -71,6 +71,50 @@ export function medianBorderColor(pixels, width, height, { border = 2 } = {}) {
   return [median(red), median(green), median(blue)];
 }
 
+/**
+ * How much background survives at the border, 0…1.
+ *
+ * A uniform studio background is removed right up to the edge, so a good matte
+ * leaves ≈0 border opacity. A busy or gradient background resists the flood
+ * fill and stays opaque, which is the signal to escalate to a segmentation
+ * model. Returns 0 for an empty buffer.
+ */
+export function residualBackgroundFraction(pixels, width, height, { alphaThreshold = 8, border = 2 } = {}) {
+  if (!pixels || width <= 0 || height <= 0) return 0;
+
+  const rings = Math.max(1, Math.min(border, Math.floor(width / 2) || 1, Math.floor(height / 2) || 1));
+  let total = 0;
+  let opaque = 0;
+
+  const consider = (x, y) => {
+    total++;
+    if (pixels[(y * width + x) * 4 + 3] > alphaThreshold) opaque++;
+  };
+
+  for (let y = 0; y < height; y++) {
+    if (y < rings || y >= height - rings) {
+      for (let x = 0; x < width; x++) consider(x, y);
+    } else {
+      for (let x = 0; x < rings; x++) {
+        consider(x, y);
+        consider(width - 1 - x, y);
+      }
+    }
+  }
+
+  return total ? opaque / total : 0;
+}
+
+/**
+ * Whether the offline matte should hand off to the AI segmentation model.
+ * `cutoff` is the fraction of surviving border opacity that counts as "the
+ * background is still there".
+ */
+export function shouldEscalateToAi(pixels, width, height, options = {}) {
+  const cutoff = Number.isFinite(options.cutoff) ? options.cutoff : 0.4;
+  return residualBackgroundFraction(pixels, width, height, options) > cutoff;
+}
+
 function dilate(mask, width, height, steps) {
   const band = new Uint8Array(mask);
   let frontier = [];
