@@ -1,0 +1,95 @@
+/* ═══════════════════════════════════════════
+   SITE FOOTER (shared)
+   Compact support footer shown on storefront pages that don't carry the
+   full .footer used by index.html / about.html. Self-contained (no CSS
+   variables or Font Awesome required) so it renders identically no matter
+   which page-level stylesheet is loaded.
+═══════════════════════════════════════════ */
+
+.site-footer {
+    background: #111111;
+    border-top: 1px solid #222222;
+    padding: 28px 40px;
+    margin-top: 56px;
+    font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+    color: #888888;
+}
+
+.site-footer-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.site-footer-brand {
+    font-family: 'Bebas Neue', 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: #ffffff;
+}
+
+.site-footer-brand span {
+    color: #c8f65d;
+}
+
+.site-footer-email {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #c8f65d;
+    text-decoration: none;
+    background: #161616;
+    border: 1px solid #222222;
+    border-radius: 999px;
+    padding: 8px 18px;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.site-footer-email:hover {
+    border-color: #c8f65d;
+    background: #1e1e1e;
+}
+
+.site-footer-links {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.site-footer-links a {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #444444;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.site-footer-links a:hover {
+    color: #c8f65d;
+}
+
+/* The shop/category pages pin a back-to-top button to the bottom-right of the
+   viewport; reserve room so it never sits on top of the footer's links. */
+body:has(#backTopBtn) .site-footer {
+    padding-bottom: 80px;
+}
+
+@media (max-width: 640px) {
+    .site-footer {
+        padding: 24px 20px;
+    }
+
+    .site-footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
