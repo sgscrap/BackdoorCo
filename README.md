@@ -134,6 +134,11 @@ Backdoor/
 │
 ├── brand-logos/             # Brand wordmarks used in emails and OG cards
 │
+├── partials/                # Shared storefront chrome — inlined by scripts/build-chrome.js
+│   ├── nav.html             # Navbar + mobile menu (every storefront page)
+│   ├── footer-compact.html  # Compact support footer (most pages)
+│   └── footer-full.html     # Rich newsletter footer (index.html, about.html)
+
 ├── favicon.svg / favicon.png  # Brand mark
 │
 ├── skills/
@@ -174,15 +179,25 @@ Static files (HTML/JS/CSS/images) live at the repo root and are published as-is.
 
 ## Customer-Facing Site
 
-All customer pages share the same shell:
+All customer pages share the same shell, generated from a single source:
 
 - **Top bar**: announcement banner + navbar + mobile menu (hamburger).
-- **Footer**: email signup, brand column, link columns, payment logos — same on every page.
+- **Footer**: a rich newsletter footer on `index.html` / `about.html`, and a compact support footer on every other page.
 
-The navbar (defined in every page, not via `<iframe>`/include) links to:
+Each page's nav and footer are inlined from a partial in [`partials/`](partials/) between `<!-- @@chrome:nav:start -->` / `<!-- @@chrome:nav:end -->` (and `chrome:footer`) marker comments:
+
+| Partial | Used by |
+| --- | --- |
+| [`partials/nav.html`](partials/nav.html) | every storefront page |
+| [`partials/footer-compact.html`](partials/footer-compact.html) | all pages except `index.html` / `about.html` |
+| [`partials/footer-full.html`](partials/footer-full.html) | `index.html`, `about.html` |
+
+Run **`npm run build:chrome`** after editing a partial to regenerate every page, and **`npm run check:chrome`** (enforced in CI) to fail the build when a page drifts from its partial. Change the nav or footer once, in one file.
+
+The navbar links to:
 
 - **Shop**: `shop-all.html` (with brand and category hash filters via `?filter=…`)
-- **Brands dropdown**: filters by `Jordan`, `Nike`, `Prada`, `Dior`, `LOEWE`, `Burberry`, `Moncler`, `Fendi`, `Adidas`, `New Balance`, `Yeezy`
+- **Brands dropdown**: filters by `Jordan`, `Nike`, `Off-White`, `True Religion`, `Prada`, `Dior`, `LOEWE`, `Burberry`, `Moncler`, `Fendi`, `Gucci`, `Adidas`, `New Balance`, `Yeezy`
 - **New Drops**: `shop-all.html?sort=newest`
 - **Reviews**: `reviews.html`
 - **About**: `about.html`
@@ -583,14 +598,15 @@ Works for Lyst, Farfetch, END., SSENSE, Mr Porter, Nordstrom, Net-A-Porter. JS-o
 | What you want to do                         | Where to look                                                                                                  |
 | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Add / update a product                      | `admin/products.html` (UI) or `product-data.js` (seeds)                                                          |
-| Track a new brand itself                    | Edit every page's navbar + brand dropdown (search for `Burberry` / `Moncler` / `Fendi` in all `*.html` files)   |
+| Track a new brand itself                    | Edit the brand dropdown in `partials/nav.html`, then `npm run build:chrome`                                       |
 | Change styling                              | `styles.css`, `store.css`, `admin.css`, `shop-all.css`, etc.                                                      |
 | Tweak shipping / promo                      | `checkout.js` (constants `FREE_SHIP_THRESHOLD`, `SHIPPING_OPTIONS`, `PROMO_CODES`)                              |
 | Switch payment behavior                     | `netlify/functions/_shared/stripe-checkout.js` or `_shared/paypal-checkout.js`                                  |
 | Adjust offer lead-scoring threshold         | `netlify/functions/create-offer.js` (`MIN_STANDARD_RATIO`, `MIN_HIGH_VALUE_RATIO`, `MIN_OFFER_AMOUNT`)          |
-| Add a public policy / FAQ page              | Create `policy.html`, add it to every page's footer link list                                                    |
+| Add a public policy / FAQ page              | Create `policy.html`, add it to `partials/footer-*.html`, then `npm run build:chrome`                            |
 | Update Firestore security rules             | `firestore.rules`                                                                                               |
 | Adjust homepage live feed                   | `app.js` → search for "Most Wanted", or `index.html` for the inline brand cards                                  |
+| Change the site-wide nav or footer          | Edit `partials/nav.html` / `partials/footer-*.html`, then `npm run build:chrome`                                 |
 | Add a new admin page                        | Drop the HTML+JS pair in `admin/`, mirror the sidebar nav (`<p class="nav-label">TOOLS</p>` etc.) + add an entry in every existing admin nav |
 | Set image crop/aspect ratio per product      | Edit product → Image Display section: Fit Mode toggle, Position X/Y sliders, Scale, Padding, Aspect Ratio dropdown (Auto / 1:1 Square / 3:4 Portrait / 4:3 Landscape / 16:9 Widescreen) |
 

@@ -483,72 +483,81 @@
   </div>
 
   <!-- ══ NAVBAR ══ -->
+  <!-- @@chrome:nav:start -->
   <nav class="navbar" id="navbar">
     <a class="nav-logo" href="index.html">
-        <div class="nav-logo-mark">B</div>
-        BACK<span>DOOR</span>
+      <div class="nav-logo-mark">B</div>
+      BACK<span>DOOR</span>
     </a>
     <div class="nav-center">
-        <a class="nav-link " href="shop-all.html">Shop</a>
-        <div class="nav-dropdown">
-            <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
-            <div class="nav-dropdown-menu">
-                <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
-                <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
-                <a href="shop-all.html?filter=Prada" class="current-cat-link">Prada</a>
-                <a href="shop-all.html?filter=Dior" class="current-cat-link">Dior</a>
-                <a href="shop-all.html?filter=LOEWE" class="current-cat-link">LOEWE</a>
-                <a href="shop-all.html?filter=Burberry" class="current-cat-link">Burberry</a>
-                <a href="shop-all.html?filter=Moncler" class="current-cat-link">Moncler</a>
-                <a href="shop-all.html?filter=Fendi" class="current-cat-link">Fendi</a>
-                <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
-                <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
-                <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
-            </div>
+      <a class="nav-link " href="shop-all.html">Shop</a>
+      <div class="nav-dropdown">
+        <a class="nav-link nav-dropdown-toggle " href="#">Brands <i class="fa-solid fa-chevron-down"></i></a>
+        <div class="nav-dropdown-menu">
+          <a href="shop-all.html?filter=Jordan" class="current-cat-link">Jordan</a>
+          <a href="shop-all.html?filter=Nike" class="current-cat-link">Nike</a>
+          <a href="shop-all.html?filter=Off-White" class="current-cat-link">Off-White</a>
+          <a href="shop-all.html?filter=True%20Religion" class="current-cat-link">True Religion</a>
+          <a href="shop-all.html?filter=Prada" class="current-cat-link">Prada</a>
+          <a href="shop-all.html?filter=Dior" class="current-cat-link">Dior</a>
+          <a href="shop-all.html?filter=LOEWE" class="current-cat-link">LOEWE</a>
+          <a href="shop-all.html?filter=Burberry" class="current-cat-link">Burberry</a>
+          <a href="shop-all.html?filter=Moncler" class="current-cat-link">Moncler</a>
+          <a href="shop-all.html?filter=Fendi" class="current-cat-link">Fendi</a>
+          <a href="shop-all.html?filter=Gucci" class="current-cat-link">Gucci</a>
+          <a href="shop-all.html?filter=Adidas" class="current-cat-link">Adidas</a>
+          <a href="shop-all.html?filter=New%20Balance" class="current-cat-link">New Balance</a>
+          <a href="shop-all.html?filter=Yeezy" class="current-cat-link">Yeezy</a>
         </div>
-        <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
-        <a class="nav-link active" href="about.html">About</a>
+      </div>
+      <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
+      <a class="nav-link " href="reviews.html">Reviews</a>
+      <a class="nav-link active" href="about.html">About</a>
     </div>
     <div class="nav-right">
-        <div class="nav-search-wrap">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="navSearch" placeholder="Search sneakers..." />
-        </div>
-        <div class="nav-icons-group">
-            <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
-                <i class="fa-regular fa-heart"></i>
-                <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
-            </a>
-            <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
-                <i class="fa-solid fa-bag-shopping"></i>
-                <span>Cart</span>
-                <span class="cart-badge" id="cartCount" style="display: none;">0</span>
-            </button>
-        </div>
-        <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
-            <span></span><span></span><span></span>
+      <div class="nav-search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="navSearch" placeholder="Search sneakers..." />
+      </div>
+      <div class="nav-icons-group">
+        <a class="nav-icon-link" href="#" id="navWishlistBtn" title="Wishlist">
+          <i class="fa-regular fa-heart"></i>
+          <span class="nav-badge" id="wishlistCountBadge" style="display: none;">0</span>
+        </a>
+        <button class="btn-cart" id="cartButton" onclick="window.toggleCart?.()">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span>Cart</span>
+          <span class="cart-badge" id="cartCount" style="display: none;">0</span>
         </button>
+      </div>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="(function(){var m=document.getElementById('navMobileMenu');var h=document.getElementById('navHamburger');if(m&&h){m.classList.toggle('open');h.classList.toggle('open');}})()">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-</nav>
-<div class="nav-mobile-menu" id="navMobileMenu">
+  </nav>
+  <div class="nav-mobile-menu" id="navMobileMenu">
     <a class="nav-link" href="shop-all.html">Shop All</a>
     <p class="nav-mobile-section">Brands</p>
     <a class="nav-link" href="shop-all.html?filter=Jordan">Jordan</a>
     <a class="nav-link" href="shop-all.html?filter=Nike">Nike</a>
+    <a class="nav-link" href="shop-all.html?filter=Off-White">Off-White</a>
+    <a class="nav-link" href="shop-all.html?filter=True%20Religion">True Religion</a>
     <a class="nav-link" href="shop-all.html?filter=Prada">Prada</a>
     <a class="nav-link" href="shop-all.html?filter=Dior">Dior</a>
     <a class="nav-link" href="shop-all.html?filter=LOEWE">LOEWE</a>
     <a class="nav-link" href="shop-all.html?filter=Burberry">Burberry</a>
     <a class="nav-link" href="shop-all.html?filter=Moncler">Moncler</a>
     <a class="nav-link" href="shop-all.html?filter=Fendi">Fendi</a>
+    <a class="nav-link" href="shop-all.html?filter=Gucci">Gucci</a>
     <a class="nav-link" href="shop-all.html?filter=Adidas">Adidas</a>
     <a class="nav-link" href="shop-all.html?filter=New%20Balance">New Balance</a>
     <a class="nav-link" href="shop-all.html?filter=Yeezy">Yeezy</a>
     <p class="nav-mobile-section">Explore</p>
-    <a class="nav-link" href="shop-all.html?sort=newest">New Drops</a>
-    <a class="nav-link" href="reviews.html">Reviews</a>
+    <a class="nav-link " href="shop-all.html?sort=newest">New Drops</a>
+    <a class="nav-link " href="reviews.html">Reviews</a>
     <a class="nav-link active" href="about.html">About</a>
-</div>
+  </div>
+  <!-- @@chrome:nav:end -->
 
   <!-- ══ HERO ══ -->
   <section class="about-hero announce-offset-section">
@@ -714,23 +723,21 @@
   </section>
 
   <!-- ══ FOOTER ══ -->
+  <!-- @@chrome:footer:start -->
   <footer class="footer">
     <div class="footer-inner">
 
-      <!-- Email signup -->
+      <!-- Email signup strip -->
       <div class="footer-signup">
         <div class="footer-signup-text">
           <h4>BE FIRST IN LINE</h4>
-          <p>Get early access to drops, restocks, and exclusive NYC events. No spam — just the right pairs.</p>
+          <p>Early access to drops, restocks, and exclusive NYC events. No spam — just the right pairs.</p>
         </div>
         <form class="footer-signup-form" onsubmit="handleFooterSignup(event)">
           <input type="email" id="footerEmailInput" placeholder="your@email.com" required autocomplete="email" />
-          <button type="submit">
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
+          <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
         </form>
       </div>
-
       <div class="footer-signup-divider"></div>
 
       <div class="footer-top">
@@ -761,10 +768,10 @@
           <a href="checkout.html">Checkout</a>
         </div>
         <div class="footer-col">
-          <h4>HELP</h4>
+          <h4>COMPANY</h4>
+          <a href="about.html">About Us</a>
           <a href="tracking.html">Track Order</a>
           <a href="accounts.html">My Account</a>
-          <a href="about.html">About Us</a>
         </div>
         <div class="footer-col">
           <h4>POLICIES</h4>
@@ -791,6 +798,7 @@
       </div>
     </div>
   </footer>
+  <!-- @@chrome:footer:end -->
 
   <script type="module" src="app.js"></script>
   <script>

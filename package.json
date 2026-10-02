@@ -6,6 +6,8 @@
   "scripts": {
     "verify:readme": "node scripts/verify-readme.js",
     "verify:readme:json": "node scripts/verify-readme.js --json",
+    "build:chrome": "node scripts/build-chrome.js",
+    "check:chrome": "node scripts/build-chrome.js --check",
     "test": "node scripts/price-monitor-retail.test.js && node scripts/crop-studio.test.js && node scripts/localize-catalog-image.test.js && node scripts/apply-product-overrides.test.js && node scripts/catalog-upload-fallback.test.js && node scripts/catalog-upload-server.test.js && node scripts/product-image-upload.test.js && node scripts/instagram-rollout.test.js && node scripts/rollout-import.test.js && node scripts/generate-instagram-rollout.test.js && node scripts/diff-rollouts.test.js && node scripts/background-removal.test.js && node scripts/check-image-hotlinks.js",
     "check:hotlinks": "node scripts/check-image-hotlinks.js",
     "report:placeholders": "node scripts/report-placeholder-images.js",
