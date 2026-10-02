@@ -192,6 +192,25 @@ const rgbAt = (data, width, x, y) => {
     }
   });
 
+  await test('the Social Desk wires the cut-out grounding controls', () => {
+    const source = fs.readFileSync(path.join(ROOT, 'admin', 'social.js'), 'utf8');
+    const html = fs.readFileSync(path.join(ROOT, 'admin', 'social.html'), 'utf8');
+    const css = fs.readFileSync(path.join(ROOT, 'admin', 'social.css'), 'utf8');
+
+    for (const id of ['groundingSection', 'shadowToggle', 'shadowDepth', 'rimToggle', 'rimStrength']) {
+      assert.match(html, new RegExp(`id="${id}"`), `social.html is missing #${id}`);
+    }
+    assert.match(source, /function groundedCutout\(/, 'grounding should be gated on the active cut-out');
+    assert.match(source, /async function renderGroundedCutout\(/, 'social.js should rasterize the grounding');
+    assert.match(source, /function refreshCutout\(/, 'grounding changes should re-bake the cut-out');
+    // The grounding must be baked into pixels, not applied as a CSS filter:
+    // html2canvas does not render CSS `filter`, so a filter would never export.
+    assert.match(source, /context\.filter = filter/, 'the shadow should use the canvas filter option');
+    assert.match(source, /pass\("none"\)/, 'the product should be drawn unfiltered on top');
+    // The pre-existing colour-filter mechanism is left exactly as it was.
+    assert.match(css, /img\[data-filter="grayscale"\]/, 'the existing CSS colour filters should stay');
+  });
+
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed) {
     process.exitCode = 1;

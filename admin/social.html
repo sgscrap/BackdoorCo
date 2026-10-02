@@ -363,6 +363,25 @@
           <p class="rollout-status" id="cutoutStatus"></p>
         </div>
 
+        <div class="ctrl-section" id="groundingSection">
+          <div class="ctrl-heading">
+            <h2>Grounding</h2>
+            <span id="groundingHint">Cut-out only</span>
+          </div>
+          <div class="toggle-row">
+            <label><input type="checkbox" id="shadowToggle" checked /> Contact shadow</label>
+            <label><input type="checkbox" id="rimToggle" checked /> Edge light</label>
+          </div>
+          <div class="form-group">
+            <label for="shadowDepth">Shadow depth <span id="shadowDepthValue">60%</span></label>
+            <input type="range" id="shadowDepth" min="0" max="100" value="60" />
+          </div>
+          <div class="form-group">
+            <label for="rimStrength">Edge light <span id="rimStrengthValue">45%</span></label>
+            <input type="range" id="rimStrength" min="0" max="100" value="45" />
+          </div>
+        </div>
+
         <div class="ctrl-section">
           <div class="ctrl-heading">
             <h2>Effects</h2>

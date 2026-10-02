@@ -1239,6 +1239,15 @@
   filter: saturate(0.8) hue-rotate(180deg) drop-shadow(0 42px 48px rgba(0, 0, 0, 0.4));
 }
 
+#groundingSection.is-inactive .toggle-row label {
+  opacity: 0.55;
+}
+
+#groundingSection.is-inactive input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Blur effect */
 .product-media.blur-bg {
   filter: blur(8px);
