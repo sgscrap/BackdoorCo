@@ -6,7 +6,7 @@
   "scripts": {
     "verify:readme": "node scripts/verify-readme.js",
     "verify:readme:json": "node scripts/verify-readme.js --json",
-    "test": "node scripts/price-monitor-retail.test.js && node scripts/crop-studio.test.js && node scripts/localize-catalog-image.test.js && node scripts/apply-product-overrides.test.js && node scripts/catalog-upload-fallback.test.js && node scripts/catalog-upload-server.test.js && node scripts/product-image-upload.test.js && node scripts/instagram-rollout.test.js && node scripts/rollout-import.test.js && node scripts/generate-instagram-rollout.test.js && node scripts/diff-rollouts.test.js && node scripts/check-image-hotlinks.js",
+    "test": "node scripts/price-monitor-retail.test.js && node scripts/crop-studio.test.js && node scripts/localize-catalog-image.test.js && node scripts/apply-product-overrides.test.js && node scripts/catalog-upload-fallback.test.js && node scripts/catalog-upload-server.test.js && node scripts/product-image-upload.test.js && node scripts/instagram-rollout.test.js && node scripts/rollout-import.test.js && node scripts/generate-instagram-rollout.test.js && node scripts/diff-rollouts.test.js && node scripts/background-removal.test.js && node scripts/check-image-hotlinks.js",
     "check:hotlinks": "node scripts/check-image-hotlinks.js",
     "report:placeholders": "node scripts/report-placeholder-images.js",
     "check:catalog-images": "node scripts/report-placeholder-images.js --strict",
@@ -29,7 +29,8 @@
     "test:instagram-rollout": "node scripts/instagram-rollout.test.js",
     "test:rollout-import": "node scripts/rollout-import.test.js",
     "test:generate-rollout": "node scripts/generate-instagram-rollout.test.js",
-    "test:diff-rollouts": "node scripts/diff-rollouts.test.js"
+    "test:diff-rollouts": "node scripts/diff-rollouts.test.js",
+    "test:background-removal": "node scripts/background-removal.test.js"
   },
   "repository": {
     "type": "git",
